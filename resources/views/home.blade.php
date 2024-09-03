@@ -1,0 +1,310 @@
+@extends('partial.main')
+
+@section('custom_styles')
+<style>
+    .logoiconDashboard {
+        transform: scale(0.4);
+    }
+    .card-header {
+        background-color: #f2f2f2;
+        padding: 10px;
+    }
+    .card-body {
+        padding: 20px;
+    }
+    .card-body img {
+        max-width: 100%;
+        height: auto;
+    }
+    .text-center p {
+        margin: 0;
+    }
+    .container-recap,
+    .manifest-recap {
+        font-size: 24px;
+        margin-top: 10px;
+    }
+    #lottie-animation {
+        width: 100%;
+        height: 100%;
+    }
+
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(4, 120px); /* 4 kolom dengan ukuran 180px */
+        gap: 0px; /* Jarak antar kotak */
+    }
+    .grid-item {
+        width: 120px;
+        height: 120px;
+        background-color: #f2f2f2;
+        border: 1px solid #ccc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        position: relative;
+    }
+    .yard-block-text {
+        position: absolute;
+        z-index: 2;
+        color: #000;
+        font-weight: bold;
+        font-size: 1.5em;
+    }
+    .selected {
+        background-color: #add8e6 !important;
+        color: white;
+    }
+
+    .detil-grid-container {
+        display: grid;
+        grid-template-columns: repeat(4);
+        gap: 0px;
+    }
+    .detil-grid-item {
+        width: 4px;
+        height: 4px;
+        border: 1px solid #ccc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    .card {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    .bg-white {
+        background-color: white;
+    }
+
+    .bg-red {
+        background-color: red !important;
+        color: white;
+    }
+
+    .bg-green {
+        background-color: green !important;
+        color: white;
+    }
+
+    .bg-yellow {
+        background-color: yellow !important;
+    }
+
+    .bg-light-gray {
+        background-color: #f2f2f2;
+    }
+
+    .grid-manifest {
+        display: grid;
+        grid-template-columns: repeat(22, 50px);
+        gap: 0px;
+    }
+    .grid-item-manifest {
+        width: 50px;
+        height: 20px;
+        background-color: #f2f2f2;
+        border: 1px solid #ccc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+</style>
+@endsection
+
+@section('content')
+
+<section>
+    <div class="row mt-0">
+        <div class="col-sm-3">
+            <div class="card">
+                <div class="card-header text-center">
+                    <p><strong>Inti Mandiri || Depo Information System</strong></p>
+                </div>
+                <div class="card-body text-center">
+                    <img src="{{ asset('logo/IntiMandiri.PNG') }}" style="width: 70%;" alt="Logo">
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card">
+                <div class="card-header text-center">
+                    <p><strong>Container Recap</strong></p>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-6 text-center container-recap">
+                            <p>LCL</p>
+                            <strong>{{ $recapContainer }}</strong>
+                        </div>
+                        <div class="col-sm-6 text-center container-recap">
+                            <p>FCL</p>
+                            <strong>300</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card">
+                <div class="card-header text-center">
+                    <p><strong>Manifest Recap</strong></p>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-9">
+                            <div class="text-center" id="lottie-animation"></div>
+                        </div>
+                        <div class="col-3 text-center manifest-recap">
+                            <strong>{{ $recapManifest }}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section>
+    <div class="row mt-0">
+        <div class="col-4">
+            <div class="card text-center">
+                <div class="card-header">
+                    <h4>Yard Condition</h4>
+                </div>
+                <div class="card-body">
+                    <div class="grid-container">
+                        @foreach($yard as $item)
+                            @php
+                                $bgColorClass = $item->yard_block ? 'bg-yellow' : '';
+                            @endphp
+                            <div class="card grid-item formEdit {{ $bgColorClass }}" data-id="{{$item->id}}">
+                                @if($item->yard_block)
+                                    <span class="yard-block-text">
+                                        {{ $item->yard_block }}
+                                        <br>
+                                        Terisi: {{ $item->percentage_filled }}%
+                                    </span>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-8">
+            <div class="card text-center">
+                <div class="card-header">
+                    <h4>Rack Condition</h4>
+                </div>
+                <div class="card-body grid-manifest">
+                    @foreach($gudang as $item)
+                        @php
+                            $bgColorClass = match($item->use_for) {
+                                'M' => 'bg-white',
+                                'D' => 'bg-red',
+                                'B' => 'bg-green',
+                                'L' => 'bg-yellow',
+                                default => ''
+                            };
+                        @endphp
+                        <div class="grid-item-manifest {{ $bgColorClass }}" onclick="toggleSelection(this)">
+                            @if($item->jumlah_barang >= 1 )
+                                {{$item->jumlah_barang}}
+                            @else
+                                {{$item->name ?? ''}}
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="modal fade" id="editCust" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-centered modal-dialog-scrollable"role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">Yard Detail</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"> <i data-feather="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="">Yard Block</label>
+                    <input readonly type="text" class="form-control" name="yard_block" id="yard_block_edit">
+                    <input readonly type="hidden" class="form-control" name="id" id="id_edit">
+                </div>
+                <div class="form-group">
+                    <label for="">Max Slot</label>
+                    <input readonly type="text" class="form-control" name="max_slot" id="max_slot_edit">
+                </div>
+                <div class="form-group">
+                    <label for="">Max Row</label>
+                    <input readonly type="text" class="form-control" name="max_row" id="max_row_edit">
+                </div>
+                <div class="form-group">
+                    <label for="">Max Tier</label>
+                    <input readonly type="text" class="form-control" name="max_tier" id="max_tier_edit">
+                </div>
+                <br>
+                <div class="button-container">
+                    <a href="" class="btn btn-info detilYard" id="detilYardLink">View Detil</a>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal"> <i class="bx bx-x d-block d-sm-none"></i> <span class="d-none d-sm-block">Close</span> </button>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+@section('custom_js')
+<script src="{{ asset('lottifiles/lokal.min.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        lottie.loadAnimation({
+            container: document.getElementById('lottie-animation'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: '/lottifiles/pack.json' // Update the path according to your Lottie JSON file
+        });
+    });
+</script>
+<script>
+   $(document).on('click', '.formEdit', function() {
+    let id = $(this).data('id');
+    $.ajax({
+      type: 'GET',
+      url: '/master/yard-detail-' + id,
+      cache: false,
+      data: {
+        id: id
+      },
+      dataType: 'json',
+
+      success: function(response) {
+
+        console.log(response);
+        $('#editCust').modal('show');
+        $("#editCust #yard_block_edit").val(response.data.yard_block);
+        $("#editCust #id_edit").val(response.data.id);
+        $("#editCust #max_slot_edit").val(response.data.max_slot);
+        $("#editCust #max_row_edit").val(response.data.max_row);
+        $("#editCust #max_tier_edit").val(response.data.max_tier);
+        $("#detilYardLink").attr('href', response.route);
+      },
+      error: function(data) {
+        console.log('error:', data)
+      }
+    });
+  });
+</script>
+@endsection
