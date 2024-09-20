@@ -103,6 +103,7 @@
         display: grid;
         grid-template-columns: repeat(22, 50px);
         gap: 0px;
+        align-items: center;
     }
     .grid-item-manifest {
         width: 50px;
@@ -114,65 +115,89 @@
         justify-content: center;
         cursor: pointer;
     }
+
+    #myDonutChart {
+        max-width: 300px;
+        max-height: 300px;
+    }
+
+    .card-body {
+        justify-content: center;
+        align-items: center;
+    }
 </style>
 @endsection
 
 @section('content')
 
 <section>
-    <div class="row mt-0">
-        <div class="col-sm-3">
-            <div class="card">
+    <div class="row mt-0 d-flex align-items-stretch">
+        <div class="col-sm-4">
+            <div class="card h-100 justify-content-center align-items-center mt-0">
                 <div class="card-header text-center">
                     <p><strong>Inti Mandiri || Depo Information System</strong></p>
                 </div>
                 <div class="card-body text-center">
-                    <img src="{{ asset('logo/IntiMandiri.PNG') }}" style="width: 70%;" alt="Logo">
+                    <img src="{{ asset('logo/IntiMandiri.PNG') }}" style="width: 80%;" alt="Logo">
                 </div>
             </div>
         </div>
         <div class="col-sm-4">
-            <div class="card">
+            <div class="card h-100 justify-content-center align-items-center mt-0">
                 <div class="card-header text-center">
-                    <p><strong>Container Recap</strong></p>
+                    <p><strong>Daily Recap</strong></p>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-sm-6 text-center container-recap">
-                            <p>LCL</p>
-                            <strong>{{ $recapContainer }}</strong>
-                        </div>
-                        <div class="col-sm-6 text-center container-recap">
-                            <p>FCL</p>
-                            <strong>300</strong>
-                        </div>
+                    <p>{{$now}}</p>
+                    <div class="table">
+                        <table class="table-responsive table-stripped">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Tonase</th>
+                                    <th>Volume</th>
+                                    <th>Masuk</th>
+                                    <th>Keluar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th>Container</th>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td>{{$masukCont}}</td>
+                                    <td>{{$keluarCont}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Manifest</th>
+                                    <td>{{$tonase}}</td>
+                                    <td>{{$volume}}</td>
+                                    <td>{{$masukManifest}}</td>
+                                    <td>{{$keluarManifest}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <a href=""><p>See more...</p></a>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-sm-4">
-            <div class="card">
+            <div class="card h-100 justify-content-center align-items-center mt-0">
                 <div class="card-header text-center">
-                    <p><strong>Manifest Recap</strong></p>
+                    <p><strong>Kapasitas Gudang</strong></p>
                 </div>
                 <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-9">
-                            <div class="text-center" id="lottie-animation"></div>
-                        </div>
-                        <div class="col-3 text-center manifest-recap">
-                            <strong>{{ $recapManifest }}</strong>
-                        </div>
-                    </div>
+                    <canvas id="myDonutChart"></canvas>
                 </div>
             </div>
         </div>
     </div>
 </section>
-
+<br>
 <section>
     <div class="row mt-0">
-        <div class="col-4">
+        <!-- <div class="col-4">
             <div class="card text-center">
                 <div class="card-header">
                     <h4>Yard Condition</h4>
@@ -196,13 +221,13 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="col-sm-8">
-            <div class="card text-center">
+        </div> -->
+        <div class="col-sm-12">
+            <div class="card justify-content-center align-items-center mt-0">
                 <div class="card-header">
                     <h4>Rack Condition</h4>
                 </div>
-                <div class="card-body grid-manifest">
+                <div class="card-body grid-manifest justify-content-center align-items-center mt-0">
                     @foreach($gudang as $item)
                         @php
                             $bgColorClass = match($item->use_for) {
@@ -307,4 +332,57 @@
     });
   });
 </script>
+
+<script>
+    var ctx = document.getElementById('myDonutChart').getContext('2d');
+    var donutChart = new Chart(ctx, {
+        type: 'doughnut', // Tipe chart
+        data: {
+            labels: ['Terisi', 'Tidak Terisi'], // Label chart
+            datasets: [{
+                label: 'Kapasitas',
+                data: [{{ $persentaseTerisi }}, {{ $persentaseTidakTerisi }}], // Data persentase
+                backgroundColor: [
+                    'rgba(75, 192, 192, 1)', // Warna untuk 'Terisi'
+                    'rgba(211, 211, 211, 1)'  // Warna untuk 'Tidak Terisi' (abu-abu muda)
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(tooltipItem) {
+                            return tooltipItem.label + ': ' + tooltipItem.raw + '%';
+                        }
+                    }
+                },
+                datalabels: {
+                    color: '#fff',
+                    font: {
+                        weight: 'bold',
+                        size: 20
+                    },
+                    formatter: function(value, context) {
+                        if (context.dataIndex === 0) {
+                            return context.chart.data.datasets[0].data[0] + '%';
+                        } else {
+                            return null;
+                        }
+                    },
+                    anchor: 'center',
+                    align: 'center'
+                }
+            }
+        }
+    });
+</script>
+
+
+
 @endsection

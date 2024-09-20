@@ -267,7 +267,7 @@
         $("#editCust #id_edit").val(response.data.id);
         $("#editCust #code_edit").val(response.data.code);
         $("#editCust #call_sign_edit").val(response.data.call_sign);
-        $("#editCust #negara_id_edit").val(response.data.negara_id);
+        $("#editCust #negara_id_edit").val(response.data.negara_id).trigger('change');
       },
       error: function(data) {
         console.log('error:', data)

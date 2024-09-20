@@ -109,6 +109,9 @@
                     <li class="submenu-item @if(Request::is('lcl/report/manifest')) active @endif">
                         <a href="{{ url('/lcl/report/manifest')}}">Manifest</a>
                     </li>
+                    <li class="submenu-item @if(Request::is('lcl/report/daily/*')) active @endif">
+                        <a href="{{ route('report.lcl.daily')}}">Daily</a>
+                    </li>
                 </ul>
             </li>
         </ul>
@@ -219,6 +222,42 @@
             </li>
         </ul>
     </li>
+    <hr>
+    <li class="sidebar-item has-sub @if(Request::is('invoice/*')) active @endif">
+        <a href="#" class='sidebar-link'>
+            <i class="fa-solid fa-dollar"></i>
+            <span>Invoice</span>
+        </a>
+        <ul class="submenu @if(Request::is('invoice/*')) active @endif">
+            <li class="sidebar-item has-sub @if(Request::is('invoice/master/*')) active @endif">
+                <a href="#" class='sidebar-link'>
+                    <span>Master</span>
+                </a>
+                <ul class="submenu @if(Request::is('invoice/master/*')) active @endif">
+                    <li class="submenu-item @if(Request::is('invoice/master/tarif')) active @endif">
+                        <a href="{{ url('/invoice/master/tarif')}}">Tarif</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="sidebar-item has-sub @if(Request::is('invoice/form/*')) active @endif">
+                <a href="#" class='sidebar-link'>
+                    <span>Form Invoice</span>
+                </a>
+                <ul class="submenu @if(Request::is('invoice/form/*')) active @endif">
+                    <li class="submenu-item @if(Request::is('invoice/form/index')) active @endif">
+                        <a href="{{ url('/invoice/form/index')}}">Created Invoice</a>
+                    </li>
+                    <li class="submenu-item @if(Request::is('invoice/form/unpaid')) active @endif">
+                        <a href="{{ url('/invoice/form/unpaid')}}">Unpaid Invoice</a>
+                    </li>
+                    <li class="submenu-item @if(Request::is('invoice/form/paid')) active @endif">
+                        <a href="{{ url('/invoice/form/paid')}}">Paid Invoice</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+
     @else
     <li class="sidebar-item @if(Request::is('bc/dashboard') || Request::is('/home')) active @endif">
         <a href="/bc/dashboard" class='sidebar-link'>

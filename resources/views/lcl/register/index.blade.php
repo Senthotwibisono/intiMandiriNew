@@ -50,7 +50,7 @@
                                     <td>Belum ada Container</td>
                                     <td>{{$jobData['job']->nombl}}</td>
                                     <td>{{$jobData['job']->eta}}</td>
-                                    <td>{{$jobData['job']->Kapal->name}}</td>
+                                    <td>{{$jobData['job']->Kapal->name ?? ''}}</td>
                                     <td>{{$jobData['job']->user->name}}</td>
                                 </tr>
                             @endif

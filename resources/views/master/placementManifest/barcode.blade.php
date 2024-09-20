@@ -182,41 +182,45 @@
     <br>
     <hr> -->
     <div class="row">
-        <div class="card">
-            <div class="card-header">
-                {{strtoupper($barcode->ref_type).' - '.strtoupper($barcode->ref_action)}}
-                <small class="pull-right"><strong>Expired Date:</strong> {{ date('d F, Y', strtotime($barcode->expired)) }}</small>
-            </div>
-            <div class="card-body">
-                <div class="text-center">
-                        <td><b>Code</b></td>
-                        <td>&nbsp;&nbsp;:&nbsp;&nbsp;</td>
-                        <td>{{ $barcode->barcode }}</td>
+        @foreach($items as $item)
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-center">
+                            <td><b>Code</b></td>
+                            <td>&nbsp;&nbsp;:&nbsp;&nbsp;</td>
+                            <td>{{ $item->barcode }}</td>
+                            <br>
+                        {!!QrCode::margin(0)->size(300)->generate($item->id)!!}
+                    </div>
+                    <br>
+                    <div class="text-center">
+                        <tr>
+                            <td>No Rack</td>
+                            <td> : </td>
+                            <td>{{$item->name}}</td>
+                        </tr>
                         <br>
-                    {!!QrCode::margin(0)->size(300)->generate($barcode->barcode)!!}
-                </div>
-                <br>
-                <div class="text-center">
-                    <tr>
-                        <td>Container</td>
-                        <td> : </td>
-                        <td>{{$barcode->cont->nocontainer}}</td>
-                    </tr>
-                    <br>
-                    <tr>
-                        <td>Size</td>
-                        <td> : </td>
-                        <td>{{$barcode->cont->size}}</td>
-                    </tr>
-                    <br>
-                    <tr>
-                        <td>Ex. Kapal</td>
-                        <td> : </td>
-                        <td>{{$barcode->cont->job->kapal->name ?? ''}}</td>
-                    </tr>
+                        <tr>
+                            <td>Fungsi Rack</td>
+                            <td> : </td>
+                            <td>
+                                @if($item->use_for == 'M')
+                                    Multi use
+                                @elseif($item->use_for == 'D')
+                                    Danger Item
+                                @elseif($item->use_for == 'B')
+                                    Behandle Rack
+                                @elseif($item->use_for == 'L')
+                                    Long Stay
+                                @else
+                                    -
+                                @endif
+                            </td>
+                        </tr>
+                    </div>
                 </div>
             </div>
-        </div>
+        @endforeach
     </div>
 </div>
 

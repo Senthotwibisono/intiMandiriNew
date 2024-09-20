@@ -136,5 +136,52 @@ class ReportController extends Controller
         return Excel::download(new ReportManifest($manifests), $fileName);
     }
 
+    public function indexDaily(Request $request)
+    {
+        $data['title'] = "Report Manifest";
+
+        // Use dates from the request or default to the current date
+        $start = $request->input('start_date') ?? Carbon::now()->toDateString();
+        $end = $request->input('end_date') ?? Carbon::now()->toDateString();
+
+        $awal = Manifest::whereDate('tglmasuk', '<=', $start)
+        ->where(function ($query) use ($start) {
+            $query->whereDate('tglrelease', '>=', $start)
+                  ->orWhereNull('tglrelease');
+        })->get();
+        $data['awal'] = $awal;
+        $data['jumlahAwal'] = $awal->count();
+        $data['quantityAwal'] = $awal->sum('quantity');
+        $data['tonaseAwal'] = $awal->sum('weight');
+        $data['volumeAwal'] = $awal->sum('meas');
+
+        $masuk = Manifest::whereBetween('tglmasuk', [$start, $end])->get();
+        $data['masuk'] = $masuk;
+        $data['jumlahMasuk'] = $masuk->count();
+        $data['quantityMasuk'] = $masuk->sum('quantity');
+        $data['tonaseMasuk'] = $masuk->sum('weight');
+        $data['volumeMasuk'] = $masuk->sum('meas');
+
+        $keluar = Manifest::whereBetween('tglrelease', [$start, $end])->get();
+        $data['keluar'] = $keluar;
+        $data['jumlahKeluar'] = $keluar->count();
+        $data['quantityKeluar'] = $keluar->sum('quantity');
+        $data['tonaseKeluar'] = $keluar->sum('weight');
+        $data['volumeKeluar'] = $keluar->sum('meas');
+
+        $akhir = Manifest::whereDate('tglmasuk', '<=', $end)
+        ->where(function ($query) use ($end) {
+            $query->whereDate('tglrelease', '>=', $end)
+                  ->orWhereNull('tglrelease');
+        })->get();
+        $data['akhir'] = $akhir;
+        $data['jumlahAkhir'] = $akhir->count();
+        $data['quantityAkhir'] = $akhir->sum('quantity');
+        $data['tonaseAkhir'] = $akhir->sum('weight');
+        $data['volumeAkhir'] = $akhir->sum('meas');
+
+        return view('lcl.report.indexDaily', $data);
+    }
+
 
 }

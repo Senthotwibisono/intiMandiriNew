@@ -70,21 +70,21 @@
 </style>
 <style>
 .fixed-height {
-    height: 600px; /* Set the fixed height for the card */
+  max-height: 600px; /* Set the fixed height for the card */
     overflow-y: auto; /* Enable vertical scrolling */
 }
 
 .fixed-height-card {
-    height: 500px; /* Set the fixed height for the card */
+  max-height: 500px; /* Set the fixed height for the card */
     overflow-y: auto; /* Enable vertical scrolling */
 }
 .fixed-height-cardBody {
-    height: 300px; /* Set the fixed height for the card */
+  max-height: 300px; /* Set the fixed height for the card */
     overflow-y: auto; /* Enable vertical scrolling */
 }
 
 .fixed-height-samll-card {
-    height: 200px; /* Set the fixed height for the card */
+  max-height: 200px; /* Set the fixed height for the card */
     overflow-y: auto; /* Enable vertical scrolling */
 }
 .button-container {

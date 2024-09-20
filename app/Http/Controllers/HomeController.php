@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Auth;
+use Carbon\Carbon;
 
 use App\Models\Manifest;
 use App\Models\Container;
 use App\Models\YardDesign as YD;
 use App\Models\YardDetil as RowTier;
 use App\Models\PlacementManifest as PM;
+use App\Models\KapasitasGudang as KG;
 
 
 class HomeController extends Controller
@@ -46,7 +49,26 @@ class HomeController extends Controller
             return $yard;
         });
 
+        $data['now'] = Carbon::now()->translatedFormat('l, d F Y H:i:s');
         $data['gudang'] = PM::orderBy('nomor', 'asc')->get();
+
+        // Daily Recap
+        $daily = Manifest::whereNot('tglmasuk', null)->where('tglrelease', null)->get();
+        $data['tonase'] = $daily->sum('weight');
+        $data['volume'] = $daily->sum('meas');
+        $data['masukCont'] = Container::whereDate('tglmasuk', Carbon::now())->count();
+        $data['masukManifest'] = Manifest::whereDate('tglmasuk', Carbon::now())->count();
+        $data['keluarCont'] = Container::whereDate('tglkeluar', Carbon::now())->count();
+        $data['keluarManifest'] = Manifest::whereDate('tglrelease', Carbon::now())->count();
+
+        $data['kg'] = KG::sum('kapasitas');
+
+        $terisi = $daily->count(); 
+        $tidakTerisi = $data['kg'] - $terisi;
+        $data['persentaseTerisi'] = ($terisi / $data['kg']) * 100;
+        $data['persentaseTidakTerisi'] = ($tidakTerisi / $data['kg']) * 100;
+
+        // dd($data['tonase'], $data['volume']);
 
         return view('home', $data);
     }

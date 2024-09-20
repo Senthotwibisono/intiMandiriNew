@@ -269,6 +269,10 @@ class ManifestController extends Controller
         $file = $request->file('file');
         $extension = $file->getClientOriginalExtension();
         $path = $file->getPathName();
+        // $pathToFile = $request->file('file')->getPathname();
+        // $sheetNames = $this->getSheetTitles($pathToFile);
+
+        // dd($sheetNames);
 
         try {
             if (in_array($extension, ['xls', 'xlsx'])) {
@@ -283,8 +287,8 @@ class ManifestController extends Controller
             $existingContainers = Cont::where('joborder_id', $jobId)->pluck('nocontainer')->toArray();
             $tempContainers = TempCont::pluck('nocontainer')->toArray();
             $newContainers = array_diff($tempContainers, $existingContainers);
-
-            foreach ($newContainers as $nocontainer) {
+            $containerPluck = collect($newContainers)->unique();
+            foreach ($containerPluck as $nocontainer) {
                 $tempContRecord = TempCont::where('nocontainer', $nocontainer)->first();
                 if ($tempContRecord->size == '20') {
                     $teus = 1;
@@ -306,7 +310,7 @@ class ManifestController extends Controller
             // dd($detils);
             foreach ($detils as $detil) {
                  $tempCont = TempCont::where('detil_id', $detil->detil_id)->first();
-                 $cont = Cont::where('nocontainer', $tempCont->nocontainer)->first();
+                 $cont = Cont::where('joborder_id', $jobId)->where('nocontainer', $tempCont->nocontainer)->first();
                  $oldManifest = Manifest::where('nohbl', $detil->nohbl)->where('container_id', $cont->id)->first();
                 //  dd($oldManifest, $cont->id);
                  $barang = TempBarang::where('detil_id', $detil->detil_id)->first();
@@ -318,7 +322,7 @@ class ManifestController extends Controller
                                   ->first();
 
                     if ($lastTally) {
-                        $lastTallyNumber = intval(substr($lastTally->notally, 12, 3));
+                        $lastTallyNumber = intval(substr($lastTally->notally, 15, 3));
                         $newTallyNumber = str_pad($lastTallyNumber + 1, 3, '0', STR_PAD_LEFT);
                     } else {
                         $newTallyNumber = '001';
@@ -350,10 +354,12 @@ class ManifestController extends Controller
                         'uid'=>Auth::user()->id,
                     ]);
                     for ($i = 1; $i < $newManifest->quantity+1; $i++) {
+                        $itemName = isset($newManifest->customer) ? $newManifest->customer->name . '-' . $i : null;
                         $item= Item::create([
                                     'manifest_id'=>$newManifest->id,
                                     'barcode'=>$newManifest->barcode . $i,
                                     'nomor'=>$i,
+                                    'name' => $itemName,
                                     'stripping' => 'N',
                                     'uid'=> Auth::user()->id,
                                 ]);

@@ -13,10 +13,11 @@
                 </div>
             </div>
             <br>
-            <table class="tabelCustom table table-bordered table-striped">
+            <table class="tabelCustom table-responsive table-bordered table-striped">
                 <thead>
                     <tr>
                         <th>Name</th>
+                        <th>Code</th>
                         <th>Phone</th>
                         <th>Contact</th>
                         <th>No Cano</th>
@@ -35,6 +36,7 @@
                     @foreach($consolidators as $cons)
                     <tr>
                         <td>{{$cons->namaconsolidator}}</td>
+                        <td>{{$cons->code}}</td>
                         <td>{{$cons->notelp}}</td>
                         <td>{{$cons->contactperson}}</td>
                         <td>{{$cons->nocano}}</td>
@@ -96,6 +98,12 @@
                             <div class="form-group">
                                 <label for="">Name</label>
                                 <input type="text" class="form-control" name="namaconsolidator">
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="">Code</label>
+                                <input type="text" class="form-control" name="code">
                             </div>
                         </div>
                         <div class="col-sm-6">
@@ -189,6 +197,12 @@
                                 <label for="">Name</label>
                                 <input type="text" class="form-control" name="namaconsolidator" id="namaconsolidator_edit">
                                 <input type="hidden" class="form-control" name="id" id="id_edit">
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="">Code</label>
+                                <input type="text" class="form-control" name="code" id="code_edit">
                             </div>
                         </div>
                         <div class="col-sm-6">
@@ -360,6 +374,7 @@
         console.log(response);
         $('#editCust').modal('show');
         $("#editCust #namaconsolidator_edit").val(response.data.namaconsolidator);
+        $("#editCust #code_edit").val(response.data.code);
         $("#editCust #id_edit").val(response.data.id);
         $("#editCust #notelp_edit").val(response.data.notelp);
         $("#editCust #contactperson_edit").val(response.data.contactperson);

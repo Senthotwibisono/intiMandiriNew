@@ -84,6 +84,7 @@ class JobOrder extends Model
         'lokasi_gudang',
         'kd_tps_asal',
         'id_consolidator',
+        'type',
     ];
 
     public function user()

@@ -14,6 +14,7 @@ class Consolidator extends Model
 
     protected $fillable = [
         'namaconsolidator',
+        'code',
         'notelp',
         'contactperson',
         'nocano',

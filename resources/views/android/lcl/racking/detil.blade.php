@@ -46,6 +46,10 @@
         margin-bottom: 10px; /* Reduced margin */
     }
 
+    /* Your existing styles here */
+    .barcode-scanner {
+        margin-bottom: 15px;
+    }
 </style>
 
 @endsection
@@ -121,12 +125,13 @@
                             <div class="form-group">
                                 <label for="">Rack</label>
                                 <input type="hidden" name="manifest_id" value="{{$manifest->id}}">
-                                <select name="lokasi_id" class="js-example-basic-single select2 form-select">
+                                <select id="rack-select" name="lokasi_id" class="js-example-basic-single select2 form-select" style="width: 100%;">
                                     <option disabled selected>Pilih Satu!</option>
                                     @foreach($locs as $loc)
                                         <option value="{{$loc->id}}">{{$loc->name}}</option>
                                     @endforeach
                                 </select>
+                                <button id="scan-button" type="button" class="btn btn-primary mt-2">Scan Barcode</button>
                             </div>
                             <div class="rack-dropzone dropzone">
                                 <!-- Dropzone where items will be placed -->
@@ -155,6 +160,27 @@
         </div>
     </div>
 </section>
+
+<!-- Modal -->
+<div class="modal fade" id="scanModal" tabindex="-1" role="dialog" aria-labelledby="scanModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="scanModalLabel">Scan Barcode</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="reader" style="width: 100%;"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 @endsection
 
@@ -345,4 +371,68 @@ document.addEventListener('DOMContentLoaded', function () {
         window.open(url, '_blank', 'width=600,height=800');
     }
 </script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', (event) => {
+    const scanButton = document.getElementById('scan-button');
+    const rackSelect = document.getElementById('rack-select');
+    const scanModal = new bootstrap.Modal(document.getElementById('scanModal'));
+
+    scanButton.addEventListener('click', () => {
+      scanModal.show();
+
+      // Initialize the QR code scanner
+      const html5QrCode = new Html5Qrcode("reader");
+
+      html5QrCode.start(
+        { facingMode: "environment" }, 
+        {
+          fps: 10,    // Optional, set the fps to 10
+          qrbox: 250  // Optional, set the size of the scanning box
+        },
+        (decodedText, decodedResult) => {
+          // Assuming the barcode contains the ID directly
+          const barcodeId = decodedText;
+
+          // Check if barcodeId is in the select options
+          const optionExists = Array.from(rackSelect.options).some(option => option.value === barcodeId);
+
+          if (optionExists) {
+            // Set the value of the select element
+            rackSelect.value = barcodeId;
+            
+            // Trigger change event
+            const event = new Event('change');
+            rackSelect.dispatchEvent(event);
+
+            // Stop scanning
+            html5QrCode.stop().then(() => {
+              // Close the modal
+              scanModal.hide();
+            }).catch((err) => {
+              console.log("Failed to stop scanning.", err);
+            });
+          } else {
+            // Show error using SweetAlert
+            Swal.fire({
+              icon: 'error',
+              title: 'Barcode Not Found',
+              text: 'The scanned barcode does not match any available rack.',
+            });
+          }
+        },
+        (errorMessage) => {
+          // Show detailed error using SweetAlert
+          console.log("QR code scanning error:", errorMessage);
+        }
+      ).catch((err) => {
+        // Show error using SweetAlert
+        console.log("Failed to stop scanning.", err);
+      });
+    });
+  });
+</script>
+
+
+
 @endsection

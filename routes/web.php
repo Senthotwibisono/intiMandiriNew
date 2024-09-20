@@ -24,6 +24,11 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\android\AndroidHomeController;
 use App\Http\Controllers\android\LclController;
 
+// invoice
+use App\Http\Controllers\invoice\MasterInvoiceController;
+use App\Http\Controllers\invoice\FormController;
+use App\Http\Controllers\invoice\InvoiceController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -163,6 +168,9 @@ Route::controller(MasterController::class)->group(function (){
      Route::get('/master/rack', 'placementManifestIndex')->name('master.rack.index');
      Route::get('/master/placementManifest/createIndex', 'pmCreateIndex');
      Route::post('/master/placementManifest/updateGrid', 'pmUpdateGrid');
+     Route::post('/master/placementManifest/kapasitas', 'kapasitasGudang');
+     Route::post('/master/placementManifest/barcodeCreate', 'pmCreateBarcode');
+     Route::get('/master/placementManifest/barcodeView', 'pmViewBarcode');
 
     //  Yard
      Route::get('/master/yard', 'yardIndex')->name('master.yard.index');
@@ -369,13 +377,18 @@ Route::controller(EasyGoController::class)->group(function(){
 });
 
 Route::controller(ReportController::class)->group(function(){
+    // Container
     Route::get('/lcl/report/cont', 'indexCont')->name('report.lcl.cont');
     Route::get('/lcl/report/contPhoto{id?}', 'photoCont')->name('report.lcl.photoCont');
     Route::get('/lcl/report/contGenerate', 'generateCont')->name('report.lcl.generateCont');
 
+    // Manifest
     Route::get('/lcl/report/manifest', 'indexManifest')->name('report.lcl.manifest');
     Route::get('/lcl/report/manifestPhoto{id?}', 'photoManifest')->name('report.lcl.photoManifest');
     Route::get('/lcl/report/manifestGenerate', 'generateManifest')->name('report.lcl.generateManifest');
+
+    // Daily
+    Route::get('/lcl/report/daily', 'indexDaily')->name('report.lcl.daily');
 });
 
 // Android
@@ -405,3 +418,43 @@ Route::controller(LclController::class)->group(function(){
     Route::get('/android/photo/photoManifest', 'photoManifest');
     Route::get('/android/photo/photoManifest-{qr?}', 'photoManifestDetil');
 });
+
+// Invoice
+    // Master
+    Route::controller(MasterInvoiceController::class)->group(function(){
+        Route::get('/invoice/master/tarif', 'tarifIndex');
+        Route::post('/invoice/master/tarif-Post', 'tarifPost');
+        Route::delete('/invoice/master/tarif-Delete{id?}', 'tarifDelete');
+        Route::get('/invoice/master/tarif-Edit{id?}', 'tarifEdit');
+        Route::post('/invoice/master/tarif-Update', 'tarifUpdate');
+    });
+
+    // Form
+    Route::controller(FormController::class)->group(function(){
+        Route::get('/invoice/form/index', 'index')->name('form.index');
+        Route::post('/invoice/form/create', 'create');
+        Route::delete('/invoice/form/delete-{id?}', 'delete');
+        Route::get('/get-manifest-data/{id}', 'getManifestData');
+        Route::get('/get-customer-data/{id}', 'getCustomerData');
+        // Step1
+        Route::get('/invoice/form/formStep1/{id?}', 'formIndex')->name('invoice.step1');     
+        Route::post('/invoice/form/submitStep1', 'step1Post');     
+        // Step2
+        Route::get('/invoice/form/formStep2/{id?}', 'step2Index')->name('invoice.step2'); // Corrected the parameter format    
+        Route::post('/invoice/form/submitStep2', 'step2Post');     
+        // Step3
+        Route::get('/invoice/form/formStep3/{id?}', 'preinvoice')->name('invoice.preinvoice'); // Corrected the parameter format    
+        Route::post('/invoice/form/submitStep3', 'step3Post');     
+    });
+
+    // Index
+    Route::controller(InvoiceController::class)->group(function(){
+        Route::get('/invoice/form/unpaid', 'unpaidIndex')->name('invoice.unpaid');
+        Route::get('/invoice/pranota-{id?}', 'pranotaIndex');
+        Route::delete('/invoice/deleteHeader-{id?}', 'deleteInvoice');
+        Route::get('/invoice/actionButton-{id?}', 'invoiceGetData');
+        Route::post('/invoice/paid', 'invoicePaid');
+        
+        Route::get('/invoice/form/paid', 'paidIndex')->name('invoice.paid');
+        Route::get('/invoice/invoicePrint-{id?}', 'invoiceIndex');
+    });

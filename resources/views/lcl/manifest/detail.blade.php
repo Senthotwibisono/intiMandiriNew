@@ -109,8 +109,8 @@
                             <th class="text-center">Packing</th>
                             <th class="text-center">Kode Kemas</th>
                             <th class="text-center">Desc</th>
-                            <th class="text-center">Weight</th>
-                            <th class="text-center">Meas</th>
+                            <th class="text-center">Tonase</th>
+                            <th class="text-center">Volume</th>
                             <th class="text-center">Packing Tally</th>
                         </tr>
                     </thead>
@@ -261,11 +261,11 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="">Weight</label>
+                                <label for="">Tonase</label>
                                 <input type="text" name="weight" class="form-control">
                             </div>
                             <div class="form-group">
-                                <label for="">Meas</label>
+                                <label for="">Volume</label>
                                 <input type="text" name="meas" class="form-control">
                             </div>
                             <div class="form-group">
@@ -362,11 +362,11 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="">Weight</label>
+                                <label for="">Tonase</label>
                                 <input type="text" name="weight" id="weight_edit" class="form-control">
                             </div>
                             <div class="form-group">
-                                <label for="">Meas</label>
+                                <label for="">Volume</label>
                                 <input type="text" name="meas" id="meas_edit" class="form-control">
                             </div>
                             <div class="form-group">

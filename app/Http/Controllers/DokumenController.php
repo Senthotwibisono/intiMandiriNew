@@ -179,7 +179,7 @@ class DokumenController extends Controller
             }
         }
 
-        // dd( $details, $header);
+        dd( $details, $header);
 
         // Old Checking
         $oldPLP = PLP::where('no_plp', $header->NO_PLP)->where('tgl_plp', $header->TGL_PLP)->first();
@@ -308,6 +308,8 @@ class DokumenController extends Controller
                 }
             }
         }
+
+        dd($header, $kms, $dok, $cont);
         if ($header != null) {
             $oldSPJM = SPJM::where('no_pib', $header->NO_PIB)->where('tgl_pib', $header->TGL_PIB)->first();
             if ($oldSPJM) {
@@ -765,7 +767,8 @@ class DokumenController extends Controller
         if ($plp) {
             try {
                 $currentYear = Carbon::now()->format('y');
-                $lastJob = Job::whereYear('c_datetime', Carbon::now()->year)
+                $currentMonth = Carbon::now()->format('m');
+                $lastJob = Job::whereYear('c_datetime', Carbon::now()->year)->whereMonth('c_datetime', Carbon::now()->month)
                               ->orderBy('id', 'desc')
                               ->first();
             
@@ -777,7 +780,7 @@ class DokumenController extends Controller
                 } else {
                     $newJobNumber = '00001';
                 }
-                $noJob = 'ITM' . $newJobNumber . '/' . $currentYear;
+                $noJob = 'ITM' . $newJobNumber . '/' .$currentMonth . '/' .$currentYear;
                 // dd($noJob);
                 $job = Job::create([
                     'nojoborder'=>$noJob,

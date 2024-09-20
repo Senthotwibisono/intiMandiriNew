@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
-  <title> {{$title}} | Icon Sarana</title>
+  <title> {{$title}} | Inti Mandiri</title>
   <link rel="stylesheet" href="{{asset('dist/assets/css/main/app.css')}}">
   <link rel="shortcut icon" href="{{asset('logo/icon.png')}}" type="image/x-icon">
   <link rel="shortcut icon" href="{{asset('logo/icon.png')}}" type="image/png">

@@ -66,7 +66,8 @@ class RegisterController extends Controller
     {
         try {
             $currentYear = Carbon::now()->format('y');
-            $lastJob = Job::whereYear('c_datetime', Carbon::now()->year)
+            $currentMonth = Carbon::now()->format('m');
+            $lastJob = Job::whereYear('c_datetime', Carbon::now()->year)->whereMonth('c_datetime', Carbon::now()->month)
                           ->orderBy('id', 'desc')
                           ->first();
         
@@ -78,7 +79,7 @@ class RegisterController extends Controller
             } else {
                 $newJobNumber = '00001';
             }
-            $noJob = 'ITM' . $newJobNumber . '/' . $currentYear;
+            $noJob = 'ITM' . $newJobNumber . '/' .$currentMonth . '/' .$currentYear;
             // dd($noJob);
             $job = Job::create([
                 'nojoborder'=>$noJob,

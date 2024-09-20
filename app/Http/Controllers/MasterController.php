@@ -11,6 +11,8 @@ use App\Imports\packingExcel;
 use App\Imports\perusahaanExcel;
 use App\Imports\ppjkExcel;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Str;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 use App\Models\Customer;
 use App\Models\Consolidator;
@@ -29,6 +31,7 @@ use App\Models\PlacementManifest as PM;
 use App\Models\YardDesign as YD;
 use App\Models\YardDetil as RowTier;
 use App\Models\JobOrder as Job;
+use App\Models\KapasitasGudang as KG;
 
 use Auth;
 use Carbon\Carbon;
@@ -76,7 +79,6 @@ class MasterController extends Controller
         $request->validate([
             'name' => 'required',
             'npwp' => 'required',
-            'phone' => 'required',
         ]);
         
         try {
@@ -88,7 +90,7 @@ class MasterController extends Controller
             ->where('phone', $request->phone)
             ->where('npwp', $request->npwp)
             ->first();
-            if ($customer) {
+            if (!$customer) {
                 $newCust = Customer::create([
                     'name'=>$request->name,
                     'code'=>$request->code,
@@ -188,6 +190,7 @@ class MasterController extends Controller
         try {
             $cons = Consolidator::create([
                 'namaconsolidator'=>$request->namaconsolidator,
+                'code'=>$request->code,
                 'notelp'=>$request->notelp,
                 'contactperson'=>$request->contactperson,
                 'nocano'=>$request->nocano,
@@ -225,6 +228,7 @@ class MasterController extends Controller
         if ($cons) {
             $cons->update([
                 'namaconsolidator'=>$request->namaconsolidator,
+                'code'=>$request->code,
                 'notelp'=>$request->notelp,
                 'contactperson'=>$request->contactperson,
                 'nocano'=>$request->nocano,
@@ -1165,10 +1169,21 @@ class MasterController extends Controller
     public function placementManifestIndex()
     {
         $data['title'] = 'Master Rack';
+        $data['kg'] = KG::find(1);
         $data['gudang'] = PM::orderBy('nomor', 'asc')->get();
         // dd($data['gudang']->nomor);
 
         return view('master.placementManifest.index', $data);
+    }
+
+    public function kapasitasGudang(Request $request)
+    {
+        $kg = KG::find(1);
+        $kg->update([
+            'kapasitas'=> $request->kapasitas,
+        ]);
+
+        return redirect()->back()->with('success', 'Kapasitas updated successfully!');
     }
 
     public function pmCreateIndex()
@@ -1211,6 +1226,49 @@ class MasterController extends Controller
         }
     
         return redirect()->back()->with('success', 'Grid updated successfully!');
+    }
+
+    public function pmCreateBarcode(Request $request)
+    {
+        $selectedGrids = $request->input('selected_grids'); // Tidak perlu explode jika data sudah berbentuk array
+        $items = PM::whereIn('id', $selectedGrids)->get();
+
+        foreach ($items as $item) {
+            if ($item->barcode == null) {
+                do {
+                    $uniqueBarcode = Str::random(19);
+                    } while (PM::where('barcode', $uniqueBarcode)->exists());
+                $item->update([
+                    'barcode'=> $uniqueBarcode,
+                ]);
+            }
+        }
+
+        $data['items'] = $items;
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Berhasil Mencetak Barcode',
+            'data' => $data,
+        ]);
+    }
+
+    public function pmViewBarcode(Request $request)
+    {
+        $data['title'] = "Barcode Rack "; 
+        $selectedGrids = $request->input('selected_grids');
+
+        // Jika selected_grids masih dalam bentuk string, ubah menjadi array
+        if (is_string($selectedGrids)) {
+            $selectedGrids = explode(',', $selectedGrids);
+        }
+    
+        // Query item berdasarkan selected grids
+        $items = PM::whereIn('id', $selectedGrids)->get();
+        $data['items'] = $items;
+        // dd($selectedGrids);
+
+        return view('master.placementManifest.barcode', $data);
     }
 
     public function yardIndex()

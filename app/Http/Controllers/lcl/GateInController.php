@@ -11,6 +11,7 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 use App\Models\Container as Cont;
 use App\Models\JobOrder as Job;
+use App\Models\Manifest;
 use App\Models\Eseal;
 use App\Models\User;
 use App\Models\Photo;
@@ -73,6 +74,13 @@ class GateInController extends Controller
                 'nopol'=>$request->nopol,
                 'no_seal'=> $request->no_seal,
             ]);
+            $manifest = Manifest::where('container_id', $cont->id)->get();
+            foreach ($manifest as $mans) {
+                $mans->update([
+                    'tglmasuk'=>$request->tglmasuk,
+                    'jammasuk'=>$request->jammasuk,
+                ]);
+            }
 
             if ($request->hasFile('photos')) {
                 foreach ($request->file('photos') as $photo) {

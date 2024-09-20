@@ -17,6 +17,7 @@ class PlacementManifest extends Model
         'name', 
         'use_for', 
         'use', 
+        'barcode',
         'jumlah_barang', 
     ];
 

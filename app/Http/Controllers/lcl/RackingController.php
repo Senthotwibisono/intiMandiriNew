@@ -70,11 +70,9 @@ class RackingController extends Controller
                     $item->update([
                         'lokasi_id' => $request->lokasi_id,
                     ]);
+                    $lokasi->increment('jumlah_barang', 1);
                 }
             }
-            $lokasi->update([
-                'jumlah_barang'=> $jumlahItem
-            ]);
             return redirect()->back()->with('status', ['type'=>'success', 'message'=>'Data updated!!']);
         }else {
             return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Rack Tidak Ditemukan']);
