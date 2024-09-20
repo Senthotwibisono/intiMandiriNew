@@ -110,7 +110,7 @@ class InvoiceController extends Controller
 
                 // Get the last inserted sequential number from the Header table
                 $lastInvoice = Header::whereYear('order_at', Carbon::now()->year)
-                                     ->orderBy('invoice_no', 'desc')
+                                     ->orderBy('id', 'desc')
                                      ->first();
 
                 if ($lastInvoice && preg_match('/\d+$/', $lastInvoice->invoice_no, $matches)) {

@@ -255,7 +255,7 @@ class FormController extends Controller
         try {
             $form = Form::find($request->id);
 
-            $latestOrder = Header::orderBy('order_no', 'desc')->first();
+            $latestOrder = Header::orderBy('id', 'desc')->first();
         
             // Calculate the next order number
             $nextOrderNo = $latestOrder ? intval($latestOrder->order_no) + 1 : 1;
