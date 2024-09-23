@@ -12,11 +12,16 @@ use App\Models\MasterTarif as MT;
 use App\Models\InvoiceForm as Form;
 use App\Models\InvoiceFormTarif as FormT;
 use App\Models\Manifest;
+use App\Models\Item;
 use App\Models\Customer;
 use App\Models\InvoiceHeader as Header;
 
 class InvoiceController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     public function unpaidIndex()
     {
         $data['title'] = 'Unpaid Invoice';
@@ -34,7 +39,11 @@ class InvoiceController extends Controller
         $data['form'] = $form;
 
         // dd($header);
-        $data['tarifs'] = FormT::where('form_id', $form->id)->get();
+        if ($header->mekanik_y_n =='N') {
+            $data['tarifs'] = FormT::where('form_id', $form->id)->where('mekanik_y_n', '=', 'N')->get();
+        }else {
+            $data['tarifs'] = FormT::where('form_id', $form->id)->where('mekanik_y_n', '=', 'Y')->get();
+        }
         $data['terbilang'] = $this->terbilang($header->grand_total);
 
         return view('invoice.pranota', $data);
@@ -54,7 +63,7 @@ class InvoiceController extends Controller
                 FormT::where('form_id', $form->id)->delete();
 
                 // Delete the header and form records
-                $header->delete();
+                $allHeader = Header::where('form_id', $form->id)->delete();
                 $form->delete();
 
                 return response()->json(['success' => 'Invoice deleted successfully']);
@@ -79,27 +88,66 @@ class InvoiceController extends Controller
     }
 
     public function invoicePaid(Request $request)
-    {
-        try {
-            $header = Header::find($request->id);
-            switch ($request->status) {
-                case 'P':
-                    $kasirP = Auth::user()->id;
-                    $timeP = Carbon::now();
-                    $kasirL = null;
-                    $timeL = null;
-                    $status = 'P';
-                    break;
+{
+    try {
+       
 
-                case 'Y':
-                    $kasirP = null;
-                    $timeP = null;
-                    $kasirL = Auth::user()->id;
-                    $timeL = Carbon::now();
-                    $status = 'Y';
-                    break;
-            }
+        // Check if the 'ktp' input is present
+        if ($request->has('ktp')) {
+            // Get the array of base64 strings from the request
+            $base64Image = $request->input('ktp');
 
+            // Loop through each base64 string
+           
+                // Remove the "data:image/png;base64," part (if necessary)
+                $image = str_replace('data:image/png;base64,', '', $base64Image);
+                $image = str_replace(' ', '+', $image); // Ensure there are no spaces
+
+                // Decode the base64 image
+                $imageData = base64_decode($image);
+
+                // Generate a filename
+                $fileName = 'ktp_' . time() . '_' . uniqid() . '.png'; // Unique filename
+
+                // Specify the path to save the image in storage/app/public/ktp
+                $path = storage_path('app/public/ktp/' . $fileName);
+
+                // Store the image in the storage directory
+                file_put_contents($path, $imageData);
+        } else {
+            $fileName = null; // Handle the case where no file was uploaded
+        }
+
+        $header = Header::find($request->id);
+        switch ($request->status) {
+            case 'P':
+                $kasirP = Auth::user()->id;
+                $timeP = Carbon::now();
+                $kasirL = null;
+                $timeL = null;
+                $status = 'P';
+                break;
+
+            case 'Y':
+                $kasirP = null;
+                $timeP = null;
+                $kasirL = Auth::user()->id;
+                $timeL = Carbon::now();
+                $status = 'Y';
+                break;
+
+            default:
+                $kasirP = null;
+                $timeP = null;
+                $kasirL = null;
+                $timeL = null;
+                $status = 'N';
+                break;
+        }
+
+        if ($status == 'N') {
+            $noInvoice = null;
+        }else {
             if ($header->invoice_no != null) {
                 $noInvoice = $header->invoice_no;
             }else {
@@ -109,7 +157,7 @@ class InvoiceController extends Controller
                 $year = Carbon::now()->format('y'); // '24' for 2024
 
                 // Get the last inserted sequential number from the Header table
-                $lastInvoice = Header::whereYear('order_at', Carbon::now()->year)
+                $lastInvoice = Header::whereYear('order_at', Carbon::now()->year)->whereNotNull('invoice_no')
                                      ->orderBy('id', 'desc')
                                      ->first();
 
@@ -125,21 +173,26 @@ class InvoiceController extends Controller
                 // Construct the new invoice number
                 $noInvoice = 'LKB-' . $consolidatorCode . '/' . $year . '/' . $newSequence;
             }
-
-            $header->update([
-                'invoice_no' =>$noInvoice,
-                'status' => $status,
-                'piutang_at' => $timeP,
-                'kasir_piutang_id' => $kasirP,
-                'lunas_at' => $timeL,
-                'kasir_lunas_id' => $kasirL,
-            ]);
-
-            return redirect()->back()->with('status', ['type'=>'success', 'message'=>'Berhasil di Simpan']);
-        } catch (\Throwable $th) {
-            return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Opss Somtehing Wrong' . $th->getMessage()]);
         }
+        // dd($noInvoice);
+
+        $header->update([
+            'invoice_no' => $noInvoice,
+            'status' => $status,
+            'piutang_at' => $timeP,
+            'kasir_piutang_id' => $kasirP,
+            'lunas_at' => $timeL,
+            'kasir_lunas_id' => $kasirL,
+            'ktp' => $fileName, // Save all filenames as JSON if multiple
+            'no_hp' => $request->no_hp,
+        ]);
+
+        return redirect()->back()->with('status', ['type' => 'success', 'message' => 'Berhasil di Simpan']);
+    } catch (\Throwable $th) {
+        return redirect()->back()->with('status', ['type' => 'error', 'message' => 'Opss Somtehing Wrong: ' . $th->getMessage()]);
     }
+}
+
 
     public function invoiceIndex($id)
     {
@@ -196,4 +249,24 @@ class InvoiceController extends Controller
 
         return $result;
     }
+
+    public function photoKTP($id)
+    {
+        $header = Header::where('id', $id)->first();
+        // dd($manifest);
+        $data['title'] = "Photo KTP - " . $header->customer->name;
+        $data['header'] = $header;
+
+        return view('invoice.ktp', $data);
+    }
+
+    public function barcodeIndex($id)
+    {
+        $manifest = Manifest::where('id', $id)->first();
+        $data['title'] = 'Barcode Packing LCL Manifest || ' . $manifest->notally;
+        $data['item'] = Item::where('manifest_id', $manifest->id)->first();
+
+        return view('invoice.manifest.barcode', $data);
+    }
+
 }

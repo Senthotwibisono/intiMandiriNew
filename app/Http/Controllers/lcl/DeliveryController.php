@@ -307,6 +307,7 @@ class DeliveryController extends Controller
             $manifest->update([
                 'tglbuangmty' => $request->tglbuangmty,
                 'jambuangmty' => $request->jambuangmty,
+                'nopol_release' => $request->nopol_release,
             ]);
 
             // dd($manifest);
@@ -343,6 +344,12 @@ class DeliveryController extends Controller
     public function createBarcode(Request $request)
     {
         $manifest = Manifest::where('id', $request->id)->first();
+        if ($manifest->no_dok == null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Dokumen belum ada, isi dokumen terlebih dahulu!',
+            ]);
+        }
         if ($manifest->status_bc == 'release') {
             $action = 'release';
         }else {

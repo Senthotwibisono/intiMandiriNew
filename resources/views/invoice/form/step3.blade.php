@@ -27,9 +27,20 @@
 
 <form action="/invoice/form/submitStep3" method="post" enctype="multipart/form-data">
     @csrf
-        <section id="preinvoice-content">
-            @include('invoice.form.preinvoice')
-        </section>
+        <div class="row">
+            <div class="col-6">
+                <section id="preinvoice-content">
+                    @include('invoice.form.preinvoice')
+                </section>
+            </div>
+            @if($form->mekanik_y_n == 'Y')
+            <div class="col-6">
+                <section id="preinvoice-content">
+                    @include('invoice.form.preinvoiceMekanik')
+                </section>
+            </div>
+            @endif
+        </div>
 
         <canvas id="invoice-canvas"></canvas>
     <footer>

@@ -98,8 +98,8 @@
             </div>
             <div class="text-center">
                 <div class="invoice-header" style="display: flex; align-items: center; justify-content: center;">
-                    <h2 style="margin-right: 10px;">Invoice</h2>
-                    <input type="text" name="judul_invoice" class="form-control" style="width: auto;" placeholder="Masukan Judul Invoice">
+                    <h2 style="margin-right: 10px;">Invoice Mekanik</h2>
+                    <input type="text" name="judul_invoice_mekanik" class="form-control" style="width: auto;" placeholder="Masukan Judul Invoice">
                     <input type="hidden" class="form-control" name="id" id="id" value="{{$form->id}}" readonly>
                 </div>
             </div>
@@ -166,7 +166,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                          @foreach ($tarifs as $tarif)
+                          @foreach ($tarifM as $tarif)
                           <tr>
                             <td class="text-right">{{ $tarif->Tarif->nama_tarif }}</td>
                             <td class="text-right">{{ number_format($tarif->harga, '2', ',' ,'.') }}</td>
@@ -190,17 +190,17 @@
                         <h4 class="lead ">Grand Total</h4>
                     </div>
                     <div class="col-6" style="text-align:right;">
-                        <h4 class="lead "><span id="grand_total_display">{{ number_format($form->admin, '2', ',', '.') ?? ''}}</span></h4>
-                        <h4 class="lead "><span id="grand_total_display">{{ number_format($form->discount, '2', ',', '.') ?? ''}}</span></h4>
-                        <h4 class="lead "><span id="grand_total_display">{{ number_format($form->total, '2', ',', '.') ?? ''}}</span></h4>
+                        <h4 class="lead "><span id="grand_total_display">{{ number_format($form->admin_m, '2', ',', '.') ?? ''}}</span></h4>
+                        <h4 class="lead "><span id="grand_total_display">{{ number_format($form->discount_m, '2', ',', '.') ?? ''}}</span></h4>
+                        <h4 class="lead "><span id="grand_total_display">{{ number_format($form->total_m, '2', ',', '.') ?? ''}}</span></h4>
                         <h4 class="lead ">
-                            {{ number_format($form->pajak, '2', ',', '.') ?? ''}} %
+                            {{ number_format($form->pajak_m, '2', ',', '.') ?? ''}} %
                         </h4>
-                        <h4 class="lead "><span id="ppn_amount_display">{{number_format($form->pajak_amount, '2', ',', '.') ?? ''}}</span></h4>
-                        <h4 class="lead "><span id="ppn_amount_display">{{number_format($form->grand_total, '2', ',', '.') ?? ''}}</span></h4>
+                        <h4 class="lead "><span id="ppn_amount_display">{{number_format($form->pajak_amount_m, '2', ',', '.') ?? ''}}</span></h4>
+                        <h4 class="lead "><span id="ppn_amount_display">{{number_format($form->grand_total_m, '2', ',', '.') ?? ''}}</span></h4>
                     </div>
                     <hr>
-                    <h4 style="text-align:left;">Terbilang : {{$terbilang}}</h4>
+                    <h4 style="text-align:left;">Terbilang : {{$terbilangMekanik}}</h4>
                 </div>
           </div>
         </div>

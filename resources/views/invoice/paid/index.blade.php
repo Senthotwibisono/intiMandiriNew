@@ -15,56 +15,70 @@
 <section>
     <div class="card">
         <div class="card-body d-flex align-items-center">
-            <table class="tabelCustom table-responsive">
-                <thead>
-                    <tr>
-                        <th class="text-center">Order No</th>
-                        <th class="text-center">Invoice Number</th>
-                        <th class="text-center">No HBL</th>
-                        <th class="text-center">Tgl. HBL</th>
-                        <th class="text-center">Quantity</th>
-                        <th class="text-center">Customer</th>
-                        <th class="text-center">Kasir</th>
-                        <th class="text-center">Status Pembayaran</th>
-                        <th class="text-center">Order At</th>
-                        <th class="text-center">Pranota</th>
-                        <th class="text-center">Invoice</th>
-                        <th class="text-center">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($headers as $form)
+            <div class="table-responsive">
+                <table class="tabelCustom table-responsive">
+                    <thead>
                         <tr>
-                            <td class="text-center">{{$form->order_no}}</td>
-                            <td class="text-center">{{$form->invoice_no}}</td>
-                            <td class="text-center">{{$form->manifest->nohbl ?? ''}}</td>
-                            <td class="text-center">{{$form->manifest->tgl_hbl ?? ''}}</td>
-                            <td class="text-center">{{$form->manifest->quantity ?? ''}}</td>
-                            <td class="text-center">{{$form->customer->name ?? ''}}</td>
-                            <td class="text-center">{{$form->kasir->name ?? ''}}</td>
-                            <td class="text-center">
-                                @if($form->status == 'P')
-                                <span class="badge bg-warning text-white">Piutang</span>
-                                @else
-                                <span class="badge bg-info text-white">Lunas</span>
-                                @endif
-                            </td>
-                            <td class="text-center">{{$form->order_at}}</td>
-                            <td class="text-center">
-                                <a type="button" href="/invoice/pranota-{{$form->id}}" target="_blank" class="btn btn-sm btn-warning text-white"><i class="fa fa-file"></i></a>
-                            </td>
-                            <td class="text-center">
-                                <a type="button" href="/invoice/invoicePrint-{{$form->id}}" target="_blank" class="btn btn-sm btn-info text-white"><i class="fa fa-file"></i></a>
-                            </td>
-                            <td class="text-center">
-                                <div class="button-container">
-                                    <button type="button" id="pay" data-id="{{$form->id}}" class="btn btn-sm btn-success pay"><i class="fa fa-cogs"></i></button>
-                                </div>
-                            </td>
+                            <th class="text-center">Order No</th>
+                            <th class="text-center">Invoice Number</th>
+                            <th class="text-center">No HBL</th>
+                            <th class="text-center">Tgl. HBL</th>
+                            <th class="text-center">Quantity</th>
+                            <th class="text-center">Customer</th>
+                            <th class="text-center">Kasir</th>
+                            <th class="text-center">Status Pembayaran</th>
+                            <th class="text-center">Order At</th>
+                            <th class="text-center">Photo KTP</th>
+                            <th class="text-center">Gate Pass</th>
+                            <th class="text-center">Container Location</th>
+                            <th class="text-center">Pranota</th>
+                            <th class="text-center">Invoice</th>
+                            <th class="text-center">Action</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach($headers as $form)
+                            <tr>
+                                <td class="text-center">{{$form->order_no}}</td>
+                                <td class="text-center">{{$form->invoice_no}}</td>
+                                <td class="text-center">{{$form->manifest->nohbl ?? ''}}</td>
+                                <td class="text-center">{{$form->manifest->tgl_hbl ?? ''}}</td>
+                                <td class="text-center">{{$form->manifest->quantity ?? ''}}</td>
+                                <td class="text-center">{{$form->customer->name ?? ''}}</td>
+                                <td class="text-center">{{$form->kasir->name ?? ''}}</td>
+                                <td class="text-center">
+                                    @if($form->status == 'P')
+                                    <span class="badge bg-warning text-white">Piutang</span>
+                                    @else
+                                    <span class="badge bg-info text-white">Lunas</span>
+                                    @endif
+                                </td>
+                                <td class="text-center">{{$form->order_at}}</td>
+                                <td class="text-center">
+                                    <a href="javascript:void(0)" onclick="openWindow('/invoice/photoKTP-{{$form->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
+                                </td>
+                                <td class="text-center">
+                                    <button class="btn btn-danger printBarcode" data-id="{{$form->manifest_id}}"><i class="fa fa-print"></i></button>
+                                </td>
+                                <td class="text-center">
+                                    <a href="javascript:void(0)" onclick="openWindow('/invoice/barcodeBarang-{{$form->manifest_id}}')" class="btn btn-sm btn-danger"><i class="fa fa-print"></i></a>
+                                </td>
+                                <td class="text-center">
+                                    <a type="button" href="/invoice/pranota-{{$form->id}}" target="_blank" class="btn btn-sm btn-warning text-white"><i class="fa fa-file"></i></a>
+                                </td>
+                                <td class="text-center">
+                                    <a type="button" href="/invoice/invoicePrint-{{$form->id}}" target="_blank" class="btn btn-sm btn-info text-white"><i class="fa fa-file"></i></a>
+                                </td>
+                                <td class="text-center">
+                                    <div class="button-container">
+                                        <button type="button" id="pay" data-id="{{$form->id}}" class="btn btn-sm btn-success pay"><i class="fa fa-cogs"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </section>
@@ -232,5 +246,68 @@
       }
     });
   });
+</script>
+
+<script>
+    function openWindow(url) {
+        window.open(url, '_blank', 'width=600,height=800');
+    }
+</script>
+
+<script>
+    $(document).on('click', '.printBarcode', function(e) {
+        e.preventDefault();
+        var containerId = $(this).data('id');
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        Swal.fire({
+            icon: 'question',
+            title: 'Do you want to generate the barcode?',
+            showCancelButton: true,
+            confirmButtonText: 'Generate',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/lcl/delivery/gateOut-barcodeGate',
+                    data: { id: containerId },
+                    cache: false,
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire('Generated!', '', 'success')
+                                .then(() => {
+                                    var barcodeId = response.data.id;
+                                    window.open('/barcode/autoGate-indexManifest' + barcodeId, '_blank', 'width=600,height=800');
+                                });
+                        } else {
+                            Swal.fire('Error', response.message, 'error');
+                        }
+                    },
+                    error: function(response) {
+                        var errors = response.responseJSON.errors;
+                        if (errors) {
+                            var errorMessage = '';
+                            $.each(errors, function(key, value) {
+                                errorMessage += value[0] + '<br>';
+                            });
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Validation Error',
+                                html: errorMessage,
+                            });
+                        } else {
+                            Swal.fire('Error', 'An error occurred while processing your request', 'error');
+                        }
+                    },
+                });
+            }
+        });
+    });
 </script>
 @endsection

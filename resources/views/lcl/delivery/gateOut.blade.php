@@ -132,6 +132,12 @@
                                 <button class="btn btn-outline-info CheckSPJMDok" type="button">Check</button>
                             </div>
                         </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="">No Polisi Release</label>
+                                <input type="text" class="form-control" name="nopol_release" id="nopol_release_edit">
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="col-6">
                                 <div class="form-group">
@@ -254,6 +260,7 @@ $(document).ready(function() {
         $("#kd_dok_edit").val(response.data.kd_dok_inout).trigger('change');
         $("#tglbuangmty_edit").val(response.data.tglbuangmty);
         $("#jambuangmty_edit").val(response.data.jambuangmty);
+        $("#nopol_release_edit").val(response.data.nopol_release);
       },
       error: function(data) {
         console.log('error:', data)

@@ -128,21 +128,54 @@ class FormController extends Controller
                 'hari_period' => $hariPeriod,
             ]);
 
-            $checkTarif = FormT::where('form_id', $form->id)->whereNotIn('tarif_id', $tarifSelected)->get();
+            
+            $checkTarif = FormT::where('form_id', $form->id)->whereNotIn('tarif_id', $tarifSelected)->where('mekanik_y_n', '=', 'N')->get();
+            // dd($tarifSelected, $checkTarif);
             if (!empty($checkTarif)) {
                 foreach ($checkTarif as $deleteOld) {
                     $deleteOld->delete();
                 }
             }
             foreach ($tarifSelected as $tarif) {
-                $oldTarif = FormT::where('form_id', $form->id)->where('tarif_id', $tarif)->first();
+                $oldTarif = FormT::where('form_id', $form->id)->whereNot('mekanik_y_n', '=', 'Y')->where('tarif_id', $tarif)->first();
                 if (empty($oldTarif)) {
                    $newTarif =  FormT::create([
                         'form_id' => $form->id,
                         'tarif_id' => $tarif,
                         'manifest_id' => $form->manifest_id,
+                        'mekanik_y_n' => 'N',
                     ]);
                 }
+            }
+
+            $tarifMekanikSelected = $request->tarifM_id;
+            if (!empty($tarifMekanikSelected)) {
+                $checkTarifMekanik = FormT::where('form_id', $form->id)->where('mekanik_y_n', '=', 'Y')->whereNotIn('tarif_id', $tarifMekanikSelected)->get();
+                if (!empty($checkTarifMekanik)) {
+                    foreach ($checkTarifMekanik as $deleteOldM) {
+                        $deleteOldM->delete();
+                    }
+                }
+
+                foreach ($tarifMekanikSelected as $tarifMekanik) {
+                    $oldTarifM = FormT::where('form_id', $form->id)->where('mekanik_y_n', '=', 'Y')->where('tarif_id', $tarifMekanik)->first();
+                    if (empty($oldTarifM)) {
+                       $newTarifM =  FormT::create([
+                            'form_id' => $form->id,
+                            'tarif_id' => $tarifMekanik,
+                            'manifest_id' => $form->manifest_id,
+                            'mekanik_y_n' => 'Y',
+                        ]);
+                    }
+                }
+
+                $form->update([
+                    'mekanik_y_n' => 'Y'
+                ]);
+            }else {
+                $form->update([
+                    'mekanik_y_n' => 'N'
+                ]);
             }
             return redirect()->route('invoice.step2', ['id'=>$form->id])->with('status', ['type'=>'success', 'message'=>'Berhasil di Simpan']);
         } catch (\Throwable $th) {
@@ -159,7 +192,9 @@ class FormController extends Controller
         $data['customer'] = Customer::all();
 
         $data['masterTarif'] = MT::all();
-        $data['selectedTarif'] = FormT::where('form_id', $id)->get();
+        $data['selectedTarif'] = FormT::where('form_id', $id)->where('mekanik_y_n', '=', 'N')->get();
+        $data['selectedTarifMekanik'] = FormT::where('form_id', $id)->where('mekanik_y_n', '=', 'Y')->get();
+        // dd($data['selectedTarifMekanik']);
 
         switch ($form->period) {
             case 1:
@@ -191,19 +226,34 @@ class FormController extends Controller
     public function step2Post(Request $request)
     {
         try {
+            $form = Form::find($request->id);
+
+            // Non Mekanik Inputs
             $tarifIds = $request->input('tarif_id');
             $hargaSatuan = $request->input('harga_satuan');
             $jumlahVolume = $request->input('jumlah_volume');
             $jumlahHari = $request->input('jumlah_hari');
             $total = $request->input('total');
 
+            if (!empty($jumlahHari)) {
+                $totalHari = array_sum($jumlahHari);
+            }else {
+                $totalHari = 0;
+            }
+
+            $totalHariMekanik = 0;
+
+            if ($form->mekanik_y_n === 'Y') {
+                $jumlahHariMekanik = $request->input('jumlah_hari_mekanik', []);
+                $totalHariMekanik = array_sum($jumlahHariMekanik);
+            }
+
+            if (($totalHari + $totalHariMekanik) != $form->jumlah_hari) {
+                return redirect()->back()->with('status', ['type' => 'error', 'message' => 'Jumlah Hari berbeda dengan interval expired date']);
+            }
+
             foreach ($tarifIds as $index => $tarifId) {
-                // Simpan data per tarif berdasarkan index
-                // $data = [
-                //     'tarif_id' => $tarifId,
-                    
-                // ];
-                $formTarif = FormT::where('form_id', $request->id)->where('tarif_id', $tarifId)->first();
+                $formTarif = FormT::where('form_id', $request->id)->where('tarif_id', $tarifId)->where('mekanik_y_n', '=', 'N')->first();
                 $formTarif->update([
                     'harga' => $hargaSatuan[$index],
                     'jumlah' => $jumlahVolume[$index],
@@ -212,26 +262,75 @@ class FormController extends Controller
                 ]);
             }
 
-            $tarif = FormT::where('form_id', $request->id)->get();
+            $tarif = FormT::where('form_id', $request->id)->where('mekanik_y_n', '=', 'N')->get();
             $total = $tarif->sum('total') + $request->admin;
             $tarifAfterDiscount = $total - $request->discount;
 
             $pajakAmount = $tarifAfterDiscount * ($request->pajak/100);
             $grandTotal = $tarifAfterDiscount + $pajakAmount;
-            // dd($tarif, $total, $tarifAfterDiscount, $pajakAmount, $grandTotal);
 
-            $form = Form::find($request->id);
+            if ($form->mekanik_y_n == 'Y') {
+                $tarifIdsMekanik = $request->input('tarif_id_mekanik');
+                $hargaSatuanMekanik = $request->input('harga_satuan_mekanik');
+                $jumlahVolumeMekanik = $request->input('jumlah_volume_mekanik');
+                $jumlahHariMekanik = $request->input('jumlah_hari_mekanik');
+                $totalMekanik = $request->input('total_mekanik');
+            
+                foreach ($tarifIdsMekanik as $index => $tarifId) {
+                    $formTarif = FormT::where('form_id', $request->id)->where('tarif_id', $tarifId)->where('mekanik_y_n', '=', 'Y')->first();
+                    $formTarif->update([
+                        'harga' => $hargaSatuanMekanik[$index], // Use the mechanic variable here
+                        'jumlah' => $jumlahVolumeMekanik[$index], // Use the mechanic variable here
+                        'jumlah_hari' => $jumlahHariMekanik[$index] ?? 0, // Use the mechanic variable here
+                        'total' => $totalMekanik[$index], // Use the mechanic variable here
+                    ]);
+                }
+            
+                $tarifMekanik = FormT::where('form_id', $request->id)->where('mekanik_y_n', '=', 'Y')->get();
+                $totalMekanik = $tarifMekanik->sum('total') + $request->admin_m;
+                $tarifAfterDiscountMekanik = $totalMekanik - $request->discount_m;
+            
+                $pajakAmountMekanik = $tarifAfterDiscountMekanik * ($request->pajak_m/100);
+                $grandTotalMekanik = $tarifAfterDiscountMekanik + $pajakAmountMekanik;
+            }else {
+                $totalMekanik = null;
+                $tarifAfterDiscountMekanik = null; 
+                $pajakAmountMekanik = null;
+                $grandTotalMekanik = null;
+            }
+            // dd($tarifIds, $tarif, $total, $tarifAfterDiscount, $pajakAmount, $grandTotal, $totalMekanik, $tarifAfterDiscountMekanik, $pajakAmountMekanik, $grandTotalMekanik);
+
+            // Check New Period
+
+            $formTarifCheckPeriod = FormT::where('form_id', $form->id)->whereNot('jumlah_hari', 0)
+            ->join('ttarif', 'invoice_form_tarif.tarif_id', '=', 'ttarif.id')
+            ->orderBy('ttarif.period', 'desc')
+            ->select('invoice_form_tarif.*') // Ensure you select the fields from `form_t`
+            ->first();
+
+            $newPeriod = $formTarifCheckPeriod->Tarif->period;
+            $newHari = $formTarifCheckPeriod->jumlah_hari;
+            // dd($formTarifCheckPeriod, $newPeriod, $newHari);
+           
             $form->update([
-                'total' => $total,
+                'total' => $tarifAfterDiscount,
                 'admin'=> $request->admin,
                 'pajak'=> $request->pajak,
                 'pajak_amount' => $pajakAmount,
                 'discount' => $request->discount,
                 'grand_total' => $grandTotal,
+                'total_m' => $tarifAfterDiscountMekanik,
+                'admin_m'=> $request->admin_m,
+                'pajak_m'=> $request->pajak_m,
+                'pajak_amount_m' => $pajakAmountMekanik,
+                'discount_m' => $request->discount_m,
+                'grand_total_m' => $grandTotalMekanik,
+                'period' =>$newPeriod,
+                'hari_period' =>$newHari,
             ]);
             return redirect()->route('invoice.preinvoice', ['id'=>$form->id])->with('status', ['type'=>'success', 'message'=>'Berhasil di Simpan']);
         } catch (\Throwable $th) {
-            //throw $th;
+            return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Gagal di Simpan '. $th->getMessage()]);
         }
     }
 
@@ -244,8 +343,10 @@ class FormController extends Controller
         $data['customer'] = Customer::all();
 
         $data['masterTarif'] = MT::all();
-        $data['tarifs'] = FormT::where('form_id', $id)->get();
+        $data['tarifs'] = FormT::where('form_id', $id)->where('mekanik_y_n', '=', 'N')->get();
+        $data['tarifM'] = FormT::where('form_id', $id)->where('mekanik_y_n', '=', 'Y')->get();
         $data['terbilang'] = $this->terbilang($data['form']->grand_total);
+        $data['terbilangMekanik'] = $this->terbilang($data['form']->grand_total_m);
 
         return view('invoice.form.step3', $data);
     }
@@ -278,7 +379,32 @@ class FormController extends Controller
                 'status' => 'N',
                 'order_at' => Carbon::now(),
                 'kasir_id' => Auth::user()->id,
+                'mekanik_y_n' => 'N',
             ]);
+
+            if ($form->mekanik_y_n == 'Y') {
+                $nextOrderNoMekanik = $latestOrder ? intval($latestOrder->order_no) + 2 : 1;
+                $formattedOrderNoMekanik = str_pad($nextOrderNoMekanik, 6, '0', STR_PAD_LEFT); // Ensure it's a 6-digit number
+                $headerMekanik = Header::create([
+                    'form_id' => $form->id,
+                    'manifest_id' => $form->manifest_id,
+                    'customer_id' => $form->customer_id,
+                    'judul_invoice' => 'Mekanik '.$request->judul_invoice,
+                    'invoice_no' => $form->invoice_no,
+                    'order_no' => $formattedOrderNoMekanik,
+                    'time_in' => $form->time_in,
+                    'expired_date' => $form->expired_date,
+                    'total' => $form->total_m,
+                    'admin' => $form->admin_m,
+                    'pajak' => $form->pajak_m,
+                    'pajak_amount' => $form->pajak_amount_m,
+                    'grand_total' => $form->grand_total_m,
+                    'status' => 'N',
+                    'order_at' => Carbon::now(),
+                    'kasir_id' => Auth::user()->id,
+                    'mekanik_y_n' => 'Y',
+                ]);
+            }
 
             $form->update([
                 'status' => 'Y'

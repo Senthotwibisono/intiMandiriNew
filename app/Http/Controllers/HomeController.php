@@ -63,7 +63,7 @@ class HomeController extends Controller
 
         $data['kg'] = KG::sum('kapasitas');
 
-        $terisi = $daily->count(); 
+        $terisi = $daily->sum('meas'); 
         $tidakTerisi = $data['kg'] - $terisi;
         $data['persentaseTerisi'] = ($terisi / $data['kg']) * 100;
         $data['persentaseTidakTerisi'] = ($tidakTerisi / $data['kg']) * 100;

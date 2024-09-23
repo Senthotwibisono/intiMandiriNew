@@ -116,16 +116,49 @@
         </div>
     </section>
     <section>
-        <div class="card">
-            <div class="card-body">
-                <div class="col-12">
-                    <div class="form-group">
-                        <label for="">Master Tarif</label>
-                        <select name="tarif_id[]" id="" class="js-example-basic-multiple form-control" style="height: 150%;" multiple="multiple">
-                            @foreach($masterTarif as $tarif)
-                                <option value="{{$tarif->id}}" @if($selectedTarif->contains('tarif_id', $tarif->id)) selected @endif>{{$tarif->nama_tarif}}/{{$tarif->kode_tarif}}</option>
-                            @endforeach
-                        </select>
+        <div class="row">
+            <div class="col-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="">Master Tarif</label>
+                                <select name="tarif_id[]" id="" class="js-example-basic-multiple form-control" style="height: 150%;" multiple="multiple">
+                                    @foreach($masterTarif as $tarif)
+                                        @if($selectedTarif->contains(function ($selected) use ($tarif) {
+                                            return $selected->tarif_id == $tarif->id && $selected->mekanik_y_n != 'Y';
+                                        }))
+                                            <option value="{{$tarif->id}}" selected>{{$tarif->nama_tarif}}/{{$tarif->kode_tarif}}</option>
+                                        @else
+                                            <option value="{{$tarif->id}}">{{$tarif->nama_tarif}}/{{$tarif->kode_tarif}}</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- mekanik -->
+            <div class="col-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="">Master Tarif Mekanik</label>
+                                <select name="tarifM_id[]" id="" class="js-example-basic-multiple form-control" style="height: 150%;" multiple="multiple">
+                                    @foreach($masterTarif as $tarif)
+                                        @if($selectedTarif->contains(function ($selected) use ($tarif) {
+                                            return $selected->tarif_id == $tarif->id && $selected->mekanik_y_n == 'Y';
+                                        }))
+                                            <option value="{{$tarif->id}}" selected>{{$tarif->nama_tarif}}/{{$tarif->kode_tarif}}</option>
+                                        @else
+                                            <option value="{{$tarif->id}}">{{$tarif->nama_tarif}}/{{$tarif->kode_tarif}}</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

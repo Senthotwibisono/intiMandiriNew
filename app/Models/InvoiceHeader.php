@@ -33,6 +33,9 @@ class InvoiceHeader extends Model
         'kasir_piutang_id',
         'lunas_at',
         'kasir_lunas_id',
+        'no_hp',
+        'ktp',
+        'mekanik_y_n'
     ];
 
 

@@ -115,102 +115,16 @@
             </div>
         </div>
     </section>
-    <section>
-        <div class="card">
-            <div class="card-body">
-                <div class="table">
-                    <table class="tabel-stripped table-responsive">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>Harga Satuan</th>
-                                <th>Jumlah (Volume)</th>
-                                <th>Jumlah Hari</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($selectedTarif as $index => $tarif)
-                                <tr>
-                                    <th>{{$tarif->Tarif->nama_tarif}}</th>
-                                    <td>
-                                        <input type="hidden" name="tarif_id[{{$index}}]" value="{{$tarif->Tarif->id}}">
-                                        <input type="number" class="form-control harga-satuan" name="harga_satuan[{{$index}}]" step="0.01" id="harga_satuan_{{$index}}" value="{{$tarif->harga ?? 0}}" data-index="{{$index}}">
-                                    </td>
-                                    <td>
-                                        <input type="number" class="form-control jumlah-volume" name="jumlah_volume[{{$index}}]" value="{{$form->cbm}}" step="0.01" id="jumlah_volume_{{$index}}" data-index="{{$index}}">
-                                    </td>
-                                    <td>
-                                        @if($tarif->Tarif->day == 'Y')
-                                            @if($tarif->Tarif->period == '1')
-                                                <input type="number" name="jumlah_hari[{{$index}}]" class="form-control jumlah-hari" value="{{$periode1}}" step="0.01" id="jumlah_hari_{{$index}}" data-index="{{$index}}">
-                                            @elseif($tarif->Tarif->period == '2')
-                                                <input type="number" name="jumlah_hari[{{$index}}]" class="form-control jumlah-hari" value="{{$periode2}}" step="0.01" id="jumlah_hari_{{$index}}" data-index="{{$index}}">
-                                            @elseif($tarif->Tarif->period == '3')
-                                                <input type="number" name="jumlah_hari[{{$index}}]" class="form-control jumlah-hari" value="{{$periode3}}" step="0.01" id="jumlah_hari_{{$index}}" data-index="{{$index}}">
-                                            @endif
-                                        @else
-                                            <input type="number" class="form-control jumlah-hari" name="jumlah_hari[{{$index}}]" value="0" step="0.01"  id="jumlah_hari_{{$index}}" data-index="{{$index}}" disabled>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <input type="number" class="form-control total" name="total[{{$index}}]" value="{{$tarif->total}}" step="0.01" id="total_{{$index}}" readonly>
-                                    </td>
-                                </tr>
-                            @endforeach
-                            <tr>
-                                <th>Administrasi</th>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td>
-                                    <input type="number" class="form-control" name="admin" id="admin" value="{{$form->admin ?? ''}}" step="0.01">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Discount</th>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td>
-                                    <input type="number" class="form-control" name="discount" id="discount" value="{{$form->discount ?? ''}}" step="0.01">
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+    <div class="row">
+        <div class="col-6">
+            @include('invoice.form.step2.nonMekanik')
         </div>
-    </section>
-
-    <section>
-        <div class="card" style="border-radius:15px !important; background-color:#435ebe !important;">
-            <div class="card-body">
-                <div class="row text-white p-3">
-                    <div class="col-6">
-                        <h1 class="lead text-white">Total</h1>
-                        <h4 class="lead text-white">PPN (%)</h4>
-                        <h4 class="lead text-white">PPN (Amount)</h4>
-                    </div>
-                    <div class="col-6" style="text-align:right;">
-                        <h1 class="lead text-white"><span id="grand_total_display">0</span></h1>
-                        <h4 class="lead text-white">
-                            <input type="number" name="pajak" class="form-control form-control-sm" id="ppn_percentage" value="11" value="{{$form->pajak ?? ''}}" style="width: 70px; display: inline-block;"> %
-                        </h4>
-                        <h4 class="lead text-white"><span id="ppn_amount_display">{{$form->pajak_amount ?? ''}}</span></h4>
-                    </div>
-                </div>
-                <hr>
-                <div class="row text-white mt-0">
-                    <div class="col-6">
-                        <h4 class="text-white">Grand Total</h4>
-                    <div class="col-6" style="text-align:right;">
-                        <h4 class="color:#ff5265;"><span id="final_grand_total_display">{{$form->grand_total ?? ''}}</span></h4>
-                    </div>
-                </div>
-            </div>
+        @if($form->mekanik_y_n == 'Y')
+        <div class="col-6">
+            @include('invoice.form.step2.mekanik')
         </div>
-    </section>
+        @endif
+    </div>
     <footer>
         <div class="card">
             <div class="button-container">
@@ -224,7 +138,6 @@
 
 @endsection
 @section('custom_js')
-
 <script>
     // SweetAlert for back button confirmation
     document.getElementById('back-button').addEventListener('click', function(event) {
@@ -350,59 +263,112 @@ $(document).ready(function() {
 
 <script>
     $(document).ready(function() {
-    // Function to update the total for each row
-    function updateRowTotal(index) {
-        var hargaSatuan = parseFloat($('#harga_satuan_' + index).val()) || 0;
-        var jumlahVolume = parseFloat($('#jumlah_volume_' + index).val()) || 0;
-        var jumlahHari = parseFloat($('#jumlah_hari_' + index).val()) || 1;
-
-        var total = hargaSatuan * jumlahVolume * jumlahHari;
-        $('#total_' + index).val(total.toFixed(2));
+        // Function to update the total for each row
+        function updateRowTotal(index) {
+            var hargaSatuan = parseFloat($('#harga_satuan_' + index).val()) || 0;
+            var jumlahVolume = parseFloat($('#jumlah_volume_' + index).val()) || 0;
+            var jumlahHari = $('#jumlah_hari_' + index).is(':disabled') ? 1 : parseFloat($('#jumlah_hari_' + index).val()) || 0;
+        
+            var total = hargaSatuan * jumlahVolume * jumlahHari;
+            $('#total_' + index).val(total.toFixed(2));
+            updateGrandTotal();
+        }
+    
+        // Function to format number as currency (rupiah format)
+        function formatNumber(number) {
+            return number.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+    
+        // Function to calculate the grand total
+        function updateGrandTotal() {
+            var grandTotal = 0;
+        
+            // Calculate the sum of all totals
+            $('.total').each(function() {
+                grandTotal += parseFloat($(this).val()) || 0;
+            });
+        
+            // Subtract discount and add admin fees
+            var discount = parseFloat($('#discount').val()) || 0;
+            grandTotal -= discount;
+            var admin = parseFloat($('#admin').val()) || 0;
+            grandTotal += admin;
+        
+            // Display formatted grand total
+            $('#grand_total_display').text(formatNumber(grandTotal));
+        
+            // Calculate and display PPN (Amount)
+            var ppnPercentage = parseFloat($('#ppn_percentage').val()) || 0;
+            var ppnAmount = grandTotal * (ppnPercentage / 100);
+            $('#ppn_amount_display').text(formatNumber(ppnAmount));
+        
+            // Calculate the final grand total (including PPN)
+            var finalGrandTotal = grandTotal + ppnAmount;
+            $('#final_grand_total_display').text(formatNumber(finalGrandTotal));
+        }
+    
+        // Event listeners for input changes
+        $('.harga-satuan, .jumlah-volume, .jumlah-hari, #discount, #admin, #ppn_percentage').on('input', function() {
+            var index = $(this).data('index');
+            updateRowTotal(index);
+        });
+    
+        // Initial calculation on page load
         updateGrandTotal();
-    }
 
-    // Function to format number as currency (rupiah format)
-    function formatNumber(number) {
-        return number.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    }
+        function updateRowTotalMekanik(index) {
+            var hargaSatuanMekanik = parseFloat($('#harga_satuan_' + index + '_mekanik').val()) || 0;
+            var jumlahVolumeMekanik = parseFloat($('#jumlah_volume_' + index + '_mekanik').val()) || 0;
+            var jumlahHariMekanik = $('#jumlah_hari_' + index + '_mekanik').is(':disabled') ? 1 : parseFloat($('#jumlah_hari_' + index + '_mekanik').val()) || 0;
 
-    // Function to calculate the grand total
-    function updateGrandTotal() {
-        var grandTotal = 0;
+            var totalMekanik = hargaSatuanMekanik * jumlahVolumeMekanik * jumlahHariMekanik;
+            $('#total_' + index + '_mekanik').val(totalMekanik.toFixed(2));
+            updateGrandTotalMekanik();
+        }
 
-        // Calculate the sum of all totals
-        $('.total').each(function() {
-            grandTotal += parseFloat($(this).val()) || 0;
+        // Function to format number as currency (rupiah format)
+        function formatNumberMekanik(number) {
+            return number.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        // Function to calculate the grand total
+        function updateGrandTotalMekanik() {
+            var grandTotalMekanik = 0;
+        
+            // Calculate the sum of all totals
+            $('.total_mekanik').each(function() {
+                grandTotalMekanik += parseFloat($(this).val()) || 0;
+            });
+        
+            // Subtract discount and add admin fees
+            var discountMekanik = parseFloat($('#discount_mekanik').val()) || 0;
+            grandTotalMekanik -= discountMekanik;
+            var adminMekanik = parseFloat($('#admin_mekanik').val()) || 0;
+            grandTotalMekanik += adminMekanik;
+        
+            // Display formatted grand total
+            $('#grand_total_display_mekanik').text(formatNumberMekanik(grandTotalMekanik));
+        
+            // Calculate and display PPN (Amount)
+            var ppnPercentageMekanik = parseFloat($('#ppn_percentage_mekanik').val()) || 0;
+            var ppnAmountMekanik = grandTotalMekanik * (ppnPercentageMekanik / 100);
+            $('#ppn_amount_display_mekanik').text(formatNumberMekanik(ppnAmountMekanik));
+        
+            // Calculate the final grand total (including PPN)
+            var finalGrandTotalMekanik = grandTotalMekanik + ppnAmountMekanik;
+            $('#final_grand_total_display_mekanik').text(formatNumberMekanik(finalGrandTotalMekanik));
+        }
+
+        // Event listeners for input changes
+        $('.harga-satuan-mekanik, .jumlah-volume-mekanik, .jumlah-hari-mekanik, #discount_mekanik, #admin_mekanik, #ppn_percentage_mekanik').on('input', function() {
+            var index = $(this).data('index');
+            updateRowTotalMekanik(index);
         });
 
-        // Subtract discount and add admin fees
-        var discount = parseFloat($('#discount').val()) || 0;
-        grandTotal -= discount;
-        var admin = parseFloat($('#admin').val()) || 0;
-        grandTotal += admin;
+        // Initial calculation on page load
+        updateGrandTotalMekanik();
 
-        // Display formatted grand total
-        $('#grand_total_display').text(formatNumber(grandTotal));
-
-        // Calculate and display PPN (Amount)
-        var ppnPercentage = parseFloat($('#ppn_percentage').val()) || 0;
-        var ppnAmount = grandTotal * (ppnPercentage / 100);
-        $('#ppn_amount_display').text(formatNumber(ppnAmount));
-
-        // Calculate the final grand total (including PPN)
-        var finalGrandTotal = grandTotal + ppnAmount;
-        $('#final_grand_total_display').text(formatNumber(finalGrandTotal));
-    }
-
-    // Event listeners for input changes
-    $('.harga-satuan, .jumlah-volume, .jumlah-hari, #discount, #admin, #ppn_percentage').on('input', function() {
-        var index = $(this).data('index');
-        updateRowTotal(index);
     });
-
-    // Initial calculation on page load
-    updateGrandTotal();
-});
-
-</script>
+    
+    </script>
 @endsection

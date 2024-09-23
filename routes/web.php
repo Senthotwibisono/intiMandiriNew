@@ -454,7 +454,9 @@ Route::controller(LclController::class)->group(function(){
         Route::delete('/invoice/deleteHeader-{id?}', 'deleteInvoice');
         Route::get('/invoice/actionButton-{id?}', 'invoiceGetData');
         Route::post('/invoice/paid', 'invoicePaid');
+        Route::get('/invoice/photoKTP-{id?}', 'photoKTP');
         
         Route::get('/invoice/form/paid', 'paidIndex')->name('invoice.paid');
         Route::get('/invoice/invoicePrint-{id?}', 'invoiceIndex');
+        Route::get('/invoice/barcodeBarang-{id?}', 'barcodeIndex');
     });

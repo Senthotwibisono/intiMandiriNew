@@ -20,6 +20,7 @@ class InvoiceFormTarif extends Model
         'jumlah',
         'jumlah_hari',
         'total',
+        'mekanik_y_n',
     ];
 
 
