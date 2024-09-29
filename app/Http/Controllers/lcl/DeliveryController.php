@@ -29,6 +29,7 @@ use App\Models\TpsSPPBBC23Kms as BC23Kms;
 use App\Models\BarcodeGate as Barcode;
 use App\Models\PlacementManifest as PM;
 use App\Models\Item;
+use App\Models\InvoiceHeader as Header;
 
 class DeliveryController extends Controller
 {
@@ -350,6 +351,22 @@ class DeliveryController extends Controller
                 'message' => 'Dokumen belum ada, isi dokumen terlebih dahulu!',
             ]);
         }
+        $header = Header::where('manifest_id', $request->id)->orderBy('expired_date', 'desc')->first();
+        // var_dump($header);
+        // die;
+        if (empty($header)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invoice belum terbit',
+            ]);
+        }
+
+        if ($header->status== 'N') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invoice belum dibayar',
+            ]);
+        }
         if ($manifest->status_bc == 'release') {
             $action = 'release';
         }else {
@@ -357,28 +374,14 @@ class DeliveryController extends Controller
         }
         $barcode = Barcode::where('ref_id', $manifest->id)->where('ref_type', '=', 'Manifest')->where('ref_action', $action)->first();
         if ($barcode) {
-                $now = Carbon::now();
-                if ($barcode->status == 'inactive' || $barcode->expired <= $now) {
-                    do {
-                        $uniqueBarcode = Str::random(20);
-                    } while (Barcode::where('barcode', $uniqueBarcode)->exists());
-                    $barcode->update([
-                        'barcode'=> $uniqueBarcode,
-                        'status'=>'active',
-                        'expired'=> Carbon::now()->addDays(3),
-                    ]);
-                    return response()->json([
-                        'success' => true,
-                        'message' => 'updated successfully!',
-                        'data'    => $barcode,
-                    ]);
-                }else {
-                    return response()->json([
-                        'success' => true,
-                        'message' => 'updated successfully!',
-                        'data'    => $barcode,
-                    ]);
-                }
+            $barcode->update([
+                'expired'=> $header->expired_date,
+            ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'updated successfully!',
+                'data'    => $barcode,
+            ]);
         }else {
             do {
                 $uniqueBarcode = Str::random(20);
@@ -390,7 +393,7 @@ class DeliveryController extends Controller
                 'ref_number'=>$manifest->notally,
                 'barcode'=> $uniqueBarcode,
                 'status'=>'active',
-                'expired'=> Carbon::now()->addDays(3),
+                'expired'=> $header->expired_date,
                 'uid'=> Auth::user()->id,
                 'created_at'=> Carbon::now(),
             ]);

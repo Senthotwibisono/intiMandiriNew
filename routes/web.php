@@ -28,6 +28,11 @@ use App\Http\Controllers\android\LclController;
 use App\Http\Controllers\invoice\MasterInvoiceController;
 use App\Http\Controllers\invoice\FormController;
 use App\Http\Controllers\invoice\InvoiceController;
+use App\Http\Controllers\invoice\ReportInvoiceController;
+
+// Perpanjangan
+use App\Http\Controllers\invoice\FormPerpanjanganController;
+use App\Http\Controllers\invoice\InvoicePerpanjanganController;
 
 
 /*
@@ -459,4 +464,45 @@ Route::controller(LclController::class)->group(function(){
         Route::get('/invoice/form/paid', 'paidIndex')->name('invoice.paid');
         Route::get('/invoice/invoicePrint-{id?}', 'invoiceIndex');
         Route::get('/invoice/barcodeBarang-{id?}', 'barcodeIndex');
+        Route::get('/invoice/dokButton-{id?}', 'invoiceGetManifestData');
+        Route::post('/invoice/updateDokumen', 'invoiceUpdateDokumen');
+    });
+
+    // Form Perpanjangan
+    Route::controller(FormPerpanjanganController::class)->group(function(){
+        Route::get('/invoice/form/perpanjangan/index', 'index')->name('form.index');
+        Route::post('/invoice/form/perpanjangan/create', 'create');
+        Route::delete('/invoice/form/perpanjangan/delete-{id?}', 'delete');
+        Route::get('/get-oldInvocie-data/{id}', 'getOldInvoiceData');
+        // Step1
+        Route::get('/invoice/form/perpanjangan/formStep1/{id?}', 'formIndex')->name('invoice.perpanjangan.step1');     
+        Route::post('/invoice/form/perpanjangan/submitStep1', 'step1Post');     
+        // Step2
+        Route::get('/invoice/form/perpanjangan/formStep2/{id?}', 'step2Index')->name('invoice.perpanjangan.step2'); // Corrected the parameter format    
+        Route::post('/invoice/form/perpanjangan/submitStep2', 'step2Post');     
+        // Step3
+        Route::get('/invoice/form/perpanjangan/formStep3/{id?}', 'preinvoice')->name('invoice.perpanjangan.preinvoice'); // Corrected the parameter format    
+        Route::post('/invoice/form/perpanjangan/submitStep3', 'step3Post');
+    });
+
+    // Invoice Perpanjangan
+    Route::controller(InvoicePerpanjanganController::class)->group(function(){
+        Route::get('/invoice/form/perpanjangan/unpaid', 'unpaidIndex')->name('invoice.perpanjangan.unpaid');
+        Route::get('/invoice/perpanjangan/pranota-{id?}', 'pranotaIndex');
+        Route::delete('/invoice/perpanjangan/deleteHeader-{id?}', 'deleteInvoice');
+        Route::get('/invoice/perpanjangan/actionButton-{id?}', 'invoiceGetData');
+        Route::post('/invoice/perpanjangan/paid', 'invoicePaid');
+        Route::get('/invoice/perpanjangan/photoKTP-{id?}', 'photoKTP');
+        
+        Route::get('/invoice/form/perpanjangan/paid', 'paidIndex')->name('invoice.paid');
+        Route::get('/invoice/perpanjangan/invoicePrint-{id?}', 'invoiceIndex');
+        Route::get('/invoice/perpanjangan/barcodeBarang-{id?}', 'barcodeIndex');
+        Route::get('/invoice/perpanjangan/dokButton-{id?}', 'invoiceGetManifestData');
+        Route::post('/invoice/perpanjangan/updateDokumen', 'invoiceUpdateDokumen');
+    }); 
+
+    Route::controller(ReportInvoiceController::class)->group(function(){
+        Route::get('/invoice/report', 'index');
+        Route::get('/invoice/reportGenerateExcel', 'generateExcel');
+        Route::get('/invoice/reportGeneratePdf', 'generatePdf');
     });

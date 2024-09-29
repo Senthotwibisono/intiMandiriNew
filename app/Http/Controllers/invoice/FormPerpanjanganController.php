@@ -9,13 +9,13 @@ use Carbon\Carbon;
 use Illuminate\Support\Str;
 
 use App\Models\MasterTarif as MT;
-use App\Models\InvoiceForm as Form;
-use App\Models\InvoiceFormTarif as FormT;
+use App\Models\InvoiceFormPerpanjangan as Form;
+use App\Models\InvoiceFormTarifPerpanjangan as FormT;
 use App\Models\Manifest;
 use App\Models\Customer;
 use App\Models\InvoiceHeader as Header;
 
-class FormController extends Controller
+class FormPerpanjanganController extends Controller
 {
     public function __construct()
     {
@@ -24,10 +24,10 @@ class FormController extends Controller
 
     public function index()
     {
-        $data['title'] = 'List Form';
-        $data['forms'] = Form::where('status', '=', 'N')->whereNot('type', '=', 'P')->orderBy('created_at', 'desc')->get();
+        $data['title'] = 'List Form Perpanjangan';
+        $data['forms'] = Form::where('status', '=', 'N')->orderBy('created_at', 'desc')->get();
 
-        return view('invoice.form.index', $data);
+        return view('invoice.perpanjangan.form.index', $data);
     }
 
     public function create(Request $request)
@@ -36,49 +36,37 @@ class FormController extends Controller
             'created_at' => Carbon::now(),
             'uid' => Auth::user()->id,
             'status' => 'N',
+            'type'=>'P',
         ]);
 
         return response()->json(['id' => $form->id]);
     }
-    
-    public function getManifestData($id)
+
+    public function getOldInvoiceData($id)
     {
         // Find the manifest by ID
-        $manifest = Manifest::find($id);
+        $header = Header::find($id);
+        $manifest = Manifest::find($header->manifest_id);
+        $customer = Customer::find($header->customer_id);
 
         // Return the manifest data as JSON
         $cbm = ceil($manifest->meas);
-        return response()->json([
+        $data = [
+            'nohbl' => $manifest->nohbl,
             'quantity' => $manifest->quantity,
             'weight'   => $manifest->weight,
             'meas'     => $manifest->meas,
-            'tglmasuk'     => $manifest->tglmasuk,
+            'tglmasuk'     => $header->expired_date,
             'cbm'      => $cbm,
-        ]);
-    }
-
-    public function getCustomerData($id)
-    {
-        // Find the manifest by ID
-        $cust = Customer::find($id);
-
+            'customer_id'=>$customer->id,
+            'npwp'=>$customer->npwp,
+            'phone'=>$customer->phone,
+        ];
         return response()->json([
-            'npwp' => $cust->npwp,
-            'phone'   => $cust->phone,
+            'success' => true,
+            'message' => 'updated successfully!',
+            'data'    => $data,
         ]);
-    }
-
-    public function formIndex($id)
-    {
-        $data['title'] = 'Create Form || Step 1';
-        $data['form'] = Form::find($id);
-        $data['manifest'] = Manifest::whereNull('tglrelease')->get();
-        $data['customer'] = Customer::all();
-
-        $data['masterTarif'] = MT::all();
-        $data['selectedTarif'] = FormT::where('form_id', $id)->get();
-
-        return view('invoice.form.formIndex', $data);
     }
 
     public function delete($id)
@@ -94,31 +82,156 @@ class FormController extends Controller
        
     }
 
+    public function formIndex($id)
+    {
+        $data['title'] = 'Create Form || Step 1';
+        $data['form'] = Form::find($id);
+        $data['manifest'] = Manifest::whereNull('tglrelease')->get();
+        $data['customer'] = Customer::all();
+
+        $data['oldInvoices'] = Header::whereNot('status', '=', 'N')->get();
+
+        $data['masterTarif'] = MT::all();
+        $data['selectedTarif'] = FormT::where('form_id', $id)->get();
+
+        return view('invoice.perpanjangan.form.formIndex', $data);
+    }
+
     public function step1Post(Request $request)
     {
         try {
             $tarifSelected = $request->tarif_id;
+            $tarifMekanikSelected = $request->tarifM_id;
 
             // dd($tarifSelected);
             if (empty($tarifSelected)) {
                 return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Anda belum memilih tarif yang akan dikenakan']);
             }
+            $header = Header::find($request->old_invoice_id);
+            if (!$header) {
+                return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Terjadi Kesalaham, hubugni admin']);
+            }
+            if ($request->time_in > $request->expired_date) {
+                return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Tanggal Expired lebih kecil dari tanggal awal']);
+            }
             $form = Form::find($request->id);
             $interval = Carbon::parse($request->time_in)->diff(Carbon::parse($request->expired_date)->addDay(1)) ?? null;
             $jumlahHari = $interval->days;
-            if ($jumlahHari<=5) {
-                $period = 1;
-                $hariPeriod = $jumlahHari;
-            }elseif ($jumlahHari >= 6 && $jumlahHari <= 10) {
-                $period = 2;
-                $hariPeriod = $jumlahHari - 5;
-            }elseif ($jumlahHari >= 11) {
-                $period = 3;
-                $hariPeriod = $jumlahHari - 10;
+
+            $lastPeriod = $header->Form->period;
+            $lastHari = $header->Form->hari_period;
+            $sisaPeriod1 = 5;  // Quota for Period 1
+            $sisaPeriod2 = 5;  // Quota for Period 2
+            
+            switch ($lastPeriod) {
+                case '1':
+                    // Calculate remaining days in Period 1
+                    $sisaPeriod = $sisaPeriod1 - $lastHari;
+            
+                    if ($jumlahHari <= $sisaPeriod) {
+                        // All remaining days fit into Period 1
+                        $usedPeriod1 = $jumlahHari;
+                        $usedPeriod2 = 0;
+                        $usedPeriod3 = 0;
+
+                        $period = 1;
+                        $hariPeriod = $jumlahHari;
+                        $massa1 = $jumlahHari;
+                        $massa2 = 0;
+                        $massa3 = 0;
+                    } else {
+                        // Overflow into Period 2 and possibly Period 3
+                        $usedPeriod1 = $sisaPeriod;
+                        $remainingDays = $jumlahHari - $sisaPeriod;
+            
+                        if ($remainingDays <= $sisaPeriod2) {
+                            // All remaining days fit into Period 2
+                            $usedPeriod2 = $remainingDays;
+                            $usedPeriod3 = 0;
+                            $period = 2;
+                            $hariPeriod = $remainingDays;
+                            $massa1 = $sisaPeriod;
+                            $massa2 = $hariPeriod;
+                            $massa3 = 0;
+                        } else {
+                            // Overflow into Period 3 (unlimited)
+                            $usedPeriod2 = $sisaPeriod2;
+                            $usedPeriod3 = $remainingDays - $sisaPeriod2;
+                            $period = 3;
+                            $hariPeriod = $usedPeriod3;
+
+                            $massa1 = $sisaPeriod;
+                            $massa2 = $usedPeriod2;
+                            $massa3 = $hariPeriod;
+                        }
+                    }
+                    break;
+            
+                case '2':
+                    // If already in Period 2, calculate similarly
+                    $sisaPeriod = $sisaPeriod2 - $lastHari;
+            
+                    if ($jumlahHari <= $sisaPeriod) {
+                        // All remaining days fit into Period 2
+                        $usedPeriod2 = $jumlahHari;
+                        $usedPeriod3 = 0;
+                        $period = 2;
+                        $hariPeriod = $jumlahHari;
+
+                        $massa1 = 0;
+                        $massa2 = $hariPeriod;
+                        $massa3 = 0;
+                    } else {
+                        // Overflow into Period 3
+                        $usedPeriod2 = $sisaPeriod;
+                        $usedPeriod3 = $jumlahHari - $sisaPeriod;
+                        $period = 3;
+                        $hariPeriod = $usedPeriod3;
+                        $massa1 = 0;
+                        $massa2 = $usedPeriod2;
+                        $massa3 = $hariPeriod;
+                    }
+                    break;
+            
+                case '3':
+                    // Period 3 has no limit, all days fit here
+                    $usedPeriod1 = 0;
+                    $usedPeriod2 = 0;
+                    $usedPeriod3 = $jumlahHari;
+                    $period = 3;
+                    $hariPeriod = $usedPeriod3;
+                        $massa1 = 0;
+                        $massa2 = 0;
+                        $massa3 = $hariPeriod;
+                    break;
+            
+                default:
+                    if ($jumlahHari<=5) {
+                        $period = 1;
+                        $hariPeriod = $jumlahHari;
+                        $massa1 = $hariPeriod;
+                        $massa2 = 0;
+                        $massa3 = 0;
+                    }elseif ($jumlahHari >= 6 && $jumlahHari <= 10) {
+                        $period = 2;
+                        $hariPeriod = $jumlahHari - 5;
+                        $massa1 = 5;
+                        $massa2 = $hariPeriod;
+                        $massa3 = 0;
+                    }elseif ($jumlahHari >= 11) {
+                        $period = 3;
+                        $hariPeriod = $jumlahHari - 10;
+                        $massa1 = 5;
+                        $massa2 = 5;
+                        $massa3 = $hariPeriod;
+                    }
+                    break;
             }
-            // dd($jumlahHari, $period, $hariPeriod);
+            // dd($jumlahHari, $lastHari, $lastPeriod, $period, $hariPeriod, $massa1, $massa2, $massa3);
+            
             $form->update([
-                'manifest_id'=>$request->manifest_id,
+                'old_invoice_id' => $header->id,
+                'manifest_id'=>$header->manifest_id,
                 'customer_id'=>$request->customer_id,
                 'cbm'=>$request->cbm,
                 'time_in' => $request->time_in,
@@ -126,8 +239,21 @@ class FormController extends Controller
                 'jumlah_hari'=>$jumlahHari,
                 'period' => $period,
                 'hari_period' => $hariPeriod,
+                'massa1' => $massa1,
+                'massa2' => $massa2,
+                'massa3' => $massa3,
             ]);
 
+            $allTarifSelected = array_merge((array) $tarifSelected, (array) $tarifMekanikSelected);
+
+            // check Massa 1
+            $checkAvalibleMassa = MT::whereIn('id', $allTarifSelected)
+                        ->where('day', '=', 'Y')
+                        ->get();
+            if ($checkAvalibleMassa->isEmpty()) {
+                return redirect()->back()->with('status', ['type' => 'error', 'message' => 'Anda belum memilih tarif untuk perpanjangan']);
+            }
+            
             
             $checkTarif = FormT::where('form_id', $form->id)->whereNotIn('tarif_id', $tarifSelected)->where('mekanik_y_n', '=', 'N')->get();
             // dd($tarifSelected, $checkTarif);
@@ -148,7 +274,7 @@ class FormController extends Controller
                 }
             }
 
-            $tarifMekanikSelected = $request->tarifM_id;
+            
             if (!empty($tarifMekanikSelected)) {
                 $checkTarifMekanik = FormT::where('form_id', $form->id)->where('mekanik_y_n', '=', 'Y')->whereNotIn('tarif_id', $tarifMekanikSelected)->get();
                 if (!empty($checkTarifMekanik)) {
@@ -177,7 +303,7 @@ class FormController extends Controller
                     'mekanik_y_n' => 'N'
                 ]);
             }
-            return redirect()->route('invoice.step2', ['id'=>$form->id])->with('status', ['type'=>'success', 'message'=>'Berhasil di Simpan']);
+            return redirect()->route('invoice.perpanjangan.step2', ['id'=>$form->id])->with('status', ['type'=>'success', 'message'=>'Berhasil di Simpan']);
         } catch (\Throwable $th) {
             return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Opps Something Wrong'.$th->getMessage()]);
         }
@@ -196,38 +322,19 @@ class FormController extends Controller
         $data['selectedTarifMekanik'] = FormT::where('form_id', $id)->where('mekanik_y_n', '=', 'Y')->get();
         // dd($data['selectedTarifMekanik']);
 
-        switch ($form->period) {
-            case 1:
-                $data['periode1'] = $form->hari_period;
-                $data['periode2'] = 0;
-                $data['periode3'] = 0;
-                break;
-            case 2:
-                $data['periode1'] = 5;
-                $data['periode2'] = $form->hari_period;
-                $data['periode3'] = 0;
-                break;
-            case 3:
-                $data['periode1'] = 5;
-                $data['periode2'] = 5;
-                $data['periode3'] = $form->hari_period;
-                break;
-            
-            default:
-                $data['periode1'] = null;
-                $data['periode2'] = null;
-                $data['periode3'] = null;
-                break;
-        }
+        $data['periode1'] = $form->massa1;
+        $data['periode2'] = $form->massa2;
+        $data['periode3'] = $form->massa3;
 
-        return view('invoice.form.step2', $data);
+        return view('invoice.perpanjangan.form.step2', $data);
     }
 
     public function step2Post(Request $request)
     {
+        // dd($request->id);
         try {
             $form = Form::find($request->id);
-
+            // dd($form);
             // Non Mekanik Inputs
             $tarifIds = $request->input('tarif_id');
             $hargaSatuan = $request->input('harga_satuan');
@@ -263,6 +370,7 @@ class FormController extends Controller
             }
 
             $tarif = FormT::where('form_id', $request->id)->where('mekanik_y_n', '=', 'N')->get();
+            // dd($tarif);
             $total = $tarif->sum('total') + $request->admin;
             $tarifAfterDiscount = $total - $request->discount;
 
@@ -303,9 +411,9 @@ class FormController extends Controller
             // Check New Period
 
             $formTarifCheckPeriod = FormT::where('form_id', $form->id)->whereNot('jumlah_hari', 0)
-            ->join('ttarif', 'invoice_form_tarif.tarif_id', '=', 'ttarif.id')
+            ->join('ttarif', 'invoice_form_tarif_perpanjangan.tarif_id', '=', 'ttarif.id')
             ->orderBy('ttarif.period', 'desc')
-            ->select('invoice_form_tarif.*') // Ensure you select the fields from `form_t`
+            ->select('invoice_form_tarif_perpanjangan.*') // Ensure you select the fields from `form_t`
             ->first();
 
             $newPeriod = $formTarifCheckPeriod->Tarif->period;
@@ -328,9 +436,9 @@ class FormController extends Controller
                 'period' =>$newPeriod,
                 'hari_period' =>$newHari,
             ]);
-            return redirect()->route('invoice.preinvoice', ['id'=>$form->id])->with('status', ['type'=>'success', 'message'=>'Berhasil di Simpan']);
-        } catch (\Throwable $th) {
-            return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Gagal di Simpan '. $th->getMessage()]);
+            return redirect()->route('invoice.perpanjangan.preinvoice', ['id'=>$form->id])->with('status', ['type'=>'success', 'message'=>'Berhasil di Simpan']);
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Gagal di Simpan '. $e->getMessage()]);
         }
     }
 
@@ -348,7 +456,7 @@ class FormController extends Controller
         $data['terbilang'] = $this->terbilang($data['form']->grand_total);
         $data['terbilangMekanik'] = $this->terbilang($data['form']->grand_total_m);
 
-        return view('invoice.form.step3', $data);
+        return view('invoice.perpanjangan.form.step3', $data);
     }
 
     public function step3Post(Request $request)
@@ -365,10 +473,10 @@ class FormController extends Controller
             $header = Header::create([
                 'form_id' => $form->id,
                 'manifest_id' => $form->manifest_id,
+                'type' => 'P',
                 'customer_id' => $form->customer_id,
-                'judul_invoice' => $request->judul_invoice,
-                'invoice_no' => $form->invoice_no,
-                'order_no' => $formattedOrderNo,
+                'judul_invoice' => 'Perpanjangan ' . $request->judul_invoice,
+                'order_no' => $formattedOrderNo . ' -P',
                 'time_in' => $form->time_in,
                 'expired_date' => $form->expired_date,
                 'total' => $form->total,
@@ -389,10 +497,10 @@ class FormController extends Controller
                 $headerMekanik = Header::create([
                     'form_id' => $form->id,
                     'manifest_id' => $form->manifest_id,
+                    'type' => 'P',
                     'customer_id' => $form->customer_id,
-                    'judul_invoice' => 'Mekanik '.$request->judul_invoice,
-                    'invoice_no' => $form->invoice_no,
-                    'order_no' => $formattedOrderNoMekanik,
+                    'judul_invoice' => 'Perpanjangan Mekanik ' . $request->judul_invoice,
+                    'order_no' => $formattedOrderNoMekanik . ' -P',
                     'time_in' => $form->time_in,
                     'expired_date' => $form->expired_date,
                     'total' => $form->total_m,
@@ -411,7 +519,7 @@ class FormController extends Controller
             $form->update([
                 'status' => 'Y'
             ]);
-            return redirect()->route('invoice.unpaid')->with('status', ['type'=>'success', 'message'=>'Berhasil di Simpan']);
+            return redirect()->route('invoice.perpanjangan.unpaid')->with('status', ['type'=>'success', 'message'=>'Berhasil di Simpan']);
         } catch (\Throwable $th) {
             //throw $th;
         }

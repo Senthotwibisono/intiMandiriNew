@@ -19,10 +19,12 @@ class InvoiceHeader extends Model
         'judul_invoice',
         'invoice_no',
         'order_no',
+        'type',
         'time_in',
         'expired_date',
         'total',
         'admin',
+        'discount',
         'pajak',
         'pajak_amount',
         'grand_total',
@@ -62,6 +64,10 @@ class InvoiceHeader extends Model
 
     public function Form()
     {
+        if ($this->type === 'P') {
+            return $this->belongsTo(InvoiceFormPerpanjangan::class, 'form_id', 'id');
+        }
+    
         return $this->belongsTo(InvoiceForm::class, 'form_id', 'id');
     }
     

@@ -16,6 +16,21 @@ use App\Models\Item;
 use App\Models\Customer;
 use App\Models\InvoiceHeader as Header;
 
+// Dok
+use App\Models\TpsSPJM as SPJM;
+use App\Models\TpsSPPB as SPPB;
+use App\Models\TpsSPPBCont as SPPBCont;
+use App\Models\TpsSPPBKms as SPPBKms;
+use App\Models\KodeDok as Kode;
+use App\Models\TpsManual as Manual;
+use App\Models\TpsManualCont as ManualCont;
+use App\Models\TpsManualKms as ManualKms;
+use App\Models\TpsSPPBBC23 as BC23;
+use App\Models\TpsSPPBBC23Cont as BC23Cont;
+use App\Models\TpsSPPBBC23Kms as BC23Kms;
+use App\Models\BarcodeGate as Barcode;
+use App\Models\PlacementManifest as PM;
+
 class InvoiceController extends Controller
 {
     public function __construct()
@@ -25,7 +40,10 @@ class InvoiceController extends Controller
     public function unpaidIndex()
     {
         $data['title'] = 'Unpaid Invoice';
-        $data['headers'] = Header::where('status', '=', 'N')->orderBy('order_at', 'desc')->get();
+        $data['headers'] = Header::where('status', 'N')
+        ->where('type', null)
+        ->orderBy('order_at', 'desc')
+        ->get();
 
         return view('invoice.unpaid.index', $data);
     }
@@ -158,15 +176,24 @@ class InvoiceController extends Controller
 
                 // Get the last inserted sequential number from the Header table
                 $lastInvoice = Header::whereYear('order_at', Carbon::now()->year)->whereNotNull('invoice_no')
-                                     ->orderBy('id', 'desc')
+                                     ->orderBy('invoice_no', 'desc')
                                      ->first();
 
-                if ($lastInvoice && preg_match('/\d+$/', $lastInvoice->invoice_no, $matches)) {
-                    $lastSequence = (int)$matches[0]; // Extract the numeric part
-                } else {
-                    $lastSequence = 0; // If no previous invoice, start from 0
-                }
+                                     if ($lastInvoice) {
+                                        // Remove '-P' if it exists at the end of the invoice number
+                                        $invoiceNumber = rtrim($lastInvoice->invoice_no, ' -P');
+                                        
+                                        // Extract the numeric part from the invoice number
+                                        if (preg_match('/(\d+)$/', $invoiceNumber, $matches)) {
+                                            $lastSequence = (int)$matches[0]; // Extract the numeric part
+                                        } else {
+                                            $lastSequence = 0; // If no valid sequence is found, start from 0
+                                        }
+                                    } else {
+                                        $lastSequence = 0; // If no previous invoice, start from 0
+                                    }
             
+                // dd($lastInvoice,$lastSequence);
                 // Increment the sequence and format as a 6-digit number
                 $newSequence = str_pad($lastSequence + 1, 6, '0', STR_PAD_LEFT);
             
@@ -212,7 +239,8 @@ class InvoiceController extends Controller
     public function paidIndex()
     {
         $data['title'] = 'List Invoice Paid';
-        $data['headers'] = Header::whereNot('status', '=', 'N')->orderBy('order_at', 'desc')->get();
+        $data['headers'] = Header::whereNot('status', '=', 'N')->where('type', null)->orderBy('order_at', 'desc')->get();
+        $data['doks'] = Kode::orderBy('kode', 'asc')->get();
 
         return view('invoice.paid.index', $data);
     }
@@ -267,6 +295,71 @@ class InvoiceController extends Controller
         $data['item'] = Item::where('manifest_id', $manifest->id)->first();
 
         return view('invoice.manifest.barcode', $data);
+    }
+
+    public function invoiceGetManifestData($id)
+    {
+        $manifest = Manifest::find($id);
+        if ($manifest) {
+            return response()->json([
+                'success' => true,
+                'message' => 'updated successfully!',
+                'data'    => $manifest,
+            ]);
+        }
+    }
+
+    public function invoiceUpdateDokumen(Request $request)
+    {
+        $manifest = Manifest::where('id', $request->id)->first();
+
+        $kdDok = $request->kd_dok;
+        $tglDok = Carbon::parse($request->tgl_dok)->format('n/j/Y');
+        $tglDokManual = Carbon::parse($request->tgl_dok)->format('d/m/Y');
+        // var_dump($tglDok, $request->no_dok, $request->kd_dok);
+        // die();
+        if ($kdDok == 1) {
+            $dok = SPPB::where('no_sppb', $request->no_dok)->where('tgl_sppb', $tglDok)->first();
+            if ($dok) {
+                $manifest->update([
+                    'kd_dok_inout' => $kdDok,
+                    'no_dok' => $request->no_dok,
+                    'tgl_dok' => $request->tgl_dok,
+                    'status_bc' => 'release',
+                ]);
+
+                return redirect()->back()->with('status', ['type' => 'success', 'message' => 'Data ditemukan, Status Dokumen : ' . $manifest->status_bc]);
+            }else {
+                return redirect()->back()->with('status', ['type' => 'success', 'error' => 'Data tidak ditemukan']);
+            }
+        }elseif ($kdDok == 2) {
+            $dok = BC23::where('no_sppb', $request->no_dok)->where('tgl_sppb', $tglDok)->first();
+            if ($dok) {
+                $manifest->update([
+                    'kd_dok_inout' => $kdDok,
+                    'no_dok' => $request->no_dok,
+                    'tgl_dok' => $request->tgl_dok,
+                    'status_bc' => 'HOLD',
+                ]);
+
+                return redirect()->back()->with('status', ['type' => 'success', 'message' => 'Data ditemukan, Status Dokumen : ' . $manifest->status_bc]);
+            }else {
+                return redirect()->back()->with('status', ['type' => 'success', 'error' => 'Data tidak ditemukan']);
+            }
+        }else {
+            $dok = Manual::where('kd_dok_inout', $kdDok)->where('no_dok_inout', $request->no_dok)->where('tgl_dok_inout', $tglDokManual)->first();
+            if ($dok) {
+                $manifest->update([
+                    'kd_dok_inout' => $kdDok,
+                    'no_dok' => $request->no_dok,
+                    'tgl_dok' => $request->tgl_dok,
+                    'status_bc' => 'HOLD',
+                ]);
+                return redirect()->back()->with('status', ['type' => 'success', 'message' => 'Data ditemukan, Status Dokumen : ' . $manifest->status_bc]);
+            }else {
+                return redirect()->back()->with('status', ['type' => 'success', 'error' => 'Data tidak ditemukan']);
+            }
+        }
     }
 
 }

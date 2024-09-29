@@ -239,11 +239,11 @@
                     </li>
                 </ul>
             </li>
-            <li class="sidebar-item has-sub @if(Request::is('invoice/form/*')) active @endif">
+            <li class="sidebar-item has-sub @if(Request::is('invoice/form/*') && !Request::is('invoice/form/perpanjangan/*')) active @endif">
                 <a href="#" class='sidebar-link'>
                     <span>Form Invoice</span>
                 </a>
-                <ul class="submenu @if(Request::is('invoice/form/*')) active @endif">
+                <ul class="submenu @if(Request::is('invoice/form/*') && !Request::is('invoice/form/perpanjangan/*')) active @endif">
                     <li class="submenu-item @if(Request::is('invoice/form/index')) active @endif">
                         <a href="{{ url('/invoice/form/index')}}">Created Invoice</a>
                     </li>
@@ -254,6 +254,26 @@
                         <a href="{{ url('/invoice/form/paid')}}">Paid Invoice</a>
                     </li>
                 </ul>
+            </li>
+            <!-- Perpanjangan -->
+            <li class="sidebar-item has-sub @if(Request::is('invoice/form/perpanjangan/*')) active @endif">
+                <a href="#" class='sidebar-link'>
+                    <span>Form Invoice Perpanjangan</span>
+                </a>
+                <ul class="submenu @if(Request::is('invoice/form/perpanjangan/*')) active @endif">
+                    <li class="submenu-item @if(Request::is('invoice/form/perpanjangan/index')) active @endif">
+                        <a href="{{ url('/invoice/form/perpanjangan/index')}}">Created Invoice Perpanjangan</a>
+                    </li>
+                    <li class="submenu-item @if(Request::is('invoice/form/perpanjangan/unpaid')) active @endif">
+                        <a href="{{ url('/invoice/form/perpanjangan/unpaid')}}">Unpaid Invoice Perpanjangan</a>
+                    </li>
+                    <li class="submenu-item @if(Request::is('invoice/form/perpanjangan/paid')) active @endif">
+                        <a href="{{ url('/invoice/form/perpanjangan/paid')}}">Paid Invoice Perpanjangan</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="submenu-item @if(Request::is('invoice/report')) active @endif">
+                <a href="{{ url('/invoice/report')}}">Rport Invoice</a>
             </li>
         </ul>
     </li>

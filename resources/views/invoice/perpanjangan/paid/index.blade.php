@@ -64,10 +64,10 @@
                                     <a href="javascript:void(0)" onclick="openWindow('/invoice/barcodeBarang-{{$form->manifest_id}}')" class="btn btn-sm btn-danger"><i class="fa fa-print"></i></a>
                                 </td>
                                 <td class="text-center">
-                                    <a type="button" href="/invoice/pranota-{{$form->id}}" target="_blank" class="btn btn-sm btn-warning text-white"><i class="fa fa-file"></i></a>
+                                    <a type="button" href="/invoice/perpanjangan/pranota-{{$form->id}}" target="_blank" class="btn btn-sm btn-warning text-white"><i class="fa fa-file"></i></a>
                                 </td>
                                 <td class="text-center">
-                                    <a type="button" href="/invoice/invoicePrint-{{$form->id}}" target="_blank" class="btn btn-sm btn-info text-white"><i class="fa fa-file"></i></a>
+                                    <a type="button" href="/invoice/perpanjangan/invoicePrint-{{$form->id}}" target="_blank" class="btn btn-sm btn-info text-white"><i class="fa fa-file"></i></a>
                                 </td>
                                 <td class="text-center">
                                     <div class="button-container">
