@@ -138,7 +138,7 @@
                     <p><strong>Inti Mandiri || Depo Information System</strong></p>
                 </div>
                 <div class="card-body text-center">
-                    <img src="{{ asset('logo/IntiMandiri.PNG') }}" style="width: 80%;" alt="Logo">
+                    <img src="{{ asset('logo/IntiMandiri.png') }}" style="width: 80%;" alt="Logo">
                 </div>
             </div>
         </div>
