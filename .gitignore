@@ -23,3 +23,5 @@ vendor
 storage
 /storage
 storage/logs/laravel.log
+node_modules
+node_modules

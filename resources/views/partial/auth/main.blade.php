@@ -13,7 +13,7 @@
                 <div id="auth-left">
 
                     <div style="position: relative;">
-                        <img class="" src="{{asset('logo/IntiMandiri.PNG')}}" alt="auth-left">
+                        <img class="" src="{{asset('logo/IntiMandiri.png')}}" alt="auth-left">
                     </div>
                     <h1 class="auth-title">Log in.</h1>
                     <p class="auth-subtitle mb-5">Log in with your data that you entered during registration.</p>

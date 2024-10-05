@@ -14,9 +14,9 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="logoicon" style="left: -1000;">
                             @if(Auth::user() && Auth::user()->hasRole('BeaCukai'))
-                            <a href="/bc/dashboard"><img src="{{asset('logo/IntiMandiri.PNG')}}" alt="Logo" style="position: relative; left: 10px;" srcset=""></a>
+                            <a href="/bc/dashboard"><img src="{{asset('logo/IntiMandiri.png')}}" alt="Logo" style="position: relative; left: 10px;" srcset=""></a>
                             @else
-                            <a href="/"><img src="{{asset('logo/IntiMandiri.PNG')}}" alt="Logo" style="position: relative; left: 10px;" srcset=""></a>
+                            <a href="/"><img src="{{asset('logo/IntiMandiri.png')}}" alt="Logo" style="position: relative; left: 10px;" srcset=""></a>
                             @endif
                         </div>
                         <!-- Dark or Light mode -->

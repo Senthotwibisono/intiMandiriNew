@@ -8,8 +8,8 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 <link rel="stylesheet" href="{{asset('dist/assets/css/main/app.css')}}">
 <link rel="stylesheet" href="{{asset('dist/assets/css/main/app-dark.css')}}">
-<link rel="shortcut icon" href="{{asset('logo/IntiMandiri.PNG')}}" type="image/x-icon">
-<link rel="shortcut icon" href="{{asset('logo/IntiMandiri.PNG')}}" type="image/png">
+<link rel="shortcut icon" href="{{asset('logo/IntiMandiri.png')}}" type="image/x-icon">
+<link rel="shortcut icon" href="{{asset('logo/IntiMandiri.png')}}" type="image/png">
 <link rel="stylesheet" href="{{asset('dist/assets/css/shared/iconly.css')}}">
 <link rel="stylesheet" href="{{ asset('fontawesome/css/all.min.css') }}">
 <link rel="stylesheet" href="{{asset('dist/assets/css/pages/datatables.css')}}">
