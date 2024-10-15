@@ -317,6 +317,8 @@ Route::controller(DokumenController::class)->group(function (){
         
         Route::get('/lcl/realisasi/seal', 'indexSeal')->name('lcl.seal.index');
         Route::post('/lcl/realisasi/seal-update', 'updateSeal')->name('lcl.seal.update');
+        Route::post('/lcl/realisasi/easyGo-send', 'easyGoSend');
+        Route::post('/lcl/realisasi/easyGo-closeDO', 'closeDO');
         
         Route::get('/lcl/realisasi/buangMT', 'indexMt')->name('lcl.mty.index');
         Route::get('/lcl/realisasi/mty-detail{id?}', 'detailMt')->name('lcl.mty.detail');
