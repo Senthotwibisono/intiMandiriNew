@@ -141,4 +141,9 @@ class JobOrder extends Model
     {
         return $this->belongsTo(Pelabuhan::class, 'pel_bongkar', 'id');
     }
+
+    public function containers()
+{
+    return $this->hasMany(Container::class, 'joborder_id', 'id');
+}
 }

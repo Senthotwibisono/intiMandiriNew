@@ -13,38 +13,23 @@
                 </div>
             </div>
             <br>
-            <table class="tabelCustom table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>Action</th>
-                        <th>CAR</th>
-                        <th>Kode Dokumen</th>
-                        <th>Nomor Dokumen</th>
-                        <th>Tanggal Dokumen</th>
-                        <th>No BC11</th>
-                        <th>Tanggal BC11</th>
-                        <th>Tanggal Upload</th>
-                        <th>Jam Upload</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($doks as $dok)
-                     <tr>
-                         <td>
-                             <a href="/dokumen/pabean/detail{{$dok->id}}" class="btn btn-warning"><i class="fa fa-pen"></i></a>
-                         </td>
-                         <td>{{$dok->car}}</td>
-                         <td>{{$dok->dokumen->name ?? ''}}</td>
-                         <td>{{$dok->no_dok_inout}}</td>
-                         <td>{{$dok->tgl_dok_inout}}</td>
-                         <td>{{$dok->no_bc11}}</td>
-                         <td>{{$dok->tgl_bc11}}</td>
-                         <td>{{$dok->tgl_upload}}</td>
-                         <td>{{$dok->jam_upload}}</td>
-                     </tr>
-                    @endforeach
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="table table-hover table-striped" id="tablePabean">
+                    <thead>
+                        <tr>
+                            <th>Action</th>
+                            <th>CAR</th>
+                            <th>Kode Dokumen</th>
+                            <th>Nomor Dokumen</th>
+                            <th>Tanggal Dokumen</th>
+                            <th>No BC11</th>
+                            <th>Tanggal BC11</th>
+                            <th>Tanggal Upload</th>
+                            <th>Jam Upload</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
         </div>
     </div>
 </section>
@@ -131,6 +116,31 @@
 @endsection
 
 @section('custom_js')
+<script>
+    $(document).ready(function(){
+        $('#tablePabean').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '/dokumen/pabeanData',
+            columns: [
+                {data:'id', name:'id', className:'text-center',
+                    render: function(data, row){
+                        return `<a href="/dokumen/pabean/detail${data}" class="btn btn-warning"><i class="fa fa-pen"></i></a>`
+                    }
+                },
+                {data:'car', name:'car', className:'text-center'},
+                {data:'dokumen.name', name:'dokumen.name', className:'text-center'},
+                {data:'no_dok_inout', name:'no_dok_inout', className:'text-center'},
+                {data:'tgl_dok_inout', name:'tgl_dok_inout', className:'text-center'},
+                {data:'no_bc11', name:'no_bc11', className:'text-center'},
+                {data:'tgl_bc11', name:'tgl_bc11', className:'text-center'},
+                {data:'tgl_upload', name:'tgl_upload', className:'text-center'},
+                {data:'jam_upload', name:'jam_upload', className:'text-center'},
+            ],
+            pageLength: 25,
+        })
+    });
+</script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Attach event listener to the update button

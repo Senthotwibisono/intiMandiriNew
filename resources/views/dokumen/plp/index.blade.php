@@ -13,46 +13,27 @@
                 </div>
             </div>
             <br>
-            <table class="tabelCustom table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>No PLP</th>
-                        <th>Tgl PLP</th>
-                        <th>Kd Kantor</th>
-                        <th>Kd TPS</th>
-                        <th>Kd TPS Asal</th>
-                        <th>Kd TPS Tujuan</th>
-                        <th>Nama Angkut</th>
-                        <th>No Voy</th>
-                        <th>No Surat</th>
-                        <th>No BC 11</th>
-                        <th>Tgl BC 11</th>
-                        <th>UID</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($dokumen as $dok)
+            <div class="table table-responsive">
+                <table class="table table-hover" id="tablePLP">
+                    <thead>
                         <tr>
-                            <td>{{$dok->no_plp}}</td>
-                            <td>{{$dok->tgl_plp}}</td>
-                            <td>{{$dok->kd_kantor}}</td>
-                            <td>{{$dok->kd_tps}}</td>
-                            <td>{{$dok->kd_tps_asal}}</td>
-                            <td>{{$dok->kd_tps_tujuan}}</td>
-                            <td>{{$dok->nm_angkut}}</td>
-                            <td>{{$dok->no_voy_flight}}</td>
-                            <td>{{$dok->no_surat}}</td>
-                            <td>{{$dok->no_bc11}}</td>
-                            <td>{{$dok->tgl_bc11}}</td>
-                            <td>{{$dok->user->name}}</td>
-                            <td>
-                                <a href="/dokumen/plp/detail{{$dok->id}}" class="btn btn-warning"><i class="fa fa-pen"></i></a>
-                            </td>
+                            <th>No PLP</th>
+                            <th>Tgl PLP</th>
+                            <th>Kd Kantor</th>
+                            <th>Kd TPS</th>
+                            <th>Kd TPS Asal</th>
+                            <th>Kd TPS Tujuan</th>
+                            <th>Nama Angkut</th>
+                            <th>No Voy</th>
+                            <th>No Surat</th>
+                            <th>No BC 11</th>
+                            <th>Tgl BC 11</th>
+                            <th>UID</th>
+                            <th>Action</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                </table>
+            </div>
         </div>
     </div>
 </section>
@@ -288,5 +269,39 @@
             });
         });
     });
+</script>
+
+<script>
+    $(document).ready(function(){
+        $('#tablePLP').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '/dokumen/plpData',
+            columns: [
+                {data:'no_plp', name:'no_plp', className:'text-center'},
+                {data:'tgl_plp', name:'tgl_plp', className:'text-center'},
+                {data:'kd_kantor', name:'kd_kantor', className:'text-center'},
+                {data:'kd_tps', name:'kd_tps', className:'text-center'},
+                {data:'kd_tps_asal', name:'kd_tps_asal', className:'text-center'},
+                {data:'kd_tps_tujuan', name:'kd_tps_tujuan', className:'text-center'},
+                {data:'nm_angkut', name:'nm_angkut', className:'text-center'},
+                {data:'no_voy_flight', name:'no_voy_flight', className:'text-center'},
+                {data:'no_surat', name:'no_surat', className:'text-center'},
+                {data:'no_bc11', name:'no_bc11', className:'text-center'},
+                {data:'tgl_bc11', name:'tgl_bc11', className:'text-center'},
+                {data:'user.name', name:'user.name', className:'text-center'},
+                {
+                    data:'id',
+                    name:'id',
+                    classNmae:'text-center',
+                    render: function(data, row){
+                        const formId = row.id;
+                        return `<a href="/dokumen/plp/detail${data}" class="btn btn-warning"><i class="fa fa-pen"></i></a>`;
+                    }
+                }
+            ],
+            pageLength: 25,
+        })
+    })
 </script>
 @endsection

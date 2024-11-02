@@ -10,39 +10,48 @@
                 </div>
             </div> -->
             <br>
-            <table class="tabelCustom table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>Action</th>
-                        <th>No Job Order</th>
-                        <th>No SPK</th>
-                        <th>No Container</th>
-                        <th>No MBL</th>
-                        <th>ETA</th>
-                        <th>Vessel</th>
-                        <th>UID</th>
-                    </tr>
-                    <tbody>
-                        @foreach($conts as $cont)
-                            <tr>
-                                <td>
-                                    <a href="/lcl/manifest/detail-{{$cont->id}}" class="btn btn-warning"><i class="fa fa-pen"></i></a>
-                                </td>
-                                <td>{{$cont->job->nojoborder}}</td>
-                                <td>{{$cont->job->nospk}}</td>
-                                <td>{{$cont->nocontainer}}</td>
-                                <td>{{$cont->job->nombl}}</td>
-                                <td>{{$cont->job->eta}}</td>
-                                <td>{{$cont->job->Kapal->name ?? ''}}</td>
-                                <td>{{$cont->user->name}}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </thead>
-            </table>
+            <div class="table table-responsive">
+                <table class="table table-hover table-stripped" id="tableManifest">
+                    <thead>
+                        <tr>
+                            <th>Action</th>
+                            <th>No Job Order</th>
+                            <th>No SPK</th>
+                            <th>No Container</th>
+                            <th>No MBL</th>
+                            <th>ETA</th>
+                            <th>Vessel</th>
+                            <th>UID</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
         </div>
     </div>
 </section>
 @endsection
 @section('custom_js')
+<script>
+    $(document).ready(function () {
+        $('#tableManifest').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '/lcl/manifest/data',
+            columns: [
+                {data:'id', name:'id', className:'text-center',
+                    render: function(data, row){
+                        return `<a href="/lcl/manifest/detail-${data}" class="btn btn-warning"><i class="fa fa-pen"></i></a>`
+                    }
+                },
+                {data:'job.nojoborder', name:'job.nojoborder', className:'text-center'},
+                {data:'job.nospk', name:'job.nospk', className:'text-center'},
+                {data:'nocontainer', name:'nocontainer', className:'text-center'},
+                {data:'job.nombl', name:'job.nombl', className:'text-center'},
+                {data:'job.eta', name:'job.eta', className:'text-center'},
+                {data:'kapal_cont', name:'kapal_cont', className:'text-center'},
+                {data:'user.name', name:'user.name', className:'text-center'},
+            ]
+        })
+    });
+</script>
 @endsection

@@ -238,7 +238,7 @@ $(document).on('click', '.CheckSPJMDok', function() {
                     console.log('error:', data);
                     Swal.fire({
                         title: 'Error!',
-                        text: 'Terjadi kesalahan saat menghapus data.',
+                        text: 'Terjadi kesalahan',
                         icon: 'error',
                     }).then(() => {
                             location.reload();

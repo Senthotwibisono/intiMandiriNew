@@ -14,64 +14,36 @@
             </div>
             <br>
             <div style="overflow-x:auto;">
-                <table class="tabelCustom table table-bordered table-striped">
-                    <thead>
-                        <tr>
-                            <!-- <th>Action</th> -->
-                            <th>CAR</th>
-                            <th>Kd Kantor</th>
-                            <th>Tgl SPJM</th>
-                            <th>No SPJM</th>
-                            <th>NPWP Importir</th>
-                            <th>Nama Importir</th>
-                            <th>NPWP PPJK</th>
-                            <th>Nama PPJK</th>
-                            <th>gudang</th>
-                            <th>Jml Cont</th>
-                            <th>No BC11</th>
-                            <th>Tgl BC11</th>
-                            <th>No Pos BC11</th>
-                            <th>Fl Karantina</th>
-                            <th>Nm Angkut</th>
-                            <th>No Voy Flight</th>
-                            <th>Tgl Upload</th>
-                            <th>Jam Upload</th>
-                            <th>No Dok</th>
-                            <th>Tgl Dok</th>
-                            <th>flag</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($doks as $dok)
-                        <tr>
-                            <!-- <td>
-                                <a href="/dokumen/spjm/detail{{$dok->id}}" class="btn btn-warning"><i class="fa fa-pen"></i></a>
-                            </td> -->
-                            <td>{{$dok->car}}</td>
-                            <td>{{$dok->kd_kantor}}</td>
-                            <td>{{$dok->tgl_pib}}</td>
-                            <td>{{$dok->no_spjm}}</td>
-                            <td>{{$dok->npwp_imp}}</td>
-                            <td>{{$dok->nama_imp}}</td>
-                            <td>{{$dok->npwp_ppjk}}</td>
-                            <td>{{$dok->nama_ppjk}}</td>
-                            <td>{{$dok->gudang}}</td>
-                            <td>{{$dok->jml_cont}}</td>
-                            <td>{{$dok->no_bc11}}</td>
-                            <td>{{$dok->tgl_bc11}}</td>
-                            <td>{{$dok->no_pos_bc11}}</td>
-                            <td>{{$dok->fl_karantina}}</td>
-                            <td>{{$dok->nm_angkut}}</td>
-                            <td>{{$dok->no_voy_flight}}</td>
-                            <td>{{$dok->tgl_upload}}</td>
-                            <td>{{$dok->jam_upload}}</td>
-                            <td>{{$dok->no_dok}}</td>
-                            <td>{{$dok->tgl_dok}}</td>
-                            <td>{{$dok->flag}}</td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                <div class="table table-responsive">
+                    <table class="table table-bordered table-striped" id="tableSPJM">
+                        <thead>
+                            <tr>
+                                <!-- <th>Action</th> -->
+                                <th>CAR</th>
+                                <th>Kd Kantor</th>
+                                <th>Tgl SPJM</th>
+                                <th>No SPJM</th>
+                                <th>NPWP Importir</th>
+                                <th>Nama Importir</th>
+                                <th>NPWP PPJK</th>
+                                <th>Nama PPJK</th>
+                                <th>gudang</th>
+                                <th>Jml Cont</th>
+                                <th>No BC11</th>
+                                <th>Tgl BC11</th>
+                                <th>No Pos BC11</th>
+                                <th>Fl Karantina</th>
+                                <th>Nm Angkut</th>
+                                <th>No Voy Flight</th>
+                                <th>Tgl Upload</th>
+                                <th>Jam Upload</th>
+                                <th>No Dok</th>
+                                <th>Tgl Dok</th>
+                                <th>flag</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -272,5 +244,39 @@
             });
         });
     });
+</script>
+
+<script>
+    $(document).ready(function(){
+        $('#tableSPJM').DataTable({
+            processing: true,
+            severSide: true,
+            ajax: '/dokumen/spjmData',
+            columns:[
+                {data:'car', name:'car', className:'text-center'},
+                {data:'kd_kantor', name:'kd_kantor', className:'text-center'},
+                {data:'tgl_pib', name:'tgl_pib', className:'text-center'},
+                {data:'no_spjm', name:'no_spjm', className:'text-center'},
+                {data:'npwp_imp', name:'npwp_imp', className:'text-center'},
+                {data:'nama_imp', name:'nama_imp', className:'text-center'},
+                {data:'npwp_ppjk', name:'npwp_ppjk', className:'text-center'},
+                {data:'nama_ppjk', name:'nama_ppjk', className:'text-center'},
+                {data:'gudang', name:'gudang', className:'text-center'},
+                {data:'jml_cont', name:'jml_cont', className:'text-center'},
+                {data:'no_bc11', name:'no_bc11', className:'text-center'},
+                {data:'tgl_bc11', name:'tgl_bc11', className:'text-center'},
+                {data:'no_pos_bc11', name:'no_pos_bc11', className:'text-center'},
+                {data:'fl_karantina', name:'fl_karantina', className:'text-center'},
+                {data:'nm_angkut', name:'nm_angkut', className:'text-center'},
+                {data:'no_voy_flight', name:'no_voy_flight', className:'text-center'},
+                {data:'tgl_upload', name:'tgl_upload', className:'text-center'},
+                {data:'jam_upload', name:'jam_upload', className:'text-center'},
+                {data:'no_dok', name:'no_dok', className:'text-center'},
+                {data:'tgl_dok', name:'tgl_dok', className:'text-center'},
+                {data:'flag', name:'flag', className:'text-center'},
+            ],
+            pageLength:25,
+        })
+    })
 </script>
 @endsection

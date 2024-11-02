@@ -14,46 +14,24 @@
             </div>
             <br>
             <div style="overflow-x:auto;">
-                <table class="tabelCustom table table-bordered table-striped">
-                    <thead>
-                        <tr>
-                            <th>Action</th>
-                            <th>car</th>
-                            <th>no_sppb</th>
-                            <th>tgl_sppb</th>
-                            <th>nojoborder</th>
-                            <th>kd_kantor_pengawas</th>
-                            <th>kd_kantor_bongkar</th>
-                            <th>no_pib</th>
-                            <th>tgl_pib</th>
-                            <th>nama_imp</th>
-                            <th>npwp_imp</th>
-                            <th>alamat_imp</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                       @foreach($doks as $dok)
-                        <tr>
-                            <td>
-                                <a href="/dokumen/sppb/detail{{$dok->id}}" class="btn btn-warning"><i class="fa fa-pen"></i></a>
-                            </td>
-                            <td>{{$dok->car}}</td>
-                            <td>{{$dok->no_sppb}}</td>
-                            <td>{{$dok->tgl_sppb}}</td>
-                            <td>{{$dok->nojoborder}}</td>
-                            <td>{{$dok->kd_kantor_pengawas}}</td>
-                            <td>{{$dok->kd_kantor_bongkar}}</td>
-                            <td>{{$dok->no_pib}}</td>
-                            <td>{{$dok->tgl_pib}}</td>
-                            <td>{{$dok->nama_imp}}</td>
-                            <td>{{$dok->npwp_imp}}</td>
-                            <td>
-                            <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" readonly>{{$dok->alamat_imp}}</textarea>
-                            </td>
-                        </tr>
-                       @endforeach
-                    </tbody>
-                </table>
+                <div class="table table-responsive">
+                    <table class="table table-hover table-responsive" id="tableSPPB">
+                        <thead>
+                            <tr>
+                                <th>Action</th>
+                                <th>car</th>
+                                <th>no_sppb</th>
+                                <th>tgl_sppb</th>
+                                <th>nojoborder</th>
+                                <th>no_pib</th>
+                                <th>tgl_pib</th>
+                                <th>nama_imp</th>
+                                <th>npwp_imp</th>
+                                <th>alamat_imp</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -225,5 +203,38 @@
             });
         });
     });
+</script>
+
+<script>
+    $(document).ready(function(){
+        $('#tableSPPB').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '/dokumen/sppbData',
+            columns:[
+                {data:'id', name:'id', className:'text-center',
+                    render: function(data, row){
+                        return `<a href="/dokumen/sppb/detail${data}" class="btn btn-warning"><i class="fa fa-pen"></i></a>
+`
+                    }
+                },
+                {data:'car', name:'car', className:'text-center'},
+                {data:'no_sppb', name:'no_sppb', className:'text-center'},
+                {data:'tgl_sppb', name:'tgl_sppb', className:'text-center'},
+                {data:'nojoborder', name:'nojoborder', className:'text-center'},
+                {data:'no_pib', name:'no_pib', className:'text-center'},
+                {data:'tgl_pib', name:'tgl_pib', className:'text-center'},
+                {data:'nama_imp', name:'nama_imp', className:'text-center'},
+                {data:'npwp_imp', name:'npwp_imp', className:'text-center'},
+                {data:'alamat_imp', name:'alamat_imp', className:'text-center',
+                    render: function(data,row){
+                        return `<textarea class="form-control" id="exampleFormControlTextarea1" rows="3" readonly>${data}</textarea>
+`
+                    }
+                },
+            ],
+            pageLength: 25,
+        })
+    })
 </script>
 @endsection

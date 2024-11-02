@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\beaCukai;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Auth;
 use Carbon\Carbon;
@@ -163,6 +164,12 @@ class BeaCukaiController extends Controller
 
     public function approveGateOut($id){
         $manifest = Manifest::where('id', $id)->first();
+        if ($manifest->status_bc == 'HOLDP2') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Harap Hubungi P2 !!',
+            ]);
+        }
         if ($manifest) {
             $manifest->update([
                 'status_bc'=>'release',

@@ -14,7 +14,6 @@ use App\Http\Controllers\lcl\DeliveryController;
 use App\Http\Controllers\lcl\RackingController;
 use App\Http\Controllers\BarcodeAutoGateController;
 use App\Http\Controllers\PhotoController;
-use App\Http\Controllers\BeaCukaiController;
 use App\Http\Controllers\PlacementContainerController;
 use App\Http\Controllers\QrController;
 use App\Http\Controllers\EasyGoController;
@@ -34,6 +33,9 @@ use App\Http\Controllers\invoice\ReportInvoiceController;
 use App\Http\Controllers\invoice\FormPerpanjanganController;
 use App\Http\Controllers\invoice\InvoicePerpanjanganController;
 
+//BeaCukai 
+use App\Http\Controllers\beaCukai\BeaCukaiController;
+use App\Http\Controllers\beaCukai\BeacukaiP2Controller;
 
 /*
 |--------------------------------------------------------------------------
@@ -190,6 +192,7 @@ Route::controller(DokumenController::class)->group(function (){
    
     // PLP
     Route::get('/dokumen/plp', 'plpIndex')->name('dokumen.plp.index');
+    Route::get('/dokumen/plpData', 'plpData')->name('dokumen.plp.data');
     Route::get('/dokumen/plp/detail{id?}', 'plpDetail')->name('dokumen.plp.detail');
     Route::get('/dokumen/plp/cont{id?}', 'plpCont')->name('dokumen.plp.detailCont');
     Route::post('/dokumen/plp/updateDetail', 'plpUpdateDetail')->name('dokumen.plp.update.detail');
@@ -199,6 +202,7 @@ Route::controller(DokumenController::class)->group(function (){
 
     // SPJM
     Route::get('/dokumen/spjm', 'spjmIndex')->name('dokumen.spjm.index');
+    Route::get('/dokumen/spjmData', 'spjmData')->name('dokumen.spjm.data');
     Route::get('/dokumen/spjm/detail{id?}', 'spjmDetail')->name('dokumen.spjm.detail');
     Route::get('/dokumen/spjm/cont{id?}', 'spjmCont')->name('dokumen.spjm.detailCont');
     Route::post('/dokumen/spjm/updateDetail', 'spjmUpdateDetail')->name('dokumen.spjm.update.detail');
@@ -207,6 +211,7 @@ Route::controller(DokumenController::class)->group(function (){
 
      // SPPB BC23
      Route::get('/dokumen/bc23', 'bc23Index')->name('dokumen.bc23.index');
+     Route::get('/dokumen/bc23Data', 'bc23Data')->name('dokumen.bc23.data');
      Route::get('/dokumen/bc23/detail{id?}', 'bc23Detail')->name('dokumen.bc23.detail');
      Route::get('/dokumen/bc23/cont{id?}', 'bc23Cont')->name('dokumen.bc23.detailCont');
      Route::post('/dokumen/bc23/updateDetail', 'bc23UpdateDetail')->name('dokumen.bc23.update.detail');
@@ -214,6 +219,7 @@ Route::controller(DokumenController::class)->group(function (){
 
       // SPPB
       Route::get('/dokumen/sppb', 'sppbIndex')->name('dokumen.sppb.index');
+      Route::get('/dokumen/sppbData', 'sppbData')->name('dokumen.sppb.data');
       Route::get('/dokumen/sppb/detail{id?}', 'sppbDetail')->name('dokumen.sppb.detail');
       Route::get('/dokumen/sppb/cont{id?}', 'sppbCont')->name('dokumen.sppb.detailCont');
       Route::post('/dokumen/sppb/updateDetail', 'sppbUpdateDetail')->name('dokumen.sppb.update.detail');
@@ -221,6 +227,7 @@ Route::controller(DokumenController::class)->group(function (){
 
     //   manual
       Route::get('/dokumen/manual', 'manualIndex')->name('dokumen.manual.index');
+      Route::get('/dokumen/manualData', 'manualData')->name('dokumen.manual.data');
       Route::get('/dokumen/manual/detail{id?}', 'manualDetail')->name('dokumen.manual.detail');
       Route::get('/dokumen/manual/cont{id?}', 'manualCont')->name('dokumen.manual.detailCont');
       Route::post('/dokumen/manual/updateDetail', 'manualUpdateDetail')->name('dokumen.manual.update.detail');
@@ -228,6 +235,7 @@ Route::controller(DokumenController::class)->group(function (){
 
     //   Pabean
       Route::get('/dokumen/pabean', 'pabeanIndex')->name('dokumen.pabean.index');
+      Route::get('/dokumen/pabeanData', 'pabeanData')->name('dokumen.pabean.data');
       Route::get('/dokumen/pabean/detail{id?}', 'pabeanDetail')->name('dokumen.pabean.detail');
       Route::get('/dokumen/pabean/cont{id?}', 'pabeanCont')->name('dokumen.pabean.detailCont');
       Route::post('/dokumen/pabean/updateDetail', 'pabeanUpdateDetail')->name('dokumen.pabean.update.detail');
@@ -238,6 +246,7 @@ Route::controller(DokumenController::class)->group(function (){
     // Register
     Route::controller(RegisterController::class)->group(function(){
         Route::get('/lcl/register', 'index')->name('lcl.register.index');
+        Route::get('/lcl/registerData', 'indexData')->name('lcl.register.data');
         Route::post('/lcl/register/post', 'create')->name('lcl.register.create');
         Route::get('/lcl/register/detail-{id?}', 'detail')->name('lcl.register.detail');
         Route::post('/lcl/register/update', 'update')->name('lcl.register.update');
@@ -251,6 +260,7 @@ Route::controller(DokumenController::class)->group(function (){
 
     Route::controller(ManifestController::class)->group(function(){
         Route::get('/lcl/manifest', 'index')->name('lcl.manifest.idex');
+        Route::get('/lcl/manifest/data', 'indexData')->name('lcl.manifest.data');
         Route::get('/lcl/manifest/detail-{id?}', 'detail')->name('lcl.manifest.detail');
         Route::post('/lcl/manifest/create', 'create')->name('lcl.manifest.create');
         Route::post('/lcl/manifest/excel', 'excel')->name('lcl.manifest.excel');
@@ -340,6 +350,7 @@ Route::controller(BarcodeAutoGateController::class)->group(function(){
     Route::get('/barcode/autoGate-photoIn{id?}', 'photoIn');
     Route::get('/barcode/autoGate-photoOut{id?}', 'photoOut');
     Route::get('/autoGate-barcode', 'indexAll')->name('barcode.autoGate.indexAll');
+    Route::get('/autoGate-barcode/data', 'indexData')->name('barcode.autoGate.indexData');
     Route::post('/autoGate', 'autoGateNotification')->name('autoGate.autoGateNotification');
 });
 
@@ -507,4 +518,21 @@ Route::controller(LclController::class)->group(function(){
         Route::get('/invoice/report', 'index');
         Route::get('/invoice/reportGenerateExcel', 'generateExcel');
         Route::get('/invoice/reportGeneratePdf', 'generatePdf');
+    });
+
+    // BeaCukai P2
+    Route::controller(BeacukaiP2Controller::class)->group(function(){
+        Route::get('/bc-p2/dashboard', 'indexDashboard');
+        Route::get('/bc-p2/logData', 'logData');
+
+        Route::get('/bc-p2/lcl/list-manifest', 'listManifestIndex');
+        Route::get('/bc-p2/lcl/list-manifest/data', 'listManifestData');
+        Route::get('/bc-p2/lcl/list-manifest/lockModal{id?}', 'listManifestModal');
+        Route::post('/bc-p2/lcl/list-manifest/lockSubmit', 'lockSubmit');
+
+        Route::get('/bc-p2/list-segelMerah', 'listSegelIndex');
+        Route::get('/bc-p2/list-segelMerah/data', 'listSegelData');
+        Route::post('/bc-p2/list-segelMerah/unlockSubmit', 'unlockSubmit');
+
+        Route::get('/bc-p2/detil-log/{id?}', 'logDetil');
     });

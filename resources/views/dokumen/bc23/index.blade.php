@@ -14,84 +14,45 @@
             </div>
             <br>
             <div style="overflow-x:auto;">
-                <table class="tabelCustom table table-bordered table-striped">
-                    <thead>
-                        <tr>
-                            <th>Action</th>
-                            <th>car</th>
-                            <th>no_sppb</th>
-                            <th>tgl_sppb</th>
-                            <th>nojoborder</th>
-                            <th>kd_kantor_pengawas</th>
-                            <th>kd_kantor_bongkar</th>
-                            <th>no_pib</th>
-                            <th>tgl_pib</th>
-                            <th>nama_imp</th>
-                            <th>npwp_imp</th>
-                            <th>alamat_imp</th>
-                            <th>npwp_ppjk</th>
-                            <th>nama_ppjk</th>
-                            <th>alamat_ppjk</th>
-                            <th>nm_angkut</th>
-                            <th>no_voy_flight</th>
-                            <th>bruto</th>
-                            <th>netto</th>
-                            <th>gudang</th>
-                            <th>status_jalur</th>
-                            <th>jml_cont</th>
-                            <th>no_bc11</th>
-                            <th>tgl_bc11</th>
-                            <th>no_pos_bc11</th>
-                            <th>no_bl_awb</th>
-                            <th>tgl_bl_awb</th>
-                            <th>no_master_bl_awb</th>
-                            <th>tgl_master_bl_awb</th>
-                            <th>tgl_upload</th>
-                            <th>jam_upload</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                       @foreach($doks as $dok)
-                        <tr>
-                            <td>
-                                <a href="/dokumen/bc23/detail{{$dok->id}}" class="btn btn-warning"><i class="fa fa-pen"></i></a>
-                            </td>
-                            <td>{{$dok->car}}</td>
-                            <td>{{$dok->no_sppb}}</td>
-                            <td>{{$dok->tgl_sppb}}</td>
-                            <td>{{$dok->nojoborder}}</td>
-                            <td>{{$dok->kd_kantor_pengawas}}</td>
-                            <td>{{$dok->kd_kantor_bongkar}}</td>
-                            <td>{{$dok->no_pib}}</td>
-                            <td>{{$dok->tgl_pib}}</td>
-                            <td>{{$dok->nama_imp}}</td>
-                            <td>{{$dok->npwp_imp}}</td>
-                            <td>
-                            <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" readonly>{{$dok->alamat_imp}}</textarea>
-                            </td>
-                            <td>{{$dok->npwp_ppjk}}</td>
-                            <td>{{$dok->nama_ppjk}}</td>
-                            <td>{{$dok->alamat_ppjk}}</td>
-                            <td>{{$dok->nm_angkut}}</td>
-                            <td>{{$dok->no_voy_flight}}</td>
-                            <td>{{$dok->bruto}}</td>
-                            <td>{{$dok->netto}}</td>
-                            <td>{{$dok->gudang}}</td>
-                            <td>{{$dok->status_jalur}}</td>
-                            <td>{{$dok->jml_cont}}</td>
-                            <td>{{$dok->no_bc11}}</td>
-                            <td>{{$dok->tgl_bc11}}</td>
-                            <td>{{$dok->no_pos_bc11}}</td>
-                            <td>{{$dok->no_bl_awb}}</td>
-                            <td>{{$dok->tgl_bl_awb}}</td>
-                            <td>{{$dok->no_master_bl_awb}}</td>
-                            <td>{{$dok->tgl_master_bl_awb}}</td>
-                            <td>{{$dok->tgl_upload}}</td>
-                            <td>{{$dok->jam_upload}}</td>
-                        </tr>
-                       @endforeach
-                    </tbody>
-                </table>
+                <div class="table table-responsive">
+                    <table class="table table-hover table-stripped" id="tableBC23">
+                        <thead>
+                            <tr>
+                                <th>Action</th>
+                                <th>car</th>
+                                <th>no_sppb</th>
+                                <th>tgl_sppb</th>
+                                <th>nojoborder</th>
+                                <th>kd_kantor_pengawas</th>
+                                <th>kd_kantor_bongkar</th>
+                                <th>no_pib</th>
+                                <th>tgl_pib</th>
+                                <th>nama_imp</th>
+                                <th>npwp_imp</th>
+                                <th>alamat_imp</th>
+                                <th>npwp_ppjk</th>
+                                <th>nama_ppjk</th>
+                                <th>alamat_ppjk</th>
+                                <th>nm_angkut</th>
+                                <th>no_voy_flight</th>
+                                <th>bruto</th>
+                                <th>netto</th>
+                                <th>gudang</th>
+                                <th>status_jalur</th>
+                                <th>jml_cont</th>
+                                <th>no_bc11</th>
+                                <th>tgl_bc11</th>
+                                <th>no_pos_bc11</th>
+                                <th>no_bl_awb</th>
+                                <th>tgl_bl_awb</th>
+                                <th>no_master_bl_awb</th>
+                                <th>tgl_master_bl_awb</th>
+                                <th>tgl_upload</th>
+                                <th>jam_upload</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -263,5 +224,62 @@
             });
         });
     });
+</script>
+
+<script>
+    $(document).ready(function(){
+        $('#tableBC23').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '/dokumen/bc23Data',
+            columns: [
+                {
+                    data:'id',
+                    name: 'id',
+                    className: 'text-center',
+                    render: function(data, row){
+                        const formId = row.id;
+                        return `<a href="/dokumen/bc23/detail${data}" class="btn btn-warning"><i class="fa fa-pen"></i></a>`;
+                    }
+                },
+                {data:'car', name:'car', className:'text-center'},
+                {data:'no_sppb', name:'no_sppb', className:'text-center'},
+                {data:'tgl_sppb', name:'tgl_sppb', className:'text-center'},
+                {data:'nojoborder', name:'nojoborder', className:'text-center'},
+                {data:'kd_kantor_pengawas', name:'kd_kantor_pengawas', className:'text-center'},
+                {data:'kd_kantor_bongkar', name:'kd_kantor_bongkar', className:'text-center'},
+                {data:'no_pib', name:'no_pib', className:'text-center'},
+                {data:'tgl_pib', name:'tgl_pib', className:'text-center'},
+                {data:'nama_imp', name:'nama_imp', className:'text-center'},
+                {data:'npwp_imp', name:'npwp_imp', className:'text-center'},
+                {data:'alamat_imp', name:'alamat_imp', className:'text-center',
+                    render: function(data, row){
+                        return `<textarea class="form-control" id="exampleFormControlTextarea1" rows="3" readonly>${data}</textarea>`;
+                    }
+                },
+                {data:'npwp_ppjk', name:'npwp_ppjk', className:'text-center'},
+                {data:'nama_ppjk', name:'nama_ppjk', className:'text-center'},
+                {data:'alamat_ppjk', name:'alamat_ppjk', className:'text-center'},
+                {data:'nm_angkut', name:'nm_angkut', className:'text-center'},
+                {data:'no_voy_flight', name:'no_voy_flight', className:'text-center'},
+                {data:'bruto', name:'bruto', className:'text-center'},
+                {data:'netto', name:'netto', className:'text-center'},
+                {data:'gudang', name:'gudang', className:'text-center'},
+                {data:'status_jalur', name:'status_jalur', className:'text-center'},
+                {data:'jml_cont', name:'jml_cont', className:'text-center'},
+                {data:'no_bc11', name:'no_bc11', className:'text-center'},
+                {data:'tgl_bc11', name:'tgl_bc11', className:'text-center'},
+                {data:'no_pos_bc11', name:'no_pos_bc11', className:'text-center'},
+                {data:'no_bl_awb', name:'no_bl_awb', className:'text-center'},
+                {data:'tgl_bl_awb', name:'tgl_bl_awb', className:'text-center'},
+                {data:'no_master_bl_awb', name:'no_master_bl_awb', className:'text-center'},
+                {data:'tgl_master_bl_awb', name:'tgl_master_bl_awb', className:'text-center'},
+                {data:'tgl_upload', name:'tgl_upload', className:'text-center'},
+                {data:'jam_upload', name:'jam_upload', className:'text-center'},
+                
+            ],
+            pageLength: 25,
+        })
+    })
 </script>
 @endsection

@@ -14,38 +14,23 @@
             </div>
             <br>
             <div style="overflow-x:auto;">
-                <table class="tabelCustom table table-bordered table-striped">
-                    <thead>
-                        <tr>
-                            <th>Action</th>
-                            <th>Id</th>
-                            <th>Kode Dokumen</th>
-                            <th>Nomor Dokumen</th>
-                            <th>Tanggal Dokumen</th>
-                            <th>No BC11</th>
-                            <th>Tanggal BC11</th>
-                            <th>Tanggal Upload</th>
-                            <th>Jam Upload</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                       @foreach($doks as $dok)
-                        <tr>
-                            <td>
-                                <a href="/dokumen/manual/detail{{$dok->idm}}" class="btn btn-warning"><i class="fa fa-pen"></i></a>
-                            </td>
-                            <td>{{$dok->id}}</td>
-                            <td>{{$dok->dokumen->name ?? ''}}</td>
-                            <td>{{$dok->no_dok_inout}}</td>
-                            <td>{{$dok->tgl_dok_inout}}</td>
-                            <td>{{$dok->no_bc11}}</td>
-                            <td>{{$dok->tgl_bc11}}</td>
-                            <td>{{$dok->tgl_upload}}</td>
-                            <td>{{$dok->jam_upload}}</td>
-                        </tr>
-                       @endforeach
-                    </tbody>
-                </table>
+                <div class="table table-responsive">
+                    <table class="table table-hover table-stripped" id="tableManual">
+                        <thead>
+                            <tr>
+                                <th>Action</th>
+                                <th>Id</th>
+                                <th>Kode Dokumen</th>
+                                <th>Nomor Dokumen</th>
+                                <th>Tanggal Dokumen</th>
+                                <th>No BC11</th>
+                                <th>Tanggal BC11</th>
+                                <th>Tanggal Upload</th>
+                                <th>Jam Upload</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -98,6 +83,30 @@
 @endsection
 
 @section('custom_js')
+<script>
+    $(document).ready(function(){
+        $('#tableManual').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '/dokumen/manualData',
+            columns:[
+                {data:'id', name:'id', className:'text-center',
+                    render: function(data,row){
+                        return `<a href="/dokumen/manual/detail${data}" class="btn btn-warning"><i class="fa fa-pen"></i></a>`
+                    }
+                },
+                {data:'id', name:'id', className:'text-center'},
+                {data:'dokumen.name', name:'dokumen.name', className:'text-center'},
+                {data:'no_dok_inout', name:'no_dok_inout', className:'text-center'},
+                {data:'tgl_dok_inout', name:'tgl_dok_inout', className:'text-center'},
+                {data:'no_bc11', name:'no_bc11', className:'text-center'},
+                {data:'tgl_bc11', name:'tgl_bc11', className:'text-center'},
+                {data:'tgl_upload', name:'tgl_upload', className:'text-center'},
+                {data:'jam_upload', name:'jam_upload', className:'text-center'},
+            ]
+        });
+    });
+</script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Attach event listener to the update button

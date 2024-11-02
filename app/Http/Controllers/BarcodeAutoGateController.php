@@ -14,6 +14,8 @@ use App\Models\BarcodeGate as Barcode;
 use App\Models\Photo;
 use App\Models\YardDetil as RowTier;
 
+use DataTables;
+
 class BarcodeAutoGateController extends Controller
 {
     public function __construct()
@@ -43,9 +45,15 @@ class BarcodeAutoGateController extends Controller
     public function indexAll()
     {
         $data['title'] = "Barcode Autogate";
-        $data['barcodes'] = Barcode::orderBy('status', 'asc')->orderBy('created_at', 'desc')->get();
 
         return view('barcode.indexAll', $data);
+    }
+
+    public function indexData(Request $request)
+    {
+        $barcode = Barcode::orderBy('status', 'asc')->orderBy('created_at', 'desc')->get();
+
+        return DataTables::of($barcode)->make(true);
     }
 
     public function photoIn($id)

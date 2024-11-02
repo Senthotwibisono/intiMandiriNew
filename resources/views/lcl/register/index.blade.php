@@ -10,54 +10,22 @@
                 </div>
             </div>
             <br>
-            <table class="tabelCustom table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>Action</th>
-                        <th>No Job Order</th>
-                        <th>No SPK</th>
-                        <th>No Container</th>
-                        <th>No MBL</th>
-                        <th>ETA</th>
-                        <th>Vessel</th>
-                        <th>UID</th>
-                    </tr>
-                    <tbody>
-                        @foreach($jobs as $jobData)
-                            @if(count($jobData['containers']) > 0)
-                                @foreach($jobData['containers'] as $container)
-                                    <tr>
-                                        <td>
-                                            <a href="/lcl/register/detail-{{$container->joborder_id}}" class="btn btn-warning"><i class="fa fa-pen"></i></a>
-                                            <button class="btn btn-danger printBarcode" data-id="{{$container->id}}"><i class="fa fa-print"></i></button>
-                                        </td>
-                                        <td>{{$container->job->nojoborder}}</td>
-                                        <td>{{$container->job->nospk}}</td>
-                                        <td>{{$container->nocontainer}}</td>
-                                        <td>{{$container->job->nombl}}</td>
-                                        <td>{{$container->job->eta}}</td>
-                                        <td>{{$container->job->Kapal->name ?? ''}}</td>
-                                        <td>{{$container->user->name}}</td>
-                                    </tr>
-                                @endforeach
-                            @else
-                                <tr>
-                                    <td>
-                                        <a href="/lcl/register/detail-{{$jobData['job']->id}}" class="btn btn-warning"><i class="fa fa-pen"></i></a>
-                                    </td>
-                                    <td>{{$jobData['job']->nojoborder}}</td>
-                                    <td>{{$jobData['job']->nospk}}</td>
-                                    <td>Belum ada Container</td>
-                                    <td>{{$jobData['job']->nombl}}</td>
-                                    <td>{{$jobData['job']->eta}}</td>
-                                    <td>{{$jobData['job']->Kapal->name ?? ''}}</td>
-                                    <td>{{$jobData['job']->user->name}}</td>
-                                </tr>
-                            @endif
-                        @endforeach
-                    </tbody>
-                </thead>
-            </table>
+            <div class="table table-responsive">
+                <table class="table table-hover table-striped" id="tableJob">
+                    <thead>
+                        <tr>
+                            <th>Action</th>
+                            <th>No Job Order</th>
+                            <th>No SPK</th>
+                            <th>No Container</th>
+                            <th>No MBL</th>
+                            <th>ETA</th>
+                            <th>Vessel</th>
+                            <th>UID</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
         </div>
     </div>
 </section>
@@ -222,6 +190,25 @@
 </div>
 @endsection
 @section('custom_js')
+<script>
+    $(document).ready(function(){
+        $('#tableJob').DataTable({
+            precessing: true,
+            serverSide: true,
+            ajax: '/lcl/registerData',
+            columns: [
+                { data: 'actions', name: 'actions', orderable: false, searchable: false },
+                { data: 'nojoborder', name: 'nojoborder' },
+                { data: 'nospk', name: 'nospk' },
+                { data: 'nocontainer', name: 'nocontainer' },
+                { data: 'nombl', name: 'nombl' },
+                { data: 'eta', name: 'eta' },
+                { data: 'Kapal_name', name: 'Kapal_name' },
+                { data: 'user_name', name: 'user_name' }
+            ]
+        })
+    });
+</script>
 <script>
     $(document).on('click', '.printBarcode', function(e) {
         e.preventDefault();

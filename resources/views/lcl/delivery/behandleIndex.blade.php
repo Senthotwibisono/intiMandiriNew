@@ -32,7 +32,7 @@
         </div> -->
         <div class="card-body">
             <div style="overflow-x:auto;">
-                <table class="tabelCustom">
+                <table class="tabelCustom table-hover table-stripped">
                     <thead>
                         <tr>
                             <th class="text-center">Action</th>

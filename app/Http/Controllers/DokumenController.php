@@ -30,6 +30,7 @@ use App\Models\Container as Cont;
 use Auth;
 use Carbon\Carbon;
 use SoapWrapper;
+use DataTables;
 
 class DokumenController extends Controller
 {
@@ -53,9 +54,14 @@ class DokumenController extends Controller
     public function plpIndex()
     {
         $data['title'] = "Dokumen PLP Tujuan";
-        $data['dokumen'] = PLP::get();
         
         return view('dokumen.plp.index', $data);
+    }
+
+    public function plpData(Request $request)
+    {
+        $dokumen = PLP::with('user')->get();
+        return DataTables::of($dokumen)->make(true);
     }
 
     public function plpDetail($id)
@@ -244,9 +250,13 @@ class DokumenController extends Controller
     public function spjmIndex()
     {
         $data['title'] = "Dokumen SPJM";
-        $data['doks'] = SPJM::get();
-
         return view('dokumen.spjm.index', $data);
+    }
+
+    public function spjmData(Request $request)
+    {
+        $dokumen = SPJM::get();
+        return DataTables::of($dokumen)->make(true);
     }
 
     public function GetSPJM_onDemand(Request $request)
@@ -381,9 +391,14 @@ class DokumenController extends Controller
     public function bc23Index()
     {
         $data['title'] = "Dokumen SPPB BC23";
-        $data['doks'] = BC23::get();
-
         return view('dokumen.bc23.index', $data);
+    }
+
+    public function bc23Data(Request $request)
+    {
+        $dokumen = BC23::get();
+
+        return DataTables::of($dokumen)->make(true);
     }
     
     public function bc23Detail($id)
@@ -567,9 +582,14 @@ class DokumenController extends Controller
     public function sppbIndex()
     {
         $data['title'] = "Dokumen SPPB";
-        $data['doks'] = SPPB::get();
 
         return view('dokumen.sppb.index', $data);
+    }
+
+    public function sppbData(Request $request)
+    {
+        $dokumen = SPPB::get();
+        return DataTables::of($dokumen)->make('true');
     }
 
     public function sppbDetail($id)
@@ -834,6 +854,12 @@ class DokumenController extends Controller
         return view('dokumen.manual.index', $data);
     }
 
+    public function manualData(Request $request)
+    {
+        $dokumen = Manual::with('dokumen')->get();
+        return DataTables::of($dokumen)->make(true);
+    }
+
     public function manualDetail($id)
     {
         $manual = Manual::where('idm', $id)->first();
@@ -969,10 +995,16 @@ class DokumenController extends Controller
     public function pabeanIndex()
     {
         $data['title'] = 'Dokumen Pabean';
-        $data['doks'] = Pabean::get();
+        
         $data['codes'] = Kode::orderBy('kode', 'asc')->get();
 
         return view('dokumen.pabean.index', $data);
+    }
+
+    public function pabeanData(Request $request)
+    {
+        $dokumen = Pabean::with('dokumen')->get();
+        return DataTables::of($dokumen)->make(true);
     }
 
     public function pabeanDetail($id)

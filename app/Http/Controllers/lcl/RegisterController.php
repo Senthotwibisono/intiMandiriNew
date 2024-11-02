@@ -22,6 +22,8 @@ use App\Models\TpsPLP as PLP;
 use App\Models\TpsPLPdetail as PLPdetail;
 use App\Models\BarcodeGate as Barcode;
 
+use DataTables;
+
 class RegisterController extends Controller
 {
     public function __construct()
@@ -39,28 +41,48 @@ class RegisterController extends Controller
         $data['ships'] = SL::get();
         $data['loks'] = LS::get();
         $data['gudangs'] = Gudang::get();
-        $data['jobs'] = null;
-        $jobs = Job::where('type', '=', 'lcl')->get();
-        $jobsWithContainers = [];
-
-        foreach ($jobs as $job) {
-            $conts = Cont::where('joborder_id', $job->id)->get();
-            if ($conts->isNotEmpty()) {
-                $jobsWithContainers[] = [
-                    'job' => $job,
-                    'containers' => $conts,
-                ];
-            } else {
-                $jobsWithContainers[] = [
-                    'job' => $job,
-                    'containers' => [],
-                ];
-            }
-        }
-
-        $data['jobs'] = $jobsWithContainers;
         return view('lcl.register.index', $data);
     }
+
+    public function indexData()
+    {
+        $jobs = Job::with(['containers', 'Kapal', 'user'])
+            ->where('type', 'lcl')
+            ->get()
+            ->map(function($job) {
+                $containers = $job->containers;
+                if ($containers->isNotEmpty()) {
+                    return $containers->map(function($container) use ($job) {
+                        return [
+                            'actions' => '<a href="/lcl/register/detail-'.$container->joborder_id.'" class="btn btn-warning"><i class="fa fa-pen"></i></a> 
+                                          <button class="btn btn-danger printBarcode" data-id="'.$container->id.'"><i class="fa fa-print"></i></button>',
+                            'nojoborder' => $job->nojoborder,
+                            'nospk' => $job->nospk,
+                            'nocontainer' => $container->nocontainer,
+                            'nombl' => $job->nombl,
+                            'eta' => $job->eta,
+                            'Kapal_name' => $job->Kapal->name ?? '',
+                            'user_name' => $job->user->name,
+                        ];
+                    });
+                } else {
+                    return [[
+                        'actions' => '<a href="/lcl/register/detail-'.$job->id.'" class="btn btn-warning"><i class="fa fa-pen"></i></a>',
+                        'nojoborder' => $job->nojoborder,
+                        'nospk' => $job->nospk,
+                        'nocontainer' => 'Belum ada Container',
+                        'nombl' => $job->nombl,
+                        'eta' => $job->eta,
+                        'Kapal_name' => $job->Kapal->name ?? '',
+                        'user_name' => $job->user->name,
+                    ]];
+                }
+            })
+            ->flatten(1);
+        
+        return datatables()->of($jobs)->rawColumns(['actions'])->make(true);
+    }
+
 
     public function create(Request $request)
     {

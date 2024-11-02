@@ -26,6 +26,7 @@ use App\Models\TempManifest;
 use App\Models\TempBarang;
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use DataTables;
 
 
 class ManifestController extends Controller
@@ -37,10 +38,20 @@ class ManifestController extends Controller
 
     public function index()
     {
-        $data['title'] = "Import LCL - Register";
+        $data['title'] = "Import LCL - Manifest List";
         $data['conts'] = Cont::where('type', '=', 'lcl')->where('tglkeluar', null )->get();
         
         return view('lcl.manifest.index', $data);
+    }
+
+    public function indexData(Request $request)
+    {
+        $cont = Cont::with(['job', 'user'])->where('type', '=', 'lcl')->where('tglkeluar', null )->get();
+
+        return DataTables::of($cont)
+        ->addColumn('kapal_cont', function($cont){
+            return $cont->job->Kapal->name ?? '-';
+        })->make(true);
     }
 
     public function detail($id)
