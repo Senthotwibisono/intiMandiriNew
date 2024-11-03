@@ -171,19 +171,27 @@ class BeaCukaiController extends Controller
             ]);
         }
         if ($manifest) {
-            $manifest->update([
-                'status_bc'=>'release',
-                'release_bc_date' => Carbon::now(),
-                'release_bc_uid' => Auth::user()->id,
-            ]);
             $barcode = Barcode::where('ref_id', $manifest->id)->where('ref_type', '=', 'Manifest')->where('ref_action', 'hold')->first();
-            $barcode->update([
-                'ref_action' => 'release',
-            ]);
-            return response()->json([
-                'success' => true,
-                'message' => 'Manifest Persilahkan Keluar',
-            ]);
+            if ($barcode) {
+                $manifest->update([
+                    'status_bc'=>'release',
+                    'release_bc_date' => Carbon::now(),
+                    'release_bc_uid' => Auth::user()->id,
+                ]);
+                $barcode->update([
+                    'ref_action' => 'release',
+                ]);
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Manifest Persilahkan Keluar',
+                ]);
+            }else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Barcode belum di cetak !!',
+                ]);
+            }
+            
         }else {
             return response()->json([
                 'success' => false,

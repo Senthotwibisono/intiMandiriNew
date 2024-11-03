@@ -134,7 +134,7 @@ class BarcodeAutoGateController extends Controller
 
             if ($data) {
                 
-                if ($dataBarcode->ref_action == 'get') {
+                if ($tipe == 'in' || $tipe == 'In' || $tipe == 'IN') {
                     $data->update([
                         'tglmasuk'=> date('Y-m-d', strtotime($dataBarcode->time_in)),
                         'jammasuk'=> date('H:i:s', strtotime($dataBarcode->time_in)),
@@ -155,7 +155,7 @@ class BarcodeAutoGateController extends Controller
                     }
 
                     return "Data updated";
-                }elseif ($dataBarcode->ref_action == 'release') {
+                }elseif ($tipe == 'out' || $tipe == 'Out' || $tipe == 'OUT') {
                     if ($dataBarcode->ref_type == 'manifest') {
                         $data->update([
                             'tglbuangmty'=> date('Y-m-d', strtotime($dataBarcode->time_out)),
