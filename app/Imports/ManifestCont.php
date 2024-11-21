@@ -7,7 +7,7 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
 use App\Models\Container as Cont;
-use App\Models\Joborder as Job;
+use App\Models\JobOrder as Job;
 use App\Models\TempCont;
 use Auth;
 use Carbon\Carbon;

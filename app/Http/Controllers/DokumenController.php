@@ -1081,107 +1081,379 @@ class DokumenController extends Controller
 			'Tgl_Sppb' => Carbon::parse($request->tgl_sppb)->format('dmY'), //09022017
             'NPWP_Imp' => $request->npwp_imp //033153321035000
         ];
+
         
         // Using the added service
-        \SoapWrapper::service('TpsOnline', function ($service) use ($data) {        
-            $this->response = $service->call('GetImpor_Sppb', [$data])->GetImpor_SppbResult;      
-        });
+        // \SoapWrapper::service('TpsOnline', function ($service) use ($data) {        
+        //     $this->response = $service->call('GetImpor_Sppb', [$data])->GetImpor_SppbResult;      
+        // }); 
         
-//        var_dump($this->response);
-        
-        libxml_use_internal_errors(true);
-        $xml = simplexml_load_string($this->response);
-        if(!$xml || !$xml->children()){
-            return back()->with('status', ['type' => 'error', 'message' => 'Error importing data: ' .  $this->response]);
-        }
+        // libxml_use_internal_errors(true);
+        // $xml = simplexml_load_string($this->response);
+        // if(!$xml || !$xml->children()){
+        //     return back()->with('status', ['type' => 'error', 'message' => 'Error importing data: ' .  $this->response]);
+        // }
 
+        $test = '<!-- BC-Doc.SPPB -->
+        <DOCUMENT>
+        <SPPB>
+        <HEADER>
+        <CAR>04030000024720201119310905</CAR>
+        <NO_SPPB>511653/KPU.01/2020</NO_SPPB>
+        <TGL_SPPB>11/20/2020</TGL_SPPB>
+        <KD_KPBC>040300</KD_KPBC>
+        <NO_PIB>511367</NO_PIB>
+        <TGL_PIB>11/20/2020</TGL_PIB>
+        <NPWP_IMP>024942047086000</NPWP_IMP>
+        <NAMA_IMP>PT. BINTANG SAPUTRA</NAMA_IMP>
+        <ALAMAT_IMP>RUKAN KENCANA NIAGA I BLOK. D1 NO.1-B JL.TAMAN ARIES MERUYA UTARA-KEMB</ALAMAT_IMP>
+        <NPWP_PPJK/>
+        <NAMA_PPJK/>
+        <ALAMAT_PPJK/>
+        <NM_ANGKUT>KYOTO TOWER 0503</NM_ANGKUT>
+        <NO_VOY_FLIGHT>024S</NO_VOY_FLIGHT>
+        <BRUTO>390656.25</BRUTO>
+        <NETTO>383156.25</NETTO>
+        <GUDANG>TMAL</GUDANG>
+        <STATUS_JALUR>H</STATUS_JALUR>
+        <JML_CONT>15</JML_CONT>
+        <NO_BC11>004625</NO_BC11>
+        <TGL_BC11>11/18/2020</TGL_BC11>
+        <NO_POS_BC11>004600000000</NO_POS_BC11>
+        <NO_BL_AWB>EGLV091030644422</NO_BL_AWB>
+        <TG_BL_AWB>11/16/2020</TG_BL_AWB>
+        <NO_MASTER_BL_AWB/>
+        <TG_MASTER_BL_AWB/>
+        </HEADER>
+        <DETIL>
+        <CONT>
+        <CAR>04030000024720201119310905</CAR>
+        <NO_CONT>DRYU2242217</NO_CONT>
+        <SIZE>20</SIZE>
+        <JNS_MUAT>F</JNS_MUAT>
+        </CONT>
+        <CONT>
+        <CAR>04030000024720201119310905</CAR>
+        <NO_CONT>DRYU2300782</NO_CONT>
+        <SIZE>20</SIZE>
+        <JNS_MUAT>F</JNS_MUAT>
+        </CONT>
+        <CONT>
+        <CAR>04030000024720201119310905</CAR>
+        <NO_CONT>DRYU2383935</NO_CONT>
+        <SIZE>20</SIZE>
+        <JNS_MUAT>F</JNS_MUAT>
+        </CONT>
+        <CONT>
+        <CAR>04030000024720201119310905</CAR>
+        <NO_CONT>EGHU3331936</NO_CONT>
+        <SIZE>20</SIZE>
+        <JNS_MUAT>F</JNS_MUAT>
+        </CONT>
+        <CONT>
+        <CAR>04030000024720201119310905</CAR>
+        <NO_CONT>EITU0195565</NO_CONT>
+        <SIZE>20</SIZE>
+        <JNS_MUAT>F</JNS_MUAT>
+        </CONT>
+        <CONT>
+        <CAR>04030000024720201119310905</CAR>
+        <NO_CONT>EITU0197763</NO_CONT>
+        <SIZE>20</SIZE>
+        <JNS_MUAT>F</JNS_MUAT>
+        </CONT>
+        <CONT>
+        <CAR>04030000024720201119310905</CAR>
+        <NO_CONT>EITU0329725</NO_CONT>
+        <SIZE>20</SIZE>
+        <JNS_MUAT>F</JNS_MUAT>
+        </CONT>
+        <CONT>
+        <CAR>04030000024720201119310905</CAR>
+        <NO_CONT>EITU0336318</NO_CONT>
+        <SIZE>20</SIZE>
+        <JNS_MUAT>F</JNS_MUAT>
+        </CONT>
+        <CONT>
+        <CAR>04030000024720201119310905</CAR>
+        <NO_CONT>EITU0529019</NO_CONT>
+        <SIZE>20</SIZE>
+        <JNS_MUAT>F</JNS_MUAT>
+        </CONT>
+        <CONT>
+        <CAR>04030000024720201119310905</CAR>
+        <NO_CONT>TEMU0537171</NO_CONT>
+        <SIZE>20</SIZE>
+        <JNS_MUAT>F</JNS_MUAT>
+        </CONT>
+        <CONT>
+        <CAR>04030000024720201119310905</CAR>
+        <NO_CONT>TEMU0663610</NO_CONT>
+        <SIZE>20</SIZE>
+        <JNS_MUAT>F</JNS_MUAT>
+        </CONT>
+        <CONT>
+        <CAR>04030000024720201119310905</CAR>
+        <NO_CONT>TEMU0684070</NO_CONT>
+        <SIZE>20</SIZE>
+        <JNS_MUAT>F</JNS_MUAT>
+        </CONT>
+        <CONT>
+        <CAR>04030000024720201119310905</CAR>
+        <NO_CONT>TEMU0768144</NO_CONT>
+        <SIZE>20</SIZE>
+        <JNS_MUAT>F</JNS_MUAT>
+        </CONT>
+        <CONT>
+        <CAR>04030000024720201119310905</CAR>
+        <NO_CONT>TEMU3938481</NO_CONT>
+        <SIZE>20</SIZE>
+        <JNS_MUAT>F</JNS_MUAT>
+        </CONT>
+        <CONT>
+        <CAR>04030000024720201119310905</CAR>
+        <NO_CONT>TLLU2012250</NO_CONT>
+        <SIZE>20</SIZE>
+        <JNS_MUAT>F</JNS_MUAT>
+        </CONT>
+        <KMS>
+        <CAR>04030000024720201119310905</CAR>
+        <JNS_KMS>CS</JNS_KMS>
+        <MERK_KMS>SESUAI BL</MERK_KMS>
+        <JML_KMS>150</JML_KMS>
+        </KMS>
+        </DETIL>
+        </SPPB>
+        <SPPB>
+        <HEADER>
+        <CAR>04030000024720201119310906</CAR>
+        <NO_SPPB>511654/KPU.01/2020</NO_SPPB>
+        <TGL_SPPB>11/20/2020</TGL_SPPB>
+        <KD_KPBC>040300</KD_KPBC>
+        <NO_PIB>511368</NO_PIB>
+        <TGL_PIB>11/20/2020</TGL_PIB>
+        <NPWP_IMP>024942047086000</NPWP_IMP>
+        <NAMA_IMP>PT. BINTANG SAPUTRA</NAMA_IMP>
+        <ALAMAT_IMP>RUKAN KENCANA NIAGA I BLOK. D1 NO.1-B JL.TAMAN ARIES MERUYA UTARA-KEMB</ALAMAT_IMP>
+        <NPWP_PPJK/>
+        <NAMA_PPJK/>
+        <ALAMAT_PPJK/>
+        <NM_ANGKUT>KYOTO TOWER 0503</NM_ANGKUT>
+        <NO_VOY_FLIGHT>024S</NO_VOY_FLIGHT>
+        <BRUTO>391290.33</BRUTO>
+        <NETTO>383790.33</NETTO>
+        <GUDANG>TMAL</GUDANG>
+        <STATUS_JALUR>H</STATUS_JALUR>
+        <JML_CONT>15</JML_CONT>
+        <NO_BC11>004625</NO_BC11>
+        <TGL_BC11>11/18/2020</TGL_BC11>
+        <NO_POS_BC11>003500000000</NO_POS_BC11>
+        <NO_BL_AWB>EGLV091030632211</NO_BL_AWB>
+        <TG_BL_AWB>11/16/2020</TG_BL_AWB>
+        <NO_MASTER_BL_AWB/>
+        <TG_MASTER_BL_AWB/>
+        </HEADER>
+        <DETIL>
+        <CONT>
+        <CAR>04030000024720201119310906</CAR>
+        <NO_CONT>BEAU2125154</NO_CONT>
+        <SIZE>20</SIZE>
+        <JNS_MUAT>F</JNS_MUAT>
+        </CONT>
+        <CONT>
+        <CAR>04030000024720201119310906</CAR>
+        <NO_CONT>EGHU3383035</NO_CONT>
+        <SIZE>20</SIZE>
+        <JNS_MUAT>F</JNS_MUAT>
+        </CONT>
+        <CONT>
+        <CAR>04030000024720201119310906</CAR>
+        <NO_CONT>EISU2015036</NO_CONT>
+        <SIZE>20</SIZE>
+        <JNS_MUAT>F</JNS_MUAT>
+        </CONT>
+        <CONT>
+        <CAR>04030000024720201119310906</CAR>
+        <NO_CONT>EISU2047671</NO_CONT>
+        <SIZE>20</SIZE>
+        <JNS_MUAT>F</JNS_MUAT>
+        </CONT>
+        <CONT>
+        <CAR>04030000024720201119310906</CAR>
+        <NO_CONT>EISU2055738</NO_CONT>
+        <SIZE>20</SIZE>
+        <JNS_MUAT>F</JNS_MUAT>
+        </CONT>
+        <CONT>
+        <CAR>04030000024720201119310906</CAR>
+        <NO_CONT>EISU3976969</NO_CONT>
+        <SIZE>20</SIZE>
+        <JNS_MUAT>F</JNS_MUAT>
+        </CONT>
+        <CONT>
+        <CAR>04030000024720201119310906</CAR>
+        <NO_CONT>EITU0265873</NO_CONT>
+        <SIZE>20</SIZE>
+        <JNS_MUAT>F</JNS_MUAT>
+        </CONT>
+        <CONT>
+        <CAR>04030000024720201119310906</CAR>
+        <NO_CONT>EITU0388116</NO_CONT>
+        <SIZE>20</SIZE>
+        <JNS_MUAT>F</JNS_MUAT>
+        </CONT>
+        <CONT>
+        <CAR>04030000024720201119310906</CAR>
+        <NO_CONT>HMCU3031392</NO_CONT>
+        <SIZE>20</SIZE>
+        <JNS_MUAT>F</JNS_MUAT>
+        </CONT>
+        <CONT>
+        <CAR>04030000024720201119310906</CAR>
+        <NO_CONT>TCKU1179777</NO_CONT>
+        <SIZE>20</SIZE>
+        <JNS_MUAT>F</JNS_MUAT>
+        </CONT>
+        <CONT>
+        <CAR>04030000024720201119310906</CAR>
+        <NO_CONT>TCLU6934564</NO_CONT>
+        <SIZE>20</SIZE>
+        <JNS_MUAT>F</JNS_MUAT>
+        </CONT>
+        <CONT>
+        <CAR>04030000024720201119310906</CAR>
+        <NO_CONT>TEMU0043820</NO_CONT>
+        <SIZE>20</SIZE>
+        <JNS_MUAT>F</JNS_MUAT>
+        </CONT>
+        <CONT>
+        <CAR>04030000024720201119310906</CAR>
+        <NO_CONT>TEMU0625610</NO_CONT>
+        <SIZE>20</SIZE>
+        <JNS_MUAT>F</JNS_MUAT>
+        </CONT>
+        <CONT>
+        <CAR>04030000024720201119310906</CAR>
+        <NO_CONT>TEMU4147700</NO_CONT>
+        <SIZE>20</SIZE>
+        <JNS_MUAT>F</JNS_MUAT>
+        </CONT>
+        <CONT>
+        <CAR>04030000024720201119310906</CAR>
+        <NO_CONT>TRHU3620494</NO_CONT>
+        <SIZE>20</SIZE>
+        <JNS_MUAT>F</JNS_MUAT>
+        </CONT>
+        <KMS>
+        <CAR>04030000024720201119310906</CAR>
+        <JNS_KMS>CS</JNS_KMS>
+        <MERK_KMS>SESUAI BL</MERK_KMS>
+        <JML_KMS>150</JML_KMS>
+        </KMS>
+        </DETIL>
+        </SPPB>
+        </DOCUMENT>';
+
+        $testXml = simplexml_load_string($test);
+        $groups = [];
+        $nextGroup = [];
         $header = null;
-        $kms = null;
-        $cont = null;
-        foreach($xml->children() as $child) {
-            foreach($child as $key => $value) {
-                if($key == 'header' || $key == 'HEADER'){
-                    $header = $value;
-                }else{
-                    foreach ($value as $key => $value):
-                        if($key == 'kms' || $key == 'KMS'):
-                            $kms [] = $value;
-                        elseif($key == 'dok' || $key == 'DOC'):
-                            $dok [] = $value;
-                        elseif($key == 'cont' || $key == 'CONT'):
-                            $cont [] = $value;
-                        endif;
-                    endforeach;
-                }
+        foreach ($testXml->children() as $child) {
+            $groups[] = $child;
+            if (strtolower($child->getName()) === 'header') {
+                $header = $child;
             }
+
         }
-        if ($header) {
-            $oldSPPB = SPPB::where('car', $header->CAR)->first();
-            if ($oldSPPB) {
-                return back()->with('status', ['type' => 'error', 'message' => 'Data sudah tersedia']);
-            }
+        dd($groups, $header);
 
-            $sppb = SPPB::create([
-                'car' =>$header->CAR ?? null,
-                'no_sppb' =>$header->NO_SPPB ?? null,
-                'tgl_sppb' =>$header->TGL_SPPB ?? null,
-                'nojoborder' =>$header->NOJOBORDER ?? null,
-                'kd_kantor_pengawas' =>$header->KD_KANTOR_PENGAWAS ?? null,
-                'kd_kantor_bongkar' =>$header->KD_KANTOR_BONGKAR ?? null,
-                'no_pib' =>$header->NO_PIB ?? null,
-                'tgl_pib' =>$header->TGL_PIB ?? null,
-                'nama_imp' =>$header->NAMA_IMP ?? null,
-                'npwp_imp' =>$header->NPWP_IMP ?? null,
-                'alamat_imp' =>$header->ALAMAT_IMP ?? null,
-                'npwp_ppjk' =>$header->NPWP_PPJK ?? null,
-                'nama_ppjk' =>$header->NAMA_PPJK ?? null,
-                'alamat_ppjk' =>$header->ALAMAT_PPJK ?? null,
-                'nm_angkut' =>$header->NM_ANGKUT ?? null,
-                'no_voy_flight' =>$header->NO_VOY_FLIGHT ?? null,
-                'bruto' =>$header->BRUTO ?? null,
-                'netto' =>$header->NETTO ?? null,
-                'gudang' =>$header->GUDANG ?? null,
-                'status_jalur' =>$header->STATUS_JALUR ?? null,
-                'jml_cont' =>$header->JML_CONT ?? null,
-                'no_bc11' =>$header->NO_BC11 ?? null,
-                'tgl_bc11' =>$header->TGL_BC11 ?? null,
-                'no_pos_bc11' =>$header->NO_POS_BC11 ?? null,
-                'no_bl_awb' =>$header->NO_BL_AWB ?? null,
-                'tgl_bl_awb' =>$header->TGL_BL_AWB ?? null,
-                'no_master_bl_awb' =>$header->NO_MASTER_BL_AWB ?? null,
-                'tgl_master_bl_awb' =>$header->TGL_MASTER_BL_AWB ?? null,
-                'tgl_upload'=>Carbon::today()->format('Y-m-d'),
-                'jam_upload'=>Carbon::now()->format('H:i:s'),
-            ]);
+    //     $header = null;
+    //     $kms = null;
+    //     $cont = null;
+    //     foreach($xml->children() as $child) {
+    //         foreach($child as $key => $value) {
+    //             if($key == 'header' || $key == 'HEADER'){
+    //                 $header = $value;
+    //             }else{
+    //                 foreach ($value as $key => $value):
+    //                     if($key == 'kms' || $key == 'KMS'):
+    //                         $kms [] = $value;
+    //                     elseif($key == 'dok' || $key == 'DOC'):
+    //                         $dok [] = $value;
+    //                     elseif($key == 'cont' || $key == 'CONT'):
+    //                         $cont [] = $value;
+    //                     endif;
+    //                 endforeach;
+    //             }
+    //         }
+    //     }
+    //     if ($header) {
+    //         $oldSPPB = SPPB::where('car', $header->CAR)->first();
+    //         if ($oldSPPB) {
+    //             return back()->with('status', ['type' => 'error', 'message' => 'Data sudah tersedia']);
+    //         }
 
-            if ($kms) {
-                foreach ($kms as $detail) {
-                    // dd($kms, $detail);
-                    $sppbKMS = SPPBKms::create([
-                        'sppb_id'=>$sppb->id ?? null,
-                        'car'=>$detail->CAR,
-                        'jns_kms'=>$detail->JNS_KMS,
-                        'merk_kms'=>$detail->MERK_KMS,
-                        'jml_kms'=>$detail->JML_KMS,
-                    ]);
-                }
-            }
+    //         $sppb = SPPB::create([
+    //             'car' =>$header->CAR ?? null,
+    //             'no_sppb' =>$header->NO_SPPB ?? null,
+    //             'tgl_sppb' =>$header->TGL_SPPB ?? null,
+    //             'nojoborder' =>$header->NOJOBORDER ?? null,
+    //             'kd_kantor_pengawas' =>$header->KD_KANTOR_PENGAWAS ?? null,
+    //             'kd_kantor_bongkar' =>$header->KD_KANTOR_BONGKAR ?? null,
+    //             'no_pib' =>$header->NO_PIB ?? null,
+    //             'tgl_pib' =>$header->TGL_PIB ?? null,
+    //             'nama_imp' =>$header->NAMA_IMP ?? null,
+    //             'npwp_imp' =>$header->NPWP_IMP ?? null,
+    //             'alamat_imp' =>$header->ALAMAT_IMP ?? null,
+    //             'npwp_ppjk' =>$header->NPWP_PPJK ?? null,
+    //             'nama_ppjk' =>$header->NAMA_PPJK ?? null,
+    //             'alamat_ppjk' =>$header->ALAMAT_PPJK ?? null,
+    //             'nm_angkut' =>$header->NM_ANGKUT ?? null,
+    //             'no_voy_flight' =>$header->NO_VOY_FLIGHT ?? null,
+    //             'bruto' =>$header->BRUTO ?? null,
+    //             'netto' =>$header->NETTO ?? null,
+    //             'gudang' =>$header->GUDANG ?? null,
+    //             'status_jalur' =>$header->STATUS_JALUR ?? null,
+    //             'jml_cont' =>$header->JML_CONT ?? null,
+    //             'no_bc11' =>$header->NO_BC11 ?? null,
+    //             'tgl_bc11' =>$header->TGL_BC11 ?? null,
+    //             'no_pos_bc11' =>$header->NO_POS_BC11 ?? null,
+    //             'no_bl_awb' =>$header->NO_BL_AWB ?? null,
+    //             'tgl_bl_awb' =>$header->TGL_BL_AWB ?? null,
+    //             'no_master_bl_awb' =>$header->NO_MASTER_BL_AWB ?? null,
+    //             'tgl_master_bl_awb' =>$header->TGL_MASTER_BL_AWB ?? null,
+    //             'tgl_upload'=>Carbon::today()->format('Y-m-d'),
+    //             'jam_upload'=>Carbon::now()->format('H:i:s'),
+    //         ]);
 
-            if ($cont) {
-                foreach ($cont as $detail) {
-                    $sppbCont = SPPBCont::create([
-                        'sppb_id' => $sppb->id,
-                        'car' => $detail->CAR,
-                        'no_cont' => $detail->NO_CONT,
-                        'size' => $detail->SIZE,
-                        'jns_muat' => $detail->JNS_MUAT,
-                    ]);
-                }
-            }
-            return back()->with('status', ['type' => 'success', 'message' => 'Data ditemukan']);
-      }else {
-        return back()->with('status', ['type' => 'error', 'message' => 'Something Wrong']);
-      }
+    //         if ($kms) {
+    //             foreach ($kms as $detail) {
+    //                 // dd($kms, $detail);
+    //                 $sppbKMS = SPPBKms::create([
+    //                     'sppb_id'=>$sppb->id ?? null,
+    //                     'car'=>$detail->CAR,
+    //                     'jns_kms'=>$detail->JNS_KMS,
+    //                     'merk_kms'=>$detail->MERK_KMS,
+    //                     'jml_kms'=>$detail->JML_KMS,
+    //                 ]);
+    //             }
+    //         }
+
+    //         if ($cont) {
+    //             foreach ($cont as $detail) {
+    //                 $sppbCont = SPPBCont::create([
+    //                     'sppb_id' => $sppb->id,
+    //                     'car' => $detail->CAR,
+    //                     'no_cont' => $detail->NO_CONT,
+    //                     'size' => $detail->SIZE,
+    //                     'jns_muat' => $detail->JNS_MUAT,
+    //                 ]);
+    //             }
+    //         }
+    //         return back()->with('status', ['type' => 'success', 'message' => 'Data ditemukan']);
+    //   }else {
+    //     return back()->with('status', ['type' => 'error', 'message' => 'Something Wrong']);
+    //   }
     }
 
     public function GetImporPermit()
@@ -1190,9 +1462,7 @@ class DokumenController extends Controller
             $service
                 ->name('TpsOnline')
                 ->wsdl($this->wsdl)
-                ->trace(true)                                                                                                  
-//                ->certificate()                                                 
-//                ->cache(WSDL_CACHE_NONE)                                        
+                ->trace(true)                                                                                                                                        
                 ->options([
                     'stream_context' => stream_context_create([
                         'ssl' => array(
@@ -1210,12 +1480,9 @@ class DokumenController extends Controller
             'Kd_Gudang' => 'ARN1'
         ];
         
-        // Using the added service
         \SoapWrapper::service('TpsOnline', function ($service) use ($data) {        
             $this->response = $service->call('GetImporPermit', [$data])->GetImporPermitResult;      
         });
-        
-//        var_dump($this->response);
         
         libxml_use_internal_errors(true);
         $xml = simplexml_load_string($this->response);
@@ -1225,8 +1492,7 @@ class DokumenController extends Controller
             'message' => 'Error : ' . $this->response,
            ]);
         }
-        
-        foreach($xml->children() as $child) {
+        foreach($testXml->children() as $child) {
             foreach($child as $key => $value) {
                 if($key == 'header' || $key == 'HEADER'){
                     $header = $value;
@@ -1676,281 +1942,6 @@ class DokumenController extends Controller
         if(!$xml || !$xml->children()){
             return back()->with('status', ['type' => 'error', 'message' => 'Error importing data: ' .  $this->response]);
         }
-
-        $test = '
-<!-- BC-Doc.SPPB -->
-<DOCUMENT>
-<SPPB>
-<HEADER>
-<CAR>04030000024720201119310905</CAR>
-<NO_SPPB>511653/KPU.01/2020</NO_SPPB>
-<TGL_SPPB>11/20/2020</TGL_SPPB>
-<KD_KPBC>040300</KD_KPBC>
-<NO_PIB>511367</NO_PIB>
-<TGL_PIB>11/20/2020</TGL_PIB>
-<NPWP_IMP>024942047086000</NPWP_IMP>
-<NAMA_IMP>PT. BINTANG SAPUTRA</NAMA_IMP>
-<ALAMAT_IMP>RUKAN KENCANA NIAGA I BLOK. D1 NO.1-B JL.TAMAN ARIES MERUYA UTARA-KEMB</ALAMAT_IMP>
-<NPWP_PPJK/>
-<NAMA_PPJK/>
-<ALAMAT_PPJK/>
-<NM_ANGKUT>KYOTO TOWER 0503</NM_ANGKUT>
-<NO_VOY_FLIGHT>024S</NO_VOY_FLIGHT>
-<BRUTO>390656.25</BRUTO>
-<NETTO>383156.25</NETTO>
-<GUDANG>TMAL</GUDANG>
-<STATUS_JALUR>H</STATUS_JALUR>
-<JML_CONT>15</JML_CONT>
-<NO_BC11>004625</NO_BC11>
-<TGL_BC11>11/18/2020</TGL_BC11>
-<NO_POS_BC11>004600000000</NO_POS_BC11>
-<NO_BL_AWB>EGLV091030644422</NO_BL_AWB>
-<TG_BL_AWB>11/16/2020</TG_BL_AWB>
-<NO_MASTER_BL_AWB/>
-<TG_MASTER_BL_AWB/>
-</HEADER>
-<DETIL>
-<CONT>
-<CAR>04030000024720201119310905</CAR>
-<NO_CONT>DRYU2242217</NO_CONT>
-<SIZE>20</SIZE>
-<JNS_MUAT>F</JNS_MUAT>
-</CONT>
-<CONT>
-<CAR>04030000024720201119310905</CAR>
-<NO_CONT>DRYU2300782</NO_CONT>
-<SIZE>20</SIZE>
-<JNS_MUAT>F</JNS_MUAT>
-</CONT>
-<CONT>
-<CAR>04030000024720201119310905</CAR>
-<NO_CONT>DRYU2383935</NO_CONT>
-<SIZE>20</SIZE>
-<JNS_MUAT>F</JNS_MUAT>
-</CONT>
-<CONT>
-<CAR>04030000024720201119310905</CAR>
-<NO_CONT>EGHU3331936</NO_CONT>
-<SIZE>20</SIZE>
-<JNS_MUAT>F</JNS_MUAT>
-</CONT>
-<CONT>
-<CAR>04030000024720201119310905</CAR>
-<NO_CONT>EITU0195565</NO_CONT>
-<SIZE>20</SIZE>
-<JNS_MUAT>F</JNS_MUAT>
-</CONT>
-<CONT>
-<CAR>04030000024720201119310905</CAR>
-<NO_CONT>EITU0197763</NO_CONT>
-<SIZE>20</SIZE>
-<JNS_MUAT>F</JNS_MUAT>
-</CONT>
-<CONT>
-<CAR>04030000024720201119310905</CAR>
-<NO_CONT>EITU0329725</NO_CONT>
-<SIZE>20</SIZE>
-<JNS_MUAT>F</JNS_MUAT>
-</CONT>
-<CONT>
-<CAR>04030000024720201119310905</CAR>
-<NO_CONT>EITU0336318</NO_CONT>
-<SIZE>20</SIZE>
-<JNS_MUAT>F</JNS_MUAT>
-</CONT>
-<CONT>
-<CAR>04030000024720201119310905</CAR>
-<NO_CONT>EITU0529019</NO_CONT>
-<SIZE>20</SIZE>
-<JNS_MUAT>F</JNS_MUAT>
-</CONT>
-<CONT>
-<CAR>04030000024720201119310905</CAR>
-<NO_CONT>TEMU0537171</NO_CONT>
-<SIZE>20</SIZE>
-<JNS_MUAT>F</JNS_MUAT>
-</CONT>
-<CONT>
-<CAR>04030000024720201119310905</CAR>
-<NO_CONT>TEMU0663610</NO_CONT>
-<SIZE>20</SIZE>
-<JNS_MUAT>F</JNS_MUAT>
-</CONT>
-<CONT>
-<CAR>04030000024720201119310905</CAR>
-<NO_CONT>TEMU0684070</NO_CONT>
-<SIZE>20</SIZE>
-<JNS_MUAT>F</JNS_MUAT>
-</CONT>
-<CONT>
-<CAR>04030000024720201119310905</CAR>
-<NO_CONT>TEMU0768144</NO_CONT>
-<SIZE>20</SIZE>
-<JNS_MUAT>F</JNS_MUAT>
-</CONT>
-<CONT>
-<CAR>04030000024720201119310905</CAR>
-<NO_CONT>TEMU3938481</NO_CONT>
-<SIZE>20</SIZE>
-<JNS_MUAT>F</JNS_MUAT>
-</CONT>
-<CONT>
-<CAR>04030000024720201119310905</CAR>
-<NO_CONT>TLLU2012250</NO_CONT>
-<SIZE>20</SIZE>
-<JNS_MUAT>F</JNS_MUAT>
-</CONT>
-<KMS>
-<CAR>04030000024720201119310905</CAR>
-<JNS_KMS>CS</JNS_KMS>
-<MERK_KMS>SESUAI BL</MERK_KMS>
-<JML_KMS>150</JML_KMS>
-</KMS>
-</DETIL>
-</SPPB>
-<SPPB>
-<HEADER>
-<CAR>04030000024720201119310906</CAR>
-<NO_SPPB>511654/KPU.01/2020</NO_SPPB>
-<TGL_SPPB>11/20/2020</TGL_SPPB>
-<KD_KPBC>040300</KD_KPBC>
-<NO_PIB>511368</NO_PIB>
-<TGL_PIB>11/20/2020</TGL_PIB>
-<NPWP_IMP>024942047086000</NPWP_IMP>
-<NAMA_IMP>PT. BINTANG SAPUTRA</NAMA_IMP>
-<ALAMAT_IMP>RUKAN KENCANA NIAGA I BLOK. D1 NO.1-B JL.TAMAN ARIES MERUYA UTARA-KEMB</ALAMAT_IMP>
-<NPWP_PPJK/>
-<NAMA_PPJK/>
-<ALAMAT_PPJK/>
-<NM_ANGKUT>KYOTO TOWER 0503</NM_ANGKUT>
-<NO_VOY_FLIGHT>024S</NO_VOY_FLIGHT>
-<BRUTO>391290.33</BRUTO>
-<NETTO>383790.33</NETTO>
-<GUDANG>TMAL</GUDANG>
-<STATUS_JALUR>H</STATUS_JALUR>
-<JML_CONT>15</JML_CONT>
-<NO_BC11>004625</NO_BC11>
-<TGL_BC11>11/18/2020</TGL_BC11>
-<NO_POS_BC11>003500000000</NO_POS_BC11>
-<NO_BL_AWB>EGLV091030632211</NO_BL_AWB>
-<TG_BL_AWB>11/16/2020</TG_BL_AWB>
-<NO_MASTER_BL_AWB/>
-<TG_MASTER_BL_AWB/>
-</HEADER>
-<DETIL>
-<CONT>
-<CAR>04030000024720201119310906</CAR>
-<NO_CONT>BEAU2125154</NO_CONT>
-<SIZE>20</SIZE>
-<JNS_MUAT>F</JNS_MUAT>
-</CONT>
-<CONT>
-<CAR>04030000024720201119310906</CAR>
-<NO_CONT>EGHU3383035</NO_CONT>
-<SIZE>20</SIZE>
-<JNS_MUAT>F</JNS_MUAT>
-</CONT>
-<CONT>
-<CAR>04030000024720201119310906</CAR>
-<NO_CONT>EISU2015036</NO_CONT>
-<SIZE>20</SIZE>
-<JNS_MUAT>F</JNS_MUAT>
-</CONT>
-<CONT>
-<CAR>04030000024720201119310906</CAR>
-<NO_CONT>EISU2047671</NO_CONT>
-<SIZE>20</SIZE>
-<JNS_MUAT>F</JNS_MUAT>
-</CONT>
-<CONT>
-<CAR>04030000024720201119310906</CAR>
-<NO_CONT>EISU2055738</NO_CONT>
-<SIZE>20</SIZE>
-<JNS_MUAT>F</JNS_MUAT>
-</CONT>
-<CONT>
-<CAR>04030000024720201119310906</CAR>
-<NO_CONT>EISU3976969</NO_CONT>
-<SIZE>20</SIZE>
-<JNS_MUAT>F</JNS_MUAT>
-</CONT>
-<CONT>
-<CAR>04030000024720201119310906</CAR>
-<NO_CONT>EITU0265873</NO_CONT>
-<SIZE>20</SIZE>
-<JNS_MUAT>F</JNS_MUAT>
-</CONT>
-<CONT>
-<CAR>04030000024720201119310906</CAR>
-<NO_CONT>EITU0388116</NO_CONT>
-<SIZE>20</SIZE>
-<JNS_MUAT>F</JNS_MUAT>
-</CONT>
-<CONT>
-<CAR>04030000024720201119310906</CAR>
-<NO_CONT>HMCU3031392</NO_CONT>
-<SIZE>20</SIZE>
-<JNS_MUAT>F</JNS_MUAT>
-</CONT>
-<CONT>
-<CAR>04030000024720201119310906</CAR>
-<NO_CONT>TCKU1179777</NO_CONT>
-<SIZE>20</SIZE>
-<JNS_MUAT>F</JNS_MUAT>
-</CONT>
-<CONT>
-<CAR>04030000024720201119310906</CAR>
-<NO_CONT>TCLU6934564</NO_CONT>
-<SIZE>20</SIZE>
-<JNS_MUAT>F</JNS_MUAT>
-</CONT>
-<CONT>
-<CAR>04030000024720201119310906</CAR>
-<NO_CONT>TEMU0043820</NO_CONT>
-<SIZE>20</SIZE>
-<JNS_MUAT>F</JNS_MUAT>
-</CONT>
-<CONT>
-<CAR>04030000024720201119310906</CAR>
-<NO_CONT>TEMU0625610</NO_CONT>
-<SIZE>20</SIZE>
-<JNS_MUAT>F</JNS_MUAT>
-</CONT>
-<CONT>
-<CAR>04030000024720201119310906</CAR>
-<NO_CONT>TEMU4147700</NO_CONT>
-<SIZE>20</SIZE>
-<JNS_MUAT>F</JNS_MUAT>
-</CONT>
-<CONT>
-<CAR>04030000024720201119310906</CAR>
-<NO_CONT>TRHU3620494</NO_CONT>
-<SIZE>20</SIZE>
-<JNS_MUAT>F</JNS_MUAT>
-</CONT>
-<KMS>
-<CAR>04030000024720201119310906</CAR>
-<JNS_KMS>CS</JNS_KMS>
-<MERK_KMS>SESUAI BL</MERK_KMS>
-<JML_KMS>150</JML_KMS>
-</KMS>
-</DETIL>
-</SPPB>
-</DOCUMENT>';
-
-        $testXml = simplexml_load_string($test);
-        $anaks = [];
-        $header = [];
-
-        foreach ($testXml as $anak) {
-            foreach ($anak as $key => $value) {
-                
-                    $header[] = $value;
-                
-            }
-        }
-        
-        dd($header);
         
         $docmanual_id = 0;
         $header = null;

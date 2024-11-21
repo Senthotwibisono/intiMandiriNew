@@ -6,7 +6,7 @@ use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use App\Models\Container as Cont;
-use App\Models\Joborder as Job;
+use App\Models\JobOrder as Job;
 use App\Models\Manifest;
 use App\Models\TempManifest;
 use App\Models\Item;
