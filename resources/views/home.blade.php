@@ -177,7 +177,7 @@
                                 </tr>
                             </tbody>
                         </table>
-                        <a href=""><p>See more...</p></a>
+                        <a href="/lcl/report/daily"><p>See more...</p></a>
                     </div>
                 </div>
             </div>

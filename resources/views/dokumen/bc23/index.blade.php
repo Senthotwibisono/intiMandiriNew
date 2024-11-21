@@ -6,7 +6,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-auto">
-                    <button type="button" class="btn btn-success" disabled>get Data</button>
+                    <button type="button" id="otomaticButton" class="btn btn-success">get Data</button>
                 </div>
                 <div class="col-auto ms-2">
                     <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addManual">SPPB BC23 On Demand</button>
@@ -65,7 +65,7 @@
                 <h5 class="modal-title" id="exampleModalCenterTitle">SPPB BC23 On Demand</h5>
                 <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"> <i data-feather="x"></i></button>
             </div>
-            <form action="{{ route('dokumen.bc23.onDemand')}}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('dokumen.bc23.onDemand')}}" method="POST" enctype="multipart/form-data" id="createForm">
                 @csrf
                 <div class="modal-body">
                     <div class="row mb-5">
@@ -91,7 +91,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal"> <i class="bx bx-x d-block d-sm-none"></i> <span class="d-none d-sm-block">Close</span> </button>
-                    <button type="submit" class="btn btn-primary ml-1" data-bs-dismiss="modal"> <i class="bx bx-check d-block d-sm-none"></i> <span class="d-none d-sm-block">Submit</span> </button>
+                    <button type="button" id="submitButton" class="btn btn-primary ml-1" data-bs-dismiss="modal"> <i class="bx bx-check d-block d-sm-none"></i> <span class="d-none d-sm-block">Submit</span> </button>
                 </div>
             </form>
         </div>
@@ -100,6 +100,74 @@
 @endsection
 
 @section('custom_js')
+<script>
+    $(document).on('click', '#otomaticButton', function () {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you want to update this record?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, update it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Processing...',
+                    text: 'Please wait',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    willOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                // Perform the AJAX request
+                $.ajax({
+                    url: "{{ route('dokumen.bc23.permit') }}", // Laravel route helper
+                    type: 'POST',
+                    data: {
+                        _token: "{{ csrf_token() }}", // Include CSRF token for security
+                        // Additional data can be added here
+                    },
+                    success: function(response) {
+                        console.log(response);
+                        if (response.success) {
+                            Swal.fire('Saved!', '', 'success')
+                                .then(() => {
+                                    // Memuat ulang halaman setelah berhasil menyimpan data
+                                    window.location.reload();
+                                });
+                        } else {
+                            Swal.fire('Error', response.message, 'error')
+                                .then(() => {
+                                    // Memuat ulang halaman setelah berhasil menyimpan data
+                                    window.location.reload();
+                                });
+                        }
+                    },
+                    error: function(response) {
+                        var errors = response.responseJSON.errors;
+                        if (errors) {
+                            var errorMessage = '';
+                            $.each(errors, function(key, value) {
+                                errorMessage += value[0] + '<br>';
+                            });
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Validation Error',
+                                html: errorMessage,
+                            });
+                        } else {
+                            console.log('error:', response);
+                        }
+                    },
+                });
+            }
+        });
+    });
+</script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Attach event listener to the update button
@@ -118,6 +186,16 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     // Submit the form programmatically if confirmed
+                    swal.fire({
+                    title: 'Processing...',
+                    text: 'Please wait',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                        willOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
                     document.getElementById('createForm').submit();
                 }
             });

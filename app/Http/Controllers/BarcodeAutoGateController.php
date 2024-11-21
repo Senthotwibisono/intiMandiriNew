@@ -132,16 +132,23 @@ class BarcodeAutoGateController extends Controller
                     break;
             }
 
+            // dd($data);
             if ($data) {
                 
                 if ($tipe == 'in' || $tipe == 'In' || $tipe == 'IN') {
                     $data->update([
-                        'tglmasuk'=> date('Y-m-d', strtotime($dataBarcode->time_in)),
-                        'jammasuk'=> date('H:i:s', strtotime($dataBarcode->time_in)),
+                        // 'tglmasuk'=> date('Y-m-d', strtotime($dataBarcode->time_in)),
+                        // 'jammasuk'=> date('H:i:s', strtotime($dataBarcode->time_in)),
+                        'tglmasuk'=> carbon::now(),
+                        'jammasuk'=> carbon::now(),
                         'uidmasuk'=> 'Autogate',
                     ]);
                     if ($request->hasFile('fileKamera')) {
-                        foreach ($request->file('fileKamera') as $photo) {
+                        // dd($request->hasFile('fileKamera'));
+                        $photos = $request->file('fileKamera');
+                        // dd($photos);
+;                        foreach ($photos as $photo) {
+                            // dd($photo);
                             $fileName = $photo->getClientOriginalName();
                             $photo->storeAs('imagesInt', $fileName, 'public'); 
                             $newPhoto = Photo::create([

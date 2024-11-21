@@ -1,5 +1,14 @@
 @extends('partial.main')
-
+@section('custom_styles')
+<style>
+    .table-responsive td,
+    .table-responsive th {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+@endsection
 @section('content')
 <section>
     <div class="card">
@@ -293,7 +302,7 @@
     <div class="modal-dialog modal-dialog-centered modal-dialog-centered modal-dialog-scrollable modal-lg"role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalCenterTitle">Edit Data Consolidator</h5>
+                <h5 class="modal-title" id="exampleModalCenterTitle">Edit Data Manifest</h5>
                 <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"> <i data-feather="x"></i></button>
             </div>
             <form action="{{ route('lcl.manifest.update')}}" method="POST" id="updateForm" enctype="multipart/form-data">

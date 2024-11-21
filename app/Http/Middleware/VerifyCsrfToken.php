@@ -13,5 +13,7 @@ class VerifyCsrfToken extends Middleware
      */
     protected $except = [
        'autoGate',
+       'lcl/realisasi/stripping/updateCont',
+       'dokumen/bc23-getData-automatic',
     ];
 }

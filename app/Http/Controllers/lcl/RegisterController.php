@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 
 use App\Models\JobOrder as Job;
 use App\Models\Container as Cont;
+use App\Models\Manifest;
 use App\Models\Consolidator;
 use App\Models\Negara;
 use App\Models\Pelabuhan;
@@ -54,12 +55,23 @@ class RegisterController extends Controller
                 if ($containers->isNotEmpty()) {
                     return $containers->map(function($container) use ($job) {
                         return [
-                            'actions' => '<a href="/lcl/register/detail-'.$container->joborder_id.'" class="btn btn-warning"><i class="fa fa-pen"></i></a> 
-                                          <button class="btn btn-danger printBarcode" data-id="'.$container->id.'"><i class="fa fa-print"></i></button>',
+                            'actions' => '<div class="button-container"><a href="/lcl/register/detail-'.$container->joborder_id.'" class="btn btn-warning"><i class="fa fa-pen"></i></a> 
+                                          <button class="btn btn-danger printBarcode" data-id="'.$container->id.'"><i class="fa fa-print"></i></button> </div>',
                             'nojoborder' => $job->nojoborder,
                             'nospk' => $job->nospk,
                             'nocontainer' => $container->nocontainer,
                             'nombl' => $job->nombl,
+                            'no_plp'=>$job->PLP->no_plp ?? '',
+                            'tgl_plp'=>$job->PLP->tgl_plp ?? '',
+                            'kd_kantor'=>$job->PLP->kd_kantor ?? '',
+                            'kd_tps'=>$job->PLP->kd_tps ?? '',
+                            'kd_tps_asal'=>$job->PLP->kd_tps_asal ?? '',
+                            'kd_tps_tujuan'=>$job->PLP->kd_tps_tujuan ?? '',
+                            'nm_angkut'=>$job->PLP->nm_angkut ?? '',
+                            'no_voy_flight'=>$job->PLP->no_voy_flight ?? '',
+                            'no_surat'=>$job->PLP->no_surat ?? '',
+                            'no_bc11'=>$job->PLP->no_bc11 ?? '',
+                            'tgl_bc11'=>$job->PLP->tgl_bc11 ?? '',
                             'eta' => $job->eta,
                             'Kapal_name' => $job->Kapal->name ?? '',
                             'user_name' => $job->user->name,
@@ -72,6 +84,17 @@ class RegisterController extends Controller
                         'nospk' => $job->nospk,
                         'nocontainer' => 'Belum ada Container',
                         'nombl' => $job->nombl,
+                        'no_plp'=>$job->PLP->no_plp ?? '',
+                        'tgl_plp'=>$job->PLP->tgl_plp ?? '',
+                        'kd_kantor'=>$job->PLP->kd_kantor ?? '',
+                        'kd_tps'=>$job->PLP->kd_tps ?? '',
+                        'kd_tps_asal'=>$job->PLP->kd_tps_asal ?? '',
+                        'kd_tps_tujuan'=>$job->PLP->kd_tps_tujuan ?? '',
+                        'nm_angkut'=>$job->PLP->nm_angkut ?? '',
+                        'no_voy_flight'=>$job->PLP->no_voy_flight ?? '',
+                        'no_surat'=>$job->PLP->no_surat ?? '',
+                        'no_bc11'=>$job->PLP->no_bc11 ?? '',
+                        'tgl_bc11'=>$job->PLP->tgl_bc11 ?? '',
                         'eta' => $job->eta,
                         'Kapal_name' => $job->Kapal->name ?? '',
                         'user_name' => $job->user->name,
@@ -147,6 +170,8 @@ class RegisterController extends Controller
         $data['gudangs'] = Gudang::get();
         $data['seals'] = Eseal::get();
         $data['conts'] = Cont::where('joborder_id', $id)->get(); 
+
+        $data['manifestJob'] = Manifest::where('joborder_id', $id)->get();
 
         return view('lcl.register.detail', $data);
     }

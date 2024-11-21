@@ -37,6 +37,9 @@ use App\Http\Controllers\invoice\InvoicePerpanjanganController;
 use App\Http\Controllers\beaCukai\BeaCukaiController;
 use App\Http\Controllers\beaCukai\BeacukaiP2Controller;
 
+// Pengiriman
+use App\Http\Controllers\PengirimanController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -198,6 +201,7 @@ Route::controller(DokumenController::class)->group(function (){
     Route::post('/dokumen/plp/updateDetail', 'plpUpdateDetail')->name('dokumen.plp.update.detail');
     Route::post('/dokumen/plp/updateCont', 'plpUpdateCont')->name('dokumen.plp.update.cont');
     Route::post('/dokumen/plp-getData', 'GetResponPLP_onDemand')->name('dokumen.plp.onDemand');
+    Route::post('/dokumen/plp-getData-automatic', 'GetResponPLP_Tujuan')->name('dokumen.plp.tujuan');
     Route::post('/dokumen/plp-cetakJob', 'createJob')->name('dokumen.plp.cetakJob');
 
     // SPJM
@@ -208,6 +212,7 @@ Route::controller(DokumenController::class)->group(function (){
     Route::post('/dokumen/spjm/updateDetail', 'spjmUpdateDetail')->name('dokumen.spjm.update.detail');
     Route::post('/dokumen/spjm/updateCont', 'spjmUpdateCont')->name('dokumen.spjm.update.cont');
     Route::post('/dokumen/spjm-getData', 'GetSPJM_onDemand')->name('dokumen.spjm.onDemand');
+    Route::post('/dokumen/spjm-getData-automatic', 'GetSPJM')->name('dokumen.spjm.automatic');
 
      // SPPB BC23
      Route::get('/dokumen/bc23', 'bc23Index')->name('dokumen.bc23.index');
@@ -216,6 +221,7 @@ Route::controller(DokumenController::class)->group(function (){
      Route::get('/dokumen/bc23/cont{id?}', 'bc23Cont')->name('dokumen.bc23.detailCont');
      Route::post('/dokumen/bc23/updateDetail', 'bc23UpdateDetail')->name('dokumen.bc23.update.detail');
      Route::post('/dokumen/bc23-getData', 'GetImpor_SPPBBC23_OnDemand')->name('dokumen.bc23.onDemand');
+     Route::post('/dokumen/bc23-getData-automatic', 'GetBC23Permit')->name('dokumen.bc23.permit');
 
       // SPPB
       Route::get('/dokumen/sppb', 'sppbIndex')->name('dokumen.sppb.index');
@@ -224,6 +230,7 @@ Route::controller(DokumenController::class)->group(function (){
       Route::get('/dokumen/sppb/cont{id?}', 'sppbCont')->name('dokumen.sppb.detailCont');
       Route::post('/dokumen/sppb/updateDetail', 'sppbUpdateDetail')->name('dokumen.sppb.update.detail');
       Route::post('/dokumen/sppb-getData', 'GetImpor_SPPB_OnDemand')->name('dokumen.sppb.onDemand');
+      Route::post('/dokumen/sppb-getData-automatic', 'GetImporPermit')->name('dokumen.sppb.import');
 
     //   manual
       Route::get('/dokumen/manual', 'manualIndex')->name('dokumen.manual.index');
@@ -240,6 +247,7 @@ Route::controller(DokumenController::class)->group(function (){
       Route::get('/dokumen/pabean/cont{id?}', 'pabeanCont')->name('dokumen.pabean.detailCont');
       Route::post('/dokumen/pabean/updateDetail', 'pabeanUpdateDetail')->name('dokumen.pabean.update.detail');
       Route::post('/dokumen/pabean-getData', 'GetDokumenPabean_OnDemand')->name('dokumen.pabean.onDemand');
+      Route::post('/dokumen/pabean-getData-otomatic', 'GetDokumenPabean')->name('dokumen.pabean.otomatis');
 });
 
 // LCL
@@ -535,4 +543,14 @@ Route::controller(LclController::class)->group(function(){
         Route::post('/bc-p2/list-segelMerah/unlockSubmit', 'unlockSubmit');
 
         Route::get('/bc-p2/detil-log/{id?}', 'logDetil');
+    });
+
+    Route::prefix('/dokumen/pengiriman')->controller(PengirimanController::class)->group(function(){
+        Route::prefix('/container')->group(function(){
+            Route::get('/index', 'containerIndex');
+            Route::get('/data', 'containerData');
+        });
+        Route::prefix('/manifest')->group(function(){
+            Route::get('/index', 'manifestIndex');
+        });
     });

@@ -101,6 +101,8 @@
                         <th>No Pos</th>
                         <th>Jenis</th>
                         <th>Customer</th>
+                        <th>Jenis Kemasan</th>
+                        <th>Quantity</th>
                         <th>BL AWB</th>
                         <th>Tgl BL AWB</th>
                         <th>Action</th>
@@ -114,6 +116,8 @@
                         <td>{{$detail->no_pos_bc11}}</td>
                         <td>{{$detail->jns_cont}}</td>
                         <td>{{$detail->consignee}}</td>
+                        <td>{{$detail->jns_kms}}</td>
+                        <td>{{$detail->jml_kms}}</td>
                         <td>{{$detail->no_bl_awb}}</td>
                         <td>{{$detail->tgl_bl_awb}}</td>
                         <td>
@@ -134,8 +138,8 @@
                  @csrf
                  <input type="hidden" name="id" value="{{ $plp->id }}">
                  <button class="btn btn-outline-info" type="submit">
-                     <i class="fas fa-print" style="width: 400px;height: 100px;"></i>
-                     <h1>Cetak Job Order</h1>
+                     <i class="fas fa-upload" style="width: 200px;height: 100px;"></i>
+                     <h4>Create Job Order</h4>
                  </button>
              </form>
        </div>

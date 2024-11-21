@@ -51,7 +51,41 @@ class ManifestController extends Controller
         return DataTables::of($cont)
         ->addColumn('kapal_cont', function($cont){
             return $cont->job->Kapal->name ?? '-';
-        })->make(true);
+        })
+        ->addColumn('no_plp', function($cont){
+            return $cont->job->PLP->no_plp ?? '-';
+        })
+        ->addColumn('tgl_plp', function($cont){
+            return $cont->job->PLP->tgl_plp ?? '-';
+        })
+        ->addColumn('kd_kantor', function($cont){
+            return $cont->job->PLP->kd_kantor ?? '-';
+        })
+        ->addColumn('kd_tps', function($cont){
+            return $cont->job->PLP->kd_tps ?? '-';
+        })
+        ->addColumn('kd_tps_asal', function($cont){
+            return $cont->job->PLP->kd_tps_asal ?? '-';
+        })
+        ->addColumn('kd_tps_tujuan', function($cont){
+            return $cont->job->PLP->kd_tps_tujuan ?? '-';
+        })
+        ->addColumn('nm_angkut', function($cont){
+            return $cont->job->PLP->nm_angkut ?? '-';
+        })
+        ->addColumn('no_voy_flight', function($cont){
+            return $cont->job->PLP->no_voy_flight ?? '-';
+        })
+        ->addColumn('no_surat', function($cont){
+            return $cont->job->PLP->no_surat ?? '-';
+        })
+        ->addColumn('no_bc11', function($cont){
+            return $cont->job->PLP->no_bc11 ?? '-';
+        })
+        ->addColumn('tgl_bc11', function($cont){
+            return $cont->job->PLP->tgl_bc11 ?? '-';
+        })
+        ->make(true);
     }
 
     public function detail($id)
@@ -77,7 +111,7 @@ class ManifestController extends Controller
                           ->first();
         
             if ($lastTally) {
-                $lastTallyNumber = intval(substr($lastTally->notally, 12, 3));
+                $lastTallyNumber = intval(substr($lastTally->notally, 15, 3));
                 $newTallyNumber = str_pad($lastTallyNumber + 1, 3, '0', STR_PAD_LEFT);
             } else {
                 $newTallyNumber = '001';

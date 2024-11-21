@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project id="c71501e4-90c6-4573-80e5-778c618fd136" activeEnvironment="Default" name="IntiMandirSoap" resourceRoot="${projectDir}" soapui-version="5.7.1" xmlns:con="http://eviware.com/soapui/config"><con:settings/><con:properties/><con:wssContainer/><con:oAuth2ProfileContainer/><con:oAuth1ProfileContainer/></con:soapui-project>

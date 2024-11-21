@@ -1,5 +1,14 @@
 @extends('partial.main')
-
+@section('custom_styles')
+<style>
+    .table-responsive td,
+    .table-responsive th {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+@endsection
 @section('content')
 
 <section>
@@ -247,13 +256,92 @@
         </div>
         <div class="card-footer">
             <div class="row">
-                <div class="col-auto">
+                <!-- <div class="col-auto">
                     <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addManual"><i class="fas fa-plus"></i></button>
-                </div>
+                </div> -->
                 <div class="col-auto">
                     <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#excelModal"><i class="fas fa-file-excel"></i></button>
                 </div>
             </div>
+        </div>
+    </div>
+</section>
+
+<!-- Manifest -->
+ <section>
+    <div class="card">
+        <div class="card-header">
+            <h4><strong>Manifest Job</strong></h4>
+        </div>
+        <div class="card-body fixed-header-card">
+            <table class="tabelCustom table-responsive">
+                <thead>
+                    <tr>
+                        <!-- <th class="text-center">Action</th> -->
+                        <!-- <th class="text-center">Approve</th>
+                        <th class="text-center">Validasi</th>
+                        <th class="text-center">Validasi Bc</th> -->
+                        <th class="text-center">Container</th>
+                        <th class="text-center">No HBL</th>
+                        <th class="text-center">Tgl HBL</th>
+                        <th class="text-center">No Tally</th>
+                        <th class="text-center">Shipper</th>
+                        <th class="text-center">Customer</th>
+                        <th class="text-center">Qty</th>
+                        <th class="text-center">Packing</th>
+                        <th class="text-center">Kode Kemas</th>
+                        <th class="text-center">Desc</th>
+                        <th class="text-center">Tonase</th>
+                        <th class="text-center">Volume</th>
+                        <th class="text-center">Packing Tally</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($manifestJob as $mans)
+                        <tr>
+                            <!-- <td>
+                                <div class="button-container">
+                                    <button class="btn btn-danger deleteButton" data-id="{{$mans->id}}">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                    <button class="btn btn-warning editButton" data-id="{{$mans->id}}">
+                                        <i class="fa fa-pencil"></i>
+                                    </button>
+                                    <a href="javascript:void(0)" onclick="openWindow('/lcl/manifest/item-{{$mans->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
+                                    <a href="javascript:void(0)" onclick="openWindow('/lcl/manifest/barcode-{{$mans->id}}')" class="btn btn-sm btn-danger"><i class="fa fa-print"></i></a>
+                                </div>
+                            </td> -->
+                            <!-- <td>
+                                @if($mans->validasi == 'N')
+                                <button class="btn btn-outline-danger approveButton" data-id="{{$mans->id}}">Approve</button>
+                                @else
+                                <div class="button-container">
+                                    <button class="btn btn-outline-success unapproveButton" data-id="{{$mans->id}}">Unapprove</button>
+                                    <a href="javascript:void(0)" onclick="openWindow('/lcl/manifest/barcode-{{$mans->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
+                                </div>
+                                @endif
+                            </td>
+                            <td>{{$mans->validasi}}</td>
+                            <td>{{$mans->validasiBc ?? 'N'}}</td> -->
+                            <td>{{$mans->cont->nocontainer}}</td>
+                            <td>{{$mans->nohbl}}</td>
+                            <td>{{$mans->tgl_hbl}}</td>
+                            <td>{{$mans->notally}}</td>
+                            <td>{{$mans->shipperM->name ?? ''}}</td>
+                            <td>{{$mans->customer->name ?? ''}}</td>
+                            <td>{{$mans->quantity}}</td>
+                            <td>{{$mans->packing->name ?? ''}}</td>
+                            <td>{{$mans->packing->code ?? ''}}</td>
+                            <td>
+                                <textarea class="form-control" cols="3" readonly>{{$mans->descofgoods}}</textarea>
+                            </td>
+                            <td>{{$mans->weight}}</td>
+                            <td>{{$mans->meas}}</td>
+                            <td>{{$mans->packingTally->name ?? ''}}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
 </section>
@@ -288,7 +376,7 @@
     <div class="modal-dialog modal-dialog-centered modal-dialog-centered modal-dialog-scrollable modal-md"role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalCenterTitle">Add Data Consolidator</h5>
+                <h5 class="modal-title" id="exampleModalCenterTitle">Add Data Container</h5>
                 <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"> <i data-feather="x"></i></button>
             </div>
             <form action="{{ route('lcl.register.container.create')}}" method="POST" enctype="multipart/form-data">

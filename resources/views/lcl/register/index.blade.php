@@ -1,5 +1,14 @@
 @extends('partial.main')
-
+@section('custom_styles')
+<style>
+    .table-responsive td,
+    .table-responsive th {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+@endsection
 @section('content')
 <section>
     <div class="card">
@@ -15,13 +24,24 @@
                     <thead>
                         <tr>
                             <th>Action</th>
-                            <th>No Job Order</th>
-                            <th>No SPK</th>
-                            <th>No Container</th>
-                            <th>No MBL</th>
-                            <th>ETA</th>
-                            <th>Vessel</th>
-                            <th>UID</th>
+                            <th class="text-center">No Job Order</th>
+                            <th class="text-center">No SPK</th>
+                            <th class="text-center">No Container</th>
+                            <th class="text-center">No MBL</th>
+                            <th class="text-center">No PLP</th>
+                            <th class="text-center">Tgl PLP</th>
+                            <th class="text-center">Kd Kantor</th>
+                            <th class="text-center">Kd TPS</th>
+                            <th class="text-center">Kd TPS Asal</th>
+                            <th class="text-center">Kd TPS Tujuan</th>
+                            <th class="text-center">Nama Angkut</th>
+                            <th class="text-center">No Voy</th>
+                            <th class="text-center">No Surat</th>
+                            <th class="text-center">No BC 11</th>
+                            <th class="text-center">Tgl BC 11</th>
+                            <th class="text-center">ETA</th>
+                            <th class="text-center">Vessel</th>
+                            <th class="text-center">UID</th>
                         </tr>
                     </thead>
                 </table>
@@ -202,6 +222,17 @@
                 { data: 'nospk', name: 'nospk' },
                 { data: 'nocontainer', name: 'nocontainer' },
                 { data: 'nombl', name: 'nombl' },
+                { data: 'no_plp', name: 'no_plp' },
+                { data: 'tgl_plp', name: 'tgl_plp' },
+                { data: 'kd_kantor', name: 'kd_kantor' },
+                { data: 'kd_tps', name: 'kd_tps' },
+                { data: 'kd_tps_asal', name: 'kd_tps_asal' },
+                { data: 'kd_tps_tujuan', name: 'kd_tps_tujuan' },
+                { data: 'nm_angkut', name: 'nm_angkut' },
+                { data: 'no_voy_flight', name: 'no_voy_flight' },
+                { data: 'no_surat', name: 'no_surat' },
+                { data: 'no_bc11', name: 'no_bc11' },
+                { data: 'tgl_bc11', name: 'tgl_bc11' },
                 { data: 'eta', name: 'eta' },
                 { data: 'Kapal_name', name: 'Kapal_name' },
                 { data: 'user_name', name: 'user_name' }
