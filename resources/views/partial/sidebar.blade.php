@@ -301,8 +301,8 @@
                     <li class="submenu-item @if(Request::is('bc/lcl/realisasi/buangMT') || Request::is('bc/lcl/realisasi/buangMT/*')) active @endif">
                         <a href="{{ url('/bc/lcl/realisasi/buangMT')}}">Buang Empty</a>
                     </li>
-                    <li class="submenu-item @if(Request::is('lcl/realisasi/stripping') || Request::is('/lcl/realisasi/stripping/*')) active @endif">
-                        <a href="{{ url('/lcl/realisasi/stripping')}}">Stripping</a>
+                    <li class="submenu-item @if(Request::is('bc/lcl/realisasi/stripping') || Request::is('/bc/lcl/realisasi/stripping/*')) active @endif">
+                        <a href="{{ url('/bc/lcl/realisasi/stripping')}}">Stripping</a>
                     </li>
                 </ul>
             </li>

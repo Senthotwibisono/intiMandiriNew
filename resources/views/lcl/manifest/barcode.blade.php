@@ -161,7 +161,7 @@
     <div class="row">
         <div class="col-12">
             <div class="text-center">
-                    <img src="/logo/IntiMandiri.PNG" class="img" alt="">
+                    <img src="/logo/IntiMandiri.png" class="img" alt="">
                
             </div>
        </div>

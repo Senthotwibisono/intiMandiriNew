@@ -16,6 +16,7 @@ use App\Models\Customer;
 use App\Models\Packing;
 use App\Models\Item;
 use App\Models\Photo;
+use DataTables;
 
 class StrippingController extends Controller
 {
@@ -30,6 +31,65 @@ class StrippingController extends Controller
         $data['conts'] = Cont::where('type', '=', 'lcl')->whereNot('tglmasuk', null)->where('tglkeluar', null )->orderBy('endstripping', 'asc')->get();
         
         return view('lcl.realisasi.stripping.index', $data);
+    }
+
+    public function indexData(Request $request)
+    {
+        $cont = Cont::with(['job', 'user'])->where('type', '=', 'lcl')->whereNot('tglmasuk', null)->where('tglkeluar', null )->orderBy('endstripping', 'asc')->get();
+        
+        return DataTables::of($cont)
+        ->addColumn('detil', function($cont){
+            if ($cont->status_ijin == 'Y') {
+                return '<a href="/lcl/realisasi/stripping/proses-' . $cont->id . '" class="btn btn-warning"><i class="fa fa-pen"></i></a>';
+            } else {
+                return '<span class="badge bg-light-danger">Belum Mendapat Ijin Bea Cukai</span>';
+            }
+        })
+        ->addColumn('status', function($cont){
+            if ($cont->endstripping != null) {
+                return '<span class="badge bg-light-danger">Finished</span>';
+            }else {
+                return '<span class="badge bg-light-success">On Proggress</span>';
+            }
+        })
+        ->addColumn('kapal', function($cont){
+            return $cont->job->Kapal->name ?? '-';
+        })
+        ->addColumn('no_plp', function($cont){
+            return $cont->job->PLP->no_plp ?? '-';
+        })
+        ->addColumn('tgl_plp', function($cont){
+            return $cont->job->PLP->tgl_plp ?? '-';
+        })
+        ->addColumn('kd_kantor', function($cont){
+            return $cont->job->PLP->kd_kantor ?? '-';
+        })
+        ->addColumn('kd_tps', function($cont){
+            return $cont->job->PLP->kd_tps ?? '-';
+        })
+        ->addColumn('kd_tps_asal', function($cont){
+            return $cont->job->PLP->kd_tps_asal ?? '-';
+        })
+        ->addColumn('kd_tps_tujuan', function($cont){
+            return $cont->job->PLP->kd_tps_tujuan ?? '-';
+        })
+        ->addColumn('nm_angkut', function($cont){
+            return $cont->job->PLP->nm_angkut ?? '-';
+        })
+        ->addColumn('no_voy_flight', function($cont){
+            return $cont->job->PLP->no_voy_flight ?? '-';
+        })
+        ->addColumn('no_surat', function($cont){
+            return $cont->job->PLP->no_surat ?? '-';
+        })
+        ->addColumn('no_bc11', function($cont){
+            return $cont->job->PLP->no_bc11 ?? '-';
+        })
+        ->addColumn('tgl_bc11', function($cont){
+            return $cont->job->PLP->tgl_bc11 ?? '-';
+        })
+        ->rawColumns(['detil', 'status'])
+        ->make(true);
     }
 
     public function proses($id)

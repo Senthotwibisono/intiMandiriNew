@@ -286,6 +286,7 @@ Route::controller(DokumenController::class)->group(function (){
     // Stripping
     Route::controller(StrippingController::class)->group(function(){
         Route::get('/lcl/realisasi/stripping', 'index')->name('lcl.stripping.index');
+        Route::get('/lcl/realisasi/stripping/data', 'indexData')->name('lcl.stripping.dataIndex');
         Route::get('/lcl/realisasi/stripping/proses-{id?}', 'proses')->name('lcl.stripping.proses');
         Route::post('/lcl/realisasi/stripping/updateCont', 'updateCont')->name('lcl.stripping.cont.update');
         Route::get('/lcl/realisasi/stripping-photoCont{id?}', 'photoCont')->name('lcl.stripping.photoCont');
@@ -380,7 +381,8 @@ Route::controller(BeaCukaiController::class)->group(function(){
     Route::post('/bc/lcl/realisasi/buangMTpost-{id?}', 'buangMtPost')->name('bc.buangMt.post');
 
     Route::get('/bc/lcl/realisasi/stripping', 'strippingIndex')->name('bc.stripping.index');
-    Route::post('/bc/lcl/realisasi/stripping/approve{id?}', 'strippingApprove')->name('bc.stripping.aprrove');
+    Route::get('/bc/lcl/realisasi/stripping/data', 'strippingIndexData')->name('bc.stripping.indexData');
+    Route::post('/bc/lcl/realisasi/stripping/approveCont', 'strippingApproveCont')->name('bc.stripping.aprroveCont');
     Route::post('/bc/lcl/realisasi/stripping-approveAll', 'strippingApproveAll');
     
     Route::get('/bc/lcl/delivery/behandle', 'behandle')->name('bc.behandle.index');

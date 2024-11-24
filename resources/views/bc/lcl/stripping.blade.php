@@ -1,8 +1,11 @@
 @extends('partial.main')
 @section('custom_styles')
 <style>
-    .highlight-yellow {
-        background-color: yellow !important;;
+    .table-fixed td,
+    .table-fixed th {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 </style>
 @endsection
@@ -11,53 +14,38 @@
     <div class="card">
         <div class="card-body">
             <br>
-            <table class="tabelCustom" style="overflow-x:auto;">
-                <thead>
-                    <tr>
-                        <th>Action</th>
-                        <th class="text-center">No HBL</th>
-                        <th class="text-center">Tgl HBL</th>
-                        <th class="text-center">No Tally</th>
-                        <th class="text-center">No Container</th>
-                        <th class="text-center">Shipper</th>
-                        <th class="text-center">Customer</th>
-                        <th class="text-center">Qty</th>
-                        <th class="text-center">Packing</th>
-                        <th class="text-center">Kode Kemas</th>
-                        <th class="text-center">Desc</th>
-                    </tr>
-                    <tbody>
-                        @foreach($manifest as $mans)
+            <div class="table table-fixed">
+                <table class="table-fixed" id="tableCont">
+                    <thead>
                         <tr>
-                            <td>
-                                @if($mans->validasiBc != 'Y')
-                                    <button class="btn btn-outline-warning approveButton" data-id="{{$mans->id}}">Approve</button>
-                                @else
-                                    <button class="btn disabled btn-success">Approved</button>
-                                @endif
-                            </td>
-                            <td>{{$mans->nohbl}}</td>
-                            <td>{{$mans->tgl_hbl}}</td>
-                            <td>{{$mans->notally}}</td>
-                            <td>{{$mans->cont->nocontainer ?? ''}}</td>
-                            <td>{{$mans->shipperM->name ?? ''}}</td>
-                            <td>{{$mans->customer->name ?? ''}}</td>
-                            <td>{{$mans->quantity}}</td>
-                            <td>{{$mans->packing->name ?? ''}}</td>
-                            <td>{{$mans->packing->code ?? ''}}</td>
-                            <td>
-                                <textarea class="form-control" cols="3" readonly>{{$mans->descofgoods}}</textarea>
-                            </td>
+                            <th class="text-center">-</th>
+                            <th class="text-center">Action</th>
+                            <th class="text-center">Status Ijin</th>
+                            <th class="text-center">No Job Order</th>
+                            <th class="text-center">No SPK</th>
+                            <th class="text-center">No Container</th>
+                            <th class="text-center">No MBL</th>
+                            <th class="text-center">ETA</th>
+                            <th class="text-center">Vessel</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">No PLP</th>
+                            <th class="text-center">Tgl PLP</th>
+                            <th class="text-center">Kd Kantor</th>
+                            <th class="text-center">Kd TPS</th>
+                            <th class="text-center">Kd TPS Asal</th>
+                            <th class="text-center">Kd TPS Tujuan</th>
+                            <th class="text-center">Nama Angkut</th>
+                            <th class="text-center">No Voy</th>
+                            <th class="text-center">No Surat</th>
+                            <th class="text-center">No BC 11</th>
+                            <th class="text-center">Tgl BC 11</th>
+                            <th>UID</th>
                         </tr>
-                        @endforeach
-                    </tbody>
-                </thead>
-            </table>
+                    </thead>
+                </table>
+            </div>
             <div class="container">
-                <form action="/bc/lcl/realisasi/stripping-approveAll" id="approveAllForm" method="POST">
-                    @csrf
-                    <button class="btn btn-outline-info approvedAll" id="approvedAll" type="button">Approve All Manifest</button>
-                </form>
+                    <button class="btn btn-outline-info approve" id="approve" type="button">Approve</button>
             </div>
         </div>
     </div>
@@ -65,6 +53,60 @@
 @endsection
 
 @section('custom_js')
+<script>
+    $(document).ready(function () {
+        let lastChecked = null;
+        $('#tableCont').DataTable({
+            processing: true,
+            serverSide: true,
+            scrollX: true,
+            ajax: '/bc/lcl/realisasi/stripping/data',
+            columns: [
+                {data:'check', name:'check', className:'text-center'},
+                {data:'action', name:'action', className:'text-center'},
+                {data:'detil', name:'detil', className:'text-center'},
+                {data:'job.nojoborder', name:'job.nojoborder', className:'text-center'},
+                {data:'job.nospk', name:'job.nospk', className:'text-center'},
+                {data:'nocontainer', name:'nocontainer', className:'text-center'},
+                {data:'job.nombl', name:'job.nombl', className:'text-center'},
+                {data:'job.eta', name:'job.eta', className:'text-center'},
+                {data:'kapal', name:'kapal', className:'text-center'},
+                {data:'status', name:'status', className:'text-center'},
+                {data:'no_plp', name:'no_plp', className:'text-center' },
+                {data:'tgl_plp', name:'tgl_plp', className:'text-center' },
+                {data:'kd_kantor', name:'kd_kantor', className:'text-center' },
+                {data:'kd_tps', name:'kd_tps', className:'text-center' },
+                {data:'kd_tps_asal', name:'kd_tps_asal', className:'text-center' },
+                {data:'kd_tps_tujuan', name:'kd_tps_tujuan', className:'text-center' },
+                {data:'nm_angkut', name:'nm_angkut', className:'text-center' },
+                {data:'no_voy_flight', name:'no_voy_flight', className:'text-center' },
+                {data:'no_surat', name:'no_surat', className:'text-center' },
+                {data:'no_bc11', name:'no_bc11', className:'text-center' },
+                {data:'tgl_bc11', name:'tgl_bc11', className:'text-center' },
+                {data:'user.name', name:'user.name', className:'text-center'},
+            ]
+        })
+        $('#tableCont').on('click', '.select-cont', function (e) {
+            const checkboxes = $('.select-cont:not(:disabled)');
+            const currentIndex = checkboxes.index(this);
+            
+            // Jika menekan tombol Shift
+            if (e.shiftKey && lastChecked !== null) {
+                const lastIndex = checkboxes.index(lastChecked);
+            
+                // Menentukan rentang checkbox yang akan dicentang
+                const start = Math.min(lastIndex, currentIndex);
+                const end = Math.max(lastIndex, currentIndex);
+            
+                // Centang semua checkbox di antara rentang
+                checkboxes.slice(start, end + 1).prop('checked', lastChecked.checked);
+            }
+        
+            // Simpan checkbox terakhir yang dicentang
+            lastChecked = this;
+        });
+    });
+</script>
 <script>
 $(document).ready(function() {
     // When Cancel button is clicked
@@ -106,6 +148,86 @@ $(document).ready(function() {
       }
     });
   });
+</script>
+
+<script>
+    $('#approve').on('click', function () {
+        var selected = [];
+        $('.select-cont:checked').each(function () {
+            selected.push($(this).val());
+        });
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        Swal.fire({
+                title: 'Are you sure?',
+                text: "",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, update it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                    title: 'Processing...',
+                    text: 'Please wait while we update the container',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                        willOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    if (selected.length > 0) {
+                        // Kirim data ke server
+                        $.ajax({
+                            url: '/bc/lcl/realisasi/stripping/approveCont',
+                            method: 'POST',
+                            data: { ids: selected },
+                            success: function (response) {
+                                console.log(response);
+                                if (response.success) {
+                                    Swal.fire('Saved!', '', 'success')
+                                        .then(() => {
+                                            // Memuat ulang halaman setelah berhasil menyimpan data
+                                            window.location.reload();
+                                        });
+                                } else {
+                                    Swal.fire('Error', response.message, 'error');
+                                }
+                            },
+                            error: function (error) {
+                                var errors = response.responseJSON.errors;
+                                if (errors) {
+                                    var errorMessage = '';
+                                    $.each(errors, function(key, value) {
+                                        errorMessage += value[0] + '<br>';
+                                    });
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Validation Error',
+                                        html: errorMessage,
+                                    });
+                                } else {
+                                    console.log('error:', response);
+                                }
+                            }
+                        });
+                    } else {
+                        Swal.fire('Error!', 'Nothing Selected', 'error')
+                        .then(() => {
+                        });
+                    }
+                } else if (result.isDenied) {
+                    Swal.fire('Changes are not saved', '', 'info')
+                }
+            });
+    });
 </script>
 
 <script>

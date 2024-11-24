@@ -1,8 +1,8 @@
 @extends('partial.main')
 @section('custom_styles')
 <style>
-    .table-responsive td,
-    .table-responsive th {
+    .table-fixed td,
+    .table-fixed th {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -19,7 +19,7 @@
                 </div>
             </div> -->
             <br>
-            <div class="table table-responsive">
+            <div class="table table-fixed">
                 <table class="table table-hover table-stripped" id="tableManifest">
                     <thead>
                         <tr>
@@ -56,6 +56,7 @@
         $('#tableManifest').DataTable({
             processing: true,
             serverSide: true,
+            scrollX: true,
             ajax: '/lcl/manifest/data',
             columns: [
                 {data:'id', name:'id', className:'text-center',

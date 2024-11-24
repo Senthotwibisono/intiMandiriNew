@@ -291,22 +291,6 @@ class DokumenController extends Controller
             ]);
         }
         
-        // Using the added service
-
-        
-//        $client = new \SoapClient($this->wsdl, array('soap_version' => SOAP_1_2));
-//
-//        /* Set your parameters for the request */
-//        $params = [
-//            'UserName' => $this->user, 
-//            'Password' => $this->password,
-//            'Kd_asp' => $this->kode
-//        ];
-//
-//        $response = $client->__soapCall("GetResponPLP_Tujuan", array($params));
-
-//        var_dump($response);
-        
         libxml_use_internal_errors(true);
         $xml = simplexml_load_string($this->response);
         // var_dump($this->response, $xml);
@@ -320,50 +304,44 @@ class DokumenController extends Controller
         
         $header = array();
         $details = [];
+        $groups = [];
         foreach($xml->children() as $child) {
-            foreach($child as $key => $value) {
-                if($key == 'header' || $key == 'HEADER'){
-                    $header[] = $value;
-                }else{
-                    foreach ($value as $detail):
-                        $details[] = $detail;
-                    endforeach;
-                }
-                // var_dump($header);
-                // die();
-                $oldPLP = PLP::where('no_plp', $header->NO_PLP)->where('tgl_plp', $header->TGL_PLP)->first();
-                if (!$oldPLP) {
-                    // Inserrt Data Header
-                    $consolidator = Consolidator::first();
-        
-                    $plp = PLP::create([
-                        'tgl_upload' => Carbon::now()->format('Ymd'), 
-                        'upload_date' => Carbon::today()->format('Y-m-d'), 
-                        'upload_time' => Carbon::now()->format('H:i:s'),
-                        'kd_kantor'=>$header->KD_KANTOR,
-                        'kd_tps'=> $this->kode,
-                        'kd_tps_asal'=>$header->KD_TPS_ASAL,
-                        'gudang_tujuan'=>$header->GUDANG_TUJUAN,
-                        'no_plp'=>$header->NO_PLP,
-                        'tgl_plp'=>$header->TGL_PLP,
-                        'call_sign'=>$header->CALL_SIGN,
-                        'nm_angkut'=>$header->NM_ANGKUT,
-                        'no_voy_flight'=>$header->NO_VOY_FLIGHT,
-                        'tgl_tiba'=>$header->TGL_TIBA,
-                        'no_surat'=>$header->NO_SURAT,
-                        'tgl_surat'=>$header->TGL_SURAT,
-                        'no_bc11'=>$header->NO_BC11,
-                        'tgl_bc11'=>$header->TGL_BC11,
-                        'uid'=> Auth::user()->id,
-                        'consolidator_id'=>$consolidator->id,
-                        'namaconsolidator'=>$consolidator->namaconsolidator,
-                        'kd_tps_tujuan'=>$header->KD_TPS_TUJUAN,
-                        'gudang_asal'=>$header->GUDANG_ASAL,
-                        'ref_number'=>$header->REF_NUMBER,
-                    ]);
-        
-                    foreach ($details as $detail) {
-                        $cont = PLPdetail::create([
+            $groups[] = $child;
+        }
+
+        foreach ($groups as $group) {
+            $header = $group->header ?? $group->HEADER;
+            $oldPLP = PLP::where('no_plp', $header->NO_PLP)->where('tgl_plp', $header->TGL_PLP)->first();
+            if (!$oldPLP) {
+                $consolidator = Consolidator::first();
+                $plp = PLP::create([
+                    'tgl_upload' => Carbon::now()->format('Ymd'), 
+                    'upload_date' => Carbon::today()->format('Y-m-d'), 
+                    'upload_time' => Carbon::now()->format('H:i:s'),
+                    'kd_kantor'=>$header->KD_KANTOR,
+                    'kd_tps'=> $this->kode,
+                    'kd_tps_asal'=>$header->KD_TPS_ASAL,
+                    'gudang_tujuan'=>$header->GUDANG_TUJUAN,
+                    'no_plp'=>$header->NO_PLP,
+                    'tgl_plp'=>$header->TGL_PLP,
+                    'call_sign'=>$header->CALL_SIGN,
+                    'nm_angkut'=>$header->NM_ANGKUT,
+                    'no_voy_flight'=>$header->NO_VOY_FLIGHT,
+                    'tgl_tiba'=>$header->TGL_TIBA,
+                    'no_surat'=>$header->NO_SURAT,
+                    'tgl_surat'=>$header->TGL_SURAT,
+                    'no_bc11'=>$header->NO_BC11,
+                    'tgl_bc11'=>$header->TGL_BC11,
+                    'uid'=> Auth::user()->id,
+                    'consolidator_id'=>$consolidator->id,
+                    'namaconsolidator'=>$consolidator->namaconsolidator,
+                    'kd_tps_tujuan'=>$header->KD_TPS_TUJUAN,
+                    'gudang_asal'=>$header->GUDANG_ASAL,
+                    'ref_number'=>$header->REF_NUMBER,
+                ]);
+                $detil = $group->DETIL ?? $group->detil;
+                foreach ($detil as $detail) {
+                    $cont = PLPdetail::create([
                         'plp_id' =>$plp->id,
                         'tgl_upload' =>$plp->tgl_upload,
                         'no_plp' =>$plp->no_plp,
@@ -381,15 +359,9 @@ class DokumenController extends Controller
                         'tgl_bl_awb' =>$detail->TGL_BL_AWB ?? NULL,
                         'flag_spk' =>$plp->flag_spk,
                        ]);
-                    }
                 }
             }
         }
-
-        // var_dump($header, $details);
-        // die;
-
-
         return response()->json([
             'success' => true,
             'message' => 'Data Berhasil di Simpan',
@@ -467,6 +439,7 @@ class DokumenController extends Controller
                     endforeach;
                 }
             }
+            // dd($header, $kms, $cont, $dok);
             // $oldSPJM = SPJM::where('no_pib', $header->NO_PIB)->where('tgl_pib', $header->TGL_PIB)->first();
             // if ($oldSPJM) {
             //     return back()->with('status', ['type' => 'error', 'message' => 'Data sudah tersedia']);
@@ -578,79 +551,63 @@ class DokumenController extends Controller
         $kms = null;
         $dok = null;
         $cont = null;
-        foreach($xml->children() as $child) {
-            foreach($child as $key => $value) {
-                if($key == 'header' || $key == 'HEADER'){
-                    $header[] = $value;
-                    $oldSPJM = SPJM::where('no_pib', $header->NO_PIB)->where('tgl_pib', $header->TGL_PIB)->first();
-                    if (!$oldSPJM) {
-                        $spjm = SPJM::create([
-                            'car'=>$header->CAR,
-                            'kd_kantor'=>$header->KD_KANTOR,
-                            'tgl_pib'=>$header->TGL_PIB,
-                            'no_pib'=>$header->NO_PIB,
-                            'no_spjm'=>$header->NO_PIB,
-                            'tgl_spjm'=>$header->TGL_SPJM,
-                            'npwp_imp'=>$header->NPWP_IMP,
-                            'nama_imp'=>$header->NAMA_IMP,
-                            'npwp_ppjk'=>$header->NPWP_PPJK,
-                            'nama_ppjk'=>$header->NAMA_PPJK,
-                            'gudang'=>$header->GUDANG,
-                            'jml_cont'=>$header->JML_CONT,
-                            'no_bc11'=>$header->NO_BC11,
-                            'tgl_bc11'=>$header->TGL_BC11,
-                            'no_pos_bc11'=>$header->NO_POS_BC11,
-                            'fl_karantina'=>$header->FL_KARANTINA,
-                            'nm_angkut'=>$header->NM_ANGKUT,
-                            'no_voy_flight'=>$header->NO_VOY_FLIGHT,
-                            'tgl_upload'=>Carbon::today()->format('Y-m-d'),
-                            'jam_upload'=>Carbon::now()->format('H:i:s'),
-                        ]);
-                    }
-                }else{
-                    if ($spjm) {
-                        foreach ($value as $key => $value):
-                            if($key == 'kms' || $key == 'KMS'):
-                                $kms[] = $value;
-                                if ($kms) {
-                                    foreach ($kms as $detail) {
-                                        $newKms = SPJMkms::create([
-                                            'spjm_id'=>$spjm->id,
-                                            'car'=>$detail->CAR,
-                                            'jns_kms'=>$detail->JNS_KMS,
-                                            'merk_kms'=>$detail->MERK_KMS,
-                                            'jml_kms'=>$detail->JML_KMS,
-                                        ]);
-                                    }
-                                };
-                            elseif($key == 'dok' || $key == 'DOC'):
-                                $dok[] = $value;
-                                if ($cont) {
-                                    foreach ($cont as $detail) {
-                                         $newCont = SPJMcont::create([
-                                             'spjm_id'=>$spjm->id,
-                                             'car'=>$detail->CAR,
-                                             'no_cont'=>$detail->NO_CONT,
-                                             'size'=>$detail->SIZE,
-                                         ]);
-                                    }
-                                 };
-                            elseif($key == 'cont' || $key == 'CONT'):
-                                $cont[] = $value;
-                                if ($dok) {
-                                    foreach ($dok as $detail) {
-                                         $newDok = SPJMdok::create([
-                                             'spjm_id'=>$spjm->id,
-                                             'car'=>$detail->CAR,
-                                             'jns_dok'=>$detail->JNS_DOK,
-                                             'no_dok'=>$detail->NO_DOK,
-                                             'tgl_dok'=>$detail->TGL_DOK,
-                                         ]);
-                                    }
-                                 };
-                            endif;
-                        endforeach;
-                    }
+        $groups = [];
+
+        foreach ($xml->children() as $child) {
+            $groups[] = $child;
+        }
+        foreach ($groups as $group) {
+            $header = $group->header ?? $group->HEADER;
+            $oldSPJM = SPJM::where('no_pib', $header->NO_PIB)->where('tgl_pib', $header->TGL_PIB)->first();
+            if (!$oldSPJM) {
+                $spjm = SPJM::create([
+                    'car'=>$header->CAR,
+                    'kd_kantor'=>$header->KD_KANTOR,
+                    'tgl_pib'=>$header->TGL_PIB,
+                    'no_pib'=>$header->NO_PIB,
+                    'no_spjm'=>$header->NO_PIB,
+                    'tgl_spjm'=>$header->TGL_SPJM,
+                    'npwp_imp'=>$header->NPWP_IMP,
+                    'nama_imp'=>$header->NAMA_IMP,
+                    'npwp_ppjk'=>$header->NPWP_PPJK,
+                    'nama_ppjk'=>$header->NAMA_PPJK,
+                    'gudang'=>$header->GUDANG,
+                    'jml_cont'=>$header->JML_CONT,
+                    'no_bc11'=>$header->NO_BC11,
+                    'tgl_bc11'=>$header->TGL_BC11,
+                    'no_pos_bc11'=>$header->NO_POS_BC11,
+                    'fl_karantina'=>$header->FL_KARANTINA,
+                    'nm_angkut'=>$header->NM_ANGKUT,
+                    'no_voy_flight'=>$header->NO_VOY_FLIGHT,
+                    'tgl_upload'=>Carbon::today()->format('Y-m-d'),
+                    'jam_upload'=>Carbon::now()->format('H:i:s'),
+                ]);
+                $detil[]  = $group->DETIL ?? $group->detil;       
+                foreach ($group->DETIL->CONT as $detailCont) {
+                    $newCont = SPJMcont::create([
+                        'spjm_id'=>$spjm->id,
+                        'car'=>$detailCont->CAR,
+                        'no_cont'=>$detailCont->NO_CONT,
+                        'size'=>$detailCont->SIZE,
+                    ]);
+                }    
+                foreach ($group->DETIL->KMS as $detailKMS) {
+                    $newKms = SPJMkms::create([
+                        'spjm_id'=>$spjm->id,
+                        'car'=>$detailKMS->CAR,
+                        'jns_kms'=>$detailKMS->JNS_KMS,
+                        'merk_kms'=>$detailKMS->MERK_KMS,
+                        'jml_kms'=>$detailKMS->JML_KMS,
+                    ]);          
+                }
+                foreach ($group->DETIL->DOK as $detailDok) {
+                    $newDok = SPJMdok::create([
+                        'spjm_id'=>$spjm->id,
+                        'car'=>$detailDok->CAR,
+                        'jns_dok'=>$detailDok->JNS_DOK,
+                        'no_dok'=>$detailDok->NO_DOK,
+                        'tgl_dok'=>$detailDok->TGL_DOK,
+                    ]);         
                 }
             }
         }
@@ -895,82 +852,70 @@ class DokumenController extends Controller
            ]);
         }
         
-        $header = null;
+        $header = array();
         $kms = null;
+        $dok = null;
         $cont = null;
-        
-        foreach($xml->children() as $child) {
-            foreach($child as $key => $value) {
-                if($key == 'header' || $key == 'HEADER'){
-                    $header = $value;
-                    $oldBC23 = BC23::where('car', $header->CAR)->first();
-                    if (!$oldBC23) {
-                        $bc23 = BC23::create([
-                            'car' =>$header->CAR ?? null,
-                            'no_sppb' =>$header->NO_SPPB ?? null,
-                            'tgl_sppb' =>$header->TGL_SPPB ?? null,
-                            'nojoborder' =>$header->NOJOBORDER ?? null,
-                            'kd_kantor_pengawas' =>$header->KD_KANTOR_PENGAWAS ?? null,
-                            'kd_kantor_bongkar' =>$header->KD_KANTOR_BONGKAR ?? null,
-                            'no_pib' =>$header->NO_PIB ?? null,
-                            'tgl_pib' =>$header->TGL_PIB ?? null,
-                            'nama_imp' =>$header->NAMA_IMP ?? null,
-                            'npwp_imp' =>$header->NPWP_IMP ?? null,
-                            'alamat_imp' =>$header->ALAMAT_IMP ?? null,
-                            'npwp_ppjk' =>$header->NPWP_PPJK ?? null,
-                            'nama_ppjk' =>$header->NAMA_PPJK ?? null,
-                            'alamat_ppjk' =>$header->ALAMAT_PPJK ?? null,
-                            'nm_angkut' =>$header->NM_ANGKUT ?? null,
-                            'no_voy_flight' =>$header->NO_VOY_FLIGHT ?? null,
-                            'bruto' =>$header->BRUTO ?? null,
-                            'netto' =>$header->NETTO ?? null,
-                            'gudang' =>$header->GUDANG ?? null,
-                            'status_jalur' =>$header->STATUS_JALUR ?? null,
-                            'jml_cont' =>$header->JML_CONT ?? null,
-                            'no_bc11' =>$header->NO_BC11 ?? null,
-                            'tgl_bc11' =>$header->TGL_BC11 ?? null,
-                            'no_pos_bc11' =>$header->NO_POS_BC11 ?? null,
-                            'no_bl_awb' =>$header->NO_BL_AWB ?? null,
-                            'tgl_bl_awb' =>$header->TGL_BL_AWB ?? null,
-                            'no_master_bl_awb' =>$header->NO_MASTER_BL_AWB ?? null,
-                            'tgl_master_bl_awb' =>$header->TGL_MASTER_BL_AWB ?? null,
-                            'tgl_upload'=>Carbon::today()->format('Y-m-d'),
-                            'jam_upload'=>Carbon::now()->format('H:i:s'),
-                        ]);
-                    }
-                }else{
-                    if ($bc23) {
-                        foreach ($value as $key => $value):
-                            if($key == 'kms' || $key == 'KMS'):
-                                $kms [] = $value;
-                                if ($kms) {
-                                    foreach ($kms as $detail) {
-                                        // dd($kms, $detail);
-                                        $bcKMS = BC23Kms::create([
-                                            'sppb23_id'=>$bc23->id ?? null,
-                                            'car'=>$detail->CAR,
-                                            'jns_kms'=>$detail->JNS_KMS,
-                                            'merk_kms'=>$detail->MERK_KMS,
-                                            'jml_kms'=>$detail->JML_KMS,
-                                        ]);
-                                    }
-                                };
-                            elseif($key == 'cont' || $key == 'CONT'):
-                                $cont [] = $value;
-                                if ($cont) {
-                                    foreach ($cont as $detail) {
-                                        $bcCont = BC23Cont::create([
-                                            'sppb23_id' => $bc23->id,
-                                            'car' => $detail->CAR,
-                                            'no_cont' => $detail->NO_CONT,
-                                            'size' => $detail->SIZE,
-                                            'jns_muat' => $detail->JNS_MUAT,
-                                        ]);
-                                    }
-                                };
-                            endif;
-                        endforeach;
-                    }
+        $groups = [];
+
+        foreach ($xml->children() as $child) {
+            $groups[] = $child;
+        }
+        foreach ($groups as $group) {
+            $header = $group->header ?? $group->HEADER;
+            $oldBC23 = BC23::where('car', $header->CAR)->first();
+            if (!$oldBC23) {
+                $bc23 = BC23::create([
+                    'car' =>$header->CAR ?? null,
+                    'no_sppb' =>$header->NO_SPPB ?? null,
+                    'tgl_sppb' =>$header->TGL_SPPB ?? null,
+                    'nojoborder' =>$header->NOJOBORDER ?? null,
+                    'kd_kantor_pengawas' =>$header->KD_KANTOR_PENGAWAS ?? null,
+                    'kd_kantor_bongkar' =>$header->KD_KANTOR_BONGKAR ?? null,
+                    'no_pib' =>$header->NO_PIB ?? null,
+                    'tgl_pib' =>$header->TGL_PIB ?? null,
+                    'nama_imp' =>$header->NAMA_IMP ?? null,
+                    'npwp_imp' =>$header->NPWP_IMP ?? null,
+                    'alamat_imp' =>$header->ALAMAT_IMP ?? null,
+                    'npwp_ppjk' =>$header->NPWP_PPJK ?? null,
+                    'nama_ppjk' =>$header->NAMA_PPJK ?? null,
+                    'alamat_ppjk' =>$header->ALAMAT_PPJK ?? null,
+                    'nm_angkut' =>$header->NM_ANGKUT ?? null,
+                    'no_voy_flight' =>$header->NO_VOY_FLIGHT ?? null,
+                    'bruto' =>$header->BRUTO ?? null,
+                    'netto' =>$header->NETTO ?? null,
+                    'gudang' =>$header->GUDANG ?? null,
+                    'status_jalur' =>$header->STATUS_JALUR ?? null,
+                    'jml_cont' =>$header->JML_CONT ?? null,
+                    'no_bc11' =>$header->NO_BC11 ?? null,
+                    'tgl_bc11' =>$header->TGL_BC11 ?? null,
+                    'no_pos_bc11' =>$header->NO_POS_BC11 ?? null,
+                    'no_bl_awb' =>$header->NO_BL_AWB ?? null,
+                    'tgl_bl_awb' =>$header->TGL_BL_AWB ?? null,
+                    'no_master_bl_awb' =>$header->NO_MASTER_BL_AWB ?? null,
+                    'tgl_master_bl_awb' =>$header->TGL_MASTER_BL_AWB ?? null,
+                    'tgl_upload'=>Carbon::today()->format('Y-m-d'),
+                    'jam_upload'=>Carbon::now()->format('H:i:s'),
+                ]);
+
+                $detil[]  = $group->DETIL ?? $group->detil;       
+                foreach ($group->DETIL->CONT as $detailCont) {
+                    $bcCont = BC23Cont::create([
+                        'sppb23_id' => $bc23->id,
+                        'car' => $detailCont->CAR,
+                        'no_cont' => $detailCont->NO_CONT,
+                        'size' => $detailCont->SIZE,
+                        'jns_muat' => $detailCont->JNS_MUAT,
+                    ]);
+                }    
+                foreach ($group->DETIL->KMS as $detailKMS) {
+                    $bcKMS = BC23Kms::create([
+                        'sppb23_id'=>$bc23->id ?? null,
+                        'car'=>$detailKMS->CAR,
+                        'jns_kms'=>$detailKMS->JNS_KMS,
+                        'merk_kms'=>$detailKMS->MERK_KMS,
+                        'jml_kms'=>$detailKMS->JML_KMS,
+                    ]);        
                 }
             }
         }
@@ -1053,9 +998,7 @@ class DokumenController extends Controller
             $service
                 ->name('TpsOnline')
                 ->wsdl($this->wsdl)
-                ->trace(true)                                                                                                  
-//                ->certificate()                                                 
-//                ->cache(WSDL_CACHE_NONE)                                        
+                ->trace(true)                                                                                                                                         
                 ->options([
                     'stream_context' => stream_context_create([
                         'ssl' => array(
@@ -1084,376 +1027,103 @@ class DokumenController extends Controller
 
         
         // Using the added service
-        // \SoapWrapper::service('TpsOnline', function ($service) use ($data) {        
-        //     $this->response = $service->call('GetImpor_Sppb', [$data])->GetImpor_SppbResult;      
-        // }); 
+        \SoapWrapper::service('TpsOnline', function ($service) use ($data) {        
+            $this->response = $service->call('GetImpor_Sppb', [$data])->GetImpor_SppbResult;      
+        }); 
         
-        // libxml_use_internal_errors(true);
-        // $xml = simplexml_load_string($this->response);
-        // if(!$xml || !$xml->children()){
-        //     return back()->with('status', ['type' => 'error', 'message' => 'Error importing data: ' .  $this->response]);
-        // }
+        libxml_use_internal_errors(true);
+        $xml = simplexml_load_string($this->response);
+        if(!$xml || !$xml->children()){
+            return back()->with('status', ['type' => 'error', 'message' => 'Error importing data: ' .  $this->response]);
+        }
 
-        $test = '<!-- BC-Doc.SPPB -->
-        <DOCUMENT>
-        <SPPB>
-        <HEADER>
-        <CAR>04030000024720201119310905</CAR>
-        <NO_SPPB>511653/KPU.01/2020</NO_SPPB>
-        <TGL_SPPB>11/20/2020</TGL_SPPB>
-        <KD_KPBC>040300</KD_KPBC>
-        <NO_PIB>511367</NO_PIB>
-        <TGL_PIB>11/20/2020</TGL_PIB>
-        <NPWP_IMP>024942047086000</NPWP_IMP>
-        <NAMA_IMP>PT. BINTANG SAPUTRA</NAMA_IMP>
-        <ALAMAT_IMP>RUKAN KENCANA NIAGA I BLOK. D1 NO.1-B JL.TAMAN ARIES MERUYA UTARA-KEMB</ALAMAT_IMP>
-        <NPWP_PPJK/>
-        <NAMA_PPJK/>
-        <ALAMAT_PPJK/>
-        <NM_ANGKUT>KYOTO TOWER 0503</NM_ANGKUT>
-        <NO_VOY_FLIGHT>024S</NO_VOY_FLIGHT>
-        <BRUTO>390656.25</BRUTO>
-        <NETTO>383156.25</NETTO>
-        <GUDANG>TMAL</GUDANG>
-        <STATUS_JALUR>H</STATUS_JALUR>
-        <JML_CONT>15</JML_CONT>
-        <NO_BC11>004625</NO_BC11>
-        <TGL_BC11>11/18/2020</TGL_BC11>
-        <NO_POS_BC11>004600000000</NO_POS_BC11>
-        <NO_BL_AWB>EGLV091030644422</NO_BL_AWB>
-        <TG_BL_AWB>11/16/2020</TG_BL_AWB>
-        <NO_MASTER_BL_AWB/>
-        <TG_MASTER_BL_AWB/>
-        </HEADER>
-        <DETIL>
-        <CONT>
-        <CAR>04030000024720201119310905</CAR>
-        <NO_CONT>DRYU2242217</NO_CONT>
-        <SIZE>20</SIZE>
-        <JNS_MUAT>F</JNS_MUAT>
-        </CONT>
-        <CONT>
-        <CAR>04030000024720201119310905</CAR>
-        <NO_CONT>DRYU2300782</NO_CONT>
-        <SIZE>20</SIZE>
-        <JNS_MUAT>F</JNS_MUAT>
-        </CONT>
-        <CONT>
-        <CAR>04030000024720201119310905</CAR>
-        <NO_CONT>DRYU2383935</NO_CONT>
-        <SIZE>20</SIZE>
-        <JNS_MUAT>F</JNS_MUAT>
-        </CONT>
-        <CONT>
-        <CAR>04030000024720201119310905</CAR>
-        <NO_CONT>EGHU3331936</NO_CONT>
-        <SIZE>20</SIZE>
-        <JNS_MUAT>F</JNS_MUAT>
-        </CONT>
-        <CONT>
-        <CAR>04030000024720201119310905</CAR>
-        <NO_CONT>EITU0195565</NO_CONT>
-        <SIZE>20</SIZE>
-        <JNS_MUAT>F</JNS_MUAT>
-        </CONT>
-        <CONT>
-        <CAR>04030000024720201119310905</CAR>
-        <NO_CONT>EITU0197763</NO_CONT>
-        <SIZE>20</SIZE>
-        <JNS_MUAT>F</JNS_MUAT>
-        </CONT>
-        <CONT>
-        <CAR>04030000024720201119310905</CAR>
-        <NO_CONT>EITU0329725</NO_CONT>
-        <SIZE>20</SIZE>
-        <JNS_MUAT>F</JNS_MUAT>
-        </CONT>
-        <CONT>
-        <CAR>04030000024720201119310905</CAR>
-        <NO_CONT>EITU0336318</NO_CONT>
-        <SIZE>20</SIZE>
-        <JNS_MUAT>F</JNS_MUAT>
-        </CONT>
-        <CONT>
-        <CAR>04030000024720201119310905</CAR>
-        <NO_CONT>EITU0529019</NO_CONT>
-        <SIZE>20</SIZE>
-        <JNS_MUAT>F</JNS_MUAT>
-        </CONT>
-        <CONT>
-        <CAR>04030000024720201119310905</CAR>
-        <NO_CONT>TEMU0537171</NO_CONT>
-        <SIZE>20</SIZE>
-        <JNS_MUAT>F</JNS_MUAT>
-        </CONT>
-        <CONT>
-        <CAR>04030000024720201119310905</CAR>
-        <NO_CONT>TEMU0663610</NO_CONT>
-        <SIZE>20</SIZE>
-        <JNS_MUAT>F</JNS_MUAT>
-        </CONT>
-        <CONT>
-        <CAR>04030000024720201119310905</CAR>
-        <NO_CONT>TEMU0684070</NO_CONT>
-        <SIZE>20</SIZE>
-        <JNS_MUAT>F</JNS_MUAT>
-        </CONT>
-        <CONT>
-        <CAR>04030000024720201119310905</CAR>
-        <NO_CONT>TEMU0768144</NO_CONT>
-        <SIZE>20</SIZE>
-        <JNS_MUAT>F</JNS_MUAT>
-        </CONT>
-        <CONT>
-        <CAR>04030000024720201119310905</CAR>
-        <NO_CONT>TEMU3938481</NO_CONT>
-        <SIZE>20</SIZE>
-        <JNS_MUAT>F</JNS_MUAT>
-        </CONT>
-        <CONT>
-        <CAR>04030000024720201119310905</CAR>
-        <NO_CONT>TLLU2012250</NO_CONT>
-        <SIZE>20</SIZE>
-        <JNS_MUAT>F</JNS_MUAT>
-        </CONT>
-        <KMS>
-        <CAR>04030000024720201119310905</CAR>
-        <JNS_KMS>CS</JNS_KMS>
-        <MERK_KMS>SESUAI BL</MERK_KMS>
-        <JML_KMS>150</JML_KMS>
-        </KMS>
-        </DETIL>
-        </SPPB>
-        <SPPB>
-        <HEADER>
-        <CAR>04030000024720201119310906</CAR>
-        <NO_SPPB>511654/KPU.01/2020</NO_SPPB>
-        <TGL_SPPB>11/20/2020</TGL_SPPB>
-        <KD_KPBC>040300</KD_KPBC>
-        <NO_PIB>511368</NO_PIB>
-        <TGL_PIB>11/20/2020</TGL_PIB>
-        <NPWP_IMP>024942047086000</NPWP_IMP>
-        <NAMA_IMP>PT. BINTANG SAPUTRA</NAMA_IMP>
-        <ALAMAT_IMP>RUKAN KENCANA NIAGA I BLOK. D1 NO.1-B JL.TAMAN ARIES MERUYA UTARA-KEMB</ALAMAT_IMP>
-        <NPWP_PPJK/>
-        <NAMA_PPJK/>
-        <ALAMAT_PPJK/>
-        <NM_ANGKUT>KYOTO TOWER 0503</NM_ANGKUT>
-        <NO_VOY_FLIGHT>024S</NO_VOY_FLIGHT>
-        <BRUTO>391290.33</BRUTO>
-        <NETTO>383790.33</NETTO>
-        <GUDANG>TMAL</GUDANG>
-        <STATUS_JALUR>H</STATUS_JALUR>
-        <JML_CONT>15</JML_CONT>
-        <NO_BC11>004625</NO_BC11>
-        <TGL_BC11>11/18/2020</TGL_BC11>
-        <NO_POS_BC11>003500000000</NO_POS_BC11>
-        <NO_BL_AWB>EGLV091030632211</NO_BL_AWB>
-        <TG_BL_AWB>11/16/2020</TG_BL_AWB>
-        <NO_MASTER_BL_AWB/>
-        <TG_MASTER_BL_AWB/>
-        </HEADER>
-        <DETIL>
-        <CONT>
-        <CAR>04030000024720201119310906</CAR>
-        <NO_CONT>BEAU2125154</NO_CONT>
-        <SIZE>20</SIZE>
-        <JNS_MUAT>F</JNS_MUAT>
-        </CONT>
-        <CONT>
-        <CAR>04030000024720201119310906</CAR>
-        <NO_CONT>EGHU3383035</NO_CONT>
-        <SIZE>20</SIZE>
-        <JNS_MUAT>F</JNS_MUAT>
-        </CONT>
-        <CONT>
-        <CAR>04030000024720201119310906</CAR>
-        <NO_CONT>EISU2015036</NO_CONT>
-        <SIZE>20</SIZE>
-        <JNS_MUAT>F</JNS_MUAT>
-        </CONT>
-        <CONT>
-        <CAR>04030000024720201119310906</CAR>
-        <NO_CONT>EISU2047671</NO_CONT>
-        <SIZE>20</SIZE>
-        <JNS_MUAT>F</JNS_MUAT>
-        </CONT>
-        <CONT>
-        <CAR>04030000024720201119310906</CAR>
-        <NO_CONT>EISU2055738</NO_CONT>
-        <SIZE>20</SIZE>
-        <JNS_MUAT>F</JNS_MUAT>
-        </CONT>
-        <CONT>
-        <CAR>04030000024720201119310906</CAR>
-        <NO_CONT>EISU3976969</NO_CONT>
-        <SIZE>20</SIZE>
-        <JNS_MUAT>F</JNS_MUAT>
-        </CONT>
-        <CONT>
-        <CAR>04030000024720201119310906</CAR>
-        <NO_CONT>EITU0265873</NO_CONT>
-        <SIZE>20</SIZE>
-        <JNS_MUAT>F</JNS_MUAT>
-        </CONT>
-        <CONT>
-        <CAR>04030000024720201119310906</CAR>
-        <NO_CONT>EITU0388116</NO_CONT>
-        <SIZE>20</SIZE>
-        <JNS_MUAT>F</JNS_MUAT>
-        </CONT>
-        <CONT>
-        <CAR>04030000024720201119310906</CAR>
-        <NO_CONT>HMCU3031392</NO_CONT>
-        <SIZE>20</SIZE>
-        <JNS_MUAT>F</JNS_MUAT>
-        </CONT>
-        <CONT>
-        <CAR>04030000024720201119310906</CAR>
-        <NO_CONT>TCKU1179777</NO_CONT>
-        <SIZE>20</SIZE>
-        <JNS_MUAT>F</JNS_MUAT>
-        </CONT>
-        <CONT>
-        <CAR>04030000024720201119310906</CAR>
-        <NO_CONT>TCLU6934564</NO_CONT>
-        <SIZE>20</SIZE>
-        <JNS_MUAT>F</JNS_MUAT>
-        </CONT>
-        <CONT>
-        <CAR>04030000024720201119310906</CAR>
-        <NO_CONT>TEMU0043820</NO_CONT>
-        <SIZE>20</SIZE>
-        <JNS_MUAT>F</JNS_MUAT>
-        </CONT>
-        <CONT>
-        <CAR>04030000024720201119310906</CAR>
-        <NO_CONT>TEMU0625610</NO_CONT>
-        <SIZE>20</SIZE>
-        <JNS_MUAT>F</JNS_MUAT>
-        </CONT>
-        <CONT>
-        <CAR>04030000024720201119310906</CAR>
-        <NO_CONT>TEMU4147700</NO_CONT>
-        <SIZE>20</SIZE>
-        <JNS_MUAT>F</JNS_MUAT>
-        </CONT>
-        <CONT>
-        <CAR>04030000024720201119310906</CAR>
-        <NO_CONT>TRHU3620494</NO_CONT>
-        <SIZE>20</SIZE>
-        <JNS_MUAT>F</JNS_MUAT>
-        </CONT>
-        <KMS>
-        <CAR>04030000024720201119310906</CAR>
-        <JNS_KMS>CS</JNS_KMS>
-        <MERK_KMS>SESUAI BL</MERK_KMS>
-        <JML_KMS>150</JML_KMS>
-        </KMS>
-        </DETIL>
-        </SPPB>
-        </DOCUMENT>';
-
-        $testXml = simplexml_load_string($test);
-        $groups = [];
-        $nextGroup = [];
         $header = null;
-        foreach ($testXml->children() as $child) {
-            $groups[] = $child;
-            if (strtolower($child->getName()) === 'header') {
-                $header = $child;
+        $kms = null;
+        $cont = null;
+        foreach($xml->children() as $child) {
+            foreach($child as $key => $value) {
+                if($key == 'header' || $key == 'HEADER'){
+                    $header = $value;
+                }else{
+                    foreach ($value as $key => $value):
+                        if($key == 'kms' || $key == 'KMS'):
+                            $kms [] = $value;
+                        elseif($key == 'dok' || $key == 'DOC'):
+                            $dok [] = $value;
+                        elseif($key == 'cont' || $key == 'CONT'):
+                            $cont [] = $value;
+                        endif;
+                    endforeach;
+                }
+            }
+        }
+        if ($header) {
+            $oldSPPB = SPPB::where('car', $header->CAR)->first();
+            if ($oldSPPB) {
+                return back()->with('status', ['type' => 'error', 'message' => 'Data sudah tersedia']);
             }
 
-        }
-        dd($groups, $header);
+            $sppb = SPPB::create([
+                'car' =>$header->CAR ?? null,
+                'no_sppb' =>$header->NO_SPPB ?? null,
+                'tgl_sppb' =>$header->TGL_SPPB ?? null,
+                'nojoborder' =>$header->NOJOBORDER ?? null,
+                'kd_kantor_pengawas' =>$header->KD_KANTOR_PENGAWAS ?? null,
+                'kd_kantor_bongkar' =>$header->KD_KANTOR_BONGKAR ?? null,
+                'no_pib' =>$header->NO_PIB ?? null,
+                'tgl_pib' =>$header->TGL_PIB ?? null,
+                'nama_imp' =>$header->NAMA_IMP ?? null,
+                'npwp_imp' =>$header->NPWP_IMP ?? null,
+                'alamat_imp' =>$header->ALAMAT_IMP ?? null,
+                'npwp_ppjk' =>$header->NPWP_PPJK ?? null,
+                'nama_ppjk' =>$header->NAMA_PPJK ?? null,
+                'alamat_ppjk' =>$header->ALAMAT_PPJK ?? null,
+                'nm_angkut' =>$header->NM_ANGKUT ?? null,
+                'no_voy_flight' =>$header->NO_VOY_FLIGHT ?? null,
+                'bruto' =>$header->BRUTO ?? null,
+                'netto' =>$header->NETTO ?? null,
+                'gudang' =>$header->GUDANG ?? null,
+                'status_jalur' =>$header->STATUS_JALUR ?? null,
+                'jml_cont' =>$header->JML_CONT ?? null,
+                'no_bc11' =>$header->NO_BC11 ?? null,
+                'tgl_bc11' =>$header->TGL_BC11 ?? null,
+                'no_pos_bc11' =>$header->NO_POS_BC11 ?? null,
+                'no_bl_awb' =>$header->NO_BL_AWB ?? null,
+                'tgl_bl_awb' =>$header->TGL_BL_AWB ?? null,
+                'no_master_bl_awb' =>$header->NO_MASTER_BL_AWB ?? null,
+                'tgl_master_bl_awb' =>$header->TGL_MASTER_BL_AWB ?? null,
+                'tgl_upload'=>Carbon::today()->format('Y-m-d'),
+                'jam_upload'=>Carbon::now()->format('H:i:s'),
+            ]);
 
-    //     $header = null;
-    //     $kms = null;
-    //     $cont = null;
-    //     foreach($xml->children() as $child) {
-    //         foreach($child as $key => $value) {
-    //             if($key == 'header' || $key == 'HEADER'){
-    //                 $header = $value;
-    //             }else{
-    //                 foreach ($value as $key => $value):
-    //                     if($key == 'kms' || $key == 'KMS'):
-    //                         $kms [] = $value;
-    //                     elseif($key == 'dok' || $key == 'DOC'):
-    //                         $dok [] = $value;
-    //                     elseif($key == 'cont' || $key == 'CONT'):
-    //                         $cont [] = $value;
-    //                     endif;
-    //                 endforeach;
-    //             }
-    //         }
-    //     }
-    //     if ($header) {
-    //         $oldSPPB = SPPB::where('car', $header->CAR)->first();
-    //         if ($oldSPPB) {
-    //             return back()->with('status', ['type' => 'error', 'message' => 'Data sudah tersedia']);
-    //         }
+            if ($kms) {
+                foreach ($kms as $detail) {
+                    // dd($kms, $detail);
+                    $sppbKMS = SPPBKms::create([
+                        'sppb_id'=>$sppb->id ?? null,
+                        'car'=>$detail->CAR,
+                        'jns_kms'=>$detail->JNS_KMS,
+                        'merk_kms'=>$detail->MERK_KMS,
+                        'jml_kms'=>$detail->JML_KMS,
+                    ]);
+                }
+            }
 
-    //         $sppb = SPPB::create([
-    //             'car' =>$header->CAR ?? null,
-    //             'no_sppb' =>$header->NO_SPPB ?? null,
-    //             'tgl_sppb' =>$header->TGL_SPPB ?? null,
-    //             'nojoborder' =>$header->NOJOBORDER ?? null,
-    //             'kd_kantor_pengawas' =>$header->KD_KANTOR_PENGAWAS ?? null,
-    //             'kd_kantor_bongkar' =>$header->KD_KANTOR_BONGKAR ?? null,
-    //             'no_pib' =>$header->NO_PIB ?? null,
-    //             'tgl_pib' =>$header->TGL_PIB ?? null,
-    //             'nama_imp' =>$header->NAMA_IMP ?? null,
-    //             'npwp_imp' =>$header->NPWP_IMP ?? null,
-    //             'alamat_imp' =>$header->ALAMAT_IMP ?? null,
-    //             'npwp_ppjk' =>$header->NPWP_PPJK ?? null,
-    //             'nama_ppjk' =>$header->NAMA_PPJK ?? null,
-    //             'alamat_ppjk' =>$header->ALAMAT_PPJK ?? null,
-    //             'nm_angkut' =>$header->NM_ANGKUT ?? null,
-    //             'no_voy_flight' =>$header->NO_VOY_FLIGHT ?? null,
-    //             'bruto' =>$header->BRUTO ?? null,
-    //             'netto' =>$header->NETTO ?? null,
-    //             'gudang' =>$header->GUDANG ?? null,
-    //             'status_jalur' =>$header->STATUS_JALUR ?? null,
-    //             'jml_cont' =>$header->JML_CONT ?? null,
-    //             'no_bc11' =>$header->NO_BC11 ?? null,
-    //             'tgl_bc11' =>$header->TGL_BC11 ?? null,
-    //             'no_pos_bc11' =>$header->NO_POS_BC11 ?? null,
-    //             'no_bl_awb' =>$header->NO_BL_AWB ?? null,
-    //             'tgl_bl_awb' =>$header->TGL_BL_AWB ?? null,
-    //             'no_master_bl_awb' =>$header->NO_MASTER_BL_AWB ?? null,
-    //             'tgl_master_bl_awb' =>$header->TGL_MASTER_BL_AWB ?? null,
-    //             'tgl_upload'=>Carbon::today()->format('Y-m-d'),
-    //             'jam_upload'=>Carbon::now()->format('H:i:s'),
-    //         ]);
-
-    //         if ($kms) {
-    //             foreach ($kms as $detail) {
-    //                 // dd($kms, $detail);
-    //                 $sppbKMS = SPPBKms::create([
-    //                     'sppb_id'=>$sppb->id ?? null,
-    //                     'car'=>$detail->CAR,
-    //                     'jns_kms'=>$detail->JNS_KMS,
-    //                     'merk_kms'=>$detail->MERK_KMS,
-    //                     'jml_kms'=>$detail->JML_KMS,
-    //                 ]);
-    //             }
-    //         }
-
-    //         if ($cont) {
-    //             foreach ($cont as $detail) {
-    //                 $sppbCont = SPPBCont::create([
-    //                     'sppb_id' => $sppb->id,
-    //                     'car' => $detail->CAR,
-    //                     'no_cont' => $detail->NO_CONT,
-    //                     'size' => $detail->SIZE,
-    //                     'jns_muat' => $detail->JNS_MUAT,
-    //                 ]);
-    //             }
-    //         }
-    //         return back()->with('status', ['type' => 'success', 'message' => 'Data ditemukan']);
-    //   }else {
-    //     return back()->with('status', ['type' => 'error', 'message' => 'Something Wrong']);
-    //   }
+            if ($cont) {
+                foreach ($cont as $detail) {
+                    $sppbCont = SPPBCont::create([
+                        'sppb_id' => $sppb->id,
+                        'car' => $detail->CAR,
+                        'no_cont' => $detail->NO_CONT,
+                        'size' => $detail->SIZE,
+                        'jns_muat' => $detail->JNS_MUAT,
+                    ]);
+                }
+            }
+            return back()->with('status', ['type' => 'success', 'message' => 'Data ditemukan']);
+      }else {
+        return back()->with('status', ['type' => 'error', 'message' => 'Something Wrong']);
+      }
     }
 
     public function GetImporPermit()
@@ -1492,81 +1162,72 @@ class DokumenController extends Controller
             'message' => 'Error : ' . $this->response,
            ]);
         }
-        foreach($testXml->children() as $child) {
-            foreach($child as $key => $value) {
-                if($key == 'header' || $key == 'HEADER'){
-                    $header = $value;
-                    $oldSPPB = SPPB::where('car', $header->CAR)->first();
-                    if (!$oldSPPB) {
-                        $sppb = SPPB::create([
-                            'car' =>$header->CAR ?? null,
-                            'no_sppb' =>$header->NO_SPPB ?? null,
-                            'tgl_sppb' =>$header->TGL_SPPB ?? null,
-                            'nojoborder' =>$header->NOJOBORDER ?? null,
-                            'kd_kantor_pengawas' =>$header->KD_KANTOR_PENGAWAS ?? null,
-                            'kd_kantor_bongkar' =>$header->KD_KANTOR_BONGKAR ?? null,
-                            'no_pib' =>$header->NO_PIB ?? null,
-                            'tgl_pib' =>$header->TGL_PIB ?? null,
-                            'nama_imp' =>$header->NAMA_IMP ?? null,
-                            'npwp_imp' =>$header->NPWP_IMP ?? null,
-                            'alamat_imp' =>$header->ALAMAT_IMP ?? null,
-                            'npwp_ppjk' =>$header->NPWP_PPJK ?? null,
-                            'nama_ppjk' =>$header->NAMA_PPJK ?? null,
-                            'alamat_ppjk' =>$header->ALAMAT_PPJK ?? null,
-                            'nm_angkut' =>$header->NM_ANGKUT ?? null,
-                            'no_voy_flight' =>$header->NO_VOY_FLIGHT ?? null,
-                            'bruto' =>$header->BRUTO ?? null,
-                            'netto' =>$header->NETTO ?? null,
-                            'gudang' =>$header->GUDANG ?? null,
-                            'status_jalur' =>$header->STATUS_JALUR ?? null,
-                            'jml_cont' =>$header->JML_CONT ?? null,
-                            'no_bc11' =>$header->NO_BC11 ?? null,
-                            'tgl_bc11' =>$header->TGL_BC11 ?? null,
-                            'no_pos_bc11' =>$header->NO_POS_BC11 ?? null,
-                            'no_bl_awb' =>$header->NO_BL_AWB ?? null,
-                            'tgl_bl_awb' =>$header->TGL_BL_AWB ?? null,
-                            'no_master_bl_awb' =>$header->NO_MASTER_BL_AWB ?? null,
-                            'tgl_master_bl_awb' =>$header->TGL_MASTER_BL_AWB ?? null,
-                            'tgl_upload'=>Carbon::today()->format('Y-m-d'),
-                            'jam_upload'=>Carbon::now()->format('H:i:s'),
-                        ]);
-            
-                    }
-                }else{
-                    if ($sppb) {
-                        foreach ($value as $key => $value):
-                            if($key == 'kms' || $key == 'KMS'):
-                                $kms [] = $value;
-                                if ($kms) {
-                                    foreach ($kms as $detail) {
-                                        // dd($kms, $detail);
-                                        $sppbKMS = SPPBKms::create([
-                                            'sppb_id'=>$sppb->id ?? null,
-                                            'car'=>$detail->CAR,
-                                            'jns_kms'=>$detail->JNS_KMS,
-                                            'merk_kms'=>$detail->MERK_KMS,
-                                            'jml_kms'=>$detail->JML_KMS,
-                                        ]);
-                                    }
-                                };
-                            elseif($key == 'dok' || $key == 'DOC'):
-                                $dok [] = $value;
-                            elseif($key == 'cont' || $key == 'CONT'):
-                                $cont [] = $value;
-                                if ($cont) {
-                                    foreach ($cont as $detail) {
-                                        $sppbCont = SPPBCont::create([
-                                            'sppb_id' => $sppb->id,
-                                            'car' => $detail->CAR,
-                                            'no_cont' => $detail->NO_CONT,
-                                            'size' => $detail->SIZE,
-                                            'jns_muat' => $detail->JNS_MUAT,
-                                        ]);
-                                    }
-                                };
-                            endif;
-                        endforeach;
-                    }
+
+        $groups = [];
+        $nextGroup = [];
+        $header = [];
+        $valueTest = [];
+        $detil = [];
+        
+        foreach ($xml->children() as $child) {
+            $groups[] = $child;
+        }
+        
+        foreach ($groups as $group) {
+            $header = $group->header ?? $group->HEADER;
+            $oldSPPB = SPPB::where('car', $header->CAR)->first();
+            if (!$oldSPPB) {
+                $sppb = SPPB::create([
+                    'car' =>$header->CAR ?? null,
+                    'no_sppb' =>$header->NO_SPPB ?? null,
+                    'tgl_sppb' =>$header->TGL_SPPB ?? null,
+                    'nojoborder' =>$header->NOJOBORDER ?? null,
+                    'kd_kantor_pengawas' =>$header->KD_KANTOR_PENGAWAS ?? null,
+                    'kd_kantor_bongkar' =>$header->KD_KANTOR_BONGKAR ?? null,
+                    'no_pib' =>$header->NO_PIB ?? null,
+                    'tgl_pib' =>$header->TGL_PIB ?? null,
+                    'nama_imp' =>$header->NAMA_IMP ?? null,
+                    'npwp_imp' =>$header->NPWP_IMP ?? null,
+                    'alamat_imp' =>$header->ALAMAT_IMP ?? null,
+                    'npwp_ppjk' =>$header->NPWP_PPJK ?? null,
+                    'nama_ppjk' =>$header->NAMA_PPJK ?? null,
+                    'alamat_ppjk' =>$header->ALAMAT_PPJK ?? null,
+                    'nm_angkut' =>$header->NM_ANGKUT ?? null,
+                    'no_voy_flight' =>$header->NO_VOY_FLIGHT ?? null,
+                    'bruto' =>$header->BRUTO ?? null,
+                    'netto' =>$header->NETTO ?? null,
+                    'gudang' =>$header->GUDANG ?? null,
+                    'status_jalur' =>$header->STATUS_JALUR ?? null,
+                    'jml_cont' =>$header->JML_CONT ?? null,
+                    'no_bc11' =>$header->NO_BC11 ?? null,
+                    'tgl_bc11' =>$header->TGL_BC11 ?? null,
+                    'no_pos_bc11' =>$header->NO_POS_BC11 ?? null,
+                    'no_bl_awb' =>$header->NO_BL_AWB ?? null,
+                    'tgl_bl_awb' =>$header->TGL_BL_AWB ?? null,
+                    'no_master_bl_awb' =>$header->NO_MASTER_BL_AWB ?? null,
+                    'tgl_master_bl_awb' =>$header->TGL_MASTER_BL_AWB ?? null,
+                    'tgl_upload'=>Carbon::today()->format('Y-m-d'),
+                    'jam_upload'=>Carbon::now()->format('H:i:s'),
+                ]);
+                $detil[]  = $group->DETIL ?? $group->detil;       
+                foreach ($group->DETIL->CONT as $detailCont) {
+                    $sppbCont = SPPBCont::create([
+                        'sppb_id' => $sppb->id,
+                        'car' => $detailCont->CAR,
+                        'no_cont' => $detailCont->NO_CONT,
+                        'size' => $detailCont->SIZE,
+                        'jns_muat' => $detailCont->JNS_MUAT,
+                    ]);
+                }    
+                foreach ($group->DETIL->KMS as $detailKMS) {
+                    # code...
+                    $sppbKMS = SPPBKms::create([
+                        'sppb_id'=>$sppb->id ?? null,
+                        'car'=>$detailKMS->CAR,
+                        'jns_kms'=>$detailKMS->JNS_KMS,
+                        'merk_kms'=>$detailKMS->MERK_KMS,
+                        'jml_kms'=>$detailKMS->JML_KMS,
+                    ]);            
                 }
             }
         }
@@ -2076,86 +1737,75 @@ class DokumenController extends Controller
             'message' => 'Error : ' . $this->response,
            ]);
         }
+
+        $groups = [];
+        $nextGroup = [];
+        $header = [];
+        $valueTest = [];
+
+        $detil = [];
+        foreach ($xml->children() as $child) {
+            $groups[] = $child;
+        }
         
-        $docmanual_id = 0;
-        $header = null;
-        $kms = null;
-        $cont = null;
-        foreach($xml->children() as $child) {
-            foreach($child as $key => $value) {
-                if($key == 'header' || $key == 'HEADER'){
-                    $header = $value;
-                    $oldPabean = Pabean::where('car', $header->CAR)->first();
-                    if (!$oldPabean) {
-                        $pabean = Pabean::create([
-                            'kd_dok_inout' => $header->KD_DOK_INOUT,
-                            'car' => $header->CAR,
-                            'no_dok_inout' => $header->NO_DOK_INOUT,
-                            'tgl_dok_inout' => $header->TGL_DOK_INOUT,
-                            'no_daftar' => $header->NO_DAFTAR,
-                            'tgl_daftar' => $header->TGL_DAFTAR,
-                            'kd_kantor' => $header->KD_KANTOR,
-                            'kd_kantor_pengawas' => $header->KD_KANTOR_PENGAWAS,
-                            'kd_kantor_bongkar' => $header->KD_KANTOR_BONGKAR,
-                            'npwp_imp' => $header->NPWP_IMP,
-                            'nm_imp' => $header->NM_IMP,
-                            'al_imp' => $header->AL_IMP,
-                            'npwp_ppjk' => $header->NPWP_PPJK,
-                            'nm_ppjk' => $header->NM_PPJK,
-                            'al_ppjk' => $header->AL_PPJK,
-                            'nm_angkut' => $header->NM_ANGKUT,
-                            'no_voy_flight' => $header->NO_VOY_FLIGHT,
-                            'brutto' => $header->BRUTTO,
-                            'netto' => $header->NETTO,
-                            'gudang' => $header->GUDANG,
-                            'status_jalur' => $header->STATUS_JALUR,
-                            'jml_cont' => $header->JML_CONT,
-                            'no_bc11' => $header->NO_BC11,
-                            'tgl_bc11' => $header->TGL_BC11,
-                            'no_pos_bc11' => $header->NO_POS_BC11,
-                            'no_bl_awb' => $header->NO_BL_AWB,
-                            'tgl_bl_awb' => $header->TGL_BL_AWB,
-                            'no_master_bl_awb' => $header->NO_MASTER_BL_AWB,
-                            'tgl_master_bl_awb' => $header->TGL_MASTER_BL_AWB,
-                            'fl_segel' => $header->FL_SEGEL,
-                            'tgl_upload'=>Carbon::today()->format('Y-m-d'),
-                            'jam_upload'=>Carbon::now()->format('H:i:s'),
-                        ]);
-                     }
-                }else{
-                    if ($pabean) {
-                        foreach ($value as $key => $value):
-                            if($key == 'kms' || $key == 'KMS'):
-                                $kms [] = $value;
-                                if ($kms) {
-                                    foreach ($kms as $detail) {
-                                        $pabeanKms = PabeanKms::create([
-                                            'pabean_id' => $pabean->id,
-                                            'car' => $detail->CAR,
-                                            'jns_kms' => $detail->JNS_KMS,
-                                            'jml_kms' => $detail->JML_KMS,
-                                        ]);
-                                    }
-                                };
-                            elseif($key == 'dok' || $key == 'DOC'):
-                                $dok [] = $value;
-                            elseif($key == 'cont' || $key == 'CONT'):
-                                $cont [] = $value;
-                                if ($cont) {
-                                    foreach ($cont as $detail) {
-                                        $pabeanCont = PabeanCont::create([
-                                            'pabean_id' => $pabean->id,
-                                            'car' => $detail->CAR,
-                                            'no_cont' => $detail->NO_CONT,
-                                            'ukr_cont' => $detail->UKR_CONT,
-                                            'size' => $detail->SIZE,
-                                            'jns_muat' => $detail->JNS_MUAT,
-                                        ]);
-                                    }
-                                };
-                            endif;
-                        endforeach;
-                    }
+        foreach ($groups as $group) {
+            $header = $group->header ?? $group->HEADER;
+            $oldPabean = Pabean::where('car', $header->CAR)->first();
+            if (!$oldPabean) {
+                $pabean = Pabean::create([
+                    'kd_dok_inout' => $header->KD_DOK_INOUT,
+                    'car' => $header->CAR,
+                    'no_dok_inout' => $header->NO_DOK_INOUT,
+                    'tgl_dok_inout' => $header->TGL_DOK_INOUT,
+                    'no_daftar' => $header->NO_DAFTAR,
+                    'tgl_daftar' => $header->TGL_DAFTAR,
+                    'kd_kantor' => $header->KD_KANTOR,
+                    'kd_kantor_pengawas' => $header->KD_KANTOR_PENGAWAS,
+                    'kd_kantor_bongkar' => $header->KD_KANTOR_BONGKAR,
+                    'npwp_imp' => $header->NPWP_IMP,
+                    'nm_imp' => $header->NM_IMP,
+                    'al_imp' => $header->AL_IMP,
+                    'npwp_ppjk' => $header->NPWP_PPJK,
+                    'nm_ppjk' => $header->NM_PPJK,
+                    'al_ppjk' => $header->AL_PPJK,
+                    'nm_angkut' => $header->NM_ANGKUT,
+                    'no_voy_flight' => $header->NO_VOY_FLIGHT,
+                    'brutto' => $header->BRUTTO,
+                    'netto' => $header->NETTO,
+                    'gudang' => $header->GUDANG,
+                    'status_jalur' => $header->STATUS_JALUR,
+                    'jml_cont' => $header->JML_CONT,
+                    'no_bc11' => $header->NO_BC11,
+                    'tgl_bc11' => $header->TGL_BC11,
+                    'no_pos_bc11' => $header->NO_POS_BC11,
+                    'no_bl_awb' => $header->NO_BL_AWB,
+                    'tgl_bl_awb' => $header->TGL_BL_AWB,
+                    'no_master_bl_awb' => $header->NO_MASTER_BL_AWB,
+                    'tgl_master_bl_awb' => $header->TGL_MASTER_BL_AWB,
+                    'fl_segel' => $header->FL_SEGEL,
+                    'tgl_upload'=>Carbon::today()->format('Y-m-d'),
+                    'jam_upload'=>Carbon::now()->format('H:i:s'),
+                ]);
+
+                $detil[]  = $group->DETIL ?? $group->detil;       
+                foreach ($group->DETIL->CONT as $detailCont) {
+                    $pabeanCont = PabeanCont::create([
+                        'pabean_id' => $pabean->id,
+                        'car' => $detailCont->CAR,
+                        'no_cont' => $detailCont->NO_CONT,
+                        'ukr_cont' => $detailCont->UKR_CONT,
+                        'size' => $detailCont->SIZE,
+                        'jns_muat' => $detailCont->JNS_MUAT,
+                    ]);
+                }    
+                foreach ($group->DETIL->KMS as $detailKMS) {
+                    # code...
+                    $pabeanKms = PabeanKms::create([
+                        'pabean_id' => $pabean->id,
+                        'car' => $detailKMS->CAR,
+                        'jns_kms' => $detailKMS->JNS_KMS,
+                        'jml_kms' => $detailKMS->JML_KMS,
+                    ]);          
                 }
             }
         }

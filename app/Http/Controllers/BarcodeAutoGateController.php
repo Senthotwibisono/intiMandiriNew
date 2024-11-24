@@ -119,6 +119,23 @@ class BarcodeAutoGateController extends Controller
         $barcode = $request->barcode;
         $dataBarcode = Barcode::where('barcode', $barcode)->first();
         $tipe = $request->tipe;
+        if ($request->hasFile('fileKamera')) {
+            // dd($request->hasFile('fileKamera'));
+            $photos = $request->file('fileKamera');
+            // dd($photos);
+;                        foreach ($photos as $photo) {
+                // dd($photo);
+                $fileName = $photo->getClientOriginalName();
+                $photo->storeAs('imagesInt', $fileName, 'public'); 
+                $newPhoto = Photo::create([
+                    'master_id' => $dataBarcode->id,
+                    'type' => $photoType,
+                    'tipe_gate' => 'in',
+                    'action' => 'gate-in',
+                    'photo' => $fileName,
+                ]);
+            }
+        }
 
         if ($dataBarcode) {
             switch ($dataBarcode->ref_type) {

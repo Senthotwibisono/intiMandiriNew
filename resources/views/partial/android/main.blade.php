@@ -14,7 +14,7 @@
                 <div class="sidebar-header position-relative">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="logoicon" style="left: -1000;">
-                            <a href="/android/dashboard"><img src="{{asset('logo/IntiMandiri.PNG')}}" alt="Logo" style="position: relative; left: 10px;" srcset=""></a>
+                            <a href="/android/dashboard"><img src="{{asset('logo/IntiMandiri.png')}}" alt="Logo" style="position: relative; left: 10px;" srcset=""></a>
                         </div>
                         <!-- Dark or Light mode -->
 

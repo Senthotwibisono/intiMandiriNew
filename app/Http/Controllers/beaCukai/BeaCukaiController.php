@@ -15,6 +15,8 @@ use App\Models\Photo;
 use App\Models\PlacementManifest as PM;
 use App\Models\Item;
 
+use DataTables;
+
 class BeaCukaiController extends Controller
 {
     public function __construct()
@@ -204,11 +206,118 @@ class BeaCukaiController extends Controller
     public function strippingIndex()
     {
         $data['title'] = "Stripping Approve";
-        $data['manifest'] = Manifest::where('validasi', '=', 'Y')->orderBy('validasiBc', 'asc')->orderBy('notally', 'asc')->get();
-
         $data['user'] = Auth::user()->name;
 
         return view('bc.lcl.stripping', $data);
+    }
+
+    public function strippingIndexData(Request $request)
+    {
+        $cont = Cont::with(['job', 'user'])->where('type', '=', 'lcl')->whereNot('tglmasuk', null)->where('tglkeluar', null )->orderBy('endstripping', 'asc')->get();
+        
+        return DataTables::of($cont)
+        ->addColumn('check', function($cont){
+            if ($cont->status_ijin =='Y') {
+                return '<input type="checkbox" class="form-check-input form-check-glow select-cont" value="' . $cont->id . '" disabled>';
+            }else {
+                return '<input type="checkbox" class="form-check-input form-check-glow select-cont" value="' . $cont->id . '">';
+            }
+        })
+        ->addColumn('action', function($cont){
+            return '<a href="/lcl/realisasi/stripping/proses-' . $cont->id . '" class="btn btn-warning"><i class="fa fa-pen"></i></a>';
+        })
+        ->addColumn('detil', function($cont){
+            if ($cont->status_ijin == 'Y') {
+                return '<span class="badge bg-light-success">Approved</span>';
+            } else {
+                return '<span class="badge bg-light-danger">Unapprove</span>';
+            }
+        })
+        ->addColumn('status', function($cont){
+            if ($cont->endstripping != null) {
+                return '<span class="badge bg-light-danger">Finished</span>';
+            }else {
+                return '<span class="badge bg-light-success">On Proggress</span>';
+            }
+        })
+        ->addColumn('kapal', function($cont){
+            return $cont->job->Kapal->name ?? '-';
+        })
+        ->addColumn('no_plp', function($cont){
+            return $cont->job->PLP->no_plp ?? '-';
+        })
+        ->addColumn('tgl_plp', function($cont){
+            return $cont->job->PLP->tgl_plp ?? '-';
+        })
+        ->addColumn('kd_kantor', function($cont){
+            return $cont->job->PLP->kd_kantor ?? '-';
+        })
+        ->addColumn('kd_tps', function($cont){
+            return $cont->job->PLP->kd_tps ?? '-';
+        })
+        ->addColumn('kd_tps_asal', function($cont){
+            return $cont->job->PLP->kd_tps_asal ?? '-';
+        })
+        ->addColumn('kd_tps_tujuan', function($cont){
+            return $cont->job->PLP->kd_tps_tujuan ?? '-';
+        })
+        ->addColumn('nm_angkut', function($cont){
+            return $cont->job->PLP->nm_angkut ?? '-';
+        })
+        ->addColumn('no_voy_flight', function($cont){
+            return $cont->job->PLP->no_voy_flight ?? '-';
+        })
+        ->addColumn('no_surat', function($cont){
+            return $cont->job->PLP->no_surat ?? '-';
+        })
+        ->addColumn('no_bc11', function($cont){
+            return $cont->job->PLP->no_bc11 ?? '-';
+        })
+        ->addColumn('tgl_bc11', function($cont){
+            return $cont->job->PLP->tgl_bc11 ?? '-';
+        })
+        ->rawColumns(['check', 'action', 'detil', 'status'])
+        ->make(true);
+    }
+
+    public function strippingApproveCont(Request $request)
+    {
+        $ids = $request->input('ids');
+        // var_dump($ids);
+        // die;
+        try {
+            $conts = Cont::whereIn('id', $ids)->get();
+            foreach ($conts as $cont) {
+                if ($cont->status_ijin != 'Y') {
+                    $cont->update([
+                        'status_ijin' => 'Y',
+                        'tgl_ijin_stripping' => Carbon::now()->format('Y-m-d'),
+                        'jam_ijin_stripping' => Carbon::now()->format('H:i:s'),
+                        'ijin_stripping_by' => Auth::user()->id,
+                    ]);
+                }
+            }
+            return response()->json([
+                 'success' => true,
+                 'message' => 'Data success updated',
+            ]);
+        } catch (\Throwable $th) {
+           return response()->json([
+                'success' => false,
+                'message' => 'Something Wrong' . $th->getMessage(),
+           ]);
+        }
+    }
+
+    public function strippingDetail($id)
+    {
+        $cont = Cont::where('id', $id)->first();
+        $data['title'] = "Stripping Proccess Container || " . $cont->nocontainer;
+        $data['manifest'] = Manifest::where('container_id', $id)->get();
+        $data['cont'] = $cont;
+        $data['validateManifest'] = $data['manifest']->where('validasi', '=', 'Y')->count();
+
+        return view('lcl.realisasi.stripping.proses', $data);
     }
 
     public function strippingApprove($id)

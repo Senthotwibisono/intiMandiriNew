@@ -94,11 +94,13 @@ class Container extends Model
         'flag_mty',
         'key_eseal',
         'nopol_vendor',
+        // Izin Stripping
         'status_ijin',
         'tgl_ijin_stripping',
         'jam_ijin_stripping',
         'ijin_stripping_by',
         'eta_jam',
+        
         'ver_app',
         'p_tglkeluar',
         'no_sp2',

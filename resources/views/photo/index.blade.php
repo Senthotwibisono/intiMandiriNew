@@ -162,7 +162,7 @@
         <div class="col-12">
             <div class="text-center">
                <div class="logo">
-                    <img src="/logo/IntiMandiri.PNG" class="img" alt="">
+                    <img src="/logo/IntiMandiri.png" class="img" alt="">
                </div>
             </div>
        </div>
