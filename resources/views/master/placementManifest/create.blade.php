@@ -222,15 +222,25 @@
         <form action="/master/placementManifest/updateGrid" method="post">
             @csrf
             <section style="">
-                <div class="form-group">
-                    <label for="">Penggunaan</label>
-                    <select name="use_for" id="">
-                        <option value="M">Multi Use</option>
-                        <option value="D">Danger Item</option>
-                        <option value="B">Behandled Rack</option>
-                        <option value="L">Long Stay</option>
-                        <option value="N">Null</option>
-                    </select>
+                <div class="row">
+                    <div class="col-3">
+                        <div class="form-group">
+                            <label for="">Penggunaan</label>
+                            <select name="use_for" class="form-select" id="">
+                                <option value="M">Multi Use</option>
+                                <option value="D">Danger Item</option>
+                                <option value="B">Behandled Rack</option>
+                                <option value="L">Long Stay</option>
+                                <option value="N">Null</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-group">
+                            <label for="">Tier</label>
+                            <input type="text" name="tier" value="4" class="form-control">
+                        </div>
+                    </div>
                 </div>
                 <div id="zoom-container" class="d-flex justify-content-center align-items-center mt-0" style="height: 100vh; overflow-x:auto; overflow-y:auto;">
                     <div class="grid-container">

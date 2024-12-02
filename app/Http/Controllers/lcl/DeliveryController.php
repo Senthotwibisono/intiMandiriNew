@@ -29,6 +29,7 @@ use App\Models\TpsSPPBBC23Kms as BC23Kms;
 use App\Models\BarcodeGate as Barcode;
 use App\Models\PlacementManifest as PM;
 use App\Models\Item;
+use App\Models\RackTier as RT;
 use App\Models\InvoiceHeader as Header;
 
 class DeliveryController extends Controller
@@ -105,18 +106,33 @@ class DeliveryController extends Controller
                     }
                 }
 
+                foreach ($item as $tem) {
+                    $tier = RT::where('rack_id', $tem->lokasi_id)->where('tier', $tem->tier)->first();
+                    if ($tier) {
+                        $tier->jumlah_barang = $tier->jumlah_barang - 1;
+                        $tier->save();
+                    }
+                }
+
                 $newLokasi = PM::where('id', $request->location_behandle)->first();
+                $newTier = RT::where('rack_id', $request->location_behandle)->where('tier', $request->tier)->first();
                 if ($newLokasi) {
                     foreach ($item as $barang) {
                         $barang->update([
                             'lokasi_id' => $newLokasi->id,
+                            'tier' => $request->tier,
                         ]);
+                        if ($newTier) {
+                            $newTier->jumlah_barang = $newTier->jumlah_barang + 1;
+                            $newTier->save();
+                        }
                     }
                     $jumlahBarang = $item->count();
                     $newJumlahBarang = $newLokasi->jumlah_barang + $jumlahBarang;
                     $newLokasi->update([
                         'jumlah_barang' => $newJumlahBarang,
                     ]);
+                    
                     $lokasiBehandle = $newLokasi->id;
                 } else {
                     $lokasiBehandle = null;

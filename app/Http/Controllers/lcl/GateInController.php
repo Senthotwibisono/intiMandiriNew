@@ -103,7 +103,7 @@ class GateInController extends Controller
         $cont = Cont::where('id', $id)->first();
         $data['title'] = "Photo Gate In Container - " . $cont->nocontainer;
         $data['item'] = $cont;
-        $data['photos'] = Photo::where('master_id', $id)->where('action', '=', 'gate_in')->get();
+        $data['photos'] = Photo::where('master_id', $id)->where('action', '=', 'gate-in')->get();
         // dd($data['photos']);
         return view('photo.index', $data);
     }
@@ -169,7 +169,7 @@ class GateInController extends Controller
         $cont = Cont::where('id', $id)->first();
         $data['title'] = "Photo Gate Out Container - " . $cont->nocontainer;
         $data['item'] = $cont;
-        $data['photos'] = Photo::where('master_id', $id)->where('type', '=', 'lcl')->where('action', '=', 'gate_out')->get();
+        $data['photos'] = Photo::where('master_id', $id)->where('type', '=', 'lcl')->where('action', '=', 'gate-out')->get();
         // dd($data['photos']);
         return view('photo.index', $data);
     }

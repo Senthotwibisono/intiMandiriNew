@@ -224,7 +224,7 @@ class BeaCukaiController extends Controller
             }
         })
         ->addColumn('action', function($cont){
-            return '<a href="/lcl/realisasi/stripping/proses-' . $cont->id . '" class="btn btn-warning"><i class="fa fa-pen"></i></a>';
+            return '<a href="/bc/lcl/realisasi/stripping/detil-' . $cont->id . '" class="btn btn-warning"><i class="fa fa-pen"></i></a>';
         })
         ->addColumn('detil', function($cont){
             if ($cont->status_ijin == 'Y') {
@@ -308,16 +308,105 @@ class BeaCukaiController extends Controller
            ]);
         }
     }
-
+    
     public function strippingDetail($id)
     {
         $cont = Cont::where('id', $id)->first();
         $data['title'] = "Stripping Proccess Container || " . $cont->nocontainer;
-        $data['manifest'] = Manifest::where('container_id', $id)->get();
         $data['cont'] = $cont;
-        $data['validateManifest'] = $data['manifest']->where('validasi', '=', 'Y')->count();
+        $data['id'] = $id;
 
-        return view('lcl.realisasi.stripping.proses', $data);
+        return view('bc.lcl.strippingDetil', $data);
+    }
+
+    public function strippingDetailData($id, Request $request)
+    {
+        $manifest = Manifest::with(['shipperM', 'customer', 'packing'])->where('container_id', $id)->get();
+
+        return DataTables::of($manifest)
+        ->addColumn('check', function($manifest){
+            if ($manifest->ijin_stripping =='Y') {
+                return '<input type="checkbox" class="form-check-input form-check-glow select-cont" value="' . $manifest->id . '" disabled>';
+            }else {
+                return '<input type="checkbox" class="form-check-input form-check-glow select-cont" value="' . $manifest->id . '">';
+            }
+        })
+        ->addColumn('detil', function($manifest){
+            if ($manifest->ijin_stripping == 'Y') {
+                return '<span class="badge bg-light-success">Approved</span>';
+            } else {
+                return '<span class="badge bg-light-danger">Unapprove</span>';
+            }
+        })
+        ->addColumn('nohbl', function ($manifest) {
+            return $manifest->nohbl ?? '-'; // Replace with proper column name
+        })
+        ->addColumn('tgl_hbl', function ($manifest) {
+            return $manifest->tgl_hbl ?? '-'; // Replace with proper column name
+        })
+        ->addColumn('notally', function ($manifest) {
+            return $manifest->notally ?? '-'; // Replace with proper column name
+        })
+        ->addColumn('shiper', function ($manifest) {
+            return $manifest->shiperM->name ?? '-'; // Replace with proper column name
+        })
+        ->addColumn('customer', function ($manifest) {
+            return $manifest->customer->name ?? '-'; // Replace with proper column name
+        })
+        ->addColumn('quantity', function ($manifest) {
+            return $manifest->quantity ?? '-'; // Replace with proper column name
+        })
+        ->addColumn('packN', function ($manifest) {
+            return $manifest->packing->name ?? '-'; // Replace with proper column name
+        })
+        ->addColumn('packC', function ($manifest) {
+            return $manifest->packing->code ?? '-'; // Replace with proper column name
+        })
+        ->addColumn('descofgoods', function ($manifest) {
+            return '<textarea class="form-control" cols="3" readonly>'. $manifest->descofgoods .'</textarea>'; // Replace with proper column name
+        })
+        ->addColumn('weight', function ($manifest) {
+            return $manifest->weight ?? '-'; // Replace with proper column name
+        })
+        ->addColumn('meas', function ($manifest) {
+            return $manifest->meas ?? '-'; // Replace with proper column name
+        })
+        ->addColumn('startstripping', function ($manifest) {
+            return $manifest->startstripping ?? '-'; // Replace with proper column name
+        })
+        ->addColumn('endstripping', function ($manifest) {
+            return $manifest->endstripping ?? '-'; // Replace with proper column name
+        })
+        ->rawColumns(['descofgoods', 'check', 'detil'])
+        ->make(true);
+    }
+
+    public function approveStrippingManifest(Request $request)
+    {
+        $ids = $request->input('ids');
+        // var_dump($ids);
+        // die;
+        try {
+            $manifest = Manifest::whereIn('id', $ids)->get();
+            foreach ($manifest as $man) {
+                if ($man->ijin_stripping != 'Y') {
+                    $man->update([
+                        'ijin_stripping' => 'Y',
+                        'ijin_stripping_at' => Carbon::now(),
+                        'ijin_stripping_by' => Auth::user()->id,
+                    ]);
+                }
+            }
+            return response()->json([
+                 'success' => true,
+                 'message' => 'Data success updated',
+            ]);
+        } catch (\Throwable $th) {
+           return response()->json([
+                'success' => false,
+                'message' => 'Something Wrong' . $th->getMessage(),
+           ]);
+        }
     }
 
     public function strippingApprove($id)

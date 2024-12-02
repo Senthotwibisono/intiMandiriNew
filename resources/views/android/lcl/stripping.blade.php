@@ -62,7 +62,16 @@ $(document).ready(function() {
         // Retrieve the ID from the data-id attribute
         let id = $(this).val();
 
-        // Perform an AJAX GET request
+        Swal.fire({
+                title: 'Processing...',
+                text: 'Please wait while we update the container',
+                icon: 'info',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                    willOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
         $.ajax({
             type: 'GET',
             url: '/android/searchCont' + id, // Correct URL path with a slash before id
@@ -75,15 +84,35 @@ $(document).ready(function() {
             success: function(response) {
                 // Log the response to the console
                 console.log(response);
-
-                // Populate form fields with data from the response
-                $("#tglstripping").val(response.data.tglstripping);
-                $("#jamstripping").val(response.data.jamstripping);
-                $("#endstripping").val(response.data.endstripping);
+                Swal.close();
+                if (response.data.status_ijin != 'Y') {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Belum Mendapat Ijin Bea Cukai',
+                        icon: 'error',
+                    }).then(() => {
+                        location.reload();
+                    });
+                }else{
+                    $("#tglstripping").val(response.data.tglstripping);
+                    $("#jamstripping").val(response.data.jamstripping);
+                    $("#endstripping").val(response.data.endstripping);
+                }
             },
 
             error: function(data) {
               console.log('error:', data)
+              let errorMessage = data.responseJSON && data.responseJSON.message 
+                    ? data.responseJSON.message 
+                    : 'Data Tidak di Temukan'; // Default message if no error message is provided
+                        
+                Swal.fire({
+                    title: 'Error!',
+                    text: errorMessage,
+                    icon: 'error',
+                }).then(() => {
+                    location.reload(); // Reload the page after the alert is confirmed
+                });
             }
         });
     });

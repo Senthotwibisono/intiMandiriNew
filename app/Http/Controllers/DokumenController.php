@@ -177,6 +177,7 @@ class DokumenController extends Controller
         if(!$xml  || !$xml->children()){
            return back()->with('status', ['type' => 'error', 'message' => 'Error importing data: ' .  $this->response]);
         }
+       
         
         foreach($xml->children() as $child) {
             foreach($child as $key => $value) {
@@ -188,6 +189,7 @@ class DokumenController extends Controller
                     endforeach;
                 }
             }
+            dd($xml);
             // Old Checking
             // $oldPLP = PLP::where('no_plp', $header->NO_PLP)->where('tgl_plp', $header->TGL_PLP)->first();
             // if ($oldPLP) {

@@ -28,10 +28,12 @@ use App\Models\LokasiSandar as LS;
 use App\Models\Vessel;
 use App\Models\ShippingLine as SL;
 use App\Models\PlacementManifest as PM;
+use App\Models\RackTier as RT;
 use App\Models\YardDesign as YD;
 use App\Models\YardDetil as RowTier;
 use App\Models\JobOrder as Job;
 use App\Models\KapasitasGudang as KG;
+use App\Models\KeteranganPhoto as Photo;
 
 use Auth;
 use Carbon\Carbon;
@@ -1199,6 +1201,7 @@ class MasterController extends Controller
     {
         $selectedGrids = json_decode($request->input('selected_grids'), true);
         $names = $request->input('name'); // This will retrieve the name array
+        // dd($request->tier);
 
         // dd($names, $selectedGrids);
         if ($request->use_for === 'N') {
@@ -1210,6 +1213,8 @@ class MasterController extends Controller
                         'name' => null,
                         'use_for' => null,
                     ]);
+
+                    $tier = RT::where('rack_id', $grid->id)->delete();
                 }
             }
         } else {
@@ -1221,6 +1226,17 @@ class MasterController extends Controller
                         'name' => $names[$gridId] ?? null,
                         'use_for' => $request->use_for,
                     ]);
+                    $oldTier = RT::where('tier', '>', $request->tier)->delete();
+
+                    for ($i=1; $i <= $request->tier ; $i++) { 
+                        $tier = RT::where('rack_id', $grid->id)->where('tier', $i)->first();
+                        if (!$tier) {
+                            $newTier = RT::create([
+                                'rack_id' => $grid->id, 
+                                'tier' => $i, 
+                            ]);
+                        }
+                    }                    
                 }
             }
         }
@@ -1234,12 +1250,16 @@ class MasterController extends Controller
         $items = PM::whereIn('id', $selectedGrids)->get();
 
         foreach ($items as $item) {
-            if ($item->barcode == null) {
-                do {
-                    $uniqueBarcode = Str::random(19);
-                    } while (PM::where('barcode', $uniqueBarcode)->exists());
-                $item->update([
-                    'barcode'=> $uniqueBarcode,
+            do {
+                $uniqueBarcode = Str::random(19);
+                } while (PM::where('barcode', $uniqueBarcode)->exists());
+            $item->update([
+                'barcode'=> $uniqueBarcode,
+            ]);
+            $tiers = RT::where('rack_id', $item->id)->get();
+            foreach ($tiers as $tier) {
+                $tier->update([
+                    'barcode' => $item->barcode . $tier->tier,
                 ]);
             }
         }
@@ -1269,6 +1289,28 @@ class MasterController extends Controller
         // dd($selectedGrids);
 
         return view('master.placementManifest.barcode', $data);
+    }
+
+    public function tierView(Request $request)
+    {
+        $data['title'] = 'Rack Tier';
+        $selectedGrids = $request->input('selected_grids');
+        // dd($selectedGrids);
+
+        // Jika selected_grids masih dalam bentuk string, ubah menjadi array
+        if (is_string($selectedGrids)) {
+            $selectedGrids = explode(',', $selectedGrids);
+        }
+    
+        // Query item berdasarkan selected grids
+        $items = PM::whereIn('id', $selectedGrids)->orderBy('name', 'asc')->get();
+        // dd($selectedGrids,$items);
+        $data['tiers'] = RT::whereIn('rack_id', $selectedGrids)->orderBy('tier', 'desc')->get();
+        $data['items'] = $items;
+        // dd($selectedGrids);
+
+        return view('master.placementManifest.tier', $data);
+
     }
 
     public function yardIndex()
@@ -1386,5 +1428,49 @@ class MasterController extends Controller
         // var_dump($request->yard_id);
         // die;
         return response()->json($rowTiers);
+    }
+
+    public function photoIndex()
+    {
+        $data['title'] = 'Keterangan Photo';
+        $data['photos'] = Photo::all();
+
+        return view('master.photo.index', $data);
+    }
+
+    public function photoPost(Request $request)
+    {
+        try {
+            if ($request->has('id')) {
+                $photo = Photo::findOrFail($request->id);
+                $photo->update([
+                    'tipe' => $request->tipe, 
+                    'kegiatan' => $request->kegiatan, 
+                    'keterangan' => $request->keterangan, 
+                ]);
+            }else {
+                $photo = Photo::create([
+                    'tipe' => $request->tipe, 
+                    'kegiatan' => $request->kegiatan, 
+                    'keterangan' => $request->keterangan, 
+                ]);
+            }
+
+            return redirect()->back()->with('status', ['type' => 'success', 'message' => 'Data successfully imported.']);
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('status', ['type' => 'error', 'message' => 'Something Wrong: '. $th->getMessage()]);
+        }
+    }
+
+    public function photoData($id)
+    {
+        $photo = Photo::findOrFail($id);
+
+        if ($photo) {
+            return response()->json([
+                'success' => true,
+                'data' => $photo,
+            ]);
+        }
     }
 }

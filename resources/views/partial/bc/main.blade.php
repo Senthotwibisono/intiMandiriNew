@@ -42,7 +42,7 @@
                     </div>
                 </div>
                 <div class="sidebar-menu">
-                    @include('partial.bc.sidebar')
+                    @include('partial.sidebar')
                 </div>
             </div>
         </div>

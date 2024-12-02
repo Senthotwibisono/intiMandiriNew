@@ -22,6 +22,7 @@ class Item extends Model
         'stripping_time',
         'uid',
         'lokasi_id',
+        'tier',
     ];
 
     public function user()

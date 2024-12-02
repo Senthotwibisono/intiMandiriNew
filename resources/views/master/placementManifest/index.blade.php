@@ -60,6 +60,7 @@
             <i class="fa fa-plus"></i>Buat Layout
         </a>
         <button class="btn btn-sm btn-warning printBarcode">Cetak Barcode</button>
+        <button class="btn btn-sm btn-primary tierView">Tier View</button>
     </div>
     
     <form action="/master/placementManifest/kapasitas" method="post" class="d-flex align-items-center">
@@ -225,6 +226,33 @@
                         }
                     },
                 });
+            }
+        });
+    });
+
+    $(document).on('click', '.tierView', function(e) {
+        e.preventDefault();
+        if (selectedGrids.length === 0) {
+            Swal.fire('Error', 'Pilih minimal satu item untuk mencetak barcode.', 'error');
+            return;
+        }
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        Swal.fire({
+            icon: 'question',
+            title: 'Do you want to view the Tier?',
+            showCancelButton: true,
+            confirmButtonText: 'Generate',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const url = `/master/placementManifest/tierView?selected_grids=`+selectedGrids;
+                const newWindow = window.open(url, '_blank', 'width=500,height=800,resizable=yes,scrollbars=yes');
+                if (!newWindow) {
+                    Swal.fire('Error', 'Popup blocked. Please allow popups for this site.', 'error');
+                }
             }
         });
     });

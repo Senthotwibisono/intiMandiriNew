@@ -125,14 +125,31 @@
                             <label for="">Quantity</label>
                             <input type="text" name="quantity" id="quantity_edit" class="form-control" readonly>
                         </div>
-                        <div class="form-group">
-                            <label for="">Location Behandle</label>
-                            <select name="location_behandle" id="location_behandle_edit" class="js-example-basic-single" style="width: 100%;">
-                                <option disabled selected>Pilih Satu!</option>
-                                @foreach($locs as $loc)
-                                    <option value="{{$loc->id}}">{{$loc->name}}</option>
-                                @endforeach
-                            </select>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="">Location Behandle</label>
+                                    <select name="location_behandle" id="location_behandle_edit" class="js-example-basic-single" style="width: 100%;">
+                                        <option disabled selected>Pilih Satu!</option>
+                                        @foreach($locs as $loc)
+                                            <option value="{{$loc->id}}">{{$loc->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="">Tier</label>
+                                        <select name="tier" class="form-select" id="tier" required>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="col-sm-6">
@@ -248,6 +265,16 @@ $(document).on('click', '.CheckSPJMDok', function() {
         cancelButtonText: 'Batal',
     }).then((result) => {
         if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Processing...',
+                text: 'Please wait while we update the container',
+                icon: 'info',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                    willOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
             $.ajax({
                 type: 'POST',
                 url: '/lcl/delivery/behandle/spjmCheck',
@@ -305,6 +332,16 @@ $(document).on('click', '.ReadyChcek', function() {
         cancelButtonText: 'Batal',
     }).then((result) => {
         if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Processing...',
+                text: 'Please wait while we update the container',
+                icon: 'info',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                    willOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
             $.ajax({
                 type: 'POST',
                 url: '/lcl/delivery/behandle/readyCheck-' + id,
@@ -360,6 +397,16 @@ $(document).on('click', '.FinishBehandle', function() {
         cancelButtonText: 'Batal',
     }).then((result) => {
         if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Processing...',
+                text: 'Please wait while we update the container',
+                icon: 'info',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                    willOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
             $.ajax({
                 type: 'POST',
                 url: '/lcl/delivery/behandle/finishCheck-' + id,
@@ -475,7 +522,16 @@ $(document).on('click', '.unapproveButton', function() {
                 confirmButtonText: 'Yes, update it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Submit the form programmatically if confirmed
+                    Swal.fire({
+                title: 'Processing...',
+                text: 'Please wait while we update the container',
+                icon: 'info',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                    willOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
                     document.getElementById('updateForm').submit();
                 }
             });

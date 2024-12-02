@@ -12,6 +12,7 @@ use App\Models\Container;
 use App\Models\YardDesign as YD;
 use App\Models\YardDetil as RowTier;
 use App\Models\PlacementManifest as PM;
+use App\Models\RackTier as RT;
 use App\Models\KapasitasGudang as KG;
 
 
@@ -67,6 +68,7 @@ class HomeController extends Controller
         $tidakTerisi = $data['kg'] - $terisi;
         $data['persentaseTerisi'] = ($terisi / $data['kg']) * 100;
         $data['persentaseTidakTerisi'] = ($tidakTerisi / $data['kg']) * 100;
+        $data['tiers'] = RT::orderBy('tier', 'desc')->get();
 
         // dd($data['tonase'], $data['volume']);
 

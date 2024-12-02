@@ -6,15 +6,6 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
-
-    .justify-text {
-        text-align: justify; /* Justify the text */
-        white-space: normal; /* Allow text to wrap */
-        max-width: 700px; /* Set the maximum width (adjust as needed) */
-        word-wrap: break-word; /* Break words if necessary */
-        display: inline-block; /* Ensure it behaves like a block for alignment */
-    }
-
 </style>
 @section('content')
 <section>
@@ -27,73 +18,17 @@
                </div>
             </div>
         </div>
-        @if(Auth::check() && !Auth::user()->hasRole('bc'))
-        <form action="{{ route('lcl.stripping.cont.update')}}" method="post" enctype="multipart/form-data">
-            @csrf
-            <div class="card-body">
-                <div class="row mt-1">
-                    <div class="col-sm-2">
-                        <div class="form-group">
-                            <label for="">Tgl Mulai Stripping</label>
-                            <input type="date" class="form-control" name="tglstripping" value="{{$cont->tglstripping ?? ''}}">
-                            <input type="hidden" class="form-control" name="id" value="{{$cont->id}}">
-                        </div>
-                    </div>
-                    <div class="col-sm-2">
-                        <div class="form-group">
-                            <label for="">Jam Mulai Stripping</label>
-                            <input type="time" class="form-control" name="jamstripping" value="{{$cont->jamstripping ?? ''}}">
-                        </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="form-group">
-                            <label for="">End Stripping Date</label>
-                            <input type="datetime-local" class="form-control" name="endstripping" value="{{$cont->endstripping ?? ''}}">
-                        </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="form-group">
-                            <label for="photos">Pilih Foto-foto</label>
-                            <input type="file" class="form-control" id="photos" name="photos[]" multiple accept="image/*">
-                        </div>
-                    </div>
-                    <div class="col-sm-2">
-                        <div class="form-group">
-                            <label for="">Validated Stripping</label>
-                            <input type="text" value="{{$validateManifest}}" class="form-control" readonly>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card-footer">
-                <div class="button-container">
-                    <button class="btn btn-warning" type="submit">Update</button>
-                </div>
-            </div>
-        </form>
-        @endif
     </div>
 </section>
 
 <section>
     <div class="card">
-        <!-- <div class="card-header">
-            <div class="row">
-                <div class="col-auto ms-2">
-                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addManual"><i class="fas fa-plus"></i></button>
-                </div>
-                <div class="col-auto ms-2">
-                    <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#excelModal"><i class="fas fa-file-excel"></i></button>
-                </div>
-            </div>
-        </div> -->
         <div class="card-body">
             <div class="table">
-                <table class="table-fixed table-bordered table-hover table-striped" id="tableDetil">
+                <table class="table-fixed" id="tableDetil">
                     <thead>
                         <tr>
-                            <th class="text-center">Action</th>
-                            <th class="text-center">Ijin BC</th>
+                            <th class="text-center">-</th>
                             <th class="text-center">Status</th>
                             <th class="text-center">No HBL</th>
                             <th class="text-center">Tgl HBL</th>
@@ -113,101 +48,27 @@
                 </table>
             </div>
         </div>
-    </div>
-</section>
-
-@if(Auth::check() && !Auth::user()->hasRole('bc'))
-<section>
-    <div class="card">
-        <div class="card-header">
-            <h4 class="text-center">Stripping Form</h4>
+        <div class="card-footer">
+            <button class="btn btn-outline-info approve" id="approve" type="button">Approve</button>
         </div>
-        <form action="{{ route('lcl.stripping.store')}}" id="updateForm" method="post" enctype="multipart/form-data">
-            @csrf
-            <div class="card-body">
-                <div class="row mt-1">
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label for="">No Tally</label>
-                            <input type="text" name="notally" id="notally_edit" class="form-control" readonly>
-                            <input type="hidden" name="id" id="id_edit" class="form-control" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label for="">No HBL</label>
-                            <input type="text" name="nohbl" id="nohbl_edit" class="form-control" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label for="">Quantity</label>
-                            <input type="text" name="quantity" id="quantity_edit" class="form-control" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label for="photos">Pilih Foto-foto</label>
-                            <input type="file" class="form-control" id="photos" name="photos[]" multiple accept="image/*">
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <label for="">Tgl Stripping</label>
-                                    <input type="date" name="tglstripping" id="tglstripping_edit" class="form-control">
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <label for="">Jam Stripping</label>
-                                    <input type="time" name="jamstripping" id="jamstripping_edit" class="form-control">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="">Start Stripping Date</label>
-                            <input type="datetime-local" name="startstripping" id="startstripping_edit" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label for="">End Stripping Date</label>
-                            <input type="datetime-local" name="endstripping" id="endstripping_edit" class="form-control">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card-footer">
-                <button class="btn btn-outline-danger" id="cancelButton">Cancel</button>
-                <button class="btn btn-outline-success updateButton" id="updateButton">Submit</button>      
-            </div>
-        </form>
     </div>
 </section>
-
-@if($cont->endstripping == null)
-<section>
-   <div class="card text-center">
-        <form action="{{ route('lcl.stripping.end') }}" method="POST" id="endForm"> 
-             @csrf
-             <input type="hidden" name="id" value="{{ $cont->id }}">
-             <button class="btn btn-danger" type="button" id="endButton"><h2 class="text-white">End Stripping</h2></button>
-         </form>
-   </div>
-</section>
-@endif
-@endif
 @endsection
 
 @section('custom_js')
+
 <script>
     $(document).ready(function () {
+        let lastChecked = null;
         var Id = {{ $id }}; 
         $('#tableDetil').DataTable({
             processing: true,
             serverSide: true,
             scrollX: true,
-            scrollCollapse: true,
-            scrollY: '50vh',
-            ajax: '/lcl/realisasi/stripping/prosesData-' + Id, // Fix concatenation
+            ajax: '/bc/lcl/realisasi/stripping/detilData-' + Id, // Fix concatenation
             columns: [
-                { data: 'action', name: 'action', className: 'text-center' }, // Define the column
+                { data: 'check', name: 'check', className: 'text-center' }, // Define the column
                 { data: 'detil', name: 'detil', className: 'text-center' }, // Define the column
-                { data: 'status', name: 'status', className: 'text-center' }, // Define the column
                 { data: 'nohbl', name: 'nohbl', className: 'text-center' }, // Define the column
                 { data: 'tgl_hbl', name: 'tgl_hbl', className: 'text-center' }, // Define the column
                 { data: 'notally', name: 'notally', className: 'text-center' }, // Define the column
@@ -223,6 +84,104 @@
                 { data: 'endstripping', name: 'endstripping', className: 'text-center' }, // Define the column
             ]
         })
+        $('#tableDetil').on('click', '.select-cont', function (e) {
+            const checkboxes = $('.select-cont:not(:disabled)');
+            const currentIndex = checkboxes.index(this);
+            
+            // Jika menekan tombol Shift
+            if (e.shiftKey && lastChecked !== null) {
+                const lastIndex = checkboxes.index(lastChecked);
+            
+                // Menentukan rentang checkbox yang akan dicentang
+                const start = Math.min(lastIndex, currentIndex);
+                const end = Math.max(lastIndex, currentIndex);
+            
+                // Centang semua checkbox di antara rentang
+                checkboxes.slice(start, end + 1).prop('checked', lastChecked.checked);
+            }
+        
+            // Simpan checkbox terakhir yang dicentang
+            lastChecked = this;
+        });
+    });
+</script>
+<script>
+    $('#approve').on('click', function () {
+        var selected = [];
+        $('.select-cont:checked').each(function () {
+            selected.push($(this).val());
+        });
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        Swal.fire({
+                title: 'Are you sure?',
+                text: "",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, update it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                    title: 'Processing...',
+                    text: 'Please wait while we update the container',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                        willOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    if (selected.length > 0) {
+                        // Kirim data ke server
+                        $.ajax({
+                            url: '/bc/lcl/realisasi/stripping/manifest/approve',
+                            method: 'POST',
+                            data: { ids: selected },
+                            success: function (response) {
+                                console.log(response);
+                                if (response.success) {
+                                    Swal.fire('Saved!', '', 'success')
+                                        .then(() => {
+                                            // Memuat ulang halaman setelah berhasil menyimpan data
+                                            window.location.reload();
+                                        });
+                                } else {
+                                    Swal.fire('Error', response.message, 'error');
+                                }
+                            },
+                            error: function (error) {
+                                var errors = response.responseJSON.errors;
+                                if (errors) {
+                                    var errorMessage = '';
+                                    $.each(errors, function(key, value) {
+                                        errorMessage += value[0] + '<br>';
+                                    });
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Validation Error',
+                                        html: errorMessage,
+                                    });
+                                } else {
+                                    console.log('error:', response);
+                                }
+                            }
+                        });
+                    } else {
+                        Swal.fire('Error!', 'Nothing Selected', 'error')
+                        .then(() => {
+                        });
+                    }
+                } else if (result.isDenied) {
+                    Swal.fire('Changes are not saved', '', 'info')
+                }
+            });
     });
 </script>
 <script>
@@ -448,16 +407,6 @@ $(document).on('click', '.unapproveButton', function() {
                 confirmButtonText: 'Yes, update it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Swal.fire({
-                    title: 'Processing...',
-                    text: 'Please wait while we update the container',
-                    icon: 'info',
-                    allowOutsideClick: false,
-                    showConfirmButton: false,
-                        willOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
                     // Submit the form programmatically if confirmed
                     document.getElementById('updateForm').submit();
                 }
@@ -483,16 +432,6 @@ $(document).on('click', '.unapproveButton', function() {
                 confirmButtonText: 'Yes, update it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Swal.fire({
-                    title: 'Processing...',
-                    text: 'Please wait while we update the container',
-                    icon: 'info',
-                    allowOutsideClick: false,
-                    showConfirmButton: false,
-                        willOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
                     // Submit the form programmatically if confirmed
                     document.getElementById('endForm').submit();
                 }

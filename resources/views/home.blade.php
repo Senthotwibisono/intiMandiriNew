@@ -1,6 +1,7 @@
 @extends('partial.main')
 
 @section('custom_styles')
+<meta http-equiv="refresh" content="300">
 <style>
     .logoiconDashboard {
         transform: scale(0.4);
@@ -31,19 +32,18 @@
 
     .grid-container {
         display: grid;
-        grid-template-columns: repeat(4, 120px); /* 4 kolom dengan ukuran 180px */
-        gap: 0px; /* Jarak antar kotak */
+        grid-template-columns: repeat(22, 90px);; /* 4 kolom dengan ukuran 180px */
+        scale: 0.75;
     }
     .grid-item {
-        width: 120px;
-        height: 120px;
+        width: 90px;
+        height: 45px;
         background-color: #f2f2f2;
         border: 1px solid #ccc;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        position: relative;
     }
     .yard-block-text {
         position: absolute;
@@ -59,12 +59,14 @@
 
     .detil-grid-container {
         display: grid;
-        grid-template-columns: repeat(4);
-        gap: 0px;
+        grid-template-columns: repeat(22, 90px); /* 5 kolom dengan ukuran 100px */
+        gap: 0px; /* Jarak antar kotak */
+        scale: 0.75;
     }
     .detil-grid-item {
-        width: 4px;
-        height: 4px;
+        width: 90px;
+        height: 45px;
+        background-color: #f2f2f2;
         border: 1px solid #ccc;
         display: flex;
         align-items: center;
@@ -101,19 +103,36 @@
 
     .grid-manifest {
         display: grid;
-        grid-template-columns: repeat(22, 50px);
-        gap: 0px;
-        align-items: center;
+        grid-template-columns: repeat(22, 90px); /* 5 kolom dengan ukuran 100px */
+        gap: 0px; /* Jarak antar kotak */
+        scale: 0.75;
     }
     .grid-item-manifest {
-        width: 50px;
-        height: 20px;
+        width: 90px;
+        height: 45px;
         background-color: #f2f2f2;
         border: 1px solid #ccc;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
+    }
+
+    .grid-item-detail {
+        position: flex;
+        top: 100%;
+        left: 0;
+        background: #f8f9fa;
+        border: 1px solid #ddd;
+        padding: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 100;
+        display: none;
+        width: 10px;
+    }
+
+    .grid-item-manifest:hover .grid-item-detail {
+        display: block;
     }
 
     #myDonutChart {
@@ -124,6 +143,39 @@
     .card-body {
         justify-content: center;
         align-items: center;
+    }
+    .kotak {
+        height: 150px; /* Mengurangi tinggi kotak menjadi 5% dari tinggi viewport */
+        width: 150px; /* Mengurangi tinggi kotak menjadi 5% dari tinggi viewport */
+        line-height: 10vh; /* Menyesuaikan line-height agar sama dengan tinggi kotak */
+        font-size: 12px; 
+        background-color: #fff;
+        text-align: center;
+        border: 1px solid #000000;
+        flex: 1;
+        margin: 0px;
+        border-radius: 0px;
+    }
+
+    .rowSide {
+        position: flex;
+        display: flex; /* Mengaktifkan Flexbox */
+        flex-wrap: nowrap; /* Item tetap dalam satu baris (tidak turun ke baris baru) */
+        gap: 2px; /* Jarak antar item */
+        width: 150px;
+    }
+    
+    .item {
+        position: flex;
+        padding: 50px;
+        background-color: white; /* Warna latar belakang (opsional) */
+        border: 1px solid #ddd; /* Border (opsional) */
+        border-radius: 2px; /* Sudut membulat (opsional) */
+    }
+
+    .item.filled {
+        background-color: red;
+        color: #fff;
     }
 </style>
 @endsection
@@ -223,29 +275,48 @@
             </div>
         </div> -->
         <div class="col-sm-12">
-            <div class="card justify-content-center align-items-center mt-0">
-                <div class="card-header">
-                    <h4>Rack Condition</h4>
+            <div class="card">
+                <div class="card-header justify-content-center align-items-center mt-0">
+                    <h4>Layout Gudang</h4>
                 </div>
-                <div class="card-body grid-manifest justify-content-center align-items-center mt-0">
-                    @foreach($gudang as $item)
-                        @php
-                            $bgColorClass = match($item->use_for) {
-                                'M' => 'bg-white',
-                                'D' => 'bg-red',
-                                'B' => 'bg-green',
-                                'L' => 'bg-yellow',
-                                default => ''
-                            };
-                        @endphp
-                        <div class="grid-item-manifest {{ $bgColorClass }}" onclick="toggleSelection(this)">
-                            @if($item->jumlah_barang >= 1 )
-                                {{$item->jumlah_barang}}
-                            @else
-                                {{$item->name ?? ''}}
-                            @endif
-                        </div>
-                    @endforeach
+                <div class="card" style="width: 100%; height: 300px;">
+                    <div class="card-body grid-manifest justify-content-center align-items-center mt-0">
+                        @foreach($gudang as $item)
+                            @php
+                                $bgColorClass = match($item->use_for) {
+                                    'M' => 'bg-white',
+                                    'D' => 'bg-white',
+                                    'B' => 'bg-white',
+                                    'L' => 'bg-white',
+                                    default => ''
+                                };
+                            @endphp
+                            <div class="grid-item-manifest {{ $bgColorClass }}" onmouseenter="showDetails(this, '{{ $item->name }}')" onmouseleave="hideDetails(this)">
+                                <a href=""><h4>{{$item->name ?? ''}}</h4></a>
+                                @if($item->name != null)
+                                <div class="grid-item-detail" style="display: none;">
+                                    <div class="rowSide">
+                                        @foreach($tiers as $tier)
+                                            @if($tier->rack_id == $item->id)
+                                                <div class="item {{ $tier->jumlah_barang > 0 ? 'filled' : '' }}">
+                                                    <p>tier: {{$tier->tier}}</p>
+                                                    <p>Jlm Brg : {{$tier->jumlah_barang}}</p>
+                                                </div>
+                                            @endif
+                                        @endforeach
+                                    </div>
+                                </div>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <h4>Notes:</h4><br>
+                    Barang Berbahaya : <span class="badge bg-light-danger">Q</span><br>
+                    Behandle Rack : <span class="badge bg-light-success">I, H</span><br>
+                    Long Stay Rack : <span class="badge bg-light-warning">G</span>
+                    
                 </div>
             </div>
         </div>
@@ -292,6 +363,22 @@
 
 @section('custom_js')
 <script src="{{ asset('lottifiles/lokal.min.js') }}"></script>
+<script>
+    function showDetails(element, details) {
+        const detailDiv = element.querySelector('.grid-item-detail');
+        if (detailDiv) {
+            detailDiv.style.display = 'block';
+        }
+    }
+
+    function hideDetails(element) {
+        const detailDiv = element.querySelector('.grid-item-detail');
+        if (detailDiv) {
+            detailDiv.style.display = 'none';
+        }
+    }
+
+</script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         lottie.loadAnimation({

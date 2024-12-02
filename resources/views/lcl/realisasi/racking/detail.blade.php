@@ -61,6 +61,7 @@
                         <th class="text-center">Name Barang</th>
                         <th class="text-center">Nomor Barang</th>
                         <th class="text-center">Rack</th>
+                        <th class="text-center">Tier</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -77,6 +78,7 @@
                             <td class="text-center">{{$plc->name}}</td>
                             <td class="text-center">{{$plc->nomor}}</td>
                             <td class="text-center">{{$plc->Rack->name ?? ''}}</td>
+                            <td class="text-center">{{$plc->tier ?? ''}}</td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -107,20 +109,35 @@
                     <div class="col-sm-6">
                         <div class="rack-area" id="rack-area">
                             <h3>Rack Area</h3>
-                            <div class="form-group">
-                                <label for="">Rack</label>
-                                <input type="hidden" name="manifest_id" value="{{$manifest->id}}">
-                                <select name="lokasi_id" class="js-example-basic-single select2 form-select">
-                                    <option disabeled selected>Pilih Satu!</option>
-                                    @foreach($locs as $loc)
-                                        <option value="{{$loc->id}}">{{$loc->name}}</option>
-                                    @endforeach
-                                </select>
+                            <div class="row mt-0">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="">Rack</label>
+                                        <input type="hidden" name="manifest_id" value="{{$manifest->id}}">
+                                        <select name="lokasi_id" class="js-example-basic-single select2 form-select">
+                                            <option disabeled selected>Pilih Satu!</option>
+                                            @foreach($locs as $loc)
+                                                <option value="{{$loc->id}}">{{$loc->name}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="">Tier</label>
+                                        <select name="tier" class="form-select" id="tier" required>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                             <div class="rack-dropzone dropzone">
                                 <!-- Dropzone where items will be placed -->
                             </div>
-                            <button id="update-button" class="btn btn-primary mt-3">Update Placement</button>
+                            <button id="update-button" type="button" class="btn btn-primary mt-3">Update Placement</button>
                         </div>
                     </div>
                 </div>
@@ -132,6 +149,7 @@
 @endsection
 
 @section('custom_js')
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     let lastChecked = null;
@@ -180,6 +198,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     cancelButtonText: 'Batal',
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Processing...',
+                            text: 'Please wait',
+                            icon: 'info',
+                            allowOutsideClick: false,
+                            showConfirmButton: false,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
                         // Send AJAX request to unPlace the selected items
                         $.ajax({
                             type: 'POST',
@@ -311,18 +339,51 @@ document.addEventListener('DOMContentLoaded', function () {
     setupDropzone(unplacedDropzone);
 
     updateButton.addEventListener('click', function () {
-        // Remove existing hidden inputs
-        document.querySelectorAll('input[name="placements[]"]').forEach(input => input.remove());
-
-        // Append hidden inputs with the placed items
-        placedItems.forEach(item => {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'placements[]';
-            input.value = JSON.stringify(item);
-            updateButton.closest('form').appendChild(input);
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you want to update this record?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, update it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Processing...',
+                    text: 'Please wait',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    willOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+            
+                // Hapus input yang sudah ada
+                document.querySelectorAll('input[name="placements[]"]').forEach(input => input.remove());
+            
+                // Validasi apakah lokasi dipilih
+                if (!lokasiSelect.value) {
+                    Swal.fire('Error', 'Please select a location before updating!', 'error');
+                    return;
+                }
+            
+                // Tambahkan input tersembunyi
+                placedItems.forEach(item => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'placements[]';
+                    input.value = JSON.stringify(item);
+                    updateButton.closest('form').appendChild(input);
+                });
+            
+                // Submit form
+                updateButton.closest('form').submit();
+            }
         });
     });
+
 });
 </script>
 

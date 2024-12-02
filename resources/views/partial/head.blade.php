@@ -93,6 +93,12 @@
     gap: 10px; /* Adjust the gap between buttons as needed */
 }
 
+.table-textarea {
+    width: 100%;
+    resize: none;
+    overflow: hidden; /* Ensures content stays visible */
+}
+
 </style>
 @if(View::hasSection('custom_styles'))
 @yield('custom_styles')

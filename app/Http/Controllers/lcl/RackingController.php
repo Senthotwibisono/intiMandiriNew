@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use App\Models\Manifest;
 use App\Models\Item;
 use App\Models\PlacementManifest as PM;
+use App\Models\RackTier as RT;
 use App\Models\RackingDetil as Rack;
 use App\Models\Photo;
 
@@ -35,7 +36,7 @@ class RackingController extends Controller
         $manifest = Manifest::where('id', $id)->first();
         $item = Item::where('manifest_id', $id)->get();
         $data['title'] = "Racking Manifest || " . $manifest->nohbl;
-        $data['locs'] = PM::whereNot('use_for', 'B')->get();
+        $data['locs'] = PM::whereNot('use_for', 'B')->orderBy('name', 'asc')->get();
         $data['manifest'] = $manifest;
         $data['placed'] = Item::where('manifest_id', $id)->whereNot('lokasi_id', null)->get();
         $data['item'] = Item::where('manifest_id', $id)->where('lokasi_id', null)->get();
@@ -63,13 +64,21 @@ class RackingController extends Controller
         // dd($decodedPlacements, $request->lokasi_id, $jumlahItem);
 
         $lokasi = PM::where('id', $request->lokasi_id)->first();
+        $tier = RT::where('rack_id', $lokasi->id)->where('tier', $request->tier)->First();
+        // dd($tier);
+        if (!$tier) {
+            return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Tier Tidak Ditemukan']);
+        }
         if ($lokasi) {
             foreach ($decodedPlacements as $drag) {
                 $item = Item::where('id', $drag['item_id'])->first();
                 if ($item) {
                     $item->update([
                         'lokasi_id' => $request->lokasi_id,
+                        'tier' => $request->tier,
                     ]);
+                    $tier->jumlah_barang = $tier->jumlah_barang + 1;
+                    $tier->save();
                     $lokasi->increment('jumlah_barang', 1);
                 }
             }
@@ -95,12 +104,16 @@ class RackingController extends Controller
 
             if ($item) {
                 $lokasi = PM::find($item->lokasi_id);
+                $tier = RT::where('rack_id', $lokasi->id)->where('tier', $item->tier)->first();
 
                 if ($lokasi) {
                     $lokasi->decrement('jumlah_barang', 1);
+                    $tier->jumlah_barang = $tier->jumlah_barang - 1;
+                    $tier->save();
 
                     $item->update([
-                        'lokasi_id' => null
+                        'lokasi_id' => null,
+                        'tier' => null
                     ]);
                 } else {
                     return response()->json([

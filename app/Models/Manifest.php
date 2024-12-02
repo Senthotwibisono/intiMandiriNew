@@ -47,6 +47,7 @@ class Manifest extends Model
         'dg_surcharge',
         'weight_surcharge',
         'racking',
+        'tier_id',
         'partoff',
         'quantity_val',
         'namapacking_val',
@@ -199,12 +200,22 @@ class Manifest extends Model
         'photo_behandle',
         'location_behandle',
         'keterangan_release',
+
+        'ijin_stripping',
+        'ijin_stripping_at',
+        'ijin_stripping_by',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class, 'uid', 'id');
     }
+
+    public function strippingBy()
+    {
+        return $this->belongsTo(User::class, 'ijin_stripping_by', 'id');
+    }
+
     public function release()
     {
         return $this->belongsTo(User::class, 'release_bc_uid', 'id');
@@ -253,6 +264,10 @@ class Manifest extends Model
     public function Rack()
     {
         return $this->belongsTo(PlacementManifest::class, 'racking', 'id');
+    }
+    public function Tier()
+    {
+        return $this->belongsTo(RackTier::class, 'tier_id', 'id');
     }
 
     public function BehandleLocation()

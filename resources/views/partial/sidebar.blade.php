@@ -1,6 +1,6 @@
 <ul class="menu">
     <li class="sidebar-title">Menu</li>
-    @if(Auth::check() && !Auth::user()->hasRole('bc'))
+    @if(Auth::check() && Auth::user()->hasRole('admin'))
     <li class="sidebar-item @if(Request::is('home') || Request::is('/home')) active @endif">
         <a href="/home" class='sidebar-link'>
             <i class="bi bi-grid-fill"></i>
@@ -173,6 +173,9 @@
             <li class="submenu-item @if(Request::is('master/gudang')) active @endif">
                 <a href="{{ route('master.gudang.index')}}">Gudang</a>
             </li>
+            <li class="submenu-item @if(Request::is('master/photo')) active @endif">
+                <a href="/master/photo">Keterangan Photo</a>
+            </li>
             <li class="submenu-item @if(Request::is('master/lokasiSandar')) active @endif">
                 <a href="{{ route('master.lokasiSandar.index')}}">Lokasi Sandar</a>
             </li>
@@ -278,6 +281,45 @@
         </ul>
     </li>
 
+    @elseif(Auth::check() && Auth::user()->hasRole('bcP2'))
+    <li class="sidebar-item @if(Request::is('bc-p2/dashboard') || Request::is('/bc-p2/dashboard')) active @endif">
+        <a href="/bc-p2/dashboard" class='sidebar-link'>
+            <i class="bi bi-grid-fill"></i>
+            <span>Dashboard</span>
+        </a>
+    </li>
+
+    <li class="sidebar-item has-sub @if(Request::is('bc-p2/lcl/*') || Request::is('/bc-p2/lcl/*')) active @endif">
+        <a href="#" class='sidebar-link'>
+            <i class="fa-solid fa-window-restore"></i>
+            <span>LCL</span>
+        </a>
+        <ul class="submenu @if(Request::is('bc-p2/lcl/*') || Request::is('/bc-p2/lcl/*')) active @endif">
+            <!-- Realisasi -->
+            <li class="submenu-item @if(Request::is('bc-p2/lcl/list-manifest') || Request::is('/bc-p2/lcl/list-manifest')) active @endif">
+                <a href="{{ url('/bc-p2/lcl/list-manifest')}}">List Manifest</a>
+            </li>
+            <li class="submenu-item @if(Request::is('bc-p2/list-segelMerah') || Request::is('/bc-p2/list-segelMerah')) active @endif">
+                <a href="{{ url('/bc-p2/list-segelMerah')}}">List Segel Merah</a>
+            </li>
+        </ul>
+    </li>
+    <li class="sidebar-item has-sub @if(Request::is('lcl/report/*')) active @endif">
+        <a href="#" class='sidebar-link'>
+            <span>Report</span>
+        </a>
+        <ul class="submenu @if(Request::is('lcl/report/*')) active @endif">
+            <li class="submenu-item @if(Request::is('lcl/report/cont')) active @endif">
+                <a href="{{ url('/lcl/report/cont')}}">Container</a>
+            </li>
+            <li class="submenu-item @if(Request::is('lcl/report/manifest')) active @endif">
+                <a href="{{ url('/lcl/report/manifest')}}">Manifest</a>
+            </li>
+            <li class="submenu-item @if(Request::is('lcl/report/daily/*')) active @endif">
+                <a href="{{ route('report.lcl.daily')}}">Daily</a>
+            </li>
+        </ul>
+    </li>
     @else
     <li class="sidebar-item @if(Request::is('bc/dashboard') || Request::is('/home')) active @endif">
         <a href="/bc/dashboard" class='sidebar-link'>
@@ -301,7 +343,7 @@
                     <li class="submenu-item @if(Request::is('bc/lcl/realisasi/buangMT') || Request::is('bc/lcl/realisasi/buangMT/*')) active @endif">
                         <a href="{{ url('/bc/lcl/realisasi/buangMT')}}">Buang Empty</a>
                     </li>
-                    <li class="submenu-item @if(Request::is('bc/lcl/realisasi/stripping') || Request::is('/bc/lcl/realisasi/stripping/*')) active @endif">
+                    <li class="submenu-item @if(Request::is('bc/lcl/realisasi/stripping/*') || Request::is('/bc/lcl/realisasi/stripping/*')) active @endif">
                         <a href="{{ url('/bc/lcl/realisasi/stripping')}}">Stripping</a>
                     </li>
                 </ul>
@@ -318,6 +360,22 @@
                     </li>
                     <li class="submenu-item @if(Request::is('bc/lcl/delivery/gateOut') || Request::is('bc/lcl/delivery/gateOut/*')) active @endif">
                         <a href="{{ url('/bc/lcl/delivery/gateOut')}}">Gate Out</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="sidebar-item has-sub @if(Request::is('lcl/report/*')) active @endif">
+                <a href="#" class='sidebar-link'>
+                    <span>Report</span>
+                </a>
+                <ul class="submenu @if(Request::is('lcl/report/*')) active @endif">
+                    <li class="submenu-item @if(Request::is('lcl/report/cont')) active @endif">
+                        <a href="{{ url('/lcl/report/cont')}}">Container</a>
+                    </li>
+                    <li class="submenu-item @if(Request::is('lcl/report/manifest')) active @endif">
+                        <a href="{{ url('/lcl/report/manifest')}}">Manifest</a>
+                    </li>
+                    <li class="submenu-item @if(Request::is('lcl/report/daily/*')) active @endif">
+                        <a href="{{ route('report.lcl.daily')}}">Daily</a>
                     </li>
                 </ul>
             </li>

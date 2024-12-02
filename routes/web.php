@@ -181,6 +181,7 @@ Route::controller(MasterController::class)->group(function (){
      Route::post('/master/placementManifest/kapasitas', 'kapasitasGudang');
      Route::post('/master/placementManifest/barcodeCreate', 'pmCreateBarcode');
      Route::get('/master/placementManifest/barcodeView', 'pmViewBarcode');
+     Route::get('/master/placementManifest/tierView', 'tierView');
 
     //  Yard
      Route::get('/master/yard', 'yardIndex')->name('master.yard.index');
@@ -189,6 +190,12 @@ Route::controller(MasterController::class)->group(function (){
      Route::post('/master/yard-reset', 'yardReset')->name('master.yard.reset');
      Route::get('/master/yard-view{id?}', 'yardView')->name('master.yard.view');
      Route::get('/master/yard-rowTierView', 'rowTierView')->name('master.yard.rowTierView');
+
+    //  Keterangan Photo
+    Route::get('/master/photo', 'photoIndex');
+    Route::get('/master/photoData{id?}', 'photoData');
+    Route::post('/master/photo-post', 'photoPost');
+    Route::delete('/master/photo-delete{id?}', 'photoDelete');
 });
 
 Route::controller(DokumenController::class)->group(function (){
@@ -288,6 +295,7 @@ Route::controller(DokumenController::class)->group(function (){
         Route::get('/lcl/realisasi/stripping', 'index')->name('lcl.stripping.index');
         Route::get('/lcl/realisasi/stripping/data', 'indexData')->name('lcl.stripping.dataIndex');
         Route::get('/lcl/realisasi/stripping/proses-{id?}', 'proses')->name('lcl.stripping.proses');
+        Route::get('/lcl/realisasi/stripping/prosesData-{id?}', 'prosesData');
         Route::post('/lcl/realisasi/stripping/updateCont', 'updateCont')->name('lcl.stripping.cont.update');
         Route::get('/lcl/realisasi/stripping-photoCont{id?}', 'photoCont')->name('lcl.stripping.photoCont');
         Route::post('/lcl/realisasi/stripping/store', 'store')->name('lcl.stripping.store');
@@ -383,6 +391,11 @@ Route::controller(BeaCukaiController::class)->group(function(){
     Route::get('/bc/lcl/realisasi/stripping', 'strippingIndex')->name('bc.stripping.index');
     Route::get('/bc/lcl/realisasi/stripping/data', 'strippingIndexData')->name('bc.stripping.indexData');
     Route::post('/bc/lcl/realisasi/stripping/approveCont', 'strippingApproveCont')->name('bc.stripping.aprroveCont');
+    
+    Route::get('/bc/lcl/realisasi/stripping/detil-{id?}', 'strippingDetail');
+    Route::get('/bc/lcl/realisasi/stripping/detilData-{id?}', 'strippingDetailData');
+    Route::post('/bc/lcl/realisasi/stripping/manifest/approve', 'approveStrippingManifest');
+
     Route::post('/bc/lcl/realisasi/stripping-approveAll', 'strippingApproveAll');
     
     Route::get('/bc/lcl/delivery/behandle', 'behandle')->name('bc.behandle.index');
@@ -426,6 +439,7 @@ Route::controller(AndroidHomeController::class)->group(function(){
 
 Route::controller(LclController::class)->group(function(){
     Route::get('/android/lcl/stripping/index', 'indexStripping');
+    Route::get('/android/lcl/stripping/manifest', 'indexStrippingManifest');
     Route::get('/android/searchCont{id?}', 'searchCont');
 
     // Placement

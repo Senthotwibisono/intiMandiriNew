@@ -99,9 +99,80 @@ class StrippingController extends Controller
         $data['manifest'] = Manifest::where('container_id', $id)->get();
         $data['cont'] = $cont;
         $data['validateManifest'] = $data['manifest']->where('validasi', '=', 'Y')->count();
+        $data['id'] = $id;
 
         return view('lcl.realisasi.stripping.proses', $data);
         
+    }
+
+    public function prosesData($id, Request $request)
+    {
+        $manifest = Manifest::with(['shipperM', 'customer', 'packing'])->where('container_id', $id)->get();
+        $herf = '/lcl/realisasi/stripping-photoManifest';
+
+        return DataTables::of($manifest)
+        ->addColumn('action', function($manifest)  use ($herf){
+            return '<div class="button-container">
+                        <button class="btn btn-warning editButton" data-id="'.$manifest->id.'"><i class="fa fa-pencil"></i></button>
+                        <a href="javascript:void(0)" onclick="openWindow(\'' . $herf . $manifest->id . '\')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
+                    </div>';
+        })
+        ->addColumn('detil', function($manifest){
+            if ($manifest->ijin_stripping == 'Y') {
+                return '<span class="badge bg-light-success">Approved</span>';
+            } else {
+                return '<span class="badge bg-light-danger">Unapprove</span>';
+            }
+        })
+        ->addColumn('status', function($manifest){
+            if ($manifest->validasi == 'Y') {
+                return '<span class="badge bg-light-success">Done</span>';
+            } else {
+                return '<span class="badge bg-light-info">on Progress</span>';
+            }
+        })
+        ->addColumn('nohbl', function ($manifest) {
+            return $manifest->nohbl ?? '-'; // Replace with proper column name
+        })
+        ->addColumn('tgl_hbl', function ($manifest) {
+            return $manifest->tgl_hbl ?? '-'; // Replace with proper column name
+        })
+        ->addColumn('notally', function ($manifest) {
+            return $manifest->notally ?? '-'; // Replace with proper column name
+        })
+        ->addColumn('shiper', function ($manifest) {
+            return $manifest->shiperM->name ?? '-'; // Replace with proper column name
+        })
+        ->addColumn('customer', function ($manifest) {
+            return $manifest->customer->name ?? '-'; // Replace with proper column name
+        })
+        ->addColumn('quantity', function ($manifest) {
+            return $manifest->quantity ?? '-'; // Replace with proper column name
+        })
+        ->addColumn('packN', function ($manifest) {
+            return $manifest->packing->name ?? '-'; // Replace with proper column name
+        })
+        ->addColumn('packC', function ($manifest) {
+            return $manifest->packing->code ?? '-'; // Replace with proper column name
+        })
+        ->addColumn('descofgoods', function ($manifest) {
+            $content = htmlspecialchars($manifest->descofgoods ?? '-', ENT_QUOTES, 'UTF-8'); // Escape special characters
+    return '<div class="justify-text">' . $content . '</div>';
+        })
+        ->addColumn('weight', function ($manifest) {
+            return $manifest->weight ?? '-'; // Replace with proper column name
+        })
+        ->addColumn('meas', function ($manifest) {
+            return $manifest->meas ?? '-'; // Replace with proper column name
+        })
+        ->addColumn('startstripping', function ($manifest) {
+            return $manifest->startstripping ?? '-'; // Replace with proper column name
+        })
+        ->addColumn('endstripping', function ($manifest) {
+            return $manifest->endstripping ?? '-'; // Replace with proper column name
+        })
+        ->rawColumns(['descofgoods', 'action', 'detil', 'status'])
+        ->make(true);
     }
 
     public function updateCont(Request $request)
@@ -121,12 +192,15 @@ class StrippingController extends Controller
 
                $manifest = Manifest::where('container_id', $cont->id)->get();
                foreach ($manifest as $mans) {
-                    $mans->update([
-                        'tglstripping' => $cont->tglstripping,
-                        'jamstripping' => $cont->jamstripping,
-                        'startstripping' => $cont->startstripping,
-                        'endstripping' => $cont->endstripping,
-                    ]);
+                    if ($mans->ijin_stripping == 'Y') {
+                        $mans->update([
+                            'tglstripping' => $cont->tglstripping,
+                            'jamstripping' => $cont->jamstripping,
+                            'startstripping' => $cont->startstripping,
+                            'endstripping' => $cont->endstripping,
+                            'validasi' => 'Y',
+                        ]);
+                    }
                }
 
                if ($request->hasFile('photos')) {
@@ -166,12 +240,15 @@ class StrippingController extends Controller
         $manifest = Manifest::where('id', $request->id)->first();
         if ($manifest) {
             try {
-                $manifest->update([
-                    'tglstripping' => $request->tglstripping,
-                    'jamstripping' => $request->jamstripping,
-                    'startstripping' => $request->startstripping,
-                    'endstripping' => $request->endstripping,
-                ]);
+                if ($manifest->ijin_stripping == 'Y') {
+                    $manifest->update([
+                        'tglstripping' => $request->tglstripping,
+                        'jamstripping' => $request->jamstripping,
+                        'startstripping' => $request->startstripping,
+                        'endstripping' => $request->endstripping,
+                        'validasi' => 'Y',
+                    ]);
+                }
 
                 // dd($manifest);
 
@@ -187,7 +264,18 @@ class StrippingController extends Controller
                         ]);
                     }
                 }
-                return redirect()->back()->with('status', ['type'=>'success', 'message'=>'Data Berhasil di Update']);
+
+                if ($manifest->ijin_stripping == 'Y') {
+                    $type = 'success';
+                    $message = 'Data Berhasil di update';
+                }elseif ($manifest->ijin_stripping != 'Y' && $request->hasFile('photos')) {
+                    $type = 'error';
+                    $message = 'Belum mendapat ijin, hanya dapat melakukan update Foto';
+                }else {
+                    $type = 'error';
+                    $message = 'Belum mendapat ijin';
+                }
+                return redirect()->back()->with('status', ['type'=>$type, 'message'=>$message]);
                 
             } catch (\Throwable $e) {
                 return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Oopss, Something Wrong'. $e->getMessage()]);
@@ -210,13 +298,20 @@ class StrippingController extends Controller
     {
         $cont = Cont::where('id', $request->id)->first();
         if ($cont) {
-            $manifest = Manifest::where('container_id', $cont->id)->whereNull('endstripping')->get();
+            $manifest = Manifest::where('container_id', $cont->id)->where('validasi', '!=', 'Y' )->get();
             if ($manifest->isNotEmpty()) {
                 return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Masih terdapat packing yang belum stripping !!']);
             }else {
                 $cont->update([
                     'endstripping' => Carbon::now(),
                 ]);
+                foreach ($manifest as $mans) {
+                    if ($mans->endstripping == null) {
+                        $mans->update([
+                            'endstripping' => $cont->endstripping
+                        ]);
+                    }
+                }
                 return redirect()->route('lcl.stripping.index')->with('status', ['type'=>'success', 'message'=>'Data berhasil di simpan !!']);
             }
         }

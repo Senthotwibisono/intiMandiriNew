@@ -32,6 +32,13 @@ class LclController extends Controller
 
         return view('android.lcl.stripping', $data);
     }
+    public function indexStrippingManifest()
+    {
+        $data['title'] = 'LCL || Stripping Mnifest';
+        $data['mans'] = Manifest::whereNot('tglmasuk', null)->where('tglbuangmty', null )->orderBy('endstripping', 'asc')->get();
+
+        return view('android.lcl.strippingManifest', $data);
+    }
 
     public function searchCont($id)
     {
@@ -42,6 +49,7 @@ class LclController extends Controller
             return response()->json([
                 'data' => $cont,
                 'message' => 'Data Ditemukan',
+                'success' => true,
             ]);
         }
     }

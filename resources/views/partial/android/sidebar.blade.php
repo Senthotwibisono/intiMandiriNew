@@ -14,9 +14,21 @@
             <span>LCL</span>
         </a>
         <ul class="submenu @if(Request::is('android/lcl/*')) active @endif">
-            <li class="submenu-item @if(Request::is('android/lcl/stripping') || Request::is('android/lcl/stripping/*')) active @endif">
-                <a href="{{ url('/android/lcl/stripping/index')}}">Stripping</a>
+            <!-- Stripping -->
+            <li class="sidebar-item has-sub @if(Request::is('android/photo/*')) active @endif">
+                <a href="#" class='sidebar-link'>
+                    <span>Stripping</span>
+                </a>
+                <ul class="submenu @if(Request::is('android/lcl/stripping/*')) active @endif">
+                    <li class="submenu-item @if(Request::is('android/lcl/stripping/index') || Request::is('/android/lcl/stripping/index')) active @endif">
+                        <a href="{{ url('/android/lcl/stripping/index')}}">Container</a>
+                    </li>
+                    <li class="submenu-item @if(Request::is('android/lcl/stripping/manifest') || Request::is('/android/lcl/stripping/manifest')) active @endif">
+                        <a href="{{ url('/android/lcl/stripping/manifest')}}">Manifest</a>
+                    </li>
+                </ul>
             </li>
+            <!--  -->
             <li class="submenu-item @if(Request::is('android/lcl/placementCont') || Request::is('android/lcl/placementCont/*')) active @endif">
                 <a href="{{ url('/android/lcl/placementCont')}}">Placement Container</a>
             </li>
