@@ -18,6 +18,8 @@ use App\Models\Photo;
 use App\Models\BarcodeGate as Barcode;
 use App\Models\YardDetil as RowTier;
 
+use App\Models\KeteranganPhoto as KP;
+
 use GuzzleHttp\Client;
 class GateInController extends Controller
 {
@@ -40,6 +42,7 @@ class GateInController extends Controller
         $data['conts'] = Cont::where('type', '=', 'lcl')->where('tglkeluar', null )->get();
         $data['user'] = Auth::user()->name;
         $data['seals'] = Eseal::get();
+        $data['kets'] = KP::where('kegiatan', '=', 'gate-in')->get();
         
         return view('lcl.realisasi.gateIn.index', $data);
     }
@@ -89,7 +92,8 @@ class GateInController extends Controller
                     $newPhoto = Photo::create([
                         'master_id' => $cont->id,
                         'type' => 'lcl',
-                        'action' => 'gate_in',
+                        'action' => 'gate-in',
+                        'detil' => $request->keteranganPhoto,
                         'photo' => $fileName,
                     ]);
                 }
@@ -160,6 +164,7 @@ class GateInController extends Controller
         $data['conts'] = Cont::whereNotNull('endstripping')->whereNotNull('tglmasuk')->get();
         $data['user'] = Auth::user()->name;
         $data['seals'] = Eseal::get();
+        $data['kets'] = KP::where('kegiatan', '=', 'gate-out')->get();
 
         return view('lcl.realisasi.gateIn.mty', $data);
     }
@@ -206,7 +211,8 @@ class GateInController extends Controller
                     $newPhoto = Photo::create([
                         'master_id' => $cont->id,
                         'type' => 'lcl',
-                        'action' => 'gate_out',
+                        'action' => 'gate-out',
+                        'detil' => $request->keteranganPhoto,
                         'photo' => $fileName,
                     ]);
                 }

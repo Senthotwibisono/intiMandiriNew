@@ -119,111 +119,137 @@ class BarcodeAutoGateController extends Controller
         $barcode = $request->barcode;
         $dataBarcode = Barcode::where('barcode', $barcode)->first();
         $tipe = $request->tipe;
-        if ($request->hasFile('fileKamera')) {
-            // dd($request->hasFile('fileKamera'));
-            $photos = $request->file('fileKamera');
-            // dd($photos);
-;                        foreach ($photos as $photo) {
-                // dd($photo);
-                $fileName = $photo->getClientOriginalName();
-                $photo->storeAs('imagesInt', $fileName, 'public'); 
-                $newPhoto = Photo::create([
-                    'master_id' => $dataBarcode->id,
-                    'type' => $photoType,
-                    'tipe_gate' => 'in',
-                    'action' => 'gate-in',
-                    'photo' => $fileName,
-                ]);
-            }
-        }
 
-        if ($dataBarcode) {
-            switch ($dataBarcode->ref_type) {
-                case 'LCL':
-                        $data = Cont::find($dataBarcode->ref_id);
-                        $photoType = 'lcl';
-                    break;
-                case 'Manifest':
-                        $data = Manifest::find($dataBarcode->ref_id);
-                        $photoType = 'manifest';
-                    break;
-            }
-
-            // dd($data);
-            if ($data) {
-                
+        if ($dataBarcode->ref_type == 'LCL') {
+            $cont = Cont::find($dataBarcode->ref_id);
+            if ($dataBarcode->ref_action == 'get') {
                 if ($tipe == 'in' || $tipe == 'In' || $tipe == 'IN') {
-                    $data->update([
-                        // 'tglmasuk'=> date('Y-m-d', strtotime($dataBarcode->time_in)),
-                        // 'jammasuk'=> date('H:i:s', strtotime($dataBarcode->time_in)),
+                    $cont->update([
+                        'tglmasuk'=> carbon::now(),
+                        'jammasuk'=> carbon::now(),
+                        'uidmasuk'=> 'Autogate',
+                    ]);
+                    $manifest = Manifest::where('container_id', $cont->id)->update([
                         'tglmasuk'=> carbon::now(),
                         'jammasuk'=> carbon::now(),
                         'uidmasuk'=> 'Autogate',
                     ]);
                     if ($request->hasFile('fileKamera')) {
-                        // dd($request->hasFile('fileKamera'));
                         $photos = $request->file('fileKamera');
-                        // dd($photos);
-;                        foreach ($photos as $photo) {
-                            // dd($photo);
+                        foreach ($photos as $photo) {
                             $fileName = $photo->getClientOriginalName();
                             $photo->storeAs('imagesInt', $fileName, 'public'); 
                             $newPhoto = Photo::create([
-                                'master_id' => $data->id,
-                                'type' => $photoType,
+                                'master_id' => $cont->id,
+                                'type' => 'lcl',
                                 'tipe_gate' => 'in',
                                 'action' => 'gate-in',
+                                'detil' => 'Truck Masuk',
                                 'photo' => $fileName,
                             ]);
                         }
                     }
-
-                    return "Data updated";
                 }elseif ($tipe == 'out' || $tipe == 'Out' || $tipe == 'OUT') {
-                    if ($dataBarcode->ref_type == 'manifest') {
-                        $data->update([
-                            'tglbuangmty'=> date('Y-m-d', strtotime($dataBarcode->time_out)),
-                            'jambuangmty'=> date('H:i:s', strtotime($dataBarcode->time_out)),
-                        ]);
-                    }elseif ($dataBarcode->ref_type == 'lcl') {
-                        $data->update([
-                            'tglkeluar'=> date('Y-m-d', strtotime($dataBarcode->time_out)),
-                            'jamkeluar'=> date('H:i:s', strtotime($dataBarcode->time_out)),
-                            'uidmty'=>'Autogate',
-                        ]);
-                        $oldYard = RowTier::where('cont_id', $data->id)->get();
-                        if ($oldYard) {
-                            foreach ($oldYard as $old) {
-                                $old->update([
-                                    'cont_id' => null,
-                                    'active' => 'N',
-                                ]);
-                            }
-                        }
-                    }
                     if ($request->hasFile('fileKamera')) {
-                        foreach ($request->file('fileKamera') as $photo) {
+                        $photos = $request->file('fileKamera');
+                        foreach ($photos as $photo) {
                             $fileName = $photo->getClientOriginalName();
                             $photo->storeAs('imagesInt', $fileName, 'public'); 
                             $newPhoto = Photo::create([
-                                'master_id' => $data->id,
-                                'type' => $photoType,
+                                'master_id' => $cont->id,
+                                'type' => 'lcl',
                                 'tipe_gate' => 'out',
-                                'action' => 'gate-out',
+                                'action' => 'gate-in',
+                                'detil' => 'Truck Keluar',
                                 'photo' => $fileName,
                             ]);
                         }
                     }
-                }else {
-                    return 'Status BC is HOLD or FLAGING, please unlock!!!';
                 }
-
+            }elseif ($dataBarcode->ref_action == 'release') {
+                if ($tipe == 'in' || $tipe == 'In' || $tipe == 'IN') {
+                    if ($request->hasFile('fileKamera')) {
+                        $photos = $request->file('fileKamera');
+                        foreach ($photos as $photo) {
+                            $fileName = $photo->getClientOriginalName();
+                            $photo->storeAs('imagesInt', $fileName, 'public'); 
+                            $newPhoto = Photo::create([
+                                'master_id' => $cont->id,
+                                'type' => 'lcl',
+                                'tipe_gate' => 'in',
+                                'action' => 'gate-out',
+                                'detil' => 'Truck Masuk',
+                                'photo' => $fileName,
+                            ]);
+                        }
+                    }
+                }elseif ($tipe == 'out' || $tipe == 'Out' || $tipe == 'OUT') {
+                    $cont->update([
+                        'tglkeluar'=> date('Y-m-d', strtotime($dataBarcode->time_out)),
+                        'jamkeluar'=> date('H:i:s', strtotime($dataBarcode->time_out)),
+                        'uidmty'=>'Autogate',
+                    ]);
+                    if ($request->hasFile('fileKamera')) {
+                        $photos = $request->file('fileKamera');
+                        foreach ($photos as $photo) {
+                            $fileName = $photo->getClientOriginalName();
+                            $photo->storeAs('imagesInt', $fileName, 'public'); 
+                            $newPhoto = Photo::create([
+                                'master_id' => $cont->id,
+                                'type' => 'lcl',
+                                'tipe_gate' => 'out',
+                                'action' => 'gate-out',
+                                'detil' => 'Truck Keluar',
+                                'photo' => $fileName,
+                            ]);
+                        }
+                    }
+                }
             }else {
-                return 'Something wrong in Model!!!';
+                return 'Status BC is HOLD or FLAGING, please unlock!!!';
             }
-        }else {
-            return 'Barcode not found !!!';
+        }elseif ($dataBarcode->ref_type == 'Manifest') {
+            $manifest = Manifest::find($dataBarcode->ref_id);
+            if ($dataBarcode->ref_action == 'release') {
+                if ($tipe == 'in' || $tipe == 'In' || $tipe == 'IN') {
+                    if ($request->hasFile('fileKamera')) {
+                        $photos = $request->file('fileKamera');
+                        foreach ($photos as $photo) {
+                            $fileName = $photo->getClientOriginalName();
+                            $photo->storeAs('imagesInt', $fileName, 'public'); 
+                            $newPhoto = Photo::create([
+                                'master_id' => $manifest->id,
+                                'type' => 'manifest',
+                                'tipe_gate' => 'in',
+                                'action' => 'gate-out',
+                                'detil' => 'Truck Masuk',
+                                'photo' => $fileName,
+                            ]);
+                        }
+                    }
+                }elseif ($tipe == 'out' || $tipe == 'Out' || $tipe == 'OUT') {
+                    $manifest->update([
+                        'tglbuangmty'=> date('Y-m-d', strtotime($dataBarcode->time_out)),
+                        'jambuangmty'=> date('H:i:s', strtotime($dataBarcode->time_out)),
+                        'uidrelease' => 'Autogate',
+                    ]);
+                    if ($request->hasFile('fileKamera')) {
+                        $photos = $request->file('fileKamera');
+                        foreach ($photos as $photo) {
+                            $fileName = $photo->getClientOriginalName();
+                            $photo->storeAs('imagesInt', $fileName, 'public'); 
+                            $newPhoto = Photo::create([
+                                'master_id' => $manifest->id,
+                                'type' => 'manifest',
+                                'tipe_gate' => 'out',
+                                'action' => 'gate-out',
+                                'detil' => 'Truck Keluar',
+                                'photo' => $fileName,
+                            ]);
+                        }
+                    }
+                }
+            }
         }
-
     }
 }

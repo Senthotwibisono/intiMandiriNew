@@ -13,7 +13,7 @@ use App\Models\PlacementManifest as PM;
 use App\Models\RackTier as RT;
 use App\Models\RackingDetil as Rack;
 use App\Models\Photo;
-
+use App\Models\KeteranganPhoto as KP;
 
 
 class RackingController extends Controller
@@ -40,6 +40,7 @@ class RackingController extends Controller
         $data['manifest'] = $manifest;
         $data['placed'] = Item::where('manifest_id', $id)->whereNot('lokasi_id', null)->get();
         $data['item'] = Item::where('manifest_id', $id)->where('lokasi_id', null)->get();
+        $data['kets'] = KP::where('kegiatan', '=', 'placement')->get();
 
         return view('lcl.realisasi.racking.detail', $data);
     }
@@ -147,6 +148,7 @@ class RackingController extends Controller
                         'master_id' => $manifest->id,
                         'type' => 'manifest',
                         'action' => 'placement',
+                        'detil' => $request->keteranganPhoto,
                         'photo' => $fileName,
                     ]);
                 }

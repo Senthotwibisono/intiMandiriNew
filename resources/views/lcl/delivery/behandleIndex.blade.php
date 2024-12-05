@@ -189,9 +189,24 @@
                             <label for="">Tanggal Ready Behandle</label>
                             <input type="datetime-local" name="date_ready_behandle" id="date_ready_behandle_edit" class="form-control" readonly>
                         </div>
-                        <div class="form-group">
-                            <label for="photos">Pilih Foto-foto</label>
-                            <input type="file" class="form-control" id="photos" name="photos[]" multiple accept="image/*">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="photos">Pilih Foto-foto</label>
+                                    <input type="file" class="form-control" id="photos" name="photos[]" multiple accept="image/*">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="">Keterangan Photo</label>
+                                    <select name="keteranganPhoto" class="js-example-basic-single form-select select2" style="width: 100%;">
+                                        <option disabled selected value>Pilih Satu!</option>
+                                        @foreach($kets as $ket)
+                                            <option value="{{$ket->keterangan}}">{{$ket->keterangan}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

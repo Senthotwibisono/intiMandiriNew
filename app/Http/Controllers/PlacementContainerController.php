@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\Photo;
 use App\Models\YardDesign as YD;
 use App\Models\YardDetil as RowTier;
+use App\Models\KeteranganPhoto as KP;
 
 class PlacementContainerController extends Controller
 {
@@ -26,6 +27,7 @@ class PlacementContainerController extends Controller
 
         $data['yards'] = YD::whereNot('yard_block', null)->get();
         $data['yardDetils'] = RowTier::get();
+        $data['kets'] = KP::where('kegiatan', '=', 'placement')->get();
         // dd($data['conts']);
 
         return view('lcl.realisasi.placement.index', $data);
@@ -133,6 +135,7 @@ class PlacementContainerController extends Controller
                             'master_id' => $cont->id,
                             'type' => 'lcl',
                             'action' => 'placement',
+                            'detil' => $request->keteranganPhoto,
                             'photo' => $fileName,
                         ]);
                     }

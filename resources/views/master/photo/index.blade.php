@@ -6,7 +6,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-auto ms-2">
-                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addManual">Add Perusahaan</button>
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addManual">Add Keterangan Photo</button>
                 </div>
             </div>
             <br>
@@ -44,7 +44,7 @@
     <div class="modal-dialog modal-dialog-centered modal-dialog-centered modal-dialog-scrollable modal-lg"role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalCenterTitle">Add Data Perusahaan</h5>
+                <h5 class="modal-title" id="exampleModalCenterTitle">Add Data Keterangan Photo</h5>
                 <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"> <i data-feather="x"></i></button>
             </div>
             <form action="/master/photo-post" method="POST" enctype="multipart/form-data" id="createForm">
@@ -56,7 +56,7 @@
                                 <label for="">Tipe</label>
                                 <select name="tipe" id="" class="customSelect select2 form-select" style="width: 100%;">
                                     <option value="Container">Container</option>
-                                    <option value="Manifest">Mnaifest</option>
+                                    <option value="Manifest">Manifest</option>
                                 </select>
                             </div>
                         </div>
@@ -93,7 +93,7 @@
     <div class="modal-dialog modal-dialog-centered modal-dialog-centered modal-dialog-scrollable modal-lg"role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalCenterTitle">Edit Data Perusahaan</h5>
+                <h5 class="modal-title" id="exampleModalCenterTitle">Edit Data Keterangan Photo</h5>
                 <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"> <i data-feather="x"></i></button>
             </div>
             <form action="/master/photo-post" method="POST" id="updateForm" enctype="multipart/form-data">
@@ -105,7 +105,7 @@
                                 <label for="">Tipe</label>
                                 <select name="tipe" id="tipe_edit" class="editSelect select2 form-select" style="width: 100%;">
                                     <option value="Container">Container</option>
-                                    <option value="Manifest">Mnaifest</option>
+                                    <option value="Manifest">Manifest</option>
                                 </select>
                             </div>
                         </div>
@@ -125,7 +125,7 @@
                             <div class="form-group">
                                 <label for="">Keterangan</label>
                                 <input type="text" id="keterangan_edit" class="form-control" name="keterangan">
-                                <input type="hidde" id="id_edit" class="form-control" name="id">
+                                <input type="hidden" id="id_edit" class="form-control" name="id">
                             </div>
                         </div>
                     </div>

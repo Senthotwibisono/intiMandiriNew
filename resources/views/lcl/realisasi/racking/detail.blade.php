@@ -36,11 +36,23 @@
         <form action="{{ route('lcl.racking.updatePhoto')}}" method="post" enctype="multipart/form-data">
             @csrf
             <div class="card-body">
-                <div class="row mt-0">
-                    <div class="form-group">
-                        <label for="">Photo Placement</label>
-                        <input type="hidden" name="id" value="{{$manifest->id}}">
-                        <input type="file" class="form-control" id="photos" name="photos[]" multiple accept="image/*">
+                <div class="row mb-0">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="photos">Pilih Foto-foto</label>
+                            <input type="file" class="form-control" id="photos" name="photos[]" multiple accept="image/*">
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="">Keterangan Photo</label>
+                            <select name="keteranganPhoto" class="js-example-basic-single form-select select2" style="width: 100%;">
+                                <option disabled selected value>Pilih Satu!</option>
+                                @foreach($kets as $ket)
+                                    <option value="{{$ket->keterangan}}">{{$ket->keterangan}}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>

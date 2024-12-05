@@ -16,6 +16,7 @@ use App\Models\YardDetil as RowTier;
 use App\Models\Item;
 use App\Models\PlacementManifest as PM;
 use App\Models\RackingDetil as Rack;
+use App\Models\KeteranganPhoto as KP;
 
 class LclController extends Controller
 {
@@ -29,13 +30,15 @@ class LclController extends Controller
     {
         $data['title'] = 'LCL || Stripping';
         $data['conts'] = Cont::where('type', '=', 'lcl')->whereNot('tglmasuk', null)->where('tglkeluar', null )->orderBy('endstripping', 'asc')->get();
-
+        
+        $data['kets'] = KP::where('kegiatan', '=', 'stripping')->get();
         return view('android.lcl.stripping', $data);
     }
     public function indexStrippingManifest()
     {
         $data['title'] = 'LCL || Stripping Mnifest';
         $data['mans'] = Manifest::whereNot('tglmasuk', null)->where('tglbuangmty', null )->orderBy('endstripping', 'asc')->get();
+        $data['kets'] = KP::where('kegiatan', '=', 'stripping')->get();
 
         return view('android.lcl.strippingManifest', $data);
     }
@@ -61,6 +64,7 @@ class LclController extends Controller
 
         $data['yards'] = YD::whereNot('yard_block', null)->get();
         $data['yardDetils'] = RowTier::get();
+        $data['kets'] = KP::where('kegiatan', '=', 'placement')->get();
 
         return view('android.lcl.placementCont', $data);
     }
@@ -85,6 +89,7 @@ class LclController extends Controller
         $data['manifest'] = $manifest;
         $data['placed'] = Item::where('manifest_id', $manifest->id)->whereNot('lokasi_id', null)->get();
         $data['item'] = Item::where('manifest_id', $manifest->id)->where('lokasi_id', null)->get();
+        $data['kets'] = KP::where('kegiatan', '=', 'palcement')->get();
 
         return view('android.lcl.racking.detil', $data);
     }
@@ -104,6 +109,7 @@ class LclController extends Controller
         $data['title'] = "Behandle Manifest || " . $manifest->nohbl;
         $data['manifest'] = $manifest;
         $data['locs'] = PM::where('use_for', 'B')->get();
+        $data['kets'] = KP::where('kegiatan', '=', 'behandle')->get();
 
         return view('android.lcl.behandle.detil', $data);
     }

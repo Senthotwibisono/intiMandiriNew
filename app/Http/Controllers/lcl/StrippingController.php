@@ -16,6 +16,7 @@ use App\Models\Customer;
 use App\Models\Packing;
 use App\Models\Item;
 use App\Models\Photo;
+use App\Models\KeteranganPhoto as KP;
 use DataTables;
 
 class StrippingController extends Controller
@@ -100,6 +101,7 @@ class StrippingController extends Controller
         $data['cont'] = $cont;
         $data['validateManifest'] = $data['manifest']->where('validasi', '=', 'Y')->count();
         $data['id'] = $id;
+        $data['kets'] = KP::where('kegiatan', '=', 'stripping')->get();
 
         return view('lcl.realisasi.stripping.proses', $data);
         
@@ -211,6 +213,7 @@ class StrippingController extends Controller
                             'master_id' => $cont->id,
                             'type' => 'lcl',
                             'action' => 'stripping',
+                            'detil' => $request->keteranganPhoto,
                             'photo' => $fileName,
                         ]);
                     }
@@ -260,6 +263,7 @@ class StrippingController extends Controller
                             'master_id' => $manifest->id,
                             'type' => 'manifest',
                             'action' => 'stripping',
+                            'detil' => $request->keteranganPhoto,
                             'photo' => $fileName,
                         ]);
                     }

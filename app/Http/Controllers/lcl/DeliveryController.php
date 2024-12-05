@@ -31,6 +31,7 @@ use App\Models\PlacementManifest as PM;
 use App\Models\Item;
 use App\Models\RackTier as RT;
 use App\Models\InvoiceHeader as Header;
+use App\Models\KeteranganPhoto as KP;
 
 class DeliveryController extends Controller
 {
@@ -45,6 +46,7 @@ class DeliveryController extends Controller
         $data['title'] = 'Manifest Behandle';
         $data['manifest'] = Manifest::get();
         $data['locs'] = PM::where('use_for', 'B')->get();
+        $data['kets'] = KP::where('kegiatan', '=', 'stripping')->get();
 
         return view('lcl.delivery.behandleIndex', $data);
     }
@@ -154,6 +156,7 @@ class DeliveryController extends Controller
                         'master_id' => $manifest->id,
                         'type' => 'manifest',
                         'action' => 'behandle',
+                        'detil' => $request->keteranganPhoto,
                         'photo' => $fileName,
                     ]);
                 }
@@ -224,7 +227,7 @@ class DeliveryController extends Controller
         $data['title'] = 'Manifest Gate Out';
         $data['manifest'] = Manifest::whereNotNull('tglstripping')->get();
         $data['doks'] = Kode::orderBy('kode', 'asc')->get();
-
+        $data['kets'] = KP::where('kegiatan', '=', 'gate-out')->get();
         return view('lcl.delivery.gateOut', $data);
     }
 
@@ -240,17 +243,36 @@ class DeliveryController extends Controller
         if ($kdDok == 1) {
             $dok = SPPB::where('no_sppb', $request->no_dok)->where('tgl_sppb', $tglDok)->first();
             if ($dok) {
-                $manifest->update([
-                    'kd_dok_inout' => $kdDok,
-                    'no_dok' => $request->no_dok,
-                    'tgl_dok' => $request->tgl_dok,
-                    'status_bc' => 'release',
-                ]);
-
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Data di temukan',
-                ]);
+                if ($dok->no_bl_awb == $manifest->nohbl) {
+                    if ($dok->nama_imp != $manifest->customer->name) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Nama Importir Berbeda',
+                        ]);
+                    }
+                    if ($dok->npwp_imp != $manifest->customer->npwp) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Nama Importir Berbeda',
+                        ]);
+                    }
+                    $manifest->update([
+                        'kd_dok_inout' => $kdDok,
+                        'no_dok' => $request->no_dok,
+                        'tgl_dok' => $request->tgl_dok,
+                        'status_bc' => 'release',
+                    ]);
+    
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Data di temukan',
+                    ]);
+                }else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'No HBL Berbeda',
+                    ]);
+                }
             }else {
                 return response()->json([
                     'success' => false,
@@ -260,17 +282,36 @@ class DeliveryController extends Controller
         }elseif ($kdDok == 2) {
             $dok = BC23::where('no_sppb', $request->no_dok)->where('tgl_sppb', $tglDok)->first();
             if ($dok) {
-                $manifest->update([
-                    'kd_dok_inout' => $kdDok,
-                    'no_dok' => $request->no_dok,
-                    'tgl_dok' => $request->tgl_dok,
-                    'status_bc' => 'HOLD',
-                ]);
-
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Data di temukan',
-                ]);
+                if ($dok->no_bl_awb == $manifest->nohbl) {
+                    if ($dok->nama_imp != $manifest->customer->name) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Nama Importir Berbeda',
+                        ]);
+                    }
+                    if ($dok->npwp_imp != $manifest->customer->npwp) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Nama Importir Berbeda',
+                        ]);
+                    }
+                    $manifest->update([
+                        'kd_dok_inout' => $kdDok,
+                        'no_dok' => $request->no_dok,
+                        'tgl_dok' => $request->tgl_dok,
+                        'status_bc' => 'HOLD',
+                    ]);
+    
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Data di temukan',
+                    ]);
+                }else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'No HBL Berbeda',
+                    ]);
+                }
             }else {
                 return response()->json([
                     'success' => false,
@@ -280,6 +321,12 @@ class DeliveryController extends Controller
         }else {
             $dok = Manual::where('kd_dok_inout', $kdDok)->where('no_dok_inout', $request->no_dok)->where('tgl_dok_inout', $tglDokManual)->first();
             if ($dok) {
+                if ($dok->no_bl_awb != $manifest->nohbl) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'No HBL Berbeda',
+                    ]);
+                }
                 $manifest->update([
                     'kd_dok_inout' => $kdDok,
                     'no_dok' => $request->no_dok,
@@ -337,6 +384,7 @@ class DeliveryController extends Controller
                         'master_id' => $manifest->id,
                         'type' => 'manifest',
                         'action' => 'gate-out',
+                        'detil' => $request->keteranganPhoto,
                         'photo' => $fileName,
                     ]);
                 }

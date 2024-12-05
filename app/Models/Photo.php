@@ -17,6 +17,7 @@ class Photo extends Model
         'type',
         'tipe_gate',
         'action',
+        'detil',
         'photo',
     ];
 

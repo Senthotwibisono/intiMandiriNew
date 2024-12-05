@@ -193,6 +193,7 @@
                                 <tr>
                                     <td class="text-center">
                                         <img src="{{ asset('storage/imagesInt/' . $photo->photo) }}" alt="Photo" class="img-fluid" style="width: 400px; height: 400px; object-fit: cover;">
+                                        <p>{{$photo->detil ?? '-'}}</p>
                                     </td>
                                     <td>
                                         <form action="{{ route('lcl.gateIn.delete.detail')}}" method="POST">
