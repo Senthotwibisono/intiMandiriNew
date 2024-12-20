@@ -12,6 +12,8 @@ use App\Models\TempManifest;
 use App\Models\Item;
 use App\Models\Customer;
 use App\Models\Packing;
+use App\Models\Pelabuhan;
+use App\Models\Vessel;
 use Auth;
 use Carbon\Carbon;
 use Str;
@@ -24,13 +26,59 @@ class ManifestExcel implements ToCollection, WithHeadingRow
     // {
     //     $this->container_id = $container_id;
     // }
+    protected $jobId;
 
+    public function __construct($jobId)
+    {
+        $this->jobId = $jobId;
+    }
     public function collection(Collection $rows)
     {
         // $sheetTitles = $import->getDelegate()->getActiveSheet()->getTitle();
         // dd($sheetTitles);
         // $headers = $rows->first()->keys()->toArray();
         // dd($headers); // This will output the column headers
+
+        $firstRow = $rows->first();
+
+        $pel_muat = trim($firstRow['pelabuhan_asal']);
+        $pel_transit = trim($firstRow['pelabuhan_transit']);
+        $pel_bongkar = trim($firstRow['pelabuhan_bongkar']);
+
+        $PM = Pelabuhan::where('kode', $pel_muat)->first();
+        if ($PM) {
+            $muat = $PM;
+        }else {
+            $muat = Pelabuhan::create([
+                'kode' => $pel_muat
+            ]);
+        }
+
+        $PT = Pelabuhan::where('kode', $pel_transit)->first();
+        if ($PT) {
+            $transit = $PT;
+        }else {
+            $transit = Pelabuhan::create([
+                'kode' => $pel_transit
+            ]);
+        }
+
+        $PB = Pelabuhan::where('kode', $pel_bongkar)->first();
+        if ($PB) {
+            $bongkar = $PB;
+        }else {
+            $bongkar = Pelabuhan::create([
+                'kode' => $pel_bongkar
+            ]);
+        }
+
+        $jobId = $this->jobId;
+        $job = Job::find($jobId);
+        $job->update([
+            'pel_muat' => $muat->id,
+            'pel_transit' => $transit->id,
+            'pel_bongkar' => $bongkar->id,
+        ]);
 
       
         foreach ($rows as $row) {
@@ -56,16 +104,63 @@ class ManifestExcel implements ToCollection, WithHeadingRow
             $meas = trim($row['volume']);
             // Hanya buat entri baru jika nama tidak kosong
 
+            $oldCST = Customer::where('name', $nama_consignee)->where('npwp', $npwp_consignee)->first();
+            if ($oldCST) {
+                $customer = $oldCST;
+            }else {
+                $customer = Customer::create([
+                    'name' => $nama_consignee,
+                    'npwp' => $npwp_consignee,
+                    'alamat' => $almt_consignee,
+                ]);
+            }
+
+            $oldShipper = Customer::where('name', $nama_shipper)->where('npwp', $npwp_shipper)->first();
+            if ($oldShipper) {
+                $shipper = $oldShipper;
+            }else {
+                $shipper = Customer::create([
+                    'name' => $nama_shipper,
+                    'npwp' => $npwp_shipper,
+                    'alamat' => $almt_shipper,
+                ]);
+            
+            }
+
+            if ($nama_notify == 'SAME AS CONSIGNEE') {
+                $notify = $customer;
+            }else {
+                $oldNotify = Customer::where('name', $nama_shipper)->where('npwp', $npwp_shipper)->first();
+                if ($oldNotify) {
+                    $notify = $oldNotify;
+                }else {
+                    $notify = Customer::create([
+                        'name' => $nama_notify,
+                        'npwp' => $npwp_notify,
+                        'alamat' => $almt_notify,
+                    ]);
+                }
+            }
+
+            $oldPack = Packing::where('code', $jenis_kemasan)->first();
+            if ($oldPack) {
+                $pack = $oldPack;
+            }else {
+                $pack = Packing::create([
+                    'code' =>$jenis_kemasan,
+                ]);
+            }
+
             $manifest = TempManifest::create([
                 'detil_id' => $detil_id,
                 'nohbl' => $nohbl,
                 'tgl_hbl' => $tgl_hbl,
-                'shipper_id' => Customer::where('name', $nama_shipper)->where('npwp', $npwp_shipper)->first()->id ?? null,
-                'customer_id' => Customer::where('name', $nama_consignee)->where('npwp', $npwp_consignee)->first()->id ?? null,
-                'notifyparty_id' =>  Customer::where('name', $nama_notify)->first()->id ?? Customer::where('name', $nama_consignee)->where('npwp', $npwp_consignee)->first()->id ?? null,
+                'shipper_id' => $shipper->id,
+                'customer_id' => $customer->id,
+                'notifyparty_id' => $notify->id,
                 'marking' => $merk_kemasan,
                 'quantity' => $quantity,
-                'packing_id' => Packing::where('name', $merk_kemasan)->where('code', $jenis_kemasan)->first()->id ?? null,
+                'packing_id' => $pack->id,
                 'weight' => $weight,
                 'meas' => $meas,
             ]);

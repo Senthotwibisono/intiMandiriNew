@@ -137,6 +137,11 @@ class JobOrder extends Model
         return $this->belongsTo(Pelabuhan::class, 'pel_muat', 'id');
     }
 
+    public function transit()
+    {
+        return $this->belongsTo(Pelabuhan::class, 'pel_transit', 'id');
+    }
+
     public function bongkar()
     {
         return $this->belongsTo(Pelabuhan::class, 'pel_bongkar', 'id');

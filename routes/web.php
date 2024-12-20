@@ -19,6 +19,8 @@ use App\Http\Controllers\QrController;
 use App\Http\Controllers\EasyGoController;
 use App\Http\Controllers\ReportController;
 
+use App\Http\Controllers\TestJsonController;
+
 // Android
 use App\Http\Controllers\android\AndroidHomeController;
 use App\Http\Controllers\android\LclController;
@@ -39,6 +41,7 @@ use App\Http\Controllers\beaCukai\BeacukaiP2Controller;
 
 // Pengiriman
 use App\Http\Controllers\PengirimanController;
+use App\Http\Controllers\pengiriman\CoariCodecoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -59,6 +62,7 @@ Route::post('/unset-session/{key}', 'SessionController@unsetSession')->name('uns
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/testJson', [TestJsonController::class, 'test']);
 
 Route::controller(SystemController::class)->group(function () {
     // user
@@ -564,6 +568,17 @@ Route::controller(LclController::class)->group(function(){
     Route::prefix('/dokumen/pengiriman')->controller(PengirimanController::class)->group(function(){
         Route::prefix('/container')->group(function(){
             Route::get('/index', 'containerIndex');
+            Route::get('/data', 'containerData');
+        });
+        Route::prefix('/manifest')->group(function(){
+            Route::get('/index', 'manifestIndex');
+        });
+    });
+
+    
+    Route::prefix('/pengiriman')->controller(CoariCodecoController::class)->group(function(){
+        Route::prefix('/coari')->group(function(){
+            Route::post('/cont', 'coariCont');
             Route::get('/data', 'containerData');
         });
         Route::prefix('/manifest')->group(function(){

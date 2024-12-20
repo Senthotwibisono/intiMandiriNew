@@ -14,6 +14,7 @@ class CoariKmsDetil extends Model
 
     protected $fillable = [
         'coari_id',
+        'manifest_id',
         'ref_number',
         'notally',
         'kd_dok',

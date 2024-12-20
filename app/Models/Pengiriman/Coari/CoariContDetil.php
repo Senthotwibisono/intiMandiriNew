@@ -14,6 +14,7 @@ class CoariContDetil extends Model
 
     protected $fillable = [
         'coari_id',
+        'cont_id',
         'ref_number',
         'kd_dok',
         'kd_tps',

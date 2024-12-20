@@ -20,6 +20,7 @@ class ManifestMaster implements WithMultipleSheets
             'Detil' => new ManifestExcel($this->jobId),
             'Barang' => new ManifestBarang($this->jobId),
             'Master Entry' => new ManifestEntry($this->jobId),
+            'Header' => new ManifestHeader($this->jobId),
         ];
     }
 }

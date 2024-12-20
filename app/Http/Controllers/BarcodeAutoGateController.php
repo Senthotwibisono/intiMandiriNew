@@ -132,7 +132,6 @@ class BarcodeAutoGateController extends Controller
                     $manifest = Manifest::where('container_id', $cont->id)->update([
                         'tglmasuk'=> carbon::now(),
                         'jammasuk'=> carbon::now(),
-                        'uidmasuk'=> 'Autogate',
                     ]);
                     if ($request->hasFile('fileKamera')) {
                         $photos = $request->file('fileKamera');

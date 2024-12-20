@@ -1,23 +1,22 @@
 <?php
 
-namespace App\Models\Pengiriman\Codeco;
+namespace App\Models\Pengiriman;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CodecoKms extends Model
+class RefNumber extends Model
 {
     use HasFactory;
-    protected $table = 'tpscodecokmsxml';
+    protected $table = 'ref_number';
     protected $primaryKey = 'id';
     public $timestamps = false;
 
     protected $fillable = [
-        'nojoborder',
-        'tgl_entry',
-        'jam_entry',
-        'ref_number',
-        'uid',
+        'main',
+        'tahun',
+        'bulan',
+        'tanggal',
         'nomor',
     ];
 }

@@ -78,13 +78,13 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label for="">Voy</label>
-                                    <input type="text" class="form-control" name="voy" value="{{$job->voy}}">
+                                    <input type="text" class="form-control" name="voy" value="{{$job->PLP->voy ?? $job->voy}}" placeholder="Data Belum Di isi">
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label for="">Call Sign</label>
-                                    <input type="text" class="form-control" value="{{$job->vessel->call_sign ?? 'Data Belum di Isi'}}">
+                                    <input type="text" class="form-control" value="{{$job->vessel->call_sign ?? $job->PLP->call_sign ?? $job->call_sign }}" placeholder="Data Belum Di isi">
                                 </div>
                             </div>
                             <div class="col-sm-6">
@@ -188,7 +188,7 @@
                     <div class="col-sm-4">
                         <div class="form-group">
                             <label for="">No PLP</label>
-                            <input type="text" name="noplp" value="{{$job->noplp ?? 'Belum Diisi'}}" class="form-control">
+                            <input type="text" name="noplp" value="{{$job->noplp}}" placeholder="Belum Diisi" class="form-control">
                             <input type="hidden" name="id" value="{{$job->id}}" class="form-control">
                         </div>
                     </div>
@@ -201,7 +201,7 @@
                     <div class="col-sm-4">
                         <div class="form-group">
                             <label for="">No Bc11</label>
-                            <input type="text" name="tno_bc11" value="{{$job->tno_bc11 ?? 'Di Isi Otomatis'}}" class="form-control" readonly>
+                            <input type="text" name="tno_bc11" value="{{$job->tno_bc11}}" placeholder="Di Isi Otomatis" class="form-control" readonly>
                         </div>
                     </div>
                 </div>

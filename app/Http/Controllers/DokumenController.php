@@ -1289,6 +1289,15 @@ class DokumenController extends Controller
 
     private function createJobOrder($plp, $noJob)
     {
+        $kapal = Vessel::where('name', $plp->nm_angkut)->where('call_sign', $plp->call_sign)->first();
+        if ($kapal) {
+            $ves = $kapal;
+        }else {
+            $ves = Vessel::create([
+                'name'=> $plp->nm_angkut,
+                'call_sign'=> $plp->call_sign,
+            ]);
+        }
         return Job::create([
             'nojoborder' => $noJob,
             'plp_id' => $plp->id,
@@ -1299,6 +1308,9 @@ class DokumenController extends Controller
             'type' => 'lcl',
             'uid' => Auth::user()->id,
             'c_datetime' => Carbon::now(),
+            'vessel' => $ves->id,
+            'voy' => $plp->no_voy_flight,
+            'call_sign' => $plp->call_sign,
         ]);
     }
 

@@ -19,6 +19,8 @@ class PengirimanController extends Controller
     public function containerIndex()
     {
         $data['title'] = "Pengriman Data Container"; 
+
+        return view('dokumen.pengiriman.coari.cont', $data);
     }
 
     public function containerData(Request $request)

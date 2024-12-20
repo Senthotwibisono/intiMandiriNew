@@ -204,6 +204,9 @@ class Manifest extends Model
         'ijin_stripping',
         'ijin_stripping_at',
         'ijin_stripping_by',
+
+        'coari_flag',
+        'codeco_flag',
     ];
 
     public function user()

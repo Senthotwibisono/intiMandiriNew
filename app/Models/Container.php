@@ -131,6 +131,8 @@ class Container extends Model
         'release_ip_host',
         'yard_id',
         'yard_detil_id',
+        'coari_flag',
+        'codeco_flag',
     ];
 
     public function user()
