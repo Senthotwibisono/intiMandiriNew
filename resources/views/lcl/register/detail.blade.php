@@ -357,7 +357,7 @@
                 <h5 class="modal-title" id="exampleModalCenterTitle">Upload Data Excel</h5>
                 <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"> <i data-feather="x"></i></button>
             </div>
-            <form action="{{ route('lcl.manifest.new')}}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('lcl.manifest.excel')}}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body">
                     <p> Upload Your File </p>
@@ -380,7 +380,7 @@
                 <h5 class="modal-title" id="exampleModalCenterTitle">Upload Data Excel</h5>
                 <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"> <i data-feather="x"></i></button>
             </div>
-            <form action="{{ route('lcl.manifest.excel')}}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('lcl.manifest.new')}}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body">
                     <p> Upload Your File </p>

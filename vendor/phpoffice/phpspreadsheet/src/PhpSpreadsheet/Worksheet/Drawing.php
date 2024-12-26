@@ -160,6 +160,12 @@ class Drawing extends BaseDrawing
             throw new PhpSpreadsheetException("File $path not found!");
         }
 
+        if ($this->worksheet !== null) {
+            if ($this->path !== '') {
+                $this->worksheet->getCell($this->coordinates);
+            }
+        }
+
         return $this;
     }
 
@@ -167,7 +173,7 @@ class Drawing extends BaseDrawing
     {
         $mime = (string) @mime_content_type($path);
         $retVal = false;
-        if (str_starts_with($mime, 'image/')) {
+        if (strpos($mime, 'image/') === 0) {
             $retVal = true;
         } elseif ($mime === 'application/octet-stream') {
             $extension = pathinfo($path, PATHINFO_EXTENSION);

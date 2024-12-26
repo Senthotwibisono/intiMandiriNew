@@ -9,14 +9,23 @@ class manifestMain implements WithMultipleSheets
     /**
     * @param Collection $collection
     */
+
+    protected $jobId;
+
+    public function __construct($jobId)
+    {
+        $this->jobId = $jobId;
+    }
+
     public function sheets(): array
     {
         return [
-            'Kontainer' => new ManifestCont($this->jobId),
-            'Detil' => new ManifestExcel($this->jobId),
-            'Barang' => new ManifestBarang($this->jobId),
-            'Master Entry' => new ManifestEntry($this->jobId),
-            'Header' => new ManifestHeader($this->jobId),
+            'NVOCC' => new dataKapal($this->jobId),
+            'MASTER' => new dataMaster($this->jobId),
+            // 'BL DOKUMEN' => new dataBC11($this->jobId),
+            'BL' => new dataManifest($this->jobId),
+            'BL HS' => new dataDetil($this->jobId),
+            'BL PETIKEMAS TERANGKUT' => new dataContainer($this->jobId),
         ];
     }
 }

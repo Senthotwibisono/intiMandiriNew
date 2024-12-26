@@ -97,7 +97,6 @@ use ReflectionException;
 use ReflectionMethod;
 use ReflectionObject;
 use ReflectionParameter;
-use SebastianBergmann\CodeCoverage\StaticAnalysisCacheNotConfiguredException;
 use SebastianBergmann\CodeCoverage\UnintentionallyCoveredCodeException;
 use SebastianBergmann\Comparator\Comparator;
 use SebastianBergmann\Comparator\Factory as ComparatorFactory;
@@ -502,7 +501,6 @@ abstract class TestCase extends Assert implements Reorderable, SelfDescribing, T
      * @throws MoreThanOneDataSetFromDataProviderException
      * @throws NoPreviousThrowableException
      * @throws ProcessIsolationException
-     * @throws StaticAnalysisCacheNotConfiguredException
      * @throws UnintentionallyCoveredCodeException
      *
      * @internal This method is not covered by the backward compatibility promise for PHPUnit
@@ -513,7 +511,7 @@ abstract class TestCase extends Assert implements Reorderable, SelfDescribing, T
             return;
         }
 
-        if (!$this->shouldRunInSeparateProcess()) {
+        if (!$this->shouldRunInSeparateProcess() || $this->requirementsNotSatisfied()) {
             (new TestRunner)->run($this);
         } else {
             (new TestRunner)->runInSeparateProcess(
@@ -2308,6 +2306,11 @@ abstract class TestCase extends Assert implements Reorderable, SelfDescribing, T
     private function hasExpectationOnOutput(): bool
     {
         return is_string($this->outputExpectedString) || is_string($this->outputExpectedRegex);
+    }
+
+    private function requirementsNotSatisfied(): bool
+    {
+        return (new Requirements)->requirementsNotSatisfiedFor(static::class, $this->name) !== [];
     }
 
     /**

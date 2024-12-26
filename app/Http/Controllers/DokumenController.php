@@ -50,9 +50,9 @@ class DokumenController extends Controller
         $this->middleware('auth');
 
         $this->wsdl = 'https://tpsonline.beacukai.go.id/tps/service.asmx?WSDL';
-        $this->user = 'AIRN';
-        $this->password = 'AIRN';
-        $this->kode = 'AIRN';
+        $this->user = 'intimandiri';
+        $this->password = 'intiMandiri1';
+        $this->kode = 'INTI';
         
     }
 

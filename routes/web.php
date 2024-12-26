@@ -283,7 +283,7 @@ Route::controller(DokumenController::class)->group(function (){
         Route::get('/lcl/manifest/detail-{id?}', 'detail')->name('lcl.manifest.detail');
         Route::post('/lcl/manifest/create', 'create')->name('lcl.manifest.create');
         Route::post('/lcl/manifest/excel', 'excel')->name('lcl.manifest.excel');
-        Route::post('/lcl/manifest/excelNew', 'excel')->name('lcl.manifest.new');
+        Route::post('/lcl/manifest/excelNew', 'newExcel')->name('lcl.manifest.new');
         Route::get('/lcl/manifest/edit-{id?}', 'edit')->name('lcl.manifest.edit');
         Route::post('/lcl/manifest/delete-{id?}', 'delete')->name('lcl.manifest.delete');
         Route::post('/lcl/manifest/update', 'update')->name('lcl.manifest.update');

@@ -12,6 +12,7 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Imports\ManifestExcel;
 use App\Imports\ManifestCont;
 use App\Imports\ManifestMaster;
+use App\Imports\formatBaru\manifestMain;
 use Maatwebsite\Excel\Facades\Excel;
 
 use App\Models\Container as Cont;
@@ -446,6 +447,121 @@ class ManifestController extends Controller
         // $sheetNames = $this->getSheetTitles($pathToFile);
 
         // dd($sheetNames);
+    }
+
+    public function newExcel(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xls,xlsx,csv|max:2048',
+        ]);
+        $file = $request->file('file');
+        $extension = $file->getClientOriginalExtension();
+        $path = $file->getPathName();
+        
+        $pathToFile = $request->file('file')->getPathname();
+        $sheetNames = $this->getSheetTitles($pathToFile);
+
+        // dd($sheetNames);
+
+        try {
+            if (in_array($extension, ['xls', 'xlsx'])) {
+                $jobId = $request->job_id;
+                $manifestExcel = new manifestMain($jobId);
+                Excel::import($manifestExcel, $path, null, ucfirst($extension));
+            } else {
+                return redirect()->back()->with('status', ['type' => 'error', 'message' => 'Unsupported file extension.']);
+            }
+            $jobId = $request->job_id;
+            $existingContainers = Cont::where('joborder_id', $jobId)->pluck('nocontainer')->toArray();
+            $tempContainers = TempCont::pluck('nocontainer')->toArray();
+            $newContainers = array_diff($tempContainers, $existingContainers);
+            $containerPluck = collect($newContainers)->unique();
+            foreach ($containerPluck as $nocontainer) {
+                $tempContRecord = TempCont::where('nocontainer', $nocontainer)->first();
+                if ($tempContRecord->size == '20') {
+                    $teus = 1;
+                }elseif ($tempContRecord->size == '40') {
+                    $teus = 2;
+                }else {
+                    $teus = 0;
+                }
+                $newCont = Cont::create([
+                    'nocontainer'=>$tempContRecord->nocontainer,
+                    'type'=>'lcl',
+                    'joborder_id'=> $jobId,
+                    'size'=>$tempContRecord->size,
+                    'teus'=>$teus,
+                    'uid' => Auth::user()->id,
+                ]);
+            }
+            $detils = TempManifest::get();
+            // dd($detils);
+            foreach ($detils as $detil) {
+                 $tempCont = TempCont::where('detil_id', $detil->detil_id)->first();
+                 $cont = Cont::where('joborder_id', $jobId)->where('nocontainer', $tempCont->nocontainer)->first();
+                 $oldManifest = Manifest::where('nohbl', $detil->nohbl)->where('container_id', $cont->id)->first();
+                //  dd($oldManifest, $cont->id);
+                 $barang = TempBarang::where('detil_id', $detil->detil_id)->first();
+                 if (!$oldManifest) {
+                    $job = Job::where('id', $cont->joborder_id)->first();
+
+                    $lastTally = Manifest::where('joborder_id', $job->id)
+                                  ->orderBy('id', 'desc')
+                                  ->first();
+
+                    if ($lastTally) {
+                        $lastTallyNumber = intval(substr($lastTally->notally, 15, 3));
+                        $newTallyNumber = str_pad($lastTallyNumber + 1, 3, '0', STR_PAD_LEFT);
+                    } else {
+                        $newTallyNumber = '001';
+                    }
+                    $noTally = $job->nojoborder . '-' . $newTallyNumber;
+                    // dd($noTally);
+                
+                    do {
+                        $uniqueBarcode = Str::random(19);
+                        } while (Manifest::where('barcode', $uniqueBarcode)->exists());
+                    $newManifest = Manifest::create([
+                        'notally'=>$noTally,
+                        'validasi' => 'N',
+                        'barcode' => $uniqueBarcode,
+                        'nohbl'=>$detil->nohbl,
+                        'container_id'=>$cont->id,
+                        'joborder_id'=>$cont->joborder_id,
+                        'tgl_hbl'=>$detil->tgl_hbl,
+                        'shipper_id'=>$detil->shipper_id,
+                        'customer_id'=>$detil->customer_id,
+                        'notifyparty_id'=>$detil->notifyparty_id,
+                        'marking'=>$detil->marking,
+                        'descofgoods'=>$barang->descofgoods,
+                        'quantity'=>$detil->quantity,
+                        'packing_id'=>$detil->packing_id,
+                        'weight'=>$detil->weight,
+                        'meas'=>$detil->meas,
+                        'packing_tally'=>$detil->packing_id,
+                        'uid'=>Auth::user()->id,
+                    ]);
+                    for ($i = 1; $i < $newManifest->quantity+1; $i++) {
+                        $itemName = isset($newManifest->customer) ? $newManifest->customer->name . '-' . $i : null;
+                        $item= Item::create([
+                                    'manifest_id'=>$newManifest->id,
+                                    'barcode'=>$newManifest->barcode . $i,
+                                    'nomor'=>$i,
+                                    'name' => $itemName,
+                                    'stripping' => 'N',
+                                    'uid'=> Auth::user()->id,
+                                ]);
+                     }
+                }
+            }
+            TempCont::truncate();
+            TempBarang::truncate();
+            TempManifest::truncate();
+            return redirect()->back()->with('status', ['type' => 'success', 'message' => 'Data successfully imported.']);
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('status', ['type' => 'error', 'message' => 'Error importing data: ' . $e->getMessage()]);
+
+        }
     }
 
     public function getSheetTitles($pathToFile)
