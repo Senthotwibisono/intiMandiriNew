@@ -314,10 +314,33 @@ class ManifestController extends Controller
         $file = $request->file('file');
         $extension = $file->getClientOriginalExtension();
         $path = $file->getPathName();
-        // $pathToFile = $request->file('file')->getPathname();
-        // $sheetNames = $this->getSheetTitles($pathToFile);
+        
+        $pathToFile = $request->file('file')->getPathname();
+        $sheetNames = $this->getSheetTitles($pathToFile);
 
-        // dd($sheetNames);
+        $detilSheet = in_array('Detil', $sheetNames) ? 'Detil' : null;
+        $kontainerSheet = in_array('Kontainer', $sheetNames) ? 'Kontainer' : null;
+        $barangSheet = in_array('Barang', $sheetNames) ? 'Barang' : null;
+        $masterSheet = in_array('Master Entry', $sheetNames) ? 'Master Entry' : null;
+        $headerheet = in_array('Header', $sheetNames) ? 'Header' : null;
+
+        if (!$detilSheet) {
+            return redirect()->back()->with('status', ['type' => 'error', 'message' => 'Format Excel Tidak Sesuai']);
+        }
+        if (!$kontainerSheet) {
+            return redirect()->back()->with('status', ['type' => 'error', 'message' => 'Format Excel Tidak Sesuai']);
+        }
+        if (!$barangSheet) {
+            return redirect()->back()->with('status', ['type' => 'error', 'message' => 'Format Excel Tidak Sesuai']);
+        }
+        if (!$masterSheet) {
+            return redirect()->back()->with('status', ['type' => 'error', 'message' => 'Format Excel Tidak Sesuai']);
+        }
+        if (!$headerheet) {
+            return redirect()->back()->with('status', ['type' => 'error', 'message' => 'Format Excel Tidak Sesuai']);
+        }
+
+        // dd($sheetNames, $detilSheet);
 
         try {
             if (in_array($extension, ['xls', 'xlsx'])) {

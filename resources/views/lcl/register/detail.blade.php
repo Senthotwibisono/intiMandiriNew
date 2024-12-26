@@ -262,6 +262,9 @@
                 <div class="col-auto">
                     <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#excelModal"><i class="fas fa-file-excel"></i></button>
                 </div>
+                <div class="col-auto">
+                    <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#newFormatModal"><i class="fas fa-file-excel"></i> || New Format</button>
+                </div>
             </div>
         </div>
     </div>
@@ -348,6 +351,29 @@
 
 <!-- Modal Excel -->
 <div class="modal fade" id="excelModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-centered modal-dialog-scrollable"role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">Upload Data Excel</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"> <i data-feather="x"></i></button>
+            </div>
+            <form action="{{ route('lcl.manifest.new')}}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+                    <p> Upload Your File </p>
+                    <input type="file" name="file" class="form-control" id="inputGroupFile01">
+                    <input type="hidden" name="job_id" value="{{$job->id}}" class="form-control">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal"> <i class="bx bx-x d-block d-sm-none"></i> <span class="d-none d-sm-block">Close</span> </button>
+                    <button type="submit" class="btn btn-primary ml-1" data-bs-dismiss="modal"> <i class="bx bx-check d-block d-sm-none"></i> <span class="d-none d-sm-block">Submit</span> </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="newFormatModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-centered modal-dialog-scrollable"role="document">
         <div class="modal-content">
             <div class="modal-header">
