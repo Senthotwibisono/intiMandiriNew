@@ -10,11 +10,22 @@
         }
     ],
     "require": {
-        "php": ">=5.4.0"
+        "php": ">=5.4.0",
+        "ext-soap": "*"
     },
     "autoload": {
         "psr-0": {
             "Artisaninweb\\SoapWrapper": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Artisaninweb\\SoapWrapper\\ServiceProvider"
+            ],
+            "aliases": {
+                "SoapWrapper": "Artisaninweb\\SoapWrapper\\Facade"
+            }
         }
     }
 }
