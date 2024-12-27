@@ -47,5 +47,7 @@ class dataMaster implements ToCollection,  WithHeadingRow
         'nombl' =>  $no_bl,
         'tgl_master_bl'=> $tanggal_bl,
         ]);
+
+        
     }
 }
