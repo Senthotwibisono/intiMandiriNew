@@ -26,6 +26,7 @@ use App\Http\Controllers\android\AndroidHomeController;
 use App\Http\Controllers\android\LclController;
 
 // invoice
+use App\Http\Controllers\invoice\DashboardInvoiceController;
 use App\Http\Controllers\invoice\MasterInvoiceController;
 use App\Http\Controllers\invoice\FormController;
 use App\Http\Controllers\invoice\InvoiceController;
@@ -467,6 +468,9 @@ Route::controller(LclController::class)->group(function(){
 });
 
 // Invoice
+    Route::controller(DashboardInvoiceController::class)->group(function(){
+        Route::get('/dashboard-invoice', 'dashboard');
+    });
     // Master
     Route::controller(MasterInvoiceController::class)->group(function(){
         Route::get('/invoice/master/tarif', 'tarifIndex');

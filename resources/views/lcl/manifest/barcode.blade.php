@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-  <meta charset="UTF-8">
+    
+    <head>
+        <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -10,186 +10,184 @@
   <link rel="stylesheet" href="{{asset('dist/assets/css/main/app.css')}}">
   <link rel="shortcut icon" href="{{asset('logo/icon.png')}}" type="image/x-icon">
   <link rel="shortcut icon" href="{{asset('logo/icon.png')}}" type="image/png">
-</head>
 
+  <style>
+    /* Set ukuran kertas A5 landscape */
+    @page {
+      width: 120mm;
+      height: 100mm;
+      margin: 0cm; /* Tambahkan margin jika diperlukan */
+    }
 
-<style>
- .section {
-      padding-top: 5%;
+    body {
+      
+      font-family: Arial, sans-serif;
+      font-size: 10pt; /* Ukuran font */
+      margin: 0;
+      line-height: 1; /* Spasi antar baris */
     }
 
     .card {
-      margin-bottom: 20px;
-    }
-
-    .card-body {
-      padding: 15px;
+      width: 100%;
+      height: 100%;
+      margin: auto;
+      border: 1px solid black;
     }
 
     .row {
       display: flex;
-      flex-wrap: wrap;
-      margin-right: -15px;
-      margin-left: -15px;
+      flex-wrap: nowrap;
+
+    }
+    
+    .col-8 {
+        width: 80%; /* 8 dari 12 kolom */
+    }
+    
+    .col-4 {
+        width: 20%; /* 4 dari 12 kolom */
+    }
+    
+    .col-45{
+        width: 33.33%        
     }
 
-    .col-6 {
-      flex: 0 0 50%;
-      max-width: 50%;
-      padding-right: 15px;
-      padding-left: 15px;
-    }
-    body{
-        font-family: 'Roboto Condensed', sans-serif;
-    }
-    .page-break {
-                page-break-before: always;
-            }
-
-            .footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            text-align: center;
-            padding: 5px;
-            font-size: 12px;
-            background-color: #f9f9f9;
-            border-top: 1px solid #ddd;
-        }
-    .m-0{
-        margin: 0px;
-    }
-    .p-0{
-        padding: 0px;
-    }
-    .pt-5{
-        padding-top:5px;
-    }
-    .mt-10{
-        margin-top:10px;
-    }
-    .text-center{
-        text-align:center !important;
-    }
-    .w-100{
-        width: 100%;
-    }
-    .w-50{
-        width:50%;   
-    }
-    .w-85{
-        width:85%;   
-    }
-    .w-15{
-        width:15%;   
-    }
-    .logo img{
-        width:45px;
-        height:45px;
-        padding-top:30px;
-    }
-    .logo span{
-        margin-left:8px;
-        top:19px;
-        position: absolute;
-        font-weight: bold;
-        font-size:25px;
-    }
-    .gray-color{
-        color:#5D5D5D;
-    }
-    .text-bold{
-        font-weight: bold;
-    }
-    .border{
-        border:1px solid black;
-    }
-    table tr,th,td{
-        border: 1px solid #d2d2d2;
-        border-collapse:collapse;
-        padding:7px 8px;
-    }
-    table tr th{
-        background: #F4F4F4;
-        font-size:15px;
-    }
-    table tr td{
-        font-size:13px;
-    }
-    table{
-        border-collapse:collapse;
-    }
-    .box-text p{
-        line-height:10px;
-    }
-    .float-left{
-        float:left;
-    }
-    .total-part{
-        font-size:16px;
-        line-height:12px;
-    }
-    .total-right p{
-        padding-right:20px;
+    .col-12 {
+        width: 100%; /* Full width */
     }
 
-    .tier-container {
-    display: flex;
-    flex-wrap: fixed; /* Mengatur agar kontainer tier bisa terlipat jika ukurannya melebihi lebar kontainer induk */
-    gap: 5px; /* Mengatur jarak antar kotak */
-}
-.kotak {
-        height: 5vh; /* Mengurangi tinggi kotak menjadi 5% dari tinggi viewport */
-        line-height: 5vh; /* Menyesuaikan line-height agar sama dengan tinggi kotak */
-        font-size: 8px; 
-        background-color: #fff;
-        text-align: center;
-        border: 2px solid #000000;
-        flex: 1;
-        margin: 0px;
-        border-radius: 0px;
+    .text-center {
+      text-align: center;
     }
 
-    .kotak.filled {
-        background-color: red;
-        color: #fff;
+    .img {
+        max-width: 100%;
+        height: auto;
+       
     }
-</style>
+    
+    /* QR Code styling */
+    .qr-code {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    </style>
+</head>
 
-<div class="container">
-    <div class="row">
-        <div class="col-12">
-            <div class="text-center">
-                    <img src="/logo/IntiMandiri.png" class="img" alt="">
-               
-            </div>
-       </div>
-    </div>
-    <br>
-    <div class="text-center">
-        {{$title}}
-    </div>
-    <hr>
-  
-    @foreach($items as $item)
-        <div class="row">
-            <div class="card">
-                <div class="card-header">
-                    {{strtoupper($item->nomor).' - '.strtoupper($item->name ?? 'Belum diberi nama')}}
+@foreach($items as $index => $item)
+<body>
+    <div class="card">
+        <!-- Bag Atas -->
+        <div class="row" style="border-bottom: 1px solid black;">
+            <div class="col-8" style="border-right: 1px solid black;">
+                <div class="row">
+                    <div class="col-4" style="border-right: 1px solid black;">
+                        <div class="img">
+                            <img src="/logo/IntiMandiri.png" class="img" alt="">
+                        </div>
+                    </div>
+                    <div class="col-8">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="text-center">
+                                    <br>
+                                    <span>PT. Inti Mandiri Utama Trans</span>
+                                    <hr>
+                                    <p>Consolidation Warehoude & Logistic</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" style="border-top: 1px solid black;">
+                            <div class="col-12">
+                                <div class="text-center">
+                                    <span>CONSIGGNEE</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" style="border-top: 1px solid black;">
+                            <div class="col-12">
+                                <div class="text-center">
+                                    <span>{{$item->manifest->customer->name ?? ''}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="text-center">
-                            <td><b>Code</b></td>
-                            <td>&nbsp;&nbsp;:&nbsp;&nbsp;</td>
-                            <td>{{ $item->barcode }}</td>
-                            <br>
-                        {!!QrCode::margin(0)->size(300)->generate($item->barcode)!!}
+                <div class="row mt-0 mb-0" style="border-top: 1px solid black;">
+                    <div class="col-12">
+                        <div class="text-center">
+                            <span>ADDRESS</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4 qr-code">
+                {!!QrCode::margin(0)->generate($item->barcode)!!}
+            </div>
+        </div>
+    
+        <!-- Bag Tengah -->
+         <div class="row" style="border-bottom: 1px solid black;">
+            <div class="col-8" style="border-right: 1px solid black;">
+                <div class="row">
+                    <div class="col-12">
+                        <p>{{$item->manifest->customer->alamat ?? ''}}</p>
+                    </div>
+                </div>
+                <div class="row" style="border-top: 1px solid black;">
+                    <div class="col-3" style="border-right: 1px solid black;">
+                        <p>Type</p>    
+                    </div>
+                    <div class="col-3" style="border-right: 1px solid black;">
+                        <p>
+                            {{$item->manifest->packing->code ?? ''}}
+                        </p>
+                    </div>
+                    <div class="col-3" style="border-right: 1px solid black;">
+                        Party
+                    </div>
+                    <div class="col-3">
+                        {{$item->manifest->quantity}}
+                    </div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <span>ETA</span>
+                    </div>
+                </div>
+                <div class="row">
+                <div class="col-12 text-center">
+                        <span>{{$item->manifest->cont->job->eta}}</span>
+                    </div>
+                </div>
+            </div>
+         </div>
+    
+         <!-- bawah -->
+        <div class="row">
+            <div class="col-12">
+                <div class="row">
+                    <div class="col-45 text-center" style="border-right: 1px solid black;">
+                        <p>Vessel : {{$item->manifest->cont->job->Kapal->name ?? ''}}</p>
+                    </div>
+                    <div class="col-45 text-center" style="border-right: 1px solid black;">
+                        <p>HBL : {{$item->manifest->nohbl ?? ''}} - {{$item->nomor}}</p>
+                    </div>
+                    <div class="col-45 text-center">
+                        <p>Forwarding : {{$item->manifest->cont->job->Forwarding->name ?? ''}}</p>
                     </div>
                 </div>
             </div>
         </div>
-    @endforeach
-</div>
-
+    
+    </div>
+    @if($index + 1 < count($items))
+        <div style="page-break-after: always;"></div>
+    @endif
+</body>
+<br>
+@endforeach
 </html>

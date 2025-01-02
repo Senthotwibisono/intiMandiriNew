@@ -35,6 +35,9 @@ class LoginController extends Controller
         if (Auth::check() && Auth::user()->hasRole('bcP2')) {
             return '/bc-p2/dashboard';
         }
+        if (Auth::check() && Auth::user()->hasRole('invoice')) {
+            return '/dashboard-invoice';
+        }
 
         if (Auth::check() && (Auth::user()->hasRole('android') || Auth::user()->hasRole('lapangan'))) {
             return '/android/dashboard';

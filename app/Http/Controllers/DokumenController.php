@@ -50,8 +50,8 @@ class DokumenController extends Controller
         $this->middleware('auth');
 
         $this->wsdl = 'https://tpsonline.beacukai.go.id/tps/service.asmx?WSDL';
-        $this->user = '1mut';
-        $this->password = 'intiMandiri1';
+        $this->user = 'INTIMANDIRI';
+        $this->password = 'INTIMANDIRI1';
         $this->kode = '1MUT';
         
     }
@@ -189,7 +189,7 @@ class DokumenController extends Controller
                     endforeach;
                 }
             }
-            dd($xml);
+            // dd($xml);
             // Old Checking
             // $oldPLP = PLP::where('no_plp', $header->NO_PLP)->where('tgl_plp', $header->TGL_PLP)->first();
             // if ($oldPLP) {

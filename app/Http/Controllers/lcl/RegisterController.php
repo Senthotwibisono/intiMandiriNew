@@ -12,6 +12,7 @@ use App\Models\JobOrder as Job;
 use App\Models\Container as Cont;
 use App\Models\Manifest;
 use App\Models\Consolidator;
+use App\Models\Customer;
 use App\Models\Negara;
 use App\Models\Pelabuhan;
 use App\Models\Vessel;
@@ -42,12 +43,13 @@ class RegisterController extends Controller
         $data['ships'] = SL::get();
         $data['loks'] = LS::get();
         $data['gudangs'] = Gudang::get();
+        $data['forwardings'] = Customer::get();
         return view('lcl.register.index', $data);
     }
 
     public function indexData()
     {
-        $jobs = Job::with(['containers', 'Kapal', 'user'])
+        $jobs = Job::with(['containers', 'Kapal', 'user', 'Forwarding'])
             ->where('type', 'lcl')
             ->get()
             ->map(function($job) {
@@ -59,6 +61,7 @@ class RegisterController extends Controller
                                           <button class="btn btn-danger printBarcode" data-id="'.$container->id.'"><i class="fa fa-print"></i></button> </div>',
                             'nojoborder' => $job->nojoborder,
                             'nospk' => $job->nospk,
+                            'forwarding' => $job->Forwarding->name ?? '',
                             'nocontainer' => $container->nocontainer,
                             'nombl' => $job->nombl,
                             'no_plp'=>$job->PLP->no_plp ?? '',
@@ -82,6 +85,7 @@ class RegisterController extends Controller
                         'actions' => '<a href="/lcl/register/detail-'.$job->id.'" class="btn btn-warning"><i class="fa fa-pen"></i></a>',
                         'nojoborder' => $job->nojoborder,
                         'nospk' => $job->nospk,
+                        'forwarding' => $job->Forwarding->name ?? '',
                         'nocontainer' => 'Belum ada Container',
                         'nombl' => $job->nombl,
                         'no_plp'=>$job->PLP->no_plp ?? '',
@@ -149,6 +153,7 @@ class RegisterController extends Controller
                 'uid'=> Auth::user()->id,
                 'c_datetime'=>Carbon::now(),
                 'type'=>'lcl',
+                'forwarding_id' => $request->forwarding_id,
             ]);
             return redirect()->route('lcl.register.detail', ['id' => $job->id])->with('status', ['type'=>'success', 'message'=>'Data berhasil di buat']);
         } catch (\Throwable $e) {
@@ -170,6 +175,7 @@ class RegisterController extends Controller
         $data['gudangs'] = Gudang::get();
         $data['seals'] = Eseal::get();
         $data['conts'] = Cont::where('joborder_id', $id)->get(); 
+        $data['forwardings'] = Customer::get();
 
         $data['manifestJob'] = Manifest::where('joborder_id', $id)->get();
 
@@ -200,6 +206,7 @@ class RegisterController extends Controller
                 'pel_muat'=>$request->pel_muat,
                 'pel_bongkar'=>$request->pel_bongkar,
                 'uid'=> Auth::user()->id,
+                'forwarding_id' => $request->forwarding_id,
             ]);
             return redirect()->back()->with('status', ['type' => 'success', 'message' => 'Data berhasil di update']);
         }else {

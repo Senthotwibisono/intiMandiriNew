@@ -26,6 +26,7 @@
                             <th>Action</th>
                             <th class="text-center">No Job Order</th>
                             <th class="text-center">No SPK</th>
+                            <th class="text-center">Forwarding</th>
                             <th class="text-center">No Container</th>
                             <th class="text-center">No MBL</th>
                             <th class="text-center">No PLP</th>
@@ -69,6 +70,15 @@
                             <div class="form-group">
                                 <label for="">No SPK</label>
                                 <input type="text" class="form-control" name="nospk">
+                            </div>
+                            <div class="form-group">
+                                <label for="">Forwarding</label>
+                                <select name="forwarding_id" class="customSelect form-select select2" style="width: 100%">
+                                    <option disabled selected value>Pilih Satu</option>
+                                    @foreach($forwardings as $forwarding)
+                                        <option value="{{$forwarding->id}}">{{$forwarding->name}}</option>
+                                    @endforeach
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label for="">No MBL</label>
@@ -220,6 +230,7 @@
                 { data: 'actions', name: 'actions', orderable: false, searchable: false },
                 { data: 'nojoborder', name: 'nojoborder' },
                 { data: 'nospk', name: 'nospk' },
+                { data: 'forwarding', name: 'forwarding' },
                 { data: 'nocontainer', name: 'nocontainer' },
                 { data: 'nombl', name: 'nombl' },
                 { data: 'no_plp', name: 'no_plp' },

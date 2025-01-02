@@ -31,6 +31,15 @@
                             <input type="text" class="form-control" name="nospk" value="{{$job->nospk}}">
                         </div>
                         <div class="form-group">
+                            <label for="">Forwarding</label>
+                            <select name="forwarding_id" class="js-example-basic-single form-select select2" style="width: 100%">
+                                <option disabled selected value>Pilih Satu</option>
+                                @foreach($forwardings as $forwarding)
+                                    <option value="{{$forwarding->id}}" {{$job->forwarding_id == $forwarding->id ? 'selected' : ''}}>{{$forwarding->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label for="">No MBL</label>
                             <input type="text" class="form-control" name="nombl" value="{{$job->nombl}}">
                         </div>

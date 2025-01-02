@@ -34,7 +34,7 @@
             </div>
             <div class="card-body">
                 <div class="row mt-0">
-                    <div class="col-sm-3">
+                    <div class="col-sm-4">
                         <div class="form-group">
                             <label for="">Manifest</label>
                             <select name="manifest_id" id="manifest_id" style="width:100%;" class="js-example-basic-single select2 form-select">
@@ -63,7 +63,7 @@
                             <input type="number" class="form-control" name="meas" id="meas" value="{{$form->manifest->meas ?? ''}}" readonly>
                         </div>
                     </div>
-                    <div class="col-sm-3">
+                    <div class="col-sm-2">
                         <div class="form-group">
                             <label for="">Volume UP</label>
                             <input type="number" class="form-control" name="cbm" id="cbm" value="{{$form->cbm ?? ''}}" readonly>
@@ -75,6 +75,32 @@
                     <div class="col-sm-4">
                         <div class="form-group">
                             <label for="">Customer Name</label>
+                            <select name="customer_id" id="customer_id" class="js-example-basic-single select2 form-select" style="width:100%;">
+                                <option disabled selected value>Pilih Satu!</option>
+                                @foreach($customer as $cus)
+                                    <option value="{{$cus->id}}" {{$form->customer_id == $cus->id ? 'selected' : ''}}>{{$cus->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label for="">NPWP</label>
+                            <input type="text" class="form-control" id="npwp" value="{{$form->customer->npwp ?? ''}}" readonly>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label for="">Phone</label>
+                            <input type="text" class="form-control" id="phone" value="{{$form->customer->phone ?? ''}}" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-0">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label for="">Forwarding</label>
                             <select name="customer_id" id="customer_id" class="js-example-basic-single select2 form-select" style="width:100%;">
                                 <option disabled selected value>Pilih Satu!</option>
                                 @foreach($customer as $cus)
@@ -215,7 +241,9 @@
                         $('#weight').val(data.weight);
                         $('#meas').val(data.meas);
                         $('#cbm').val(data.cbm);
+                        $('#forwarding').val(data.forwarding);
                         $('#time_in').val(data.tglmasuk);
+                        $('#customer_id').val(data.cust).trigger('change');
                     }
                 });
             } else {
@@ -225,6 +253,7 @@
                 $('#meas').val('');
                 $('#cbm').val('');
                 $('#time_in').val('');
+                $('#customer_id').val('').trigger('change');
             }
         });
     });

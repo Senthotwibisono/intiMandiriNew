@@ -14,27 +14,33 @@ namespace Monolog\Test;
 use Monolog\Level;
 use Monolog\Logger;
 use Monolog\LogRecord;
-use Monolog\JsonSerializableDateTimeImmutable;
+use Monolog\DateTimeImmutable;
 use Monolog\Formatter\FormatterInterface;
 use Psr\Log\LogLevel;
-use ReflectionProperty;
 
 /**
  * Lets you easily generate log records and a dummy formatter for testing purposes
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
- *
- * @internal feel free to reuse this to test your own handlers, this is marked internal to avoid issues with PHPStorm https://github.com/Seldaek/monolog/issues/1677
  */
 class TestCase extends \PHPUnit\Framework\TestCase
 {
+    public function tearDown(): void
+    {
+        parent::tearDown();
+
+        if (isset($this->handler)) {
+            unset($this->handler);
+        }
+    }
+
     /**
      * @param array<mixed> $context
      * @param array<mixed> $extra
      *
      * @phpstan-param value-of<Level::VALUES>|value-of<Level::NAMES>|Level|LogLevel::* $level
      */
-    protected function getRecord(int|string|Level $level = Level::Warning, string|\Stringable $message = 'test', array $context = [], string $channel = 'test', \DateTimeImmutable $datetime = new JsonSerializableDateTimeImmutable(true), array $extra = []): LogRecord
+    protected function getRecord(int|string|Level $level = Level::Warning, string|\Stringable $message = 'test', array $context = [], string $channel = 'test', \DateTimeImmutable $datetime = new DateTimeImmutable(true), array $extra = []): LogRecord
     {
         return new LogRecord(
             message: (string) $message,
@@ -65,9 +71,9 @@ class TestCase extends \PHPUnit\Framework\TestCase
         $formatter = $this->createMock(FormatterInterface::class);
         $formatter->expects(self::any())
             ->method('format')
-            ->willReturnCallback(function ($record) {
+            ->will(self::returnCallback(function ($record) {
                 return $record->message;
-            });
+            }));
 
         return $formatter;
     }

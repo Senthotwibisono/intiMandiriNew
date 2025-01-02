@@ -85,6 +85,7 @@ class JobOrder extends Model
         'kd_tps_asal',
         'id_consolidator',
         'type',
+        'forwarding_id',
     ];
 
     public function user()
@@ -148,7 +149,12 @@ class JobOrder extends Model
     }
 
     public function containers()
-{
-    return $this->hasMany(Container::class, 'joborder_id', 'id');
-}
+    {
+        return $this->hasMany(Container::class, 'joborder_id', 'id');
+    }
+
+    public function Forwarding()
+    {
+        return $this->belongsTo(Customer::class, 'forwarding_id', 'id');
+    }
 }

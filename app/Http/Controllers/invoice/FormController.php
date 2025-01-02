@@ -48,12 +48,15 @@ class FormController extends Controller
 
         // Return the manifest data as JSON
         $cbm = ceil($manifest->meas);
+        $forwarding = $manifest->cont->job->Forwarding->name ?? '';
         return response()->json([
             'quantity' => $manifest->quantity,
             'weight'   => $manifest->weight,
             'meas'     => $manifest->meas,
             'tglmasuk'     => $manifest->tglmasuk,
             'cbm'      => $cbm,
+            'forwarding'      => $forwarding,
+            'cust' => $manifest->customer_id,
         ]);
     }
 
