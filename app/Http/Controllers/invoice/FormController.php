@@ -25,7 +25,10 @@ class FormController extends Controller
     public function index()
     {
         $data['title'] = 'List Form';
-        $data['forms'] = Form::where('status', '=', 'N')->whereNot('type', '=', 'P')->orderBy('created_at', 'desc')->get();
+        $data['forms'] = Form::where('status', '=', 'N')->where(function ($query) {
+            $query->where('type', '!=', 'P')
+                  ->orWhereNull('type');
+        })->orderBy('created_at', 'desc')->get();
 
         return view('invoice.form.index', $data);
     }
@@ -79,6 +82,10 @@ class FormController extends Controller
         $data['customer'] = Customer::all();
 
         $data['masterTarif'] = MT::all();
+        $data['masterTarifMekanik'] = MT::where(function ($query) {
+            $query->where('day', '!=', 'Y')
+                  ->orWhereNull('day');
+        })->get();
         $data['selectedTarif'] = FormT::where('form_id', $id)->get();
 
         return view('invoice.form.formIndex', $data);
@@ -103,21 +110,38 @@ class FormController extends Controller
             $tarifSelected = $request->tarif_id;
 
             // dd($tarifSelected);
+            $masterTarifSelectedPeriod = MT::whereIn('id', $tarifSelected)->where('day', 'Y')->orderBy('period', 'desc')->first();
+            // dd($masterTarifSelectedPeriod);
             if (empty($tarifSelected)) {
                 return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Anda belum memilih tarif yang akan dikenakan']);
             }
             $form = Form::find($request->id);
             $interval = Carbon::parse($request->time_in)->diff(Carbon::parse($request->expired_date)->addDay(1)) ?? null;
             $jumlahHari = $interval->days;
-            if ($jumlahHari<=5) {
-                $period = 1;
-                $hariPeriod = $jumlahHari;
-            }elseif ($jumlahHari >= 6 && $jumlahHari <= 10) {
-                $period = 2;
-                $hariPeriod = $jumlahHari - 5;
-            }elseif ($jumlahHari >= 11) {
-                $period = 3;
-                $hariPeriod = $jumlahHari - 10;
+            if ($masterTarifSelectedPeriod->period == 3) {
+                if ($jumlahHari<=5) {
+                    $period = 1;
+                    $hariPeriod = $jumlahHari;
+                }elseif ($jumlahHari >= 6 && $jumlahHari <= 10) {
+                    $period = 2;
+                    $hariPeriod = $jumlahHari - 5;
+                }elseif ($jumlahHari >= 11) {
+                    $period = 3;
+                    $hariPeriod = $jumlahHari - 10;
+                }
+            }
+            if ($masterTarifSelectedPeriod->period == 2) {
+                if ($jumlahHari<=5) {
+                    $period = 1;
+                    $hariPeriod = $jumlahHari;
+                }else {
+                    $period = 2;
+                    $hariPeriod = $jumlahHari - 5;
+                }
+            }
+            if ($masterTarifSelectedPeriod->period == 1) {
+                    $period = 1;
+                    $hariPeriod = $jumlahHari;
             }
             // dd($jumlahHari, $period, $hariPeriod);
             $form->update([
@@ -176,6 +200,8 @@ class FormController extends Controller
                     'mekanik_y_n' => 'Y'
                 ]);
             }else {
+            
+                $oldTarifDetilMekanik = FormT::where('form_id', $form->id)->where('mekanik_y_n', '=', 'Y')->delete();
                 $form->update([
                     'mekanik_y_n' => 'N'
                 ]);
@@ -199,21 +225,45 @@ class FormController extends Controller
         $data['selectedTarifMekanik'] = FormT::where('form_id', $id)->where('mekanik_y_n', '=', 'Y')->get();
         // dd($data['selectedTarifMekanik']);
 
+        $hariData = FormT::where('form_id', $id)
+        ->whereHas('Tarif', function ($query) {
+            $query->whereIn('period', [1, 2, 3]);
+        })
+        ->get()
+        ->groupBy(function ($item) {
+            return $item->Tarif->period;
+        })
+        ->map(function ($group) {
+            return $group->pluck('jumlah_hari')->first(); // Ambil nilai pertama jika ada
+        });
+
+        $hari1 = $hariData->get(1, null);
+        $hari2 = $hariData->get(2, null);
+        $hari3 = $hariData->get(3, null);
+
+        $data['hari1'] = $hari1;
+        $data['hari2'] = $hari2;
+        $data['hari3'] = $hari3;
+
+        $data['jumlahHariTotal'] = $form->jumlah_hari;
+        // dd($data['jumlahHariTotal']);
+
+        // dd($hari1, $hari2, $hari3);
         switch ($form->period) {
             case 1:
-                $data['periode1'] = $form->hari_period;
-                $data['periode2'] = 0;
-                $data['periode3'] = 0;
+                $data['periode1'] = $hari1 ?? $form->hari_period;
+                $data['periode2'] = $hari2 ?? 0;
+                $data['periode3'] = $hari3 ?? 0;
                 break;
             case 2:
-                $data['periode1'] = 5;
-                $data['periode2'] = $form->hari_period;
-                $data['periode3'] = 0;
+                $data['periode1'] = $hari1 ?? 5;
+                $data['periode2'] = $hari2 ?? $form->hari_period;
+                $data['periode3'] = $hari3 ?? 0;
                 break;
             case 3:
-                $data['periode1'] = 5;
-                $data['periode2'] = 5;
-                $data['periode3'] = $form->hari_period;
+                $data['periode1'] = $hari1 ?? 5;
+                $data['periode2'] = $hari2 ?? 5;
+                $data['periode3'] = $hari3 ?? $form->hari_period;
                 break;
             
             default:
@@ -223,6 +273,8 @@ class FormController extends Controller
                 break;
         }
 
+        $data['jumlahHari'] = $form->jumlah_hari;
+        // dd($data['jumlahHari']);
         return view('invoice.form.step2', $data);
     }
 
@@ -358,67 +410,71 @@ class FormController extends Controller
     {
         try {
             $form = Form::find($request->id);
-
-            $latestOrder = Header::orderBy('id', 'desc')->first();
-        
-            // Calculate the next order number
-            $nextOrderNo = $latestOrder ? intval($latestOrder->order_no) + 1 : 1;
-            $formattedOrderNo = str_pad($nextOrderNo, 6, '0', STR_PAD_LEFT); // Ensure it's a 6-digit number
-
-            $header = Header::create([
-                'form_id' => $form->id,
-                'manifest_id' => $form->manifest_id,
-                'customer_id' => $form->customer_id,
-                'judul_invoice' => $request->judul_invoice,
-                'invoice_no' => $form->invoice_no,
-                'order_no' => $formattedOrderNo,
-                'time_in' => $form->time_in,
-                'expired_date' => $form->expired_date,
-                'total' => $form->total,
-                'admin' => $form->admin,
-                'discount' => $form->discount,
-                'pajak' => $form->pajak,
-                'pajak_amount' => $form->pajak_amount,
-                'grand_total' => $form->grand_total,
-                'status' => 'N',
-                'order_at' => Carbon::now(),
-                'kasir_id' => Auth::user()->id,
-                'mekanik_y_n' => 'N',
-            ]);
-
-            if ($form->mekanik_y_n == 'Y') {
-                $nextOrderNoMekanik = $latestOrder ? intval($latestOrder->order_no) + 2 : 1;
-                $formattedOrderNoMekanik = str_pad($nextOrderNoMekanik, 6, '0', STR_PAD_LEFT); // Ensure it's a 6-digit number
-                $headerMekanik = Header::create([
-                    'form_id' => $form->id,
-                    'manifest_id' => $form->manifest_id,
-                    'customer_id' => $form->customer_id,
-                    'judul_invoice' => 'Mekanik '.$request->judul_invoice,
-                    'invoice_no' => $form->invoice_no,
-                    'order_no' => $formattedOrderNoMekanik,
-                    'time_in' => $form->time_in,
-                    'expired_date' => $form->expired_date,
-                    'total' => $form->total_m,
-                    'admin' => $form->admin_m,
-                    'discount' => $form->discount_m,
-                    'pajak' => $form->pajak_m,
-                    'pajak_amount' => $form->pajak_amount_m,
-                    'grand_total' => $form->grand_total_m,
-                    'status' => 'N',
-                    'order_at' => Carbon::now(),
-                    'kasir_id' => Auth::user()->id,
-                    'mekanik_y_n' => 'Y',
-                ]);
+            if (!$form) {
+                return redirect()->back()->with('status', ['type' => 'error', 'message' => 'Form not found']);
             }
 
-            $form->update([
-                'status' => 'Y'
-            ]);
-            return redirect()->route('invoice.unpaid')->with('status', ['type'=>'success', 'message'=>'Berhasil di Simpan']);
-        } catch (\Throwable $th) {
-            //throw $th;
+            // Update or create non-mekanik header
+            $this->updateOrCreateHeader($form, false, $request);
+
+            // Update or create mekanik header (if applicable)
+            if ($form->mekanik_y_n == 'Y') {
+                $this->updateOrCreateHeader($form, true, $request);
+            } else {
+                // Close existing mekanik headers if mekanik is not active
+                Header::where('form_id', $form->id)->where('mekanik_y_n', 'Y')->update(['status' => 'C']);
+            }
+
+            // Update form status
+            $form->update(['status' => 'Y']);
+
+            return redirect()->route('invoice.unpaid')->with('status', ['type' => 'success', 'message' => 'Berhasil di Simpan']);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('status', ['type' => 'error', 'message' => $e->getMessage()]);
         }
     }
+
+    private function updateOrCreateHeader($form, $isMekanik, $request)
+    {
+        $mekanik = $isMekanik ? 'Y' : 'N';
+        $oldHeader = Header::where('form_id', $form->id)->where('mekanik_y_n', $mekanik)->first();
+
+        $data = [
+            'form_id' => $form->id,
+            'manifest_id' => $form->manifest_id,
+            'customer_id' => $form->customer_id,
+            'judul_invoice' => $isMekanik ? 'Mekanik ' . $request->judul_invoice : $request->judul_invoice,
+            'invoice_no' => $form->invoice_no,
+            'order_no' => $oldHeader->order_no ?? $this->getNextOrderNo(),
+            'time_in' => $form->time_in,
+            'expired_date' => $form->expired_date,
+            'total' => $isMekanik ? $form->total_m : $form->total,
+            'admin' => $isMekanik ? $form->admin_m : $form->admin,
+            'discount' => $isMekanik ? $form->discount_m : $form->discount,
+            'pajak' => $isMekanik ? $form->pajak_m : $form->pajak,
+            'pajak_amount' => $isMekanik ? $form->pajak_amount_m : $form->pajak_amount,
+            'grand_total' => $isMekanik ? $form->grand_total_m : $form->grand_total,
+            'status' => 'N',
+            'order_at' => Carbon::now(),
+            'kasir_id' => Auth::user()->id,
+            'mekanik_y_n' => $mekanik,
+        ];
+
+        if ($oldHeader) {
+            $oldHeader->update($data);
+        } else {
+            Header::create($data);
+        }
+    }
+
+
+    private function getNextOrderNo()
+    {
+        $latestOrder = Header::orderBy('order_no', 'desc')->first();
+        $nextOrderNo = $latestOrder ? intval($latestOrder->order_no) + 1 : 1;
+        return str_pad($nextOrderNo, 6, '0', STR_PAD_LEFT);
+    }
+
 
     private function terbilang($number)
     {

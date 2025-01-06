@@ -48,6 +48,7 @@
             <div class="button-container">
                 <button class="btn btn-success" type="submit">Submit</button>
                 <a href="#" class="btn btn-warning" id="back-button" type="button">Back</a>
+                <a href="#" class="btn btn-primary" id="home-button" type="button"><i class="fa fa-home"></i></a>
                 <a class="btn btn-danger Delete" data-id="{{$form->id}}" type="button"><i class="fa fa-close"></i> Batal</a>
             </div>
         </div>
@@ -76,6 +77,29 @@
             if (result.isConfirmed) {
                 // Redirect to the back URL if confirmed
                 window.location.href = '/invoice/form/formStep2/' + formId;
+            }
+        });
+    });
+</script>
+<script>
+    // SweetAlert for back button confirmation
+    document.getElementById('home-button').addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent the default action
+
+        var formId = document.getElementById('id').value;
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, go back!',
+            cancelButtonText: 'No, stay here'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Redirect to the back URL if confirmed
+                window.location.href = '/invoice/form/index';
             }
         });
     });

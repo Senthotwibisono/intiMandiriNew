@@ -173,7 +173,7 @@
                             <div class="form-group">
                                 <label for="">Master Tarif Mekanik</label>
                                 <select name="tarifM_id[]" id="" class="js-example-basic-multiple form-control" style="height: 150%;" multiple="multiple">
-                                    @foreach($masterTarif as $tarif)
+                                    @foreach($masterTarifMekanik as $tarif)
                                         @if($selectedTarif->contains(function ($selected) use ($tarif) {
                                             return $selected->tarif_id == $tarif->id && $selected->mekanik_y_n == 'Y';
                                         }))

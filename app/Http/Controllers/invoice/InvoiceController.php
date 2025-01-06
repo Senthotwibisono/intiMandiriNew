@@ -31,6 +31,8 @@ use App\Models\TpsSPPBBC23Kms as BC23Kms;
 use App\Models\BarcodeGate as Barcode;
 use App\Models\PlacementManifest as PM;
 
+use DataTables;
+
 class InvoiceController extends Controller
 {
     public function __construct()
@@ -47,6 +49,61 @@ class InvoiceController extends Controller
 
         return view('invoice.unpaid.index', $data);
     }
+
+    // public function unpaidData(Request $request)
+    // {
+    //     $invoice = Header::with(['manifest', 'customer', 'kasir'])->where('status', 'N')->orderBy('order_at', 'desc')->get();
+    //     // dd($invoice);
+
+    //     return DataTables::of($invoice)
+    //     ->addColumn('orderNo', function ($invoice) {
+    //         return $invoice->order_no ?? '-';
+    //     })
+    //     ->addColumn('hbl', function ($invoice) {
+    //         return $invoice->manifest->nohbl ?? '-';
+    //     })
+    //     ->addColumn('tglHBL', function ($invoice) {
+    //         return $invoice->manifest->tgl_hbl ?? '-';
+    //     })
+    //     ->addColumn('quantity', function ($invoice) {
+    //         return $invoice->manifest->quantity ?? '-';
+    //     })
+    //     ->addColumn('customer', function ($invoice) {
+    //         return $invoice->customer->name ?? '-';
+    //     })
+    //     ->addColumn('kasir', function ($invoice) {
+    //         return $invoice->kasir->name ?? '-';
+    //     })
+    //     ->addColumn('orderAt', function ($invoice) {
+    //         return $invoice->order_at ?? '-';
+    //     })
+    //     ->addColumn('pranota', function ($invoice) {
+    //         $disabled = $invoice->status === 'C' ? 'disabled' : '';
+    //         return '<a type="button" href="/invoice/pranota-' . $invoice->id . '" target="_blank" class="btn btn-sm btn-warning text-white ' . $disabled . '">
+    //                     <i class="fa fa-file"></i>
+    //                 </a>';
+    //     })
+    //     ->addColumn('photoKTP', function ($invoice) {
+    //         $disabled = $invoice->status === 'C' ? 'disabled' : '';
+    //         return '<a href="javascript:void(0)" onclick="openWindow(\'/invoice/photoKTP-' . $invoice->id . '\')" class="btn btn-sm btn-info ' . $disabled . '">
+    //                     <i class="fa fa-eye"></i>
+    //                 </a>';
+    //     })
+    //     ->addColumn('action', function ($invoice) {
+    //         $disabled = $invoice->status === 'C' ? 'disabled' : '';
+    //         return '<div class="button-container text-center">
+    //                     <button class="btn btn-danger cancelInvoice" data-id="' . $invoice->id . '" ' . $disabled . '>
+    //                         <i class="fa fa-trash"></i>
+    //                     </button>
+    //                     <button type="button" id="pay" data-id="' . $invoice->id . '" class="btn btn-sm btn-success pay ' . $disabled . '">
+    //                         <i class="fa fa-cogs"></i>
+    //                     </button>
+    //                     <a href="" class="btn btn-primary ' . $disabled . '">Revisi</a>
+    //                 </div>';
+    //     })
+    //     ->rawColumns(['pranota', 'photoKTP', 'action']) // Render HTML pada kolom ini
+    //     ->make(true);
+    // }
 
     public function pranotaIndex($id)
     {
@@ -77,12 +134,14 @@ class InvoiceController extends Controller
             $form = Form::find($header->form_id);
 
             if ($form) {
-                // Delete the related FormT records
-                FormT::where('form_id', $form->id)->delete();
-
-                // Delete the header and form records
-                $allHeader = Header::where('form_id', $form->id)->delete();
-                $form->delete();
+                $allHeader = Header::where('form_id', $form->id)->get();
+                foreach ($allHeader as $header) {
+                    $header->update([
+                        'status' => 'C',
+                        'cancel_at' => carbon::now(),
+                        'cancel_id' => Auth::user()->name,
+                    ]);
+                }
 
                 return response()->json(['success' => 'Invoice deleted successfully']);
             } else {

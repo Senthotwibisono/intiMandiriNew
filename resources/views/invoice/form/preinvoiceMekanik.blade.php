@@ -11,11 +11,11 @@
 </head>
 
 <style>
-    @page {
-        size: 11in 9.5in;
-        margin: 0;
+    @page{
+        size: 10cm auto;
+        margin: 0cm;
     }
-
+    
     body {
         margin: 0;
         padding: 0;
@@ -25,10 +25,11 @@
     }
 
     .container {
-        width: 100%;
-        max-width: 950px;
+        width: 10cm;
+        max-width: auto;
+        height: auto;
         margin: 0 auto;
-        padding: 20px; /* Reduced from 30px */
+        padding: 5px; /* Reduced from 30px */
         background: #fff;
     }
 
@@ -85,10 +86,22 @@
     .p-3 {
         padding: 0.5rem; /* Reduced from 1rem */
     }
+
+    .img {
+        max-width: 70%;
+        height: auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+       
+    }
 </style>
 
 <body>
   <div class="container">
+  <div class="img">
+        <img src="/logo/IntiMandiri.png" class="img" alt="">
+    </div>
     <div class="row">
       <div class="col-xs-12">
         <div class="grid invoice">
@@ -183,19 +196,19 @@
                 <div class="row text-white p-3">
                     <div class="col-6">
                         <h4 class="lead ">Admin</h4>
-                        <h4 class="lead ">Discount</h4>
+                        <!-- <h4 class="lead ">Discount</h4> -->
                         <h4 class="lead ">Total</h4>
-                        <h4 class="lead ">PPN (%)</h4>
-                        <h4 class="lead ">PPN (Amount)</h4>
+                        <h4 class="lead ">PPN ({{ number_format($form->pajak_m, '2', ',', '.') ?? ''}}%)</h4>
+                        <!-- <h4 class="lead ">PPN (Amount)</h4> -->
                         <h4 class="lead ">Grand Total</h4>
                     </div>
                     <div class="col-6" style="text-align:right;">
                         <h4 class="lead "><span id="grand_total_display">{{ number_format($form->admin_m, '2', ',', '.') ?? ''}}</span></h4>
-                        <h4 class="lead "><span id="grand_total_display">{{ number_format($form->discount_m, '2', ',', '.') ?? ''}}</span></h4>
+                        <!-- <h4 class="lead "><span id="grand_total_display">{{ number_format($form->discount_m, '2', ',', '.') ?? ''}}</span></h4> -->
                         <h4 class="lead "><span id="grand_total_display">{{ number_format($form->total_m, '2', ',', '.') ?? ''}}</span></h4>
-                        <h4 class="lead ">
+                        <!-- <h4 class="lead ">
                             {{ number_format($form->pajak_m, '2', ',', '.') ?? ''}} %
-                        </h4>
+                        </h4> -->
                         <h4 class="lead "><span id="ppn_amount_display">{{number_format($form->pajak_amount_m, '2', ',', '.') ?? ''}}</span></h4>
                         <h4 class="lead "><span id="ppn_amount_display">{{number_format($form->grand_total_m, '2', ',', '.') ?? ''}}</span></h4>
                     </div>

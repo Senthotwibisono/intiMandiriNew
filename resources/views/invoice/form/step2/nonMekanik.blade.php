@@ -2,7 +2,7 @@
         <div class="card">
             <div class="card-body">
                 <div class="table">
-                    <table class="tabel-stripped table-responsive">
+                    <table class="table-responsive table-striped table-hover">
                         <thead>
                             <tr>
                                 <th></th>
@@ -26,18 +26,18 @@
                                     <td>
                                         @if($tarif->Tarif->day == 'Y')
                                             @if($tarif->Tarif->period == '1')
-                                                <input type="number" name="jumlah_hari[{{$index}}]" class="form-control jumlah-hari" value="{{$periode1}}" step="0.01" id="jumlah_hari_{{$index}}" data-index="{{$index}}">
+                                                <input type="number" name="jumlah_hari[{{$index}}]" class="form-control jumlah-hari" id="jumlah_hari_{{$index}}" data-index="{{$index}}" data-period="1">
                                             @elseif($tarif->Tarif->period == '2')
-                                                <input type="number" name="jumlah_hari[{{$index}}]" class="form-control jumlah-hari" value="{{$periode2}}" step="0.01" id="jumlah_hari_{{$index}}" data-index="{{$index}}">
+                                                <input type="number" name="jumlah_hari[{{$index}}]" class="form-control jumlah-hari" id="jumlah_hari_{{$index}}" data-index="{{$index}}" data-period="2">
                                             @elseif($tarif->Tarif->period == '3')
-                                                <input type="number" name="jumlah_hari[{{$index}}]" class="form-control jumlah-hari" value="{{$periode3}}" step="0.01" id="jumlah_hari_{{$index}}" data-index="{{$index}}">
+                                                <input type="number" name="jumlah_hari[{{$index}}]" class="form-control jumlah-hari" id="jumlah_hari_{{$index}}" data-index="{{$index}}" data-period="3">
                                             @endif
                                         @else
                                             <input type="number" class="form-control jumlah-hari" name="jumlah_hari[{{$index}}]" value="0" step="0.01"  id="jumlah_hari_{{$index}}" data-index="{{$index}}" disabled>
                                         @endif
                                     </td>
                                     <td>
-                                        <input type="number" class="form-control total" name="total[{{$index}}]" value="{{$tarif->total}}" step="0.01" id="total_{{$index}}" readonly>
+                                        <input type="number" class="form-control total" name="total[{{$index}}]"  step="0.01" id="total_{{$index}}" readonly>
                                     </td>
                                 </tr>
                             @endforeach

@@ -99,24 +99,28 @@
             </div>
             <div class="card-footer">
                 <div class="row mt-0">
-                    <div class="col-sm-6">
+                    <div class="col-sm-5">
                         <div class="form-group">
                             <label for="">Time In</label>
                             <input type="date" name="time_in" id="time_in" class="form-control" value="{{$form->time_in ?? ''}}" disabled>
                         </div>
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-5">
                         <div class="form-group">
                             <label for="">Expired</label>
                             <input type="date" name="expired_date" id="" class="form-control" value="{{$form->expired_date ?? ''}}" disabled>
                         </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <label for="">Jumlah Hari</label>
+                        <input type="text" value="{{$form->jumlah_hari}}" class="form-control" readonly>
                     </div>
                 </div>
             </div>
         </div>
     </section>
     <div class="row">
-        <div class="col-6">
+        <div class="col-6" style="overflow-x: auto;">
             @include('invoice.form.step2.nonMekanik')
         </div>
         @if($form->mekanik_y_n == 'Y')
@@ -257,6 +261,95 @@ $(document).ready(function() {
                 });
             }
         });
+    });
+});
+</script>
+
+<script>
+    // Mendapatkan nilai dari server
+    var hari1 = @json($hari1 ?? 5);
+    var hari2 = @json($hari2 ?? 5); // Gunakan 0 jika $hari2 bernilai null
+    var hari3 = @json($hari3 ?? 0); // Gunakan 0 jika $hari3 bernilai null
+    var totalHari = hari1 + hari2 + hari3;
+    
+    var formHari = {{ $form->jumlah_hari }};
+    var formPeriod = {{ $form->period }};
+    
+    console.log("formHari " + formHari);
+    console.log("totalHari " + totalHari);
+
+    if (formHari != totalHari) {
+        
+        if (formHari > totalHari) {
+            if (formPeriod == 3) {
+                hari3 = formHari - (hari1 + hari2);
+            } else if(formPeriod == 2){
+                hari2 = formHari - hari1;
+            } else if(formPeriod == 1){
+                hari1 = formHari
+            }
+        }
+
+        if (formHari < totalHari) {
+            if (formPeriod == 3) {
+                var checkHari3 = formHari - (hari1 + hari2);
+                if (checkHari3 < 0) {
+                    hari3 = 0;
+
+                    var checkHari2 = formHari - hari1;
+                    if (checkHari2 > 0) {
+                        hari2 = checkHari2;
+                    }else {
+                        hari2 = 0;
+                        hari1 = formHari;
+                    }
+                } else {
+                    hari3 = checkHari3;
+                }
+            } else if (formPeriod == 2) {
+                var checkHari2 = formHari - hari1;
+                if (checkHari2 > 0) {
+                    hari2 = checkHari2;
+                }else {
+                    hari2 = 0;
+                    hari1 = formHari;
+                }
+            } else if(formPeriod == 1) {
+                hari1 = formHari;
+            }
+        }
+    }
+
+    // Mengatur value elemen input dengan nilai ini
+    $(document).ready(function () {
+        $('.jumlah-hari, .jumlah-hari-mekanik').each(function () {
+            var period = $(this).data('period');
+            // Isi berdasarkan periode
+            if (period == 1) {
+                $(this).val(hari1); 
+            } else if (period == 2) {
+                $(this).val(hari2); 
+            } else if (period == 3) {
+                $(this).val(hari3); 
+            }
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+    // Perulangan pada setiap elemen total
+    $('.total').each(function (index) {
+        var hargaSatuan = parseFloat($('#harga_satuan_' + index).val()) || 0; // Ambil harga satuan
+        var jumlahVolume = parseFloat($('#jumlah_volume_' + index).val()) || 0; // Ambil jumlah volume
+
+        // Cek apakah jumlah_hari dinonaktifkan, gunakan default 1 jika iya
+        var jumlahHari = $('#jumlah_hari_' + index).is(':disabled') ? 1 : parseFloat($('#jumlah_hari_' + index).val()) || 0;
+        // Hitung total
+        var total = hargaSatuan * jumlahVolume * jumlahHari;
+       
+        // Set nilai elemen total
+        $(this).val(total); 
     });
 });
 </script>

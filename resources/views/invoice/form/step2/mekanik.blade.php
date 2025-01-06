@@ -2,7 +2,7 @@
     <div class="card">
         <div class="card-body">
             <div class="table">
-                <table class="tabel-stripped table-responsive">
+                <table class="tabel-stripped table-responsive table-hover">
                     <thead>
                         <tr>
                             <th></th>
@@ -24,17 +24,7 @@
                                     <input type="number" class="form-control jumlah-volume-mekanik" name="jumlah_volume_mekanik[{{$index}}]" value="{{$form->cbm}}" step="0.01" id="jumlah_volume_{{$index}}_mekanik" data-index="{{$index}}">
                                 </td>
                                 <td>
-                                    @if($tarif->Tarif->day == 'Y')
-                                        @if($tarif->Tarif->period == '1')
-                                            <input type="number" name="jumlah_hari_mekanik[{{$index}}]" class="form-control jumlah-hari-mekanik" value="{{$periode1}}" step="0.01" id="jumlah_hari_{{$index}}_mekanik" data-index="{{$index}}">
-                                        @elseif($tarif->Tarif->period == '2')
-                                            <input type="number" name="jumlah_hari_mekanik[{{$index}}]" class="form-control jumlah-hari-mekanik" value="{{$periode2}}" step="0.01" id="jumlah_hari_{{$index}}_mekanik" data-index="{{$index}}">
-                                        @elseif($tarif->Tarif->period == '3')
-                                            <input type="number" name="jumlah_hari_mekanik[{{$index}}]" class="form-control jumlah-hari-mekanik" value="{{$periode3}}" step="0.01" id="jumlah_hari_{{$index}}_mekanik" data-index="{{$index}}">
-                                        @endif
-                                    @else
-                                        <input type="number" class="form-control jumlah-hari-mekanik" name="jumlah_hari_mekanik[{{$index}}]" value="0" step="0.01" id="jumlah_hari_{{$index}}_mekanik" data-index="{{$index}}" disabled>
-                                    @endif
+                                    <input type="number" class="form-control jumlah-hari-mekanik" name="jumlah_hari_mekanik[{{$index}}]" value="0" step="0.01" id="jumlah_hari_{{$index}}_mekanik" data-index="{{$index}}" disabled>
                                 </td>
                                 <td>
                                     <input type="number" class="form-control total_mekanik" name="total_mekanik[{{$index}}]" value="{{$tarif->total}}" step="0.01" id="total_{{$index}}_mekanik" readonly>

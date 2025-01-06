@@ -34,15 +34,22 @@
                             <td class="text-center">{{$form->kasir->name ?? ''}}</td>
                             <td class="text-center">{{$form->order_at}}</td>
                             <td class="text-center">
-                                <a type="button" href="/invoice/pranota-{{$form->id}}" target="_blank" class="btn btn-sm btn-warning text-white"><i class="fa fa-file"></i></a>
+                                <a type="button" href="/invoice/pranota-{{$form->id}}" target="_blank" class="btn btn-sm btn-warning text-white {{ $form->status === 'C' ? 'disabled' : '' }}"><i class="fa fa-file"></i></a>
                             </td>
                             <td class="text-center">
-                                <a href="javascript:void(0)" onclick="openWindow('/invoice/photoKTP-{{$form->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
+                                <a href="javascript:void(0)" onclick="openWindow('/invoice/photoKTP-{{$form->id}}')" class="btn btn-sm btn-info {{ $form->status === 'C' ? 'disabled' : '' }}"><i class="fa fa-eye"></i></a>
                             </td>
-                            <td class="text-center">
-                                <div class="button-container">
-                                    <button class="btn btn-danger" data-id="{{ $form->id }}" id="deleteUser-{{ $form->id }}"><i class="fa fa-trash"></i></button>
-                                    <button type="button" id="pay" data-id="{{$form->id}}" class="btn btn-sm btn-success pay"><i class="fa fa-cogs"></i></button>
+                            <td class="">
+                                <div class="button-container text-center">
+                                    <button class="btn btn-danger cancelInvoice" data-id="{{ $form->id }}" 
+                                        {{ $form->status === 'C' ? 'disabled' : '' }}>
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                    <button type="button" id="pay" data-id="{{$form->id}}" class="btn btn-sm btn-success pay" 
+                                        {{ $form->status === 'C' ? 'disabled' : '' }}>
+                                        <i class="fa fa-cogs"></i>
+                                    </button>
+                                    <button class="btn btn-primary {{ $form->status === 'C' ? 'disabled' : '' }} revisiInvoice" data-id="{{$form->Form->id}}">Revisi</button>
                                 </div>
                             </td>
                         </tr>
@@ -112,6 +119,60 @@
 
 @section('custom_js')
 
+<script>
+    $(document).ready(function(){
+        $('.revisiInvoice').on('click', function(){
+            let id = $(this).data('id');
+            console.log("logId" + id);
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Apakah anda yakin untuk melakukan revisi pada invoice ini?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, update it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Processing...',
+                        text: 'Please wait',
+                        icon: 'info',
+                        allowOutsideClick: false,
+                        showConfirmButton: false,
+                        willOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    window.location.href = '/invoice/form/formStep1/' + id;
+                }
+            });
+        })
+    })
+</script>
+
+<script>
+    $(document).ready(function (){
+        $('#dataUnpaid').DataTable({
+            processing : true,
+            serverSide : false,
+            ajax : '/invoice/form/unpaidData',
+            column : [
+                { data: 'orderNo', name: 'orderNo', className: 'text-center' },
+                { data: 'hbl', name: 'hbl', className: 'text-center' },
+                { data: 'tglHBL', name: 'tglHBL', className: 'text-center' },
+                { data: 'quantity', name: 'quantity', className: 'text-center' },
+                { data: 'customer', name: 'customer', className: 'text-center' },
+                { data: 'kasir', name: 'kasir', className: 'text-center' },
+                { data: 'orderAt', name: 'orderAt', className: 'text-center' },
+                { data: 'pranota', name: 'pranota', className: 'text-center', orderable: false, searchable: false },
+                { data: 'photoKTP', name: 'photoKTP', className: 'text-center', orderable: false, searchable: false },
+                { data: 'action', name: 'action', className: 'text-center', orderable: false, searchable: false },
+            ],
+        });
+    });
+</script>
+
 <script> 
     document.addEventListener('DOMContentLoaded', function () {
         // Attach event listener to the update button
@@ -144,7 +205,16 @@
                 confirmButtonText: 'Yes, update it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Submit the form programmatically if confirmed
+                    Swal.fire({
+                        title: 'Processing...',
+                        text: 'Please wait',
+                        icon: 'info',
+                        allowOutsideClick: false,
+                        showConfirmButton: false,
+                        willOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
                     document.getElementById('updateForm').submit();
                 }
             });
@@ -171,10 +241,8 @@
 </script>
 
 <script>
-    document.querySelectorAll('[id^="deleteUser-"]').forEach(button => {
-    button.addEventListener('click', function() {
-        var userId = this.getAttribute('data-id');
-
+    $(document).on('click', '.cancelInvoice', function(){
+        let id = $(this).data('id');
         Swal.fire({
             title: 'Apakah Anda yakin?',
             text: "Anda tidak akan dapat mengembalikan ini!",
@@ -186,39 +254,61 @@
             cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
-                fetch(`/invoice/deleteHeader-${userId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    }
-                }).then(response => {
-                    if (response.ok) {
-                        Swal.fire(
-                            'Dihapus!',
-                            'Data invoice telah dihapus.',
-                            'success'
-                        ).then(() => {
-                            location.reload();
-                        });
-                    } else {
-                        Swal.fire(
-                            'Gagal!',
-                            'Data pengguna tidak dapat dihapus.',
-                            'error'
-                        );
-                    }
-                }).catch(error => {
-                    Swal.fire(
-                        'Gagal!',
-                        'Terjadi kesalahan saat menghapus data pengguna.',
-                        'error'
-                    );
+                Swal.fire({
+                        title: 'Processing...',
+                        text: 'Please wait',
+                        icon: 'info',
+                        allowOutsideClick: false,
+                        showConfirmButton: false,
+                        willOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                $.ajax({
+                    type: 'POST',
+                    url: '/invoice/deleteHeader-' + id,
+                    cache : false,
+                    data: {
+                        id: id,
+                        _token: '{{ csrf_token() }}'
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        console.log(response);
+                        if (response.success) {
+                            Swal.fire('Saved!', '', 'success')
+                                .then(() => {
+                                    // Memuat ulang halaman setelah berhasil menyimpan data
+                                    window.location.reload();
+                                });
+                        } else {
+                            Swal.fire('Error', response.message, 'error')
+                                .then(() => {
+                                    // Memuat ulang halaman setelah berhasil menyimpan data
+                                    window.location.reload();
+                                });
+                        }
+                    },
+                    error: function(response) {
+                        var errors = response.responseJSON.errors;
+                        if (errors) {
+                            var errorMessage = '';
+                            $.each(errors, function(key, value) {
+                                errorMessage += value[0] + '<br>';
+                            });
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Validation Error',
+                                html: errorMessage,
+                            });
+                        } else {
+                            console.log('error:', response);
+                        }
+                    },
                 });
             }
         });
-    });
-});
+    })
 </script>
 
 <script>

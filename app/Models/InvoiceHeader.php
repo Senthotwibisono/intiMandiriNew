@@ -37,7 +37,9 @@ class InvoiceHeader extends Model
         'kasir_lunas_id',
         'no_hp',
         'ktp',
-        'mekanik_y_n'
+        'mekanik_y_n',
+        'cancel_id',
+        'cancel_at',
     ];
 
 
@@ -74,5 +76,10 @@ class InvoiceHeader extends Model
     public function Tarif()
     {
         return $this->belongsTo(MasterTarif::class, 'tarif_id', 'id');
+    }
+
+    public function Cancel()
+    {
+        return $this->belongsTo(User::class, 'cancel_id', 'id');
     }
 }

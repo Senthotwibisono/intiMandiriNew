@@ -501,8 +501,9 @@ Route::controller(LclController::class)->group(function(){
     // Index
     Route::controller(InvoiceController::class)->group(function(){
         Route::get('/invoice/form/unpaid', 'unpaidIndex')->name('invoice.unpaid');
+        Route::get('/invoice/form/unpaidData', 'unpaidData');
         Route::get('/invoice/pranota-{id?}', 'pranotaIndex');
-        Route::delete('/invoice/deleteHeader-{id?}', 'deleteInvoice');
+        Route::post('/invoice/deleteHeader-{id?}', 'deleteInvoice');
         Route::get('/invoice/actionButton-{id?}', 'invoiceGetData');
         Route::post('/invoice/paid', 'invoicePaid');
         Route::get('/invoice/photoKTP-{id?}', 'photoKTP');
