@@ -5,10 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class JobOrder extends Model
+class JobOrderFCL extends Model
 {
     use HasFactory;
-    protected $table = 'tjoborder';
+    protected $table = 'tjoborder_fcl';
     protected $primaryKey = 'id';
     public $timestamps = false;
 
@@ -95,7 +95,7 @@ class JobOrder extends Model
 
     public function PLP()
     {
-        return $this->belongsTo(TpsPLP::class, 'plp_id', 'id')->where('type', 'lcl');
+        return $this->belongsTo(TpsPLP::class, 'plp_id', 'id')->where('type', 'fcl');
     }
 
     public function Kapal()
@@ -150,7 +150,7 @@ class JobOrder extends Model
 
     public function containers()
     {
-        return $this->hasMany(Container::class, 'joborder_id', 'id');
+        return $this->hasMany(ContainerFCL::class, 'joborder_id', 'id');
     }
 
     public function Forwarding()

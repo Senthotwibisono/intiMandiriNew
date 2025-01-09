@@ -117,6 +117,66 @@
         </ul>
     </li>
 
+    <!-- FCL -->
+    <li class="sidebar-item has-sub @if(Request::is('fcl/*')) active @endif">
+        <a href="#" class='sidebar-link'>
+            <i class="fa-solid fa-window-restore"></i>
+            <span>FCL</span>
+        </a>
+        <ul class="submenu @if(Request::is('fcl/*')) active @endif">
+            <li class="submenu-item @if(Request::is('fcl/register') || Request::is('fcl/register/*')) active @endif">
+                <a href="{{ url('/fcl/register/index')}}">Register</a>
+            </li>
+            <!-- Realisasi -->
+            <li class="sidebar-item has-sub @if(Request::is('fcl/realisasi/*')) active @endif">
+                <a href="#" class='sidebar-link'>
+                    <span>Realisasi</span>
+                </a>
+                <ul class="submenu @if(Request::is('fcl/realisasi/*')) active @endif">
+                    <li class="submenu-item @if(Request::is('fcl/realisasi/seal') || Request::is('fcl/realisasi/seal/*')) active @endif">
+                        <a href="{{ url('/fcl/realisasi/seal')}}">Dispathce E-Seal</a>
+                    </li>
+                    <li class="submenu-item @if(Request::is('fcl/realisasi/gateIn') || Request::is('fcl/realisasi/gateIn/*')) active @endif">
+                        <a href="{{ url('/fcl/realisasi/gateIn')}}">Gate In Container</a>
+                    </li>
+                    <li class="submenu-item @if(Request::is('fcl/realisasi/placementCont') || Request::is('fcl/realisasi/placementCont/*')) active @endif">
+                        <a href="{{ url('/fcl/realisasi/placementCont')}}">Placement Container</a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Delivery -->
+            <li class="sidebar-item has-sub @if(Request::is('fcl/delivery/*')) active @endif">
+                <a href="#" class='sidebar-link'>
+                    <span>Delivery</span>
+                </a>
+                <ul class="submenu @if(Request::is('fcl/delivery/*')) active @endif">
+                    <li class="submenu-item @if(Request::is('fcl/delivery/behandle') || Request::is('fcl/delivery/behandle/*')) active @endif">
+                        <a href="{{ url('/fcl/delivery/behandle')}}">Behandle</a>
+                    </li>
+                    <li class="submenu-item @if(Request::is('fcl/delivery/gateOut') || Request::is('fcl/delivery/gateOut/*')) active @endif">
+                        <a href="{{ url('/fcl/delivery/gateOut')}}">Gate Out</a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Report -->
+            <li class="sidebar-item has-sub @if(Request::is('fcl/report/*')) active @endif">
+                <a href="#" class='sidebar-link'>
+                    <span>Report</span>
+                </a>
+                <ul class="submenu @if(Request::is('fcl/report/*')) active @endif">
+                    <li class="submenu-item @if(Request::is('fcl/report/cont')) active @endif">
+                        <a href="{{ url('/fcl/report/cont')}}">Container</a>
+                    </li>
+                    <li class="submenu-item @if(Request::is('fcl/report/daily/*')) active @endif">
+                        <a href="{{ route('report.lcl.daily')}}">Daily</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+
     <!-- Photo -->
     <li class="sidebar-item has-sub @if(Request::is('photo/*')) active @endif">
         <a href="#" class='sidebar-link'>
@@ -432,6 +492,65 @@
                         <a href="{{ url('/lcl/report/manifest')}}">Manifest</a>
                     </li>
                     <li class="submenu-item @if(Request::is('lcl/report/daily/*')) active @endif">
+                        <a href="{{ route('report.lcl.daily')}}">Daily</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+
+    <li class="sidebar-item has-sub @if(Request::is('fcl/*')) active @endif">
+        <a href="#" class='sidebar-link'>
+            <i class="fa-solid fa-window-restore"></i>
+            <span>FCL</span>
+        </a>
+        <ul class="submenu @if(Request::is('fcl/*')) active @endif">
+            <li class="submenu-item @if(Request::is('fcl/register') || Request::is('fcl/register/*')) active @endif">
+                <a href="{{ url('/fcl/register/index')}}">Register</a>
+            </li>
+            <!-- Realisasi -->
+            <li class="sidebar-item has-sub @if(Request::is('fcl/realisasi/*')) active @endif">
+                <a href="#" class='sidebar-link'>
+                    <span>Realisasi</span>
+                </a>
+                <ul class="submenu @if(Request::is('fcl/realisasi/*')) active @endif">
+                    <li class="submenu-item @if(Request::is('fcl/realisasi/seal') || Request::is('fcl/realisasi/seal/*')) active @endif">
+                        <a href="{{ url('/fcl/realisasi/seal')}}">Dispathce E-Seal</a>
+                    </li>
+                    <li class="submenu-item @if(Request::is('fcl/realisasi/gateIn') || Request::is('fcl/realisasi/gateIn/*')) active @endif">
+                        <a href="{{ url('/fcl/realisasi/gateIn')}}">Gate In Container</a>
+                    </li>
+                    <li class="submenu-item @if(Request::is('fcl/realisasi/placementCont') || Request::is('fcl/realisasi/placementCont/*')) active @endif">
+                        <a href="{{ url('/fcl/realisasi/placementCont')}}">Placement Container</a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Delivery -->
+            <li class="sidebar-item has-sub @if(Request::is('fcl/delivery/*')) active @endif">
+                <a href="#" class='sidebar-link'>
+                    <span>Delivery</span>
+                </a>
+                <ul class="submenu @if(Request::is('fcl/delivery/*')) active @endif">
+                    <li class="submenu-item @if(Request::is('fcl/delivery/behandle') || Request::is('fcl/delivery/behandle/*')) active @endif">
+                        <a href="{{ url('/fcl/delivery/behandle')}}">Behandle</a>
+                    </li>
+                    <li class="submenu-item @if(Request::is('fcl/delivery/gateOut') || Request::is('fcl/delivery/gateOut/*')) active @endif">
+                        <a href="{{ url('/fcl/delivery/gateOut')}}">Gate Out</a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Report -->
+            <li class="sidebar-item has-sub @if(Request::is('fcl/report/*')) active @endif">
+                <a href="#" class='sidebar-link'>
+                    <span>Report</span>
+                </a>
+                <ul class="submenu @if(Request::is('fcl/report/*')) active @endif">
+                    <li class="submenu-item @if(Request::is('fcl/report/cont')) active @endif">
+                        <a href="{{ url('/fcl/report/cont')}}">Container</a>
+                    </li>
+                    <li class="submenu-item @if(Request::is('fcl/report/daily/*')) active @endif">
                         <a href="{{ route('report.lcl.daily')}}">Daily</a>
                     </li>
                 </ul>

@@ -66,6 +66,7 @@
                                 <select name="kegiatan" id="" class="customSelect select2 form-select" style="width: 100%;">
                                     <option value="gate-in">gate-in</option>
                                     <option value="gate-out">gate-out</option>
+                                    <option value="buang-mty">buang-mty</option>
                                     <option value="stripping">stripping</option>
                                     <option value="behandle">behandle</option>
                                     <option value="placement">placement</option>
@@ -115,6 +116,7 @@
                                 <select name="kegiatan" id="kegiatan_edit" class="editSelect select2 form-select" style="width: 100%;">
                                     <option value="gate-in">gate-in</option>
                                     <option value="gate-out">gate-out</option>
+                                    <option value="buang-mty">buang-mty</option>
                                     <option value="stripping">stripping</option>
                                     <option value="behandle">behandle</option>
                                     <option value="placement">placement</option>

@@ -134,14 +134,48 @@
 @if($plp->joborder_id == null)
     <section>
        <div class="card text-center">
-            <form action="{{ route('dokumen.plp.cetakJob') }}" method="POST">
-                 @csrf
-                 <input type="hidden" name="id" value="{{ $plp->id }}">
-                 <button class="btn btn-outline-info" type="submit">
-                     <i class="fas fa-upload" style="width: 200px;height: 100px;"></i>
-                     <h4>Create Job Order</h4>
-                 </button>
-             </form>
+        <div class="card-header">
+            <h4>
+                Form Create Job Order
+            </h4>
+        </div>
+        <form action="{{ route('dokumen.plp.cetakJob') }}" method="POST" id="jobForm">
+            @csrf
+            <div class="card-body">
+                <input type="hidden" name="id" value="{{ $plp->id }}">
+                <div class="row">
+                   <div class="col-4">
+                       <div class="form-group">
+                           <label for="">No SPK</label>
+                           <input type="text" name="nospk" id="" class="form-control">
+                       </div>
+                   </div>
+                   <div class="col-4">
+                       <div class="form-group">
+                           <label for="">Forwarding</label>
+                           <select name="forwarding_id" id="" type="width:100%;" class="js-example-basic-single form-select select2">
+                                <option disabled selected value>Pilih Satu</option>
+                                @foreach($forwardings as $forwarding)
+                                    <option value="{{$forwarding->id}}">{{$forwarding->name}}</option>
+                                @endforeach
+                           </select>
+                       </div>
+                   </div>
+                   <div class="col-4">
+                       <div class="form-group">
+                           <label for="">Type</label>
+                           <select name="type" id="" type="width:100%;" class="form-select">
+                                <option value="lcl">LCL</option>
+                                <option value="fcl">FCL</option>
+                           </select>
+                       </div>
+                   </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <button type="button" id="createJob" class="btn btn-outline-info">submit</button>
+            </div>
+        </form>
        </div>
     </section>
 @endif
@@ -204,6 +238,30 @@
                 if (result.isConfirmed) {
                     // Submit the form programmatically if confirmed
                     document.getElementById('createForm').submit();
+                }
+            });
+        });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Attach event listener to the update button
+        document.getElementById('createJob').addEventListener('click', function (e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Show SweetAlert confirmation dialog
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to update this record?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, update it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Submit the form programmatically if confirmed
+                    document.getElementById('jobForm').submit();
                 }
             });
         });

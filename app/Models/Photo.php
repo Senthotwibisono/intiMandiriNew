@@ -23,7 +23,13 @@ class Photo extends Model
 
     public function container()
     {
-        return $this->belongsTo(Container::class, 'master_id', 'id');
+        if ($this->type == 'lcl' || $this->type == 'LCL') {
+            return $this->belongsTo(Container::class, 'master_id', 'id');
+        }
+
+        if ($this->type == 'fcl' || $this->type == 'FCL') {
+            return $this->belongsTo(ContainerFCL::class, 'master_id', 'id');
+        }
     }
 
     public function manifest()

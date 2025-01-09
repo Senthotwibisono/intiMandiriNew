@@ -2,19 +2,20 @@
 @section('custom_styles')
 <style>
     .highlight-yellow {
-        background-color: yellow !important;;
+        background-color: yellow !important;
+        color: black !important; 
     }
 </style>
 
 <style>
     .highlight-blue {
-        background-color: blue !important;;
+        background-color: blue !important;
     }
 </style>
 
 <style>
     .highlight-red {
-        background-color: red !important;;
+        background-color: red !important;
     }
 </style>
 @endsection
@@ -44,6 +45,7 @@
                             <th class="text-center">Shipper</th>
                             <th class="text-center">Customer</th>
                             <th class="text-center">Qty</th>
+                            <th class="text-center">Qty Final</th>
                             <th class="text-center">Packing</th>
                             <th class="text-center">Kode Kemas</th>
                             <th class="text-center">Weight</th>
@@ -71,6 +73,7 @@
                                 <td>{{$mans->shipperM->name ?? ''}}</td>
                                 <td>{{$mans->customer->name ?? ''}}</td>
                                 <td>{{$mans->quantity}}</td>
+                                <td>{{$mans->final_qty}}</td>
                                 <td>{{$mans->packing->name ?? ''}}</td>
                                 <td>{{$mans->packing->code ?? ''}}</td>
                                 <td>{{$mans->weight}}</td>

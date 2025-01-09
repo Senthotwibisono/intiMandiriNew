@@ -12,6 +12,7 @@ use App\Models\Container as Cont;
 use App\Models\JobOrder as Job;
 use App\Models\Manifest;
 use App\Models\Photo;
+use App\Models\KeteranganPhoto as Ket;
 
 class PhotoController extends Controller
 {
@@ -49,6 +50,7 @@ class PhotoController extends Controller
                         'type' => 'manifest',
                         'action' => $request->action,
                         'photo' => $fileName,
+                        'detil'=> $request->detil,
                     ]);
                 }
             }
@@ -72,6 +74,7 @@ class PhotoController extends Controller
                         'type' => 'lcl',
                         'action' => $request->action,
                         'photo' => $fileName,
+                        'detil'=> $request->detil,
                     ]);
                 }
             }
@@ -80,5 +83,21 @@ class PhotoController extends Controller
         } catch (\Throwable $e) {
             return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Oopss, Something Wrong'. $e->getMessage()]);
         }
+    }
+
+    public function getKeteranganContainerLcl(Request $request)
+    {
+        // var_dump($request->kegiatan);
+        // die();
+        $kegiatan = $request->kegiatan;
+        $detils = Ket::where('tipe', 'Container')->where('kegiatan', $kegiatan)->pluck('keterangan');
+        return response()->json($detils);
+    }
+
+    public function getKeteranganManifestLcl(Request $request)
+    {
+        $kegiatan =  $request->kegiatan;
+        $detils = Ket::where('tipe', 'Manifest')->where('kegiatan', $kegiatan)->pluck('keterangan');
+        return response()->json($detils);
     }
 }

@@ -14,6 +14,7 @@ class TpsPLP extends Model
 
     protected $fillable = [
         'joborder_id',
+        'type',
         'tgl_upload',
         'upload_date',
         'upload_time',

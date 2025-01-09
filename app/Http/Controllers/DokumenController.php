@@ -25,10 +25,13 @@ use App\Models\TpsPabeanKms as PabeanKms;
 
 use App\Models\JobOrder as Job;
 use App\Models\Container as Cont;
+use App\Models\JobOrderFCL as JobF;
+use App\Models\ContainerFCL as ContF;
 use App\Models\Manifest;
 use App\Models\Customer;
 use App\Models\Packing;
 use App\Models\Item;
+use App\Models\Vessel;
 
 use Auth;
 use Illuminate\Support\Str;
@@ -73,6 +76,7 @@ class DokumenController extends Controller
     {
         $plp = PLP::where('id', $id)->first();
         $detail = PLPdetail::where('plp_id', $id)->get();
+        $data['forwardings'] = Customer::get();
 
         $data['title'] = "Detail Respon PLP " . $plp->no_surat;
         $data['plp'] = $plp;
@@ -1246,20 +1250,39 @@ class DokumenController extends Controller
         $plp = PLP::where('id', $request->id)->first();
         if ($plp) {
             try {
-                $noJob = $this->generateJobNumber();
-                $job = $this->createJobOrder($plp, $noJob);
-
-                $plpDetails = PLPdetail::where('plp_id', $plp->id)->get();
-
-                $this->createContainers($plpDetails, $job);
-                $this->createManifests($plpDetails, $job);
-
-                $plp->update([
-                    'joborder_id' => $job->id,
-                ]);
-
-                return redirect()->route('lcl.register.detail', ['id' => $job->id])
-                    ->with('status', ['type' => 'success', 'message' => 'Data berhasil dibuat']);
+                // dd($request->all());
+                if ($request->type == 'lcl') {
+                    $noJob = $this->generateJobNumber();
+                    $job = $this->createJobOrder($plp, $noJob, $request);
+    
+                    $plpDetails = PLPdetail::where('plp_id', $plp->id)->get();
+    
+                    $this->createContainers($plpDetails, $job);
+                    $this->createManifests($plpDetails, $job);
+    
+                    $plp->update([
+                        'joborder_id' => $job->id,
+                        'type' => $request->type,
+                    ]);
+    
+                    return redirect()->route('lcl.register.detail', ['id' => $job->id])
+                        ->with('status', ['type' => 'success', 'message' => 'Data berhasil dibuat']);
+                }else {
+                    $noJob = $this->generateJobNumberFCL();
+                    $job = $this->createJobOrderFCL($plp, $noJob, $request);
+    
+                    $plpDetails = PLPdetail::where('plp_id', $plp->id)->get();
+    
+                    $this->createContainersFCL($plpDetails, $job);
+    
+                    $plp->update([
+                        'joborder_id' => $job->id,
+                        'type' => $request->type,
+                    ]);
+    
+                    return redirect()->route('fcl.register.index')
+                        ->with('status', ['type' => 'success', 'message' => 'Data berhasil dibuat']);
+                }
             } catch (\Throwable $e) {
                 return redirect()->back()
                     ->with('status', ['type' => 'error', 'message' => 'Oopss, Something Wrong: ' . $e->getMessage()]);
@@ -1287,7 +1310,26 @@ class DokumenController extends Controller
         return 'ITM' . $newJobNumber . '/' . $currentMonth . '/' . $currentYear;
     }
 
-    private function createJobOrder($plp, $noJob)
+    private function generateJobNumberFCL()
+    {
+        $currentYear = Carbon::now()->format('y');
+        $currentMonth = Carbon::now()->format('m');
+        $lastJob = JobF::whereYear('c_datetime', Carbon::now()->year)
+            ->whereMonth('c_datetime', Carbon::now()->month)
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if ($lastJob) {
+            $lastJobNumber = intval(substr($lastJob->nojoborder, 3, 5));
+            $newJobNumber = str_pad($lastJobNumber + 1, 5, '0', STR_PAD_LEFT);
+        } else {
+            $newJobNumber = '00001';
+        }
+
+        return 'ITM' . $newJobNumber . '/' . $currentMonth . '/' . $currentYear;
+    }
+
+    private function createJobOrder($plp, $noJob, $request)
     {
         $kapal = Vessel::where('name', $plp->nm_angkut)->where('call_sign', $plp->call_sign)->first();
         if ($kapal) {
@@ -1311,6 +1353,37 @@ class DokumenController extends Controller
             'vessel' => $ves->id,
             'voy' => $plp->no_voy_flight,
             'call_sign' => $plp->call_sign,
+            'nospk' => $request->nospk,
+            'forwarding_id' => $request->forwarding_id,
+        ]);
+    }
+
+    private function createJobOrderFCL($plp, $noJob, $request)
+    {
+        $kapal = Vessel::where('name', $plp->nm_angkut)->where('call_sign', $plp->call_sign)->first();
+        if ($kapal) {
+            $ves = $kapal;
+        }else {
+            $ves = Vessel::create([
+                'name'=> $plp->nm_angkut,
+                'call_sign'=> $plp->call_sign,
+            ]);
+        }
+        return JobF::create([
+            'nojoborder' => $noJob,
+            'plp_id' => $plp->id,
+            'tno_bc11' => $plp->no_bc11,
+            'ttgl_bc11' => $plp->tgl_bc11,
+            'noplp' => $plp->no_plp,
+            'ttgl_plp' => $plp->tgl_plp,
+            'type' => 'fcl',
+            'uid' => Auth::user()->id,
+            'c_datetime' => Carbon::now(),
+            'vessel' => $ves->id,
+            'voy' => $plp->no_voy_flight,
+            'call_sign' => $plp->call_sign,
+            'nospk' => $request->nospk,
+            'forwarding_id' => $request->forwarding_id,
         ]);
     }
 
@@ -1324,6 +1397,24 @@ class DokumenController extends Controller
             Cont::create([
                 'nocontainer' => $cont->no_cont,
                 'type' => 'lcl',
+                'joborder_id' => $job->id,
+                'size' => $cont->uk_cont,
+                'teus' => $teus,
+                'uid' => Auth::user()->id,
+            ]);
+        }
+    }
+
+    private function createContainersFCL($plpDetails, $job)
+    {
+        $conts = $plpDetails->unique('no_cont');
+
+        foreach ($conts as $cont) {
+            $teus = $this->calculateTeus($cont->uk_cont);
+
+            ContF::create([
+                'nocontainer' => $cont->no_cont,
+                'type' => 'fcl',
                 'joborder_id' => $job->id,
                 'size' => $cont->uk_cont,
                 'teus' => $teus,

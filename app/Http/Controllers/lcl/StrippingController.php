@@ -244,12 +244,20 @@ class StrippingController extends Controller
         if ($manifest) {
             try {
                 if ($manifest->ijin_stripping == 'Y') {
+                    if ($request->final_qty == $manifest->quantity) {
+                        $statusBc = null;
+                    }else {
+                        $statusBc = 'HOLD';
+                    }
+                    // dd($statusBc);
                     $manifest->update([
                         'tglstripping' => $request->tglstripping,
                         'jamstripping' => $request->jamstripping,
                         'startstripping' => $request->startstripping,
                         'endstripping' => $request->endstripping,
                         'validasi' => 'Y',
+                        'status_bc' => $statusBc,
+                        'final_qty' => $request->final_qty,
                     ]);
                 }
 

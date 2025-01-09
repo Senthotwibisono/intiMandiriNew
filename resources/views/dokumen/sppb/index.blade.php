@@ -1,5 +1,14 @@
 @extends('partial.main')
-
+@section('custom_styles')
+<style>
+    .table-fixed td,
+    .table-fixed th {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+@endsection
 @section('content')
 <section>
     <div class="card">
@@ -13,26 +22,26 @@
                 </div>
             </div>
             <br>
-            <div style="overflow-x:auto;">
-                <div class="table table-responsive">
-                    <table class="table table-hover table-responsive" id="tableSPPB">
-                        <thead>
-                            <tr>
-                                <th>Action</th>
-                                <th>car</th>
-                                <th>no_sppb</th>
-                                <th>tgl_sppb</th>
-                                <th>nojoborder</th>
-                                <th>no_pib</th>
-                                <th>tgl_pib</th>
-                                <th>nama_imp</th>
-                                <th>npwp_imp</th>
-                                <th>alamat_imp</th>
-                            </tr>
-                        </thead>
-                    </table>
-                </div>
+            
+            <div class="table">
+                <table class="table-fixed table-hover table-stripped" id="tableSPPB">
+                    <thead>
+                        <tr>
+                            <th>Action</th>
+                            <th>car</th>
+                            <th>no_sppb</th>
+                            <th>tgl_sppb</th>
+                            <th>nojoborder</th>
+                            <th>no_pib</th>
+                            <th>tgl_pib</th>
+                            <th>nama_imp</th>
+                            <th>npwp_imp</th>
+                            <th>alamat_imp</th>
+                        </tr>
+                    </thead>
+                </table>
             </div>
+           
         </div>
     </div>
 </section>

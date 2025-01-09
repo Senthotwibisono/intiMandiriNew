@@ -2,7 +2,7 @@
 @section('custom_styles')
 <style>
     .highlight-yellow {
-        background-color: yellow !important;;
+        background-color: yellow !important;
     }
 </style>
 @endsection
@@ -15,36 +15,37 @@
                 <thead>
                     <tr>
                         <th>Action</th>
+                        <th>Status BC</th>
                         <th>No Job Order</th>
                         <th>No SPK</th>
                         <th>No Container</th>
                         <th>No MBL</th>
-                        <th>Gate In</th>
-                        <th>Stripping</th>
-                        <th>Buang Empty</th>
+                        <th>Tgl Masuk</th>
+                        <th>Jam Masuk</th>
+                        <th>Tgl Keluar</th>
+                        <th>Jam Keluar</th>
+                        <th>UID</th>
                     </tr>
                     <tbody>
-                        @foreach($conts as $cont)
-                            <tr>
+                        @foreach($containers as $cont)
+                            <tr class="{{ $cont->status_bc !== 'release' ? 'highlight-yellow' : '' }}">
                                 <td>
                                     <div class="button-container">
                                         <buttpn class="btn btn-outline-warning editButton" data-id="{{$cont->id}}"><i class="fa fa-pen"></i></buttpn>
-                                        <a href="javascript:void(0)" onclick="openWindow('/lcl/report/contPhoto{{$cont->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
+                                        <a href="javascript:void(0)" onclick="openWindow('/lcl/realisasi/mty-detail{{$cont->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
+                                        <button class="btn btn-danger printBarcode" data-id="{{$cont->id}}"><i class="fa fa-print"></i></button>
                                     </div>
                                 </td>
+                                <td>{{$cont->status_bc}}</td>
                                 <td>{{$cont->job->nojoborder}}</td>
                                 <td>{{$cont->job->nospk}}</td>
                                 <td>{{$cont->nocontainer}}</td>
                                 <td>{{$cont->job->nombl}}</td>
-                                <td>
-                                    <a href="javascript:void(0)" onclick="openWindow('/lcl/realisasi/gateIn-detail{{$cont->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
-                                </td>
-                                <td>
-                                    <a href="javascript:void(0)" onclick="openWindow('/lcl/realisasi/stripping-photoCont{{$cont->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
-                                </td>
-                                <td>
-                                    <a href="javascript:void(0)" onclick="openWindow('/lcl/realisasi/mty-detail{{$cont->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
-                                </td>
+                                <td>{{$cont->tglmasuk ?? 'Belum Masuk'}}</td>
+                                <td>{{$cont->jammasuk ?? 'Belum Masuk'}}</td>
+                                <td>{{$cont->tglkeluar ?? 'Belum Keluar'}}</td>
+                                <td>{{$cont->jamkeluar ?? 'Belum Keluar'}}</td>
+                                <td>{{$cont->user->name}}</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -55,10 +56,10 @@
 </section>
 <section>
     <div class="card">
-        <div class="card-header text-center">
-            <strong>Photo Container Form</strong>
+        <div class="card-header">
+            <strong>Form Input Gate In Data</strong>
         </div>
-        <form action="{{ route('photo.lcl.storeContainer')}}" id="updateForm" method="post" enctype="multipart/form-data">
+        <form action="{{ route('lcl.mty.update')}}" id="updateForm" method="post" enctype="multipart/form-data">
             <div class="card-body">
                 @csrf
                 <div class="row mt-2">
@@ -86,34 +87,56 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="photos">Pilih Foto-foto</label>
+                                    <input type="file" class="form-control" id="photos" name="photos[]" multiple accept="image/*">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="">Keterangan Photo</label>
+                                    <select name="keteranganPhoto" class="js-example-basic-single form-select select2" style="width: 100%;">
+                                        <option disabled selected value>Pilih Satu!</option>
+                                        @foreach($kets as $ket)
+                                            <option value="{{$ket->keterangan}}">{{$ket->keterangan}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-6">
-                        <div class="form-group">
-                            <label for="">Kegiatan</label>
-                            <select name="action" id="kegiatan" style="width: 100%;" class="js-example-basic-single form-select select2">
-                                <option disabled selected value>Pilih Satu Kegiatan!</option>
-                                <option value="gate-in">Gate In</option>
-                                <option value="buang-mty">Buang Empty</option>
-                                <option value="stripping">stripping</option>
-                                <option value="placement">placement</option>
-                            </select>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="">Tgl Keluar</label>
+                                    <input type="date" class="form-control" name="tglkeluar" id="tglkeluar">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="for-group">
+                                    <label for="">Jam Keluar</label>
+                                    <input type="time" class="form-control" name="jamkeluar" id="jamkeluar">
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group">
-                            <label for="">Keterangan</label>
-                            <select name="detil" id="detilPhoto" style="width:100%;" class="js-example-basic-single select2 form-select">
-                                <option disabled selected>PIlih Kegiatan Terlebih Dahulu!</option>
-                            </select>
+                            <label for="">Nomor Polisi</label>
+                            <input type="text" name="nopol_mty" id="nopol_mty" class="form-control">
                         </div>
                         <div class="form-group">
-                            <label for="photos">Pilih Foto-foto</label>
-                            <input type="file" class="form-control" id="photos" name="photos[]" multiple accept="image/*">
+                            <label for="">Petugas Lapangan</label>
+                            <input type="text" id="nameUid"value="{{$user}}" class="form-control" readonly>
+                            <input type="hidden" name="uidmty" id="uidmty" class="form-control">
                         </div>
                     </div>
                 </div>
             </div>
             <div class="card-footer">
-                <button class="btn btn-outline-danger" id="cancelButton">Cancel</button>
-                <button class="btn btn-outline-success updateButton" id="updateButton">Submit</button>        
+                <button type="button" class="btn btn-outline-danger" id="cancelButton">Cancel</button>
+                <button type="button" class="btn btn-outline-success updateButton" id="updateButton">Submit</button>        
             </div>
         </form>
     </div>
@@ -121,60 +144,6 @@
 @endsection
 
 @section('custom_js')
-
-<script>
-$(document).ready(function(){
-    $('#kegiatan').on('change', function(){
-        let kegiatan = $(this).val();
-        console.log('kegiatan = ' + kegiatan);
-        swal.fire({
-            title: 'Processing...',
-            text: 'Please wait',
-            icon: 'info',
-            allowOutsideClick: false,
-            showConfirmButton: false,
-                willOpen: () => {
-                    Swal.showLoading();
-                }
-        });
-        $.ajax({
-            type: 'GET',
-            url: '/getContainerLclKeterangan',
-            cache: false,
-            data: {
-              kegiatan: kegiatan
-            },
-            dataType: 'json',
-
-            success: function(response){
-                Swal.close();
-                Swal.fire({
-                    title: 'success!',
-                    text: 'Data di Temukan',
-                    icon: 'success',
-                    confirmButton: 'Ok',
-                })
-
-                console.log(response);
-                $('#detilPhoto').empty().append('<option disabled selected>Pilih Satu!</option>');
-                    Object.values(response).forEach(function(detil) {
-                    $('#detilPhoto').append(`<option value="${detil}">${detil}</option>`);
-                });
-            },
-            error: function(data) {
-              console.log('error:', data);
-                  Swal.fire({
-                      title: 'Error',
-                      text: 'Data tidak ditemukan',
-                      icon: 'error',
-                      confirmButtonText: 'OK'
-                  });
-            }
-        })
-    })
-})
-</script>
-
 <script>
 $(document).ready(function() {
     // When Cancel button is clicked
@@ -188,19 +157,9 @@ $(document).ready(function() {
 <script>
    $(document).on('click', '.editButton', function() {
     let id = $(this).data('id');
-    swal.fire({
-            title: 'Processing...',
-            text: 'Please wait',
-            icon: 'info',
-            allowOutsideClick: false,
-            showConfirmButton: false,
-                willOpen: () => {
-                    Swal.showLoading();
-                }
-        });
     $.ajax({
       type: 'GET',
-      url: '/lcl/realisasi/gateIn-edt' + id,
+      url: '/fcl/realisasi/placementEdit-' + id,
       cache: false,
       data: {
         id: id
@@ -208,14 +167,6 @@ $(document).ready(function() {
       dataType: 'json',
 
       success: function(response) {
-        Swal.close();
-
-        Swal.fire({
-            title: 'Success!',
-            text: 'Data berhasil diambil.',
-            icon: 'success',
-            confirmButtonText: 'OK'
-        });
 
         console.log(response);
         $("#nospk").val(response.job.nospk);
@@ -230,13 +181,7 @@ $(document).ready(function() {
         $("#nameUid").val(response.uid.name ?? response.user);
       },
       error: function(data) {
-        console.log('error:', data);
-            Swal.fire({
-                title: 'Error',
-                text: 'Failed to fetch data',
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
+        console.log('error:', data)
       }
     });
   });

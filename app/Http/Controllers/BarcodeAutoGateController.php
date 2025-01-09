@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 use App\Models\Container as Cont;
+use App\Models\ContainerFCL as ContF;
 use App\Models\Manifest;
 use App\Models\BarcodeGate as Barcode;
 use App\Models\Photo;

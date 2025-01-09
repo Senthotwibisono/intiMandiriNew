@@ -8,6 +8,8 @@ use Carbon\Carbon;
 
 use App\Models\Container as Cont;
 use App\Models\JobOrder as Job;
+use App\Models\ContainerFCL as ContF;
+use App\Models\JobOrderFCL as JobF;
 use App\Models\User;
 use App\Models\Photo;
 use App\Models\YardDesign as YD;
@@ -27,7 +29,7 @@ class PlacementContainerController extends Controller
 
         $data['yards'] = YD::whereNot('yard_block', null)->get();
         $data['yardDetils'] = RowTier::get();
-        $data['kets'] = KP::where('kegiatan', '=', 'placement')->get();
+        $data['kets'] = KP::where('tipe', 'Container')->where('kegiatan', '=', 'placement')->get();
         // dd($data['conts']);
 
         return view('lcl.realisasi.placement.index', $data);
@@ -92,11 +94,12 @@ class PlacementContainerController extends Controller
     {
         $cont = Cont::where('id', $request->id)->first();
         if ($cont) {
-            $oldYard = RowTier::where('cont_id', $cont->id)->get();
+            $oldYard = RowTier::where('cont_type', 'lcl')->where('cont_id', $cont->id)->get();
             if ($oldYard) {
                 foreach ($oldYard as $old) {
                     $old->update([
                         'cont_id' => null,
+                        'cont_type'=>  null,
                         'active' => 'N',
                     ]);
                 }
@@ -119,11 +122,13 @@ class PlacementContainerController extends Controller
                     $nexyard = RowTier::where('yard_id', $request->yard_id)->where('slot', $nextSlot)->where('row', $request->row)->where('tier', $request->tier)->first();
                     $nexyard->update([
                         'cont_id' => $cont->id,
+                        'cont_type'=>  'lcl',
                         'active' => 'Y',
                     ]);
                 }
                 $yardDetil->update([
                     'cont_id' => $cont->id,
+                    'cont_type'=>  'lcl',
                     'active' => 'Y',
                 ]);
     
@@ -153,6 +158,125 @@ class PlacementContainerController extends Controller
         $data['title'] = "Photo PLacement Container Container - " . $cont->nocontainer;
         $data['item'] = $cont;
         $data['photos'] = Photo::where('master_id', $id)->where('action', '=', 'placement')->get();
+        // dd($data['photos']);
+        return view('photo.index', $data);
+    }
+
+    // FCL
+    public function indexFCL()
+    {
+        $data['title'] = 'FCL || Realisasi - Placement Container';
+        $data['conts'] = ContF::where('type', '=', 'fcl')->whereNot('tglmasuk', null)->where('tglkeluar', null )->get();
+
+        $data['yards'] = YD::whereNot('yard_block', null)->get();
+        $data['yardDetils'] = RowTier::get();
+        $data['kets'] = KP::where('kegiatan', '=', 'placement')->get();
+        // dd($data['conts']);
+
+        return view('fcl.realisasi.placementContainer', $data);
+    }
+    public function editFCL($id)
+    {
+        $cont = ContF::where('id', $id)->first();
+        if ($cont) {
+            $job = JobF::where('id', $cont->joborder_id)->first();
+            $user = Auth::user()->name;
+            $userId = Auth::user()->id;
+            $uid = User::where('id', $cont->uidmasuk)->first();
+            $rowTier = RowTier::where('id', $cont->yard_detil_id)->first();
+            // var_dump($cont->yard_detil_id, $rowTier);
+            // die;
+            if ($rowTier) {
+                $slot = $rowTier->slot;
+                $row = $rowTier->row;
+                $tier = $rowTier->tier;
+            } else {
+                $slot = null;
+                $row = null;
+                $tier = null;
+            }
+            return response()->json([
+                'success' => true,
+                'data' => $cont,
+                'job' =>$job,
+                'user' => $user,
+                'userId' => $userId,
+                'uid' => $uid,
+                'slot' => $slot,
+                'row' => $row,
+                'tier' => $tier,
+            ]);
+        }
+    }
+
+    public function updateFCL(Request $request)
+    {
+        $cont = ContF::where('id', $request->id)->first();
+        if ($cont) {
+            $oldYard = RowTier::where('cont_type', 'lcl')->where('cont_id', $cont->id)->where('cont_type', 'fcl')->get();
+            if ($oldYard) {
+                foreach ($oldYard as $old) {
+                    $old->update([
+                        'cont_id' => null,
+                        'cont_type'=>  null,
+                        'active' => 'N',
+                    ]);
+                }
+            }
+            $yardDetil = RowTier::where('yard_id', $request->yard_id)->where('slot', $request->slot)->where('row', $request->row)->where('tier', $request->tier)->first();
+            if ($yardDetil) {
+                if ($yardDetil->cont_id != null && $yardDetil->cont_id != $cont->id) {
+                    return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Yard Sudah Terisi, Silahkan pilih yard lain']);
+                }
+                
+                
+                $cont->update([
+                    'yard_id'=>$request->yard_id,
+                    'yard_detil_id'=> $yardDetil->id,
+                ]);
+
+
+                if ($cont->size == '40') {
+                    $nextSlot = $request->slot + 1;
+                    $nexyard = RowTier::where('yard_id', $request->yard_id)->where('slot', $nextSlot)->where('row', $request->row)->where('tier', $request->tier)->first();
+                    $nexyard->update([
+                        'cont_id' => $cont->id,
+                        'cont_type'=>  'fcl',
+                        'active' => 'Y',
+                    ]);
+                }
+                $yardDetil->update([
+                    'cont_id' => $cont->id,
+                    'cont_type'=>  'fcl',
+                    'active' => 'Y',
+                ]);
+    
+                if ($request->hasFile('photos')) {
+                    foreach ($request->file('photos') as $photo) {
+                        $fileName = $photo->getClientOriginalName();
+                        $photo->storeAs('imagesInt', $fileName, 'public'); 
+                        $newPhoto = Photo::create([
+                            'master_id' => $cont->id,
+                            'type' => 'fcl',
+                            'action' => 'placement',
+                            'detil' => $request->keteranganPhoto,
+                            'photo' => $fileName,
+                        ]);
+                    }
+                }
+                return redirect()->back()->with('status', ['type'=>'success', 'message'=>'Data berhasil di update']);
+            }else {
+                return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Yard Tidak Ditemukan']);
+            }
+        }
+    }
+
+    public function detailFCL($id)
+    {
+        $cont = ContF::where('id', $id)->first();
+        $data['title'] = "Photo PLacement Container Container - " . $cont->nocontainer;
+        $data['item'] = $cont;
+        $data['photos'] = Photo::where('type', 'fcl')->where('master_id', $id)->where('action', '=', 'placement')->get();
         // dd($data['photos']);
         return view('photo.index', $data);
     }

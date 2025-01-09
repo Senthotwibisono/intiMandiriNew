@@ -18,13 +18,19 @@ class YardDetil extends Model
         'row', 
         'tier', 
         'cont_id',
+        'cont_type',
         'active',
         
     ];
 
     public function cont()
     {
-        return $this->belongsTo(Container::class, 'cont_id', 'id');
+        if ($this->cont_type == 'lcl') {
+            return $this->belongsTo(Container::class, 'cont_id', 'id');
+        }
+        if ($this->cont_type == 'fcl') {
+            return $this->belongsTo(ContainerFCL::class, 'cont_id', 'id');
+        }
     }
 
     public function yb()

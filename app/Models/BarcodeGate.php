@@ -36,7 +36,12 @@ class BarcodeGate extends Model
 
     public function cont()
     {
-        return $this->belongsTo(Container::class, 'ref_id', 'id');
+        if ($this->ref_type == 'FCL') {
+            return $this->belongsTo(ContainerFCL::class, 'ref_id', 'id');
+        }
+        if ($this->ref_type == 'LCL') {
+            return $this->belongsTo(Container::class, 'ref_id', 'id');
+        }
     }
 
     public function manifest()

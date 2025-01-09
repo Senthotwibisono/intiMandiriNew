@@ -115,6 +115,7 @@
                             <th class="text-center">Shipper</th>
                             <th class="text-center">Customer</th>
                             <th class="text-center">Qty</th>
+                            <th class="text-center">Quantity Final</th>
                             <th class="text-center">Packing</th>
                             <th class="text-center">Kode Kemas</th>
                             <th class="text-center">Desc</th>
@@ -156,6 +157,7 @@
                                 <td>{{$mans->shipperM->name ?? ''}}</td>
                                 <td>{{$mans->customer->name ?? ''}}</td>
                                 <td>{{$mans->quantity}}</td>
+                                <td>{{$mans->final_qty}}</td>
                                 <td>{{$mans->packing->name ?? ''}}</td>
                                 <td>{{$mans->packing->code ?? ''}}</td>
                                 <td>

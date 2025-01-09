@@ -44,6 +44,11 @@ use App\Http\Controllers\beaCukai\BeacukaiP2Controller;
 use App\Http\Controllers\PengirimanController;
 use App\Http\Controllers\pengiriman\CoariCodecoController;
 
+
+// FCL
+ use App\Http\Controllers\FCL\RegisterFCLController;
+ use App\Http\Controllers\FCL\Realisasi\GateInFCLCotroller;
+ use App\Http\Controllers\FCL\Delivery\DeliveryFCLController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -366,6 +371,9 @@ Route::controller(PhotoController::class)->group(function(){
 
     Route::post('/photo/lcl/manifestPost', 'storeManifest')->name('photo.lcl.storeManifest');
     Route::post('/photo/lcl/ContainerPost', 'storeContainer')->name('photo.lcl.storeContainer');
+
+    Route::get('/getContainerLclKeterangan', 'getKeteranganContainerLcl');
+    Route::get('/getManifestLclKeterangan', 'getKeteranganManifestLcl');
 });
 // Barcode
 Route::controller(BarcodeAutoGateController::class)->group(function(){
@@ -386,6 +394,11 @@ Route::controller(PlacementContainerController::class)->group(function(){
     Route::get('/lcl/realisasi/placementEdit-{id?}', 'edit')->name('placementCont.lcl.edit');
     Route::post('/lcl/realisasi/placementUpdate', 'updateLCL')->name('placementCont.lcl.update');
     Route::get('/lcl/realisasi/placementDetail{id?}', 'detail')->name('placementCont.lcl.detail');
+
+    Route::get('/fcl/realisasi/placementCont', 'indexFCL')->name('placementCont.fcl.index');
+    Route::get('/fcl/realisasi/placementEdit-{id?}', 'editFCL')->name('placementCont.fcl.edit');
+    Route::post('/fcl/realisasi/placementUpdate', 'updateFCL')->name('placementCont.fcl.update');
+    Route::get('/fcl/realisasi/placementDetail{id?}', 'detailFCL')->name('placementCont.fcl.detail');
 });
 
 // BcGatter
@@ -589,5 +602,48 @@ Route::controller(LclController::class)->group(function(){
         });
         Route::prefix('/manifest')->group(function(){
             Route::get('/index', 'manifestIndex');
+        });
+    });
+
+    // FCL
+    Route::prefix('/fcl')->group(function(){
+        Route::prefix('/register')->controller(RegisterFCLController::class)->group(function(){
+            Route::get('/index', 'index')->name('fcl.register.index');
+            Route::get('/data', 'indexData');
+            Route::get('/detail-{id}', 'detail');
+            Route::get('/containerEdit{id}', 'editContainer');
+            Route::post('/create', 'create')->name('fcl.register.create');
+            Route::post('/updateContainer', 'updateContainer')->name('fcl.register.updateCont');
+            Route::post('/postPLP', 'postPLP')->name('fcl.register.updatePLP');
+            Route::delete('/containerDelete{id}', 'deleteContainer');
+            Route::post('/barcodeGate', 'createBarcode');
+        });
+
+        Route::prefix('/realisasi')->controller(GateInFCLCotroller::class)->group(function(){
+            Route::get('/gateIn', 'index')->name('fcl.gateIn.index');
+            Route::get('/gateIn-edt{id?}', 'edit')->name('fcl.gateIn.edit');
+            Route::post('/gateIn-update', 'update')->name('fcl.gateIn.update');
+            Route::get('/gateIn-detail{id?}', 'detail')->name('fcl.gateIn.detail');
+            Route::post('/gateIn-detailDelete', 'detailDelete')->name('fcl.gateIn.delete.detail');
+
+            Route::get('/seal', 'indexSeal');
+            Route::post('/seal-update', 'updateSeal')->name('fcl.seal.update');
+            Route::post('/easyGo-send', 'easyGoSend');
+            Route::post('/easyGo-closeDO', 'closeDO');
+        });
+
+        Route::prefix('/delivery')->controller(DeliveryFCLController::class)->group(function(){
+            Route::get('/behandle', 'indexBehandle');
+            Route::get('/dataCont{id}', 'getDataCont');
+
+            Route::post('/behandleReadyCheck{id}', 'readyCheckBehandle');
+            Route::post('/prosesCheckBehandle{id}', 'prosesCheckBehandle');
+            Route::post('/finishCheckBehandle{id}', 'finishCheckBehandle');
+            Route::post('/behandleUpdate', 'updateDataBehandle')->name('fcl.delivery.updateBehandle');
+
+            Route::get('/behandleDetil{id}', 'detailBehandle');
+
+            Route::get('/gateOut', 'indexGateOut');
+            
         });
     });

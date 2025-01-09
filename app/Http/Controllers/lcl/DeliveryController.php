@@ -46,7 +46,7 @@ class DeliveryController extends Controller
         $data['title'] = 'Manifest Behandle';
         $data['manifest'] = Manifest::get();
         $data['locs'] = PM::where('use_for', 'B')->get();
-        $data['kets'] = KP::where('kegiatan', '=', 'stripping')->get();
+        $data['kets'] = KP::where('tipe', 'Manifest')->where('kegiatan', '=', 'behandle')->get();
 
         return view('lcl.delivery.behandleIndex', $data);
     }
@@ -256,11 +256,16 @@ class DeliveryController extends Controller
                             'message' => 'Nama Importir Berbeda',
                         ]);
                     }
+                    if ($manifest->qty == $manifest->final_qty) {
+                        $statusBC = "release";
+                    }else {
+                        $statusBC = "HOLD";
+                    }
                     $manifest->update([
                         'kd_dok_inout' => $kdDok,
                         'no_dok' => $request->no_dok,
                         'tgl_dok' => $request->tgl_dok,
-                        'status_bc' => 'release',
+                        'status_bc' => $statusBC,
                     ]);
     
                     return response()->json([
