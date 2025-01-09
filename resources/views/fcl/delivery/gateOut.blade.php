@@ -36,16 +36,16 @@
                                         <button class="btn btn-danger printBarcode" data-id="{{$cont->id}}"><i class="fa fa-print"></i></button>
                                     </div>
                                 </td>
-                                <td>{{$cont->status_bc}}</td>
-                                <td>{{$cont->job->nojoborder}}</td>
-                                <td>{{$cont->job->nospk}}</td>
-                                <td>{{$cont->nocontainer}}</td>
-                                <td>{{$cont->job->nombl}}</td>
+                                <td>{{$cont->status_bc ?? ''}}</td>
+                                <td>{{$cont->job->nojoborder ?? ''}}</td>
+                                <td>{{$cont->job->nospk ?? ''}}</td>
+                                <td>{{$cont->nocontainer ?? ''}}</td>
+                                <td>{{$cont->job->nombl ?? ''}}</td>
                                 <td>{{$cont->tglmasuk ?? 'Belum Masuk'}}</td>
                                 <td>{{$cont->jammasuk ?? 'Belum Masuk'}}</td>
                                 <td>{{$cont->tglkeluar ?? 'Belum Keluar'}}</td>
                                 <td>{{$cont->jamkeluar ?? 'Belum Keluar'}}</td>
-                                <td>{{$cont->user->name}}</td>
+                                <td>{{$cont->user->name ?? ''}}</td>
                             </tr>
                         @endforeach
                     </tbody>

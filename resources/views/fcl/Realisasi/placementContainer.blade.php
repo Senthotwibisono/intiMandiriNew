@@ -26,14 +26,14 @@
                                         <a href="javascript:void(0)" onclick="openWindow('/fcl/realisasi/placementDetail{{$cont->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
                                     </div>
                                 </td>
-                                <td>{{$cont->job->nojoborder}}</td>
-                                <td>{{$cont->job->nospk}}</td>
-                                <td>{{$cont->nocontainer}}</td>
+                                <td>{{$cont->job->nojoborder ?? ''}}</td>
+                                <td>{{$cont->job->nospk ?? ''}}</td>
+                                <td>{{$cont->nocontainer ?? ''}}</td>
                                 <td>{{$cont->Yard->yard_block ?? ''}}</td>
                                 <td>{{$cont->DetilYard->slot ?? ''}}</td>
                                 <td>{{$cont->DetilYard->row ?? ''}}</td>
                                 <td>{{$cont->DetilYard->tier ?? ''}}</td>
-                                <td>{{$cont->user->name}}</td>
+                                <td>{{$cont->user->name ?? ''}}</td>
                             </tr>
                         @endforeach
                     </tbody>

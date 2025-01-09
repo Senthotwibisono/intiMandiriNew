@@ -26,13 +26,13 @@
                                         <a href="javascript:void(0)" onclick="openWindow('/fcl/realisasi/gateIn-detail{{$cont->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
                                     </div>
                                 </td>
-                                <td>{{$cont->job->nojoborder}}</td>
-                                <td>{{$cont->job->nospk}}</td>
-                                <td>{{$cont->nocontainer}}</td>
-                                <td>{{$cont->job->nombl}}</td>
-                                <td>{{$cont->job->eta}}</td>
+                                <td>{{$cont->job->nojoborder ?? ''}}</td>
+                                <td>{{$cont->job->nospk ?? ''}}</td>
+                                <td>{{$cont->nocontainer ?? ''}}</td>
+                                <td>{{$cont->job->nombl ?? ''}}</td>
+                                <td>{{$cont->job->eta ?? ''}}</td>
                                 <td>{{$cont->job->Kapal->name ?? ''}}</td>
-                                <td>{{$cont->user->name}}</td>
+                                <td>{{$cont->user->name ?? ''}}</td>
                             </tr>
                         @endforeach
                     </tbody>

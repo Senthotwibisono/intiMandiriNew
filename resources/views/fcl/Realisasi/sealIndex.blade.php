@@ -38,14 +38,14 @@
                                             @endif
                                         </div>
                                     </td>
-                                    <td>{{$cont->job->nojoborder}}</td>
-                                    <td>{{$cont->job->nospk}}</td>
-                                    <td>{{$cont->nocontainer}}</td>
-                                    <td>{{$cont->job->nombl}}</td>
+                                    <td>{{$cont->job->nojoborder ?? ''}}</td>
+                                    <td>{{$cont->job->nospk ?? ''}}</td>
+                                    <td>{{$cont->nocontainer ?? ''}}</td>
+                                    <td>{{$cont->job->nombl ?? ''}}</td>
                                     <td>{{$cont->do_id ?? ''}}</td>
                                     <td>{{$cont->tgl_dispatche ?? ''}}</td>
                                     <td>{{$cont->jam_dispatche ?? ''}}</td>
-                                    <td>{{$cont->job->eta}}</td>
+                                    <td>{{$cont->job->eta ?? ''}}</td>
                                     <td>{{$cont->job->Kapal->name ?? ''}}</td>
                                     <td>{{$cont->seal->code ?? ''}}</td>
                                     <td>{{$cont->user->name}}</td>

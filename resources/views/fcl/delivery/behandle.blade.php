@@ -84,19 +84,19 @@
                                         {{$mans->status_behandle}}
                                     @endif
                                 </td>
-                                <td>{{$mans->job->nojoborder}}</td>
-                                <td>{{$mans->job->nombl}}</td>
-                                <td>{{$mans->tgl_master_bl}}</td>
-                                <td>{{$mans->nocontainer}}</td>
+                                <td>{{$mans->job->nojoborder ?? ''}}</td>
+                                <td>{{$mans->job->nombl ?? ''}}</td>
+                                <td>{{$mans->tgl_master_bl ?? ''}}</td>
+                                <td>{{$mans->nocontainer ?? ''}}</td>
                                 <td>{{$mans->size ?? ''}}</td>
-                                <td>{{$mans->teus}}</td>
+                                <td>{{$mans->teus ?? ''}}</td>
                                 <td>{{$mans->job->PLP->no_plp ?? ''}}</td>
                                 <td>{{$mans->job->PLP->tgl_plp ?? ''}}</td>
-                                <td>{{$mans->date_ready_behandle}}</td>
-                                <td>{{$mans->date_check_behandle}}</td>
-                                <td>{{$mans->desc_check_behandle}}</td>
-                                <td>{{$mans->date_finish_behandle}}</td>
-                                <td>{{$mans->desc_finish_behandle}}</td>
+                                <td>{{$mans->date_ready_behandle ?? ''}}</td>
+                                <td>{{$mans->date_check_behandle ?? ''}}</td>
+                                <td>{{$mans->desc_check_behandle ?? ''}}</td>
+                                <td>{{$mans->date_finish_behandle ?? ''}}</td>
+                                <td>{{$mans->desc_finish_behandle ?? ''}}</td>
                             </tr>
                         @endforeach
                     </tbody>
