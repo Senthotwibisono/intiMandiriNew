@@ -65,36 +65,20 @@
 <section>
     <div class="card">
         <div class="card-body fixed-height-cardBody">
-            <table class="tabelCustom">
-                <thead>
-                    <tr>
-                        <th class="text-center">Action</th>
-                        <th class="text-center">Barcode Barang</th>
-                        <th class="text-center">Name Barang</th>
-                        <th class="text-center">Nomor Barang</th>
-                        <th class="text-center">Rack</th>
-                        <th class="text-center">Tier</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($placed as $plc)
+            <div class="table">
+                <table class="table-hover" id="tableDetil">
+                    <thead>
                         <tr>
-                            <td>
-                                <div class="button-container">
-                                    <button class="btn btn-outline-danger unPlace" data-id="{{$plc->id}}">Batal Placement</button>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <a href="javascript:void(0)" onclick="openWindow('/lcl/realisasi/racking/itemBarcode-{{$plc->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
-                            </td>
-                            <td class="text-center">{{$plc->name}}</td>
-                            <td class="text-center">{{$plc->nomor}}</td>
-                            <td class="text-center">{{$plc->Rack->name ?? ''}}</td>
-                            <td class="text-center">{{$plc->tier ?? ''}}</td>
+                            <th class="text-center">Action</th>
+                            <th class="text-center">Barcode Barang</th>
+                            <th class="text-center">Name Barang</th>
+                            <th class="text-center">Nomor Barang</th>
+                            <th class="text-center">Rack</th>
+                            <th class="text-center">Tier</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                </table>
+            </div>
         </div>
     </div>
 </section>
@@ -161,14 +145,31 @@
 @endsection
 
 @section('custom_js')
-
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    let lastChecked = null;
+    $(document).ready(function(){
+        var id = {{$manifest->id}};
+        var table = $('#tableDetil').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '/lcl/realisasi/racking/itemTableData-' + id,
+            columns: [
+                { data: 'action', name: 'action', className: 'text-center action-cell' },
+                { data: 'barcode', name: 'barcode', className: 'text-center' },
+                { data: 'name', name: 'name', className: 'text-center' },
+                { data: 'nomor', name: 'nomor', className: 'text-center' },
+                { data: 'rack', name: 'rack', className: 'text-center' },
+                { data: 'tier', name: 'tier', className: 'text-center' },
+            ]
+        });
 
-    // Handle row selection with Shift key
-    document.querySelectorAll('tbody tr').forEach((row) => {
-        row.addEventListener('click', function(e) {
+        let lastChecked = null;
+
+        // Handle row selection with Shift key
+        $('#tableDetil tbody').on('click', 'tr', function(e) {
+            if ($(e.target).closest('td').hasClass('action-cell')) {
+                return; // Keluar tanpa memproses seleksi
+            }
+
             if (!lastChecked) {
                 lastChecked = this;
                 toggleSelection(this);
@@ -176,13 +177,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             if (e.shiftKey) {
-                let start = Array.from(document.querySelectorAll('tbody tr')).indexOf(this);
-                let end = Array.from(document.querySelectorAll('tbody tr')).indexOf(lastChecked);
+                let rows = $('#tableDetil tbody tr');
+                let start = rows.index(this);
+                let end = rows.index(lastChecked);
                 let range = [start, end].sort((a, b) => a - b);
 
-                document.querySelectorAll('tbody tr').forEach((r, i) => {
-                    if (i >= range[0] && i <= range[1]) {
-                        toggleSelection(r, true);
+                rows.each(function(index) {
+                    if (index >= range[0] && index <= range[1]) {
+                        toggleSelection(this, true);
                     }
                 });
             } else {
@@ -191,14 +193,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
             lastChecked = this;
         });
-    });
 
-    // Handle the unPlace action on all selected rows
-    document.querySelectorAll('.unPlace').forEach((button) => {
-        button.addEventListener('click', function(e) {
+        // Handle the unPlace action on all selected rows
+        $('#tableDetil').on('click', '.unPlace', function(e) {
             e.stopPropagation(); // Prevent row click event
-            let selectedRows = document.querySelectorAll('tr.selected');
-            let ids = Array.from(selectedRows).map(row => row.querySelector('.unPlace').dataset.id);
+            let selectedRows = $('#tableDetil tbody tr.selected');
+            let ids = selectedRows.map(function() {
+                return $(this).find('.unPlace').data('id');
+            }).get();
 
             if (ids.length > 0) {
                 Swal.fire({
@@ -220,6 +222,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 Swal.showLoading();
                             }
                         });
+
                         // Send AJAX request to unPlace the selected items
                         $.ajax({
                             type: 'POST',
@@ -239,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                         text: response.message,
                                         icon: 'success',
                                     }).then(() => {
-                                        location.reload(); // Reload the page after success
+                                        location.reload(); // Reload the DataTable after success
                                     });
                                 } else {
                                     Swal.fire({
@@ -267,20 +270,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         });
-    });
 
-    // Function to toggle selection of a row
-    function toggleSelection(row, select = null) {
-        if (select === null) {
-            row.classList.toggle('selected');
-        } else if (select) {
-            row.classList.add('selected');
-        } else {
-            row.classList.remove('selected');
+        // Function to toggle selection of a row
+        function toggleSelection(row, select = null) {
+            if (select === null) {
+                $(row).toggleClass('selected');
+            } else if (select) {
+                $(row).addClass('selected');
+            } else {
+                $(row).removeClass('selected');
+            }
         }
-    }
-});
-
+    });
 </script>
 
 <script>

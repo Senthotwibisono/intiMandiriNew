@@ -109,7 +109,7 @@
                     <li class="submenu-item @if(Request::is('lcl/report/manifest')) active @endif">
                         <a href="{{ url('/lcl/report/manifest')}}">Manifest</a>
                     </li>
-                    <li class="submenu-item @if(Request::is('lcl/report/daily/*')) active @endif">
+                    <li class="submenu-item @if(Request::is('lcl/report/daily*')) active @endif">
                         <a href="{{ route('report.lcl.daily')}}">Daily</a>
                     </li>
                 </ul>

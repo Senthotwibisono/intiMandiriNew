@@ -101,14 +101,14 @@
             </div>
         </div>
         <div class="card-body">
-            <div style="overflow-x:auto;">
-                <table class="tabelCustom table-responsive">
+            <div class="table">
+                <table class="table-hover table-stripped" id="tableDetil">
                     <thead>
                         <tr>
-                            <th class="text-center">Action</th>
-                            <!-- <th class="text-center">Approve</th>
-                            <th class="text-center">Validasi</th>
-                            <th class="text-center">Validasi Bc</th> -->
+                            <th class="text-center">Delete</th>
+                            <th class="text-center">Edit</th>
+                            <th class="text-center">Detil</th>
+                            <th class="text-center">Barcode</th>
                             <th class="text-center">No HBL</th>
                             <th class="text-center">Tgl HBL</th>
                             <th class="text-center">No Tally</th>
@@ -124,53 +124,8 @@
                             <th class="text-center">Packing Tally</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach($manifest as $mans)
-                            <tr>
-                                <td>
-                                    <div class="button-container">
-                                        <button class="btn btn-danger deleteButton" data-id="{{$mans->id}}">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                        <button class="btn btn-warning editButton" data-id="{{$mans->id}}">
-                                            <i class="fa fa-pencil"></i>
-                                        </button>
-                                        <a href="javascript:void(0)" onclick="openWindow('/lcl/manifest/item-{{$mans->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
-                                        <a href="javascript:void(0)" onclick="openWindow('/lcl/manifest/barcode-{{$mans->id}}')" class="btn btn-sm btn-danger"><i class="fa fa-print"></i></a>
-                                    </div>
-                                </td>
-                                <!-- <td>
-                                    @if($mans->validasi == 'N')
-                                    <button class="btn btn-outline-danger approveButton" data-id="{{$mans->id}}">Approve</button>
-                                    @else
-                                    <div class="button-container">
-                                        <button class="btn btn-outline-success unapproveButton" data-id="{{$mans->id}}">Unapprove</button>
-                                        <a href="javascript:void(0)" onclick="openWindow('/lcl/manifest/barcode-{{$mans->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
-                                    </div>
-                                    @endif
-                                </td>
-                                <td>{{$mans->validasi}}</td>
-                                <td>{{$mans->validasiBc ?? 'N'}}</td> -->
-                                <td>{{$mans->nohbl}}</td>
-                                <td>{{$mans->tgl_hbl}}</td>
-                                <td>{{$mans->notally}}</td>
-                                <td>{{$mans->shipperM->name ?? ''}}</td>
-                                <td>{{$mans->customer->name ?? ''}}</td>
-                                <td>{{$mans->quantity}}</td>
-                                <td>{{$mans->final_qty}}</td>
-                                <td>{{$mans->packing->name ?? ''}}</td>
-                                <td>{{$mans->packing->code ?? ''}}</td>
-                                <td>
-                                    <textarea class="form-control" cols="3" readonly>{{$mans->descofgoods}}</textarea>
-                                </td>
-                                <td>{{$mans->weight}}</td>
-                                <td>{{$mans->meas}}</td>
-                                <td>{{$mans->packingTally->name ?? ''}}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
             </div>
+            </table>
         </div>
     </div>
 </section>
@@ -403,6 +358,39 @@
 @endsection
 
 @section('custom_js')
+<script>
+    $(document).ready(function () {
+        var Id = {{ $cont->id }}; 
+        $('#tableDetil').DataTable({
+            processing: true,
+            serverSide: true,
+            scrollX: true,
+            scrollCollapse: true,
+            scrollY: '50vh',
+            ajax: '/lcl/manifest/detailManifestData-' + Id, // Fix concatenation
+            columns: [
+                { data: 'delete', name: 'delete', className: 'text-center' }, // Define the column
+                { data: 'edit', name: 'edit', className: 'text-center' }, // Define the column
+                { data: 'detil', name: 'detil', className: 'text-center' }, // Define the column
+                { data: 'barcode', name: 'barcode', className: 'text-center' }, // Define the column
+                { data: 'nohbl', name: 'nohbl', className: 'text-center' }, // Define the column
+                { data: 'tgl_hbl', name: 'tgl_hbl', className: 'text-center' }, // Define the column
+                { data: 'notally', name: 'notally', className: 'text-center' }, // Define the column
+                { data: 'shipper', name: 'shipper', className: 'text-center' }, // Define the column
+                { data: 'customer', name: 'customer', className: 'text-center' }, // Define the column
+                { data: 'quantity', name: 'quantity', className: 'text-center' }, // Define the column
+                { data: 'final_qty', name: 'final_qty', className: 'text-center' }, // Define the column
+                { data: 'packingName', name: 'packingName', className: 'text-center' }, // Define the column
+                { data: 'packingCode', name: 'packingCode', className: 'text-center' }, // Define the column
+                { data: 'desc', name: 'desc', className: 'text-center' }, // Define the column
+                { data: 'weight', name: 'weight', className: 'text-center' }, // Define the column
+                { data: 'meas', name: 'meas', className: 'text-center' }, // Define the column
+                { data: 'packingTally', name: 'packingTally', className: 'text-center' }, // Define the column
+             
+            ]
+        })
+    });
+</script>
 <script>
    $(document).on('click', '.editButton', function() {
     let id = $(this).data('id');

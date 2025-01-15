@@ -15,6 +15,7 @@ use App\Models\RackingDetil as Rack;
 use App\Models\Photo;
 use App\Models\KeteranganPhoto as KP;
 
+use DataTables;
 
 class RackingController extends Controller
 {
@@ -26,9 +27,66 @@ class RackingController extends Controller
     public function index()
     {
         $data['title'] = "Racking Manifest";
-        $data['manifest'] = Manifest::whereNot('jamstripping', null)->where('tglbuangmty', null)->get();
 
         return view('lcl.realisasi.racking.index', $data);
+    }
+
+    public function indexTable(Request $request)
+    {
+        $manifest = Manifest::with(['customer', 'shipperM', 'packing'])->whereNot('jamstripping', null)->where('tglbuangmty', null)->get();
+
+        return DataTables::of($manifest)
+        ->addColumn('action', function($manifest){
+            return '<a href="/lcl/realisasi/racking/detail-'.$manifest->id.'" class="btn btn-warning editButton"><i class="fa fa-pencil"></i></a>';
+        })
+        ->addColumn('nohbl', function($manifest){
+            return $manifest->nohbl ?? '-';
+        })
+        ->addColumn('tgl_hbl', function($manifest){
+            return $manifest->tgl_hbl ?? '-';
+        })
+        ->addColumn('notally', function($manifest){
+            return $manifest->notally ?? '-';
+        })
+        ->addColumn('barcode', function($manifest){
+            return $manifest->barcode ?? '-';
+        })
+        ->addColumn('shipper', function($manifest){
+            return $manifest->shipperM->name ?? '-';
+        })
+        ->addColumn('customer', function($manifest){
+            return $manifest->customer->name ?? '-';
+        })
+        ->addColumn('quantity', function($manifest){
+            return $manifest->quantity ?? '-';
+        })
+        ->addColumn('final_qty', function($manifest){
+            return $manifest->final_qty ?? '-';
+        })
+        ->addColumn('packingName', function($manifest){
+            return $manifest->packing->name ?? '-';
+        })
+        ->addColumn('packingCode', function($manifest){
+            return $manifest->packing->code ?? '-';
+        })
+        ->addColumn('desc', function($manifest){
+            $desc = $manifest->descofgoods ?? '-';
+            return '<textarea class="form-control" cols="3" readonly>'.$desc.'</textarea>';
+        })
+        ->addColumn('weight', function($manifest){
+            return $manifest->weight ?? '-';
+        })
+        ->addColumn('meas', function($manifest){
+            return $manifest->meas ?? '-';
+        })
+        ->addColumn('startStripping', function($manifest){
+            return $manifest->startstripping ?? '-';
+        })
+        ->addColumn('endstripping', function($manifest){
+            return $manifest->endstripping ?? '-';
+        })
+        ->rawColumns(['action', 'desc'])
+        ->make(true);
     }
 
     public function detail($id)
@@ -43,6 +101,34 @@ class RackingController extends Controller
         $data['kets'] = KP::where('kegiatan', '=', 'placement')->get();
 
         return view('lcl.realisasi.racking.detail', $data);
+    }
+
+    public function itemTableData($id,Request $request)
+    {
+        $item = Item::where('manifest_id', $id)->whereNot('lokasi_id', null)->get();
+        
+        return DataTables::of($item)
+        ->addColumn('action', function($item){
+            return '<button class="btn btn-outline-danger unPlace" data-id="'.$item->id.'">Batal Placement</button>';
+        })
+        ->addColumn('barcode', function($item){
+            $herf = '/lcl/realisasi/racking/itemBarcode-'; 
+            return '<a href="javascript:void(0)" onclick="openWindow(\''.$herf.$item->id.'\')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>';
+        })
+        ->addColumn('name', function($item){
+            return $item->name ?? '-';
+        })
+        ->addColumn('nomor', function($item){
+            return $item->nomor ?? '-';
+        })
+        ->addColumn('rack', function($item){
+            return $item->Rack->name ?? '-';
+        })
+        ->addColumn('tier', function($iten){
+            return $item->tier ?? '-';
+        })
+        ->rawColumns(['action', 'barcode'])
+        ->make(true);
     }
 
     public function itemBarcode($id)

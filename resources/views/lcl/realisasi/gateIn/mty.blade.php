@@ -11,10 +11,13 @@
     <div class="card">
         <div class="card-body fixed-height-cardBody">
             <br>
-            <table class="tabelCustom" style="overflow-x:auto;">
+            <div class="table"></div>
+            <table class="table-hover" id="tableDetil">
                 <thead>
                     <tr>
                         <th>Action</th>
+                        <th>Detil</th>
+                        <th>Barcode</th>
                         <th>Status BC</th>
                         <th>No Job Order</th>
                         <th>No SPK</th>
@@ -26,29 +29,6 @@
                         <th>Jam Keluar</th>
                         <th>UID</th>
                     </tr>
-                    <tbody>
-                        @foreach($conts as $cont)
-                            <tr class="{{ $cont->status_bc !== 'release' ? 'highlight-yellow' : '' }}">
-                                <td>
-                                    <div class="button-container">
-                                        <buttpn class="btn btn-outline-warning editButton" data-id="{{$cont->id}}"><i class="fa fa-pen"></i></buttpn>
-                                        <a href="javascript:void(0)" onclick="openWindow('/lcl/realisasi/mty-detail{{$cont->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
-                                        <button class="btn btn-danger printBarcode" data-id="{{$cont->id}}"><i class="fa fa-print"></i></button>
-                                    </div>
-                                </td>
-                                <td>{{$cont->status_bc}}</td>
-                                <td>{{$cont->job->nojoborder}}</td>
-                                <td>{{$cont->job->nospk}}</td>
-                                <td>{{$cont->nocontainer}}</td>
-                                <td>{{$cont->job->nombl}}</td>
-                                <td>{{$cont->tglmasuk ?? 'Belum Masuk'}}</td>
-                                <td>{{$cont->jammasuk ?? 'Belum Masuk'}}</td>
-                                <td>{{$cont->tglkeluar ?? 'Belum Keluar'}}</td>
-                                <td>{{$cont->jamkeluar ?? 'Belum Keluar'}}</td>
-                                <td>{{$cont->user->name}}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
                 </thead>
             </table>
         </div>
@@ -144,6 +124,35 @@
 @endsection
 
 @section('custom_js')
+<script>
+    $(document).ready(function(){
+        $('#tableDetil').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '/lcl/realisasi/emptyTable',
+            columns: [
+                {data:'edit', name:'edit', className:'text-center'},
+                {data:'detil', name:'detil', className:'text-center'},
+                {data:'barcode', name:'barcode', className:'text-center'},
+                {data:'status_bc', name:'status_bc', className:'text-center'},
+                {data:'joborder', name:'joborder', className:'text-center'},
+                {data:'nospk', name:'nospk', className:'text-center'},
+                {data:'nocontainer', name:'nocontainer', className:'text-center'},
+                {data:'nombl', name:'nombl', className:'text-center'},
+                {data:'tglmasuk', name:'tglmasuk', className:'text-center'},
+                {data:'jammasuk', name:'jammasuk', className:'text-center'},
+                {data:'tglkeluar', name:'tglkeluar', className:'text-center'},
+                {data:'jamkeluar', name:'jamkeluar', className:'text-center'},
+                {data:'user', name:'user', className:'text-center'},
+            ],
+            createdRow: function (row, data, dataIndex) {
+                if (data.highlight === 'highlight-yellow') {
+                    $(row).addClass('highlight-yellow');
+                }
+            }
+        })
+    });
+</script>
 <script>
 $(document).ready(function() {
     // When Cancel button is clicked

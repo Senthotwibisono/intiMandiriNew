@@ -50,10 +50,12 @@ class BeaCukaiController extends Controller
             $cont->update([
                 'status_bc'=>'release',
             ]);
-            $barcode = Barcode::where('ref_id', $cont->id)->where('ref_type', '=', 'LCL')->where('ref_action', 'hold')->first();
-            $barcode->update([
-                'ref_action' => 'release',
-            ]);
+            $barcode = Barcode::where('ref_id', $cont->id)->where('ref_type', '=', 'LCL')->where('ref_action', 'release')->first();
+            if ($barcode) {
+                $barcode->update([
+                    'status' => 'active',
+                ]);
+            }
             return response()->json([
                 'success' => true,
                 'message' => 'Container diperbolehkan keluar',

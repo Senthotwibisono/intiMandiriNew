@@ -151,6 +151,10 @@
                             <label for="">Quantity</label>
                             <input type="text" name="quantity" id="quantity_edit" class="form-control" readonly>
                         </div>
+                        <div class="form-group">
+                            <label for="">Quantity Real</label>
+                            <input type="text" name="final_qty" id="final_qty_edit" class="form-control">
+                        </div>
                         <div class="row">
                             <div class="col-6">
                                 <div class="form-group">
@@ -280,6 +284,7 @@ $(document).ready(function() {
         $("#nohbl_edit").val(response.data.nohbl);
         $("#notally_edit").val(response.data.notally);
         $("#quantity_edit").val(response.data.quantity);
+        $("#final_qty_edit").val(response.data.final_qty);
         $("#tglstripping_edit").val(response.data.tglstripping);
         $("#jamstripping_edit").val(response.data.jamstripping);
         $("#startstripping_edit").val(response.data.startstripping);
@@ -463,10 +468,14 @@ $(document).on('click', '.unapproveButton', function() {
         document.getElementById('updateButton').addEventListener('click', function (e) {
             e.preventDefault(); // Prevent the default form submission
 
+            var quantity = document.getElementById('quantity_edit').value;
+            var final_qty = document.getElementById('final_qty_edit').value;
+            console.log('qty = ' + quantity);
+            console.log('final qty = ' + final_qty);
             // Show SweetAlert confirmation dialog
             Swal.fire({
                 title: 'Are you sure?',
-                text: "Data detail barang akan reset ketika Quantity berubah Value",
+                text: "Apakah data yang anda masukkan sudah sesuai?",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -474,18 +483,45 @@ $(document).on('click', '.unapproveButton', function() {
                 confirmButtonText: 'Yes, update it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Swal.fire({
-                    title: 'Processing...',
-                    text: 'Please wait while we update the container',
-                    icon: 'info',
-                    allowOutsideClick: false,
-                    showConfirmButton: false,
-                        willOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
-                    // Submit the form programmatically if confirmed
-                    document.getElementById('updateForm').submit();
+                    if (quantity != final_qty) {
+                        Swal.fire({
+                            title: "Apakah Anda Yakin?",
+                            text: "Quantity yang anda masukkan berbeda dengan quantity flat file. Quantity Flat File : " + quantity + " Quantity yang anda masukkan : " + final_qty, 
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, update it!'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                Swal.fire({
+                                 title: 'Processing...',
+                                 text: 'Please wait while we update the container',
+                                 icon: 'info',
+                                 allowOutsideClick: false,
+                                 showConfirmButton: false,
+                                     willOpen: () => {
+                                         Swal.showLoading();
+                                    }
+                                });
+                                // Submit the form programmatically if confirmed
+                                document.getElementById('updateForm').submit(); 
+                            }
+                        })
+                    }else{
+                        Swal.fire({
+                        title: 'Processing...',
+                        text: 'Please wait while we update the container',
+                        icon: 'info',
+                        allowOutsideClick: false,
+                        showConfirmButton: false,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                        // Submit the form programmatically if confirmed
+                        document.getElementById('updateForm').submit();
+                    }
                 }
             });
         });

@@ -57,62 +57,33 @@
 <section>
     <div class="card">
         <div class="card-body">
-            <table class="tabelCustom table-responsive" style="overflow-:auto;">
-                <thead>
-                    <tr>
-                        <th class="text-center">Action</th>
-                        <th class="text-center">No Job Order</th>
-                        <th class="text-center">Nama Angkut</th>
-                        <th class="text-center">No Container</th>
-                        <th class="text-center">Size</th>
-                        <th class="text-center">ETA</th>
-                        <th class="text-center">TPS Asal</th>
-                        <th class="text-center">Consolidator</th>
-                        <th class="text-center">No PLP</th>
-                        <th class="text-center">Tgl PLP</th>
-                        <th class="text-center">No BC 1.1</th>
-                        <th class="text-center">Tgl BC 1.1</th>
-                        <th class="text-center">No POS BC 1.1</th>
-                        <th class="text-center">Tgl Masuk</th>
-                        <th class="text-center">Jam Masuk</th>
-                        <th class="text-center">Nomor Polisi</th>
-                        <th class="text-center">Tgl Stripping</th>
-                        <th class="text-center">Jam Stripping</th>
-                        <th class="text-center">Tgl Keluar</th>
-                        <th class="text-center">Jam Keluar</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($conts as $cont)
-                        <tr class="{{ $cont->status_bc !== 'release' ? 'highlight-yellow' : '' }}">
-                            <td>
-                                <div class="button-container">
-                                    <a href="javascript:void(0)" onclick="openWindow('/lcl/report/contPhoto{{$cont->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
-                                </div>
-                            </td>
-                            <td>{{$cont->job->nojoborder}}</td>
-                            <td class="text-center">{{$cont->job->PLP->nm_angkut}}</td>
-                            <td class="text-center">{{$cont->nocontainer}}</td>
-                            <td class="text-center">{{$cont->size}}</td>
-                            <td class="text-center">{{$cont->job->eta}}</td>
-                            <td class="text-center">{{$cont->job->PLP->kd_tps_asal}}</td>
-                            <td class="text-center">{{$cont->job->PLP->namaconsolidator}}</td>
-                            <td class="text-center">{{$cont->job->noplp}}</td>
-                            <td class="text-center">{{$cont->job->ttgl_plp}}</td>
-                            <td class="text-center">{{$cont->job->PLP->no_bc11}}</td>
-                            <td class="text-center">{{$cont->job->PLP->tgl_bc11}}</td>
-                            <td class="text-center"> </td>
-                            <td class="text-center">{{$cont->tglmasuk ?? 'Belum Masuk'}} </td>
-                            <td class="text-center">{{$cont->jammasuk ?? 'Belum Masuk'}} </td>
-                            <td class="text-center">{{$cont->nopol ?? 'Belum Masuk'}} </td>
-                            <td class="text-center">{{$cont->tglstripping ?? 'Belum Stripping'}}</td>
-                            <td class="text-center">{{$cont->jamstripping ?? 'Belum Stripping'}}</td>
-                            <td class="text-center">{{$cont->tglbuangmty ?? 'Belum Keluar'}}</td>
-                            <td class="text-center">{{$cont->jambuangmty ?? 'Belum Keluar'}}</td>
+            <div class="table">
+                <table class="table-hover" id="dataReportCont">
+                    <thead>
+                        <tr>
+                            <th class="text-center">Action</th>
+                            <th class="text-center">No Job Order</th>
+                            <th class="text-center">Nama Angkut</th>
+                            <th class="text-center">No Container</th>
+                            <th class="text-center">Size</th>
+                            <th class="text-center">ETA</th>
+                            <th class="text-center">TPS Asal</th>
+                            <th class="text-center">Consolidator</th>
+                            <th class="text-center">No PLP</th>
+                            <th class="text-center">Tgl PLP</th>
+                            <th class="text-center">No BC 1.1</th>
+                            <th class="text-center">Tgl BC 1.1</th>
+                            <th class="text-center">Tgl Masuk</th>
+                            <th class="text-center">Jam Masuk</th>
+                            <th class="text-center">Nomor Polisi</th>
+                            <th class="text-center">Tgl Stripping</th>
+                            <th class="text-center">Jam Stripping</th>
+                            <th class="text-center">Tgl Keluar</th>
+                            <th class="text-center">Jam Keluar</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                </table>
+            </div>
         </div>
     </div>
 </section>
@@ -120,6 +91,37 @@
 @endsection
 
 @section('custom_js')
+<script>
+    $(document).ready(function(){
+        $('#dataReportCont').DataTable({
+            processing: true,
+            serverSide: true,
+            scrollX: true,
+            ajax: '/lcl/report/dataCont',
+            columns:[
+                { data:'detil', name:'detil', className:'text-center' },
+                { data:'jobordr', name:'jobordr', className:'text-center' },
+                { data:'nm_angkut', name:'nm_angkut', className:'text-center' },
+                { data:'nocontainer', name:'nocontainer', className:'text-center' },
+                { data:'size', name:'size', className:'text-center' },
+                { data:'eta', name:'eta', className:'text-center' },
+                { data:'kd_tps_asal', name:'kd_tps_asal', className:'text-center' },
+                { data:'namaconsolidator', name:'namaconsolidator', className:'text-center' },
+                { data:'noplp', name:'noplp', className:'text-center' },
+                { data:'tglPLP', name:'tglPLP', className:'text-center' },
+                { data:'no_bc11', name:'no_bc11', className:'text-center' },
+                { data:'tgl_bc11', name:'tgl_bc11', className:'text-center' },
+                { data:'tglmasuk', name:'tglmasuk', className:'text-center' },
+                { data:'jammasuk', name:'jammasuk', className:'text-center' },
+                { data:'nopol', name:'nopol', className:'text-center' },
+                { data:'tglkeluar', name:'tglkeluar', className:'text-center' },
+                { data:'jamkeluar', name:'jamkeluar', className:'text-center' },
+                { data:'tglstripping', name:'tglstripping', className:'text-center' },
+                { data:'jamstripping', name:'jamstripping', className:'text-center' },
+            ]
+        })
+    })
+</script>
 <script>
     function openWindow(url) {
         window.open(url, '_blank', 'width=1500,height=1000');

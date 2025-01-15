@@ -159,7 +159,7 @@ class StrippingController extends Controller
         })
         ->addColumn('descofgoods', function ($manifest) {
             $content = htmlspecialchars($manifest->descofgoods ?? '-', ENT_QUOTES, 'UTF-8'); // Escape special characters
-    return '<div class="justify-text">' . $content . '</div>';
+        return '<div class="justify-text">' . $content . '</div>';
         })
         ->addColumn('weight', function ($manifest) {
             return $manifest->weight ?? '-'; // Replace with proper column name

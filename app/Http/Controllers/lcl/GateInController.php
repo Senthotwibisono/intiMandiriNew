@@ -8,6 +8,7 @@ use Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use DataTables;
 
 use App\Models\Container as Cont;
 use App\Models\JobOrder as Job;
@@ -39,7 +40,6 @@ class GateInController extends Controller
     public function index()
     {
         $data['title'] = "Import LCL - Gate In";
-        $data['conts'] = Cont::where('type', '=', 'lcl')->where('tglkeluar', null )->get();
         $data['user'] = Auth::user()->name;
         $data['seals'] = Eseal::get();
         $data['kets'] = KP::where('kegiatan', '=', 'gate-in')->get();
@@ -93,6 +93,7 @@ class GateInController extends Controller
                         'master_id' => $cont->id,
                         'type' => 'lcl',
                         'action' => 'gate-in',
+                        'tipe_gate' => 'in',
                         'detil' => $request->keteranganPhoto,
                         'photo' => $fileName,
                     ]);
@@ -133,12 +134,67 @@ class GateInController extends Controller
     public function indexSeal()
     {
         $data['title'] = "Import LCL - Dispatche E-Seal";
-        $data['conts'] = Cont::where('type', '=', 'lcl')->where('tglkeluar', null )->get();
         $data['user'] = Auth::user()->name;
         $data['seals'] = Eseal::get();
         $data['now'] = Carbon::now();
         
         return view('lcl.realisasi.gateIn.seal', $data);
+    }
+
+    public function dataSeal(Request $request)
+    {
+        $cont = Cont::with(['job', 'seal', 'user'])->where('type', '=', 'lcl')->where('tglkeluar', null )->get();
+        
+        return DataTables::of($cont)
+        ->addColumn('edit', function($cont){
+            return '<buttpn class="btn btn-outline-warning editButton" data-id="'.$cont->id.'"><i class="fa fa-pen"></i></buttpn>';
+        })
+        ->addColumn('detil', function($cont){
+            return "<a href=\"javascript:void(0)\" onclick=\"openWindow('/lcl/realisasi/gateIn-detail{$cont->id}')\" class=\"btn btn-sm btn-info\"><i class=\"fa fa-eye\"></i></a>";
+        })
+        ->addColumn('dispatcheButton', function ($cont) {
+            if ($cont->no_seal != null) {
+                return $cont->status_dispatche == 'Y' 
+                    ? '<button class="btn btn-danger closeDO" data-id="'.$cont->id.'">Close DO</button>'
+                    : '<button class="btn btn-primary sendEasyGo" data-id="'.$cont->id.'">Dispatche E-Seal</button>';
+            }
+            return '';
+        })
+        ->addColumn('joborder', function($cont){
+            return $cont->job->nojoborder ?? '-';
+        })
+        ->addColumn('nocontainer', function($cont){
+            return $cont->nocontainer ?? '-';
+        })
+        ->addColumn('nospk', function($cont){
+            return $cont->job->nospk ?? '-';
+        })
+        ->addColumn('nombl', function($cont){
+            return $cont->job->nombl ?? '-';
+        })
+        ->addColumn('doId', function($cont){
+            return $cont->do_id ?? '-';
+        })
+        ->addColumn('tglDispatche', function($cont){
+            return $cont->tgl_dispatche ?? '-';
+        })
+        ->addColumn('jam_dispatche', function($cont){
+            return $cont->jam_dispatche ?? '-';
+        })
+        ->addColumn('eta', function($cont){
+            return $cont->job->eta ?? '-';
+        })
+        ->addColumn('nameKapal', function($cont){
+            return $cont->job->Kapal->name ?? '-';
+        })
+        ->addColumn('code', function($cont){
+            return $cont->seal->code ?? '-';
+        })
+        ->addColumn('name', function($cont){
+            return $cont->user->name ?? '-';
+        })
+        ->rawColumns(['edit', 'detil', 'dispatcheButton'])
+        ->make(true);
     }
 
     public function updateSeal(Request $request)
@@ -169,12 +225,64 @@ class GateInController extends Controller
         return view('lcl.realisasi.gateIn.mty', $data);
     }
 
+    public function emptyTable(Request $request)
+    {
+        $container = Cont::whereNotNull('endstripping')->whereNotNull('tglmasuk')->get();
+
+        return DataTables::of($container)
+        ->addColumn('highlight', function ($container) {
+            return $container->status_bc !== 'release' ? 'highlight-yellow' : '';
+        })
+        ->addColumn('edit', function($container){
+            return '<buttpn class="btn btn-outline-warning editButton" data-id="'.$container->id.'"><i class="fa fa-pen"></i></buttpn>';
+        })
+        ->addColumn('detil', function($container){
+            $herf = "/lcl/realisasi/mty-detail";
+            return '<a href="javascript:void(0)" onclick="openWindow(\''.$herf.$container->id.'\')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>';
+        })
+        ->addColumn('barcode', function($container){
+            return '<button class="btn btn-danger printBarcode" data-id="'.$container->id.'"><i class="fa fa-print"></i></button>';
+        })
+        ->addColumn('status_bc', function($container){
+            return $container->status_bc ?? '-';
+        })
+        ->addColumn('joborder', function($container){
+            return $container->job->nojoborder ?? '-';
+        })
+        ->addColumn('nospk', function($container){
+            return $container->job->nospk ?? '-';
+        })
+        ->addColumn('nocontainer', function($container){
+            return $container->nocontainer ?? '-';
+        })
+        ->addColumn('nombl', function($container){
+            return $container->job->nombl ?? '-';
+        })
+        ->addColumn('tglmasuk', function($container){
+            return $container->tglmasuk ?? 'Belum Masuk';
+        })
+        ->addColumn('jammasuk', function($container){
+            return $container->tglkeluar ?? 'Belum Masuk';
+        })
+        ->addColumn('tglkeluar', function($container){
+            return $container->tglkeluar ?? 'Belum Keluar';
+        })
+        ->addColumn('jamkeluar', function($container){
+            return $container->jamkeluar ?? 'Belum Keluar';
+        })
+        ->addColumn('user', function($container){
+            return $container->user->name ?? '';
+        })
+        ->rawColumns(['edit', 'detil', 'barcode'])
+        ->make(true);
+    }
+
     public function detailMt($id)
     {
         $cont = Cont::where('id', $id)->first();
         $data['title'] = "Photo Gate Out Container - " . $cont->nocontainer;
         $data['item'] = $cont;
-        $data['photos'] = Photo::where('master_id', $id)->where('type', '=', 'lcl')->where('action', '=', 'gate-out')->get();
+        $data['photos'] = Photo::where('master_id', $id)->where('type', '=', 'lcl')->where('action', '=', 'buang-mty')->get();
         // dd($data['photos']);
         return view('photo.index', $data);
     }
@@ -211,7 +319,7 @@ class GateInController extends Controller
                     $newPhoto = Photo::create([
                         'master_id' => $cont->id,
                         'type' => 'lcl',
-                        'action' => 'gate-out',
+                        'action' => 'buang-mty',
                         'detil' => $request->keteranganPhoto,
                         'photo' => $fileName,
                     ]);
@@ -227,7 +335,7 @@ class GateInController extends Controller
         if ($cont->status_bc != 'release') {
             $action = 'hold';
         }else {
-            $action = 'release';
+            $action = 'active';
         }
         $barcode = Barcode::where('ref_id', $cont->id)->where('ref_type', '=', 'LCL')->where('ref_action', $action)->first();
         if ($barcode) {
@@ -260,10 +368,10 @@ class GateInController extends Controller
             $newBarcode = Barcode::create([
                 'ref_id'=>$cont->id,
                 'ref_type'=>'LCL',
-                'ref_action'=> $action,
+                'ref_action'=> 'release',
                 'ref_number'=>$cont->nocontainer,
                 'barcode'=> $uniqueBarcode,
-                'status'=>'active',
+                'status'=>$action,
                 'expired'=> Carbon::now()->addDays(3),
                 'uid'=> Auth::user()->id,
                 'created_at'=> Carbon::now(),

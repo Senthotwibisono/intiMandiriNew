@@ -31,11 +31,23 @@
             </div>
         </div> -->
         <div class="card-body">
-            <div style="overflow-x:auto;">
-                <table class="tabelCustom table-hover table-stripped">
+            <div class="table">
+                <div class="mb-3">
+                    <label for="statusFilter" class="form-label">Filter by Status Behandle:</label>
+                    <select id="filterBehandle" class="form-select">
+                        <option value="all" selected>Show All</option>
+                        <option value="behandled">Behandeled</option>
+                        <option value="ready">Ready</option>
+                        <option value="proses">On Progress</option>
+                        <option value="finish">Finish</option>
+                    </select>
+                </div>
+                <table class="table-hover" id="tableBehandle">
                     <thead>
                         <tr>
-                            <th class="text-center">Action</th>
+                            <th class="text-center">Edit</th>
+                            <th class="text-center">Detil</th>
+                            <th class="text-center">Behandle Button</th>
                             <th class="text-center">Status Behandle</th>
                             <th class="text-center">No HBL</th>
                             <th class="text-center">Tgl HBL</th>
@@ -43,59 +55,17 @@
                             <th class="text-center">Shipper</th>
                             <th class="text-center">Customer</th>
                             <th class="text-center">Qty</th>
+                            <th class="text-center">Qty Real Time</th>
                             <th class="text-center">Packing</th>
                             <th class="text-center">Kode Kemas</th>
+                            <th class="text-center">Desc</th>
                             <th class="text-center">Weight</th>
                             <th class="text-center">Meas</th>
+                            <th class="text-center">Packing Tally</th>
                             <th class="text-center">Dok SPJM</th>
                             <th class="text-center">Tgl SPJM</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach($manifest as $mans)
-                            <tr class="{{ $mans->status_behandle == 1 ? 'highlight-yellow' : ($mans->status_behandle == 3 ? 'highlight-blue' : ($mans->status_behandle == 2 ? 'highlight-green' : '')) }}">
-                                <td>
-                                    <div class="button-container">
-                                        <button class="btn btn-warning editButton" data-id="{{$mans->id}}"><i class="fa fa-pencil"></i></button>
-                                        <a href="javascript:void(0)" onclick="openWindow('/lcl/realisasi/behandle-detail{{$mans->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
-                                        @if($mans->no_spjm != null)
-                                            @if($mans->status_behandle == 1)
-                                                <button class="btn btn-outline-primary ReadyChcek" data-id="{{$mans->id}}">Make It Ready</button>
-                                            @elseif($mans->status_behandle == 2)
-                                                <button class="btn btn-primary FinishBehandle" data-id="{{$mans->id}}">Finish</button>
-                                            @endif
-                                        @endif
-                                    </div>
-                                </td>
-                                <td>
-                                    @if($mans->status_behandle == 1)
-                                        <!-- <p>On Progress</p> -->
-                                        <span class="badge bg-light-warning">On Progress</span>
-                                        @elseif($mans->status_behandle == 2)
-                                        <!-- <p>Ready</p> -->
-                                        <span class="badge bg-light-success">Ready</span>
-                                        @elseif($mans->status_behandle == 3)
-                                        <!-- <p>Finish</p> -->
-                                        <span class="badge bg-light-info">Finish</span>
-                                    @else
-                                        {{$mans->status_behandle}}
-                                    @endif
-                                </td>
-                                <td>{{$mans->nohbl}}</td>
-                                <td>{{$mans->tgl_hbl}}</td>
-                                <td>{{$mans->notally}}</td>
-                                <td>{{$mans->shipperM->name ?? ''}}</td>
-                                <td>{{$mans->customer->name ?? ''}}</td>
-                                <td>{{$mans->quantity}}</td>
-                                <td>{{$mans->packing->name ?? ''}}</td>
-                                <td>{{$mans->packing->code ?? ''}}</td>
-                                <td>{{$mans->weight}}</td>
-                                <td>{{$mans->meas}}</td>
-                                <td>{{$mans->no_spjm}}</td>
-                                <td>{{$mans->tgl_spjm}}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
                 </table>
             </div>
         </div>
@@ -221,6 +191,59 @@
 @endsection
 
 @section('custom_js')
+<script>
+    $(document).ready(function(){
+        var filter = $('#filterBehandle').val();
+        // console.log('filter Behandle' + filter);
+        var table = $('#tableBehandle').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '/lcl/delivery/behandle/behandleData',
+                type: 'GET',
+                data: function (d) {
+                    // Add the filter value to the request
+                    d.filter = $('#filterBehandle').val();
+                }
+            },
+            scrollX: true,
+            columns:[
+                { data:'edit', name:'edit', className:'text-center' },
+                { data:'detil', name:'detil', className:'text-center' },
+                { data:'behandleButton', name:'behandleButton', className:'text-center' },
+                { data:'statusBehandle', name:'statusBehandle', className:'text-center' },
+                { data:'nohbl', name:'nohbl', className:'text-center' },
+                { data:'tgl_hbl', name:'tgl_hbl', className:'text-center' },
+                { data:'notally', name:'notally', className:'text-center' },
+                { data:'shipper', name:'shipper', className:'text-center' },
+                { data:'customer', name:'customer', className:'text-center' },
+                { data:'quantity', name:'quantity', className:'text-center' },
+                { data:'final_qty', name:'final_qty', className:'text-center' },
+                { data:'packingName', name:'packingName', className:'text-center' },
+                { data:'packingCode', name:'packingCode', className:'text-center' },
+                { data:'desc', name:'desc', className:'text-center' },
+                { data:'weight', name:'weight', className:'text-center' },
+                { data:'meas', name:'meas', className:'text-center' },
+                { data:'packingTally', name:'packingTally', className:'text-center' },
+                { data:'noSPJM', name:'noSPJM', className:'text-center' },
+                { data:'tglSPJM', name:'tglSPJM', className:'text-center' },
+            ],
+            createdRow: function (row, data, dataIndex) {
+                if (data.highlight === 'highlight-yellow') {
+                    $(row).addClass('highlight-yellow');
+                } else if (data.highlight === 'highlight-blue') {
+                    $(row).addClass('highlight-blue');
+                } else if (data.highlight === 'highlight-green') {
+                    $(row).addClass('highlight-green');
+                }
+            }
+        })
+        $('#filterBehandle').on('change', function () {
+            console.log('Filter Behandle changed to: ' + $(this).val());
+            table.ajax.reload(); // Reload the table data
+        });
+    })
+</script>
 <script>
 $(document).ready(function() {
     // When Cancel button is clicked

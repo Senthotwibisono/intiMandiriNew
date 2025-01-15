@@ -34,7 +34,7 @@
 <script>
     $(document).ready(function(){
         $('#tableBarcode').DataTable({
-            precessing: true,
+            processing: true,
             serverSide: true,
             ajax: '/autoGate-barcode/data',
             columns: [

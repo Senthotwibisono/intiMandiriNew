@@ -22,11 +22,13 @@
 <section>
     <div class="card">
         <div class="card-body">
-            <div style="overflow-x:auto;">
-                <table class="tabelCustom">
+            <div class="table">
+                <table class="table-hover table-stripped" id="tableGateOut">
                     <thead>
                         <tr>
-                            <th class="text-center">Action</th>
+                            <th class="text-center">Edit</th>
+                            <th class="text-center">Detil</th>
+                            <th class="text-center">Barcode</th>
                             <th class="text-center">Status BC</th>
                             <th class="text-center">No HBL</th>
                             <th class="text-center">Tgl HBL</th>
@@ -34,44 +36,18 @@
                             <th class="text-center">Shipper</th>
                             <th class="text-center">Customer</th>
                             <th class="text-center">Qty</th>
+                            <th class="text-center">Qty Real Time</th>
                             <th class="text-center">Packing</th>
                             <th class="text-center">Kode Kemas</th>
+                            <th class="text-center">Desc of Goods</th>
                             <th class="text-center">Weight</th>
                             <th class="text-center">Meas</th>
+                            <th class="text-center">Packing Tally</th>
                             <th class="text-center">Jenis Dok</th>
                             <th class="text-center">No Dok</th>
                             <th class="text-center">Tgl Dok</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach($manifest as $mans)
-                            <tr class="{{ $mans->status_bc === 'HOLD' ? 'highlight-yellow text-white' : ($mans->status_bc === 'HOLDP2' ? 'highlight-red text-white' : '') }}">
-                                <td>
-                                    <div class="button-container">
-                                        <button class="btn btn-warning editButton" data-id="{{$mans->id}}"><i class="fa fa-pencil"></i></button>
-                                        <a href="javascript:void(0)" onclick="openWindow('/lcl/realisasi/GateOut-detail{{$mans->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
-                                        @if($mans->no_dok != null)
-                                        <button class="btn btn-danger printBarcode" data-id="{{$mans->id}}"><i class="fa fa-print"></i></button>
-                                        @endif
-                                    </div>
-                                </td>
-                                <td>{{$mans->status_bc}}</td>
-                                <td>{{$mans->nohbl}}</td>
-                                <td>{{$mans->tgl_hbl}}</td>
-                                <td>{{$mans->notally}}</td>
-                                <td>{{$mans->shipperM->name ?? ''}}</td>
-                                <td>{{$mans->customer->name ?? ''}}</td>
-                                <td>{{$mans->quantity}}</td>
-                                <td>{{$mans->packing->name ?? ''}}</td>
-                                <td>{{$mans->packing->code ?? ''}}</td>
-                                <td>{{$mans->weight}}</td>
-                                <td>{{$mans->meas}}</td>
-                                <td>{{$mans->dokumen->name ?? ''}}</td>
-                                <td>{{$mans->no_dok}}</td>
-                                <td>{{$mans->tgl_dok}}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
                 </table>
             </div>
         </div>
@@ -184,6 +160,46 @@
 @endsection
 
 @section('custom_js')
+<script>
+    $(document).ready(function(){
+        $('#tableGateOut').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '/lcl/delivery/dataGateOut',
+            scrollX: true,
+            columns: [
+                { data: 'edit', name: 'edit', className: 'text-center' },
+                { data: 'detail', name: 'detail', className: 'text-center' },
+                { data: 'barcode', name: 'barcode', className: 'text-center' },
+                { data: 'status_bc', name: 'status_bc', className: 'text-center' },
+                { data: 'nohbl', name: 'nohbl', className: 'text-center' },
+                { data: 'tgl_hbl', name: 'tgl_hbl', className: 'text-center' },
+                { data: 'notally', name: 'notally', className: 'text-center' },
+                { data: 'shipper', name: 'shipper', className: 'text-center' },
+                { data: 'customer', name: 'customer', className: 'text-center' },
+                { data: 'quantity', name: 'quantity', className: 'text-center' },
+                { data: 'final_qty', name: 'final_qty', className: 'text-center' },
+                { data: 'packingName', name: 'packingName', className: 'text-center' },
+                { data: 'packingCode', name: 'packingCode', className: 'text-center' },
+                { data: 'desc', name: 'desc', className: 'text-center' },
+                { data: 'weight', name: 'weight', className: 'text-center' },
+                { data: 'meas', name: 'meas', className: 'text-center' },
+                { data: 'packingTally', name: 'packingTally', className: 'text-center' },
+                { data: 'dokumen', name: 'dokumen', className: 'text-center' },
+                { data: 'no_dok', name: 'no_dok', className: 'text-center' },
+                { data: 'tglDok', name: 'tglDok', className: 'text-center' },
+            ],
+            createdRow: function (row, data, dataIndex) {
+                if (data.highlight === 'highlight-yellow') {
+                    $(row).addClass('highlight-yellow');
+                } else if (data.highlight === 'highlight-red text-white') {
+                    $(row).addClass('highlight-red text-white');
+                }
+            }
+
+        })
+    })
+</script>
 <script>
 $(document).ready(function() {
     // When Cancel button is clicked

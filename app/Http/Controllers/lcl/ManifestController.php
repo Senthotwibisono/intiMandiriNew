@@ -101,6 +101,71 @@ class ManifestController extends Controller
         return view('lcl.manifest.detail', $data);
     }
 
+    public function detailManifestData($id, Request $request)
+    {
+        $manifest = Manifest::with(['shipperM', 'customer', 'packing', 'packingTally'])->where('container_id', $id)->get();
+        
+       
+
+        return DataTables::of($manifest)
+        ->addColumn('delete', function($manifest){
+            return '<button class="btn btn-danger deleteButton" data-id="'.$manifest->id.'"><i class="fa fa-trash"></i></button>';
+        })
+        ->addColumn('edit', function($manifest){
+            return '<button class="btn btn-warning editButton" data-id="'.$manifest->id.'"><i class="fa fa-pencil"></i></button>';
+        })
+        ->addColumn('detil', function($manifest){
+            $herfDetil = '/lcl/manifest/item-';
+            return '<a href="javascript:void(0)" onclick="openWindow(\''. $herfDetil . $manifest->id .'\')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a';
+        })
+        ->addColumn('barcode', function($manifest){
+            $herfBarcode = '/lcl/manifest/barcode-';
+            return '<a href="javascript:void(0)" onclick="openWindow(\''. $herfBarcode . $manifest->id .'\')" class="btn btn-sm btn-danger"><i class="fa fa-print"></i></a>';
+        })
+        ->addColumn('nohbl', function($manifest){
+            return $manifest->nohbl ?? '-';
+        })
+        ->addColumn('tgl_hbl', function($manifest){
+            return $manifest->tgl_hbl ?? '-';
+        })
+        ->addColumn('notally', function($manifest){
+            return $manifest->notally ?? '-';
+        })
+        ->addColumn('shipper', function($manifest){
+            return $manifest->shipperM->name ?? '-';
+        })
+        ->addColumn('customer', function($manifest){
+            return $manifest->customer->name ?? '-';
+        })
+        ->addColumn('quantity', function($manifest){
+            return $manifest->quantity ?? '-';
+        })
+        ->addColumn('final_qty', function($manifest){
+            return $manifest->final_qty ?? '-';
+        })
+        ->addColumn('packingName', function($manifest){
+            return $manifest->packing->name ?? '-';
+        })
+        ->addColumn('packingCode', function($manifest){
+            return $manifest->packing->code ?? '-';
+        })
+        ->addColumn('desc', function($manifest){
+            $desc = $manifest->descofgoods ?? '-';
+            return '<textarea class="form-control" cols="3" readonly>'. $desc .'</textarea>';
+        })
+        ->addColumn('weight', function($manifest){
+            return $manifest->weight ?? '';
+        })
+        ->addColumn('meas', function($manifest){
+            return $manifest->meas ?? '-';
+        })
+        ->addColumn('packingTally', function($manifest){
+            return $manifest->packingTally->name ?? '-';
+        })
+        ->rawColumns(['delete', 'edit', 'detil', 'barcode', 'desc'])
+        ->make(true);
+    }
+
     public function create(Request $request)
     {
         $cont = Cont::where('id', $request->container_id)->first();

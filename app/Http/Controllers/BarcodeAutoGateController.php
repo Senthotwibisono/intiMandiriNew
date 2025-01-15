@@ -70,18 +70,24 @@ class BarcodeAutoGateController extends Controller
                     $item = Manifest::find($barcode->ref_id);
                     $tipe = 'manifest';
                     break;
+                case 'FCL':
+                    $item = ContF::find($barcode->ref_id);
+                    $tipe = 'fcl';
+                    break;
             }
 
             if ($barcode->ref_action == 'get') {
                 $action = 'gate-in';
+                $detil = '1. Photo Peti Kemas di Depan Gate by Auto Gate';
             }else {
-                $action = 'gate-out';
+                $action = ($barcode->type == 'FCL' || $barcode->type == 'Manifest') ? 'gate-out' : 'buang-mty';
+                $detil = '1. Photo Peti Kemas di Depan Gate by Auto Gate';
             }
 
             $data['title'] = "Photo In ".$action." - " . $barcode->ref_number;
             $data['item'] = $item;
-            $data['photos'] = Photo::where('master_id', $id)->where('type', $tipe)->where('action', $action )->where('tipe_gate', '=', 'in')->get();
-            // dd($data['photos']);
+            $data['photos'] = Photo::where('master_id', $item->id)->where('type', $tipe)->where('action', $action )->where('tipe_gate', 'in')->where('detil', $detil)->get();
+            // dd($tipe);
             return view('photo.index', $data);
         }
     }
@@ -94,22 +100,31 @@ class BarcodeAutoGateController extends Controller
                 case 'LCL':
                     $item = Cont::find($barcode->ref_id);
                     $tipe = 'lcl';
+                    $action = 'buang-mty';
                     break;
                 case 'Manifest':
                     $item = Manifest::find($barcode->ref_id);
                     $tipe = 'manifest';
+                    $action = 'gate-out';
+                    break;
+                case 'FCL':
+                    $item = ContF::find($barcode->ref_id);
+                    $tipe = 'fcl';
+                    $action = 'gate-out';
                     break;
             }
-
             if ($barcode->ref_action == 'get') {
                 $action = 'gate-in';
+                $detil = '1. Photo Peti Kemas di Depan Gate by Auto Gate (keluar)';
             }else {
-                $action = 'gate-out';
+                $action = ($barcode->type == 'FCL' || $barcode->type == 'Manifest') ? 'gate-out' : 'buang-mty';
+                $detil = '1. Photo Peti Kemas di Depan Gate by Auto Gate (keluar)';
             }
+            
 
             $data['title'] = "Photo Out ".$action." - " . $barcode->ref_number;
             $data['item'] = $item;
-            $data['photos'] = Photo::where('master_id', $id)->where('type', $tipe)->where('action', $action )->where('tipe_gate', '=', 'out')->get();
+            $data['photos'] = Photo::where('master_id', $item->id)->where('type', $tipe)->where('action', $action )->where('tipe_gate', '=', 'out')->where('detil', $detil)->get();
             // dd($data['photos']);
             return view('photo.index', $data);
         }
@@ -144,7 +159,7 @@ class BarcodeAutoGateController extends Controller
                                 'type' => 'lcl',
                                 'tipe_gate' => 'in',
                                 'action' => 'gate-in',
-                                'detil' => 'Truck Masuk',
+                                'detil' => '1. Photo Peti Kemas di Depan Gate by Auto Gate',
                                 'photo' => $fileName,
                             ]);
                         }
@@ -160,7 +175,7 @@ class BarcodeAutoGateController extends Controller
                                 'type' => 'lcl',
                                 'tipe_gate' => 'out',
                                 'action' => 'gate-in',
-                                'detil' => 'Truck Keluar',
+                                'detil' => '1. Photo Peti Kemas di Depan Gate by Auto Gate (keluar)',
                                 'photo' => $fileName,
                             ]);
                         }
@@ -177,8 +192,8 @@ class BarcodeAutoGateController extends Controller
                                 'master_id' => $cont->id,
                                 'type' => 'lcl',
                                 'tipe_gate' => 'in',
-                                'action' => 'gate-out',
-                                'detil' => 'Truck Masuk',
+                                'action' => 'buang-mty',
+                                'detil' => '1. Photo Peti Kemas di Depan Gate by Auto Gate',
                                 'photo' => $fileName,
                             ]);
                         }
@@ -198,8 +213,8 @@ class BarcodeAutoGateController extends Controller
                                 'master_id' => $cont->id,
                                 'type' => 'lcl',
                                 'tipe_gate' => 'out',
-                                'action' => 'gate-out',
-                                'detil' => 'Truck Keluar',
+                                'action' => 'buang-mty',
+                                'detil' => '1. Photo Peti Kemas di Depan Gate by Auto Gate (keluar)',
                                 'photo' => $fileName,
                             ]);
                         }
@@ -249,6 +264,89 @@ class BarcodeAutoGateController extends Controller
                         }
                     }
                 }
+            }
+        }elseif ($dataBarcode->ref_type == 'FCL') {
+            $cont = ContF::find($dataBarcode->ref_id);
+            if ($dataBarcode->ref_action == 'get') {
+                if ($tipe == 'in' || $tipe == 'In' || $tipe == 'IN') {
+                    $cont->update([
+                        'tglmasuk'=> carbon::now(),
+                        'jammasuk'=> carbon::now(),
+                        'uidmasuk'=> 'Autogate',
+                    ]);
+                    if ($request->hasFile('fileKamera')) {
+                        $photos = $request->file('fileKamera');
+                        foreach ($photos as $photo) {
+                            $fileName = $photo->getClientOriginalName();
+                            $photo->storeAs('imagesInt', $fileName, 'public'); 
+                            $newPhoto = Photo::create([
+                                'master_id' => $cont->id,
+                                'type' => 'fcl',
+                                'tipe_gate' => 'in',
+                                'action' => 'gate-in',
+                                'detil' => '1. Photo Peti Kemas di Depan Gate by Auto Gate',
+                                'photo' => $fileName,
+                            ]);
+                        }
+                    }
+                }elseif ($tipe == 'out' || $tipe == 'Out' || $tipe == 'OUT') {
+                    if ($request->hasFile('fileKamera')) {
+                        $photos = $request->file('fileKamera');
+                        foreach ($photos as $photo) {
+                            $fileName = $photo->getClientOriginalName();
+                            $photo->storeAs('imagesInt', $fileName, 'public'); 
+                            $newPhoto = Photo::create([
+                                'master_id' => $cont->id,
+                                'type' => 'fcl',
+                                'tipe_gate' => 'out',
+                                'action' => 'gate-in',
+                                'detil' => '1. Photo Peti Kemas di Depan Gate by Auto Gate (keluar)',
+                                'photo' => $fileName,
+                            ]);
+                        }
+                    }
+                }
+            }elseif ($dataBarcode->ref_action == 'release') {
+                if ($tipe == 'in' || $tipe == 'In' || $tipe == 'IN') {
+                    if ($request->hasFile('fileKamera')) {
+                        $photos = $request->file('fileKamera');
+                        foreach ($photos as $photo) {
+                            $fileName = $photo->getClientOriginalName();
+                            $photo->storeAs('imagesInt', $fileName, 'public'); 
+                            $newPhoto = Photo::create([
+                                'master_id' => $cont->id,
+                                'type' => 'fcl',
+                                'tipe_gate' => 'in',
+                                'action' => 'gate-out',
+                                'detil' => '1. Photo Peti Kemas di Depan Gate by Auto Gate',
+                                'photo' => $fileName,
+                            ]);
+                        }
+                    }
+                }elseif ($tipe == 'out' || $tipe == 'Out' || $tipe == 'OUT') {
+                    $cont->update([
+                        'tglkeluar'=> date('Y-m-d', strtotime($dataBarcode->time_out)),
+                        'jamkeluar'=> date('H:i:s', strtotime($dataBarcode->time_out)),
+                        'uidmty'=>'Autogate',
+                    ]);
+                    if ($request->hasFile('fileKamera')) {
+                        $photos = $request->file('fileKamera');
+                        foreach ($photos as $photo) {
+                            $fileName = $photo->getClientOriginalName();
+                            $photo->storeAs('imagesInt', $fileName, 'public'); 
+                            $newPhoto = Photo::create([
+                                'master_id' => $cont->id,
+                                'type' => 'fcl',
+                                'tipe_gate' => 'out',
+                                'action' => 'gate-out',
+                                'detil' => '1. Photo Peti Kemas di Depan Gate by Auto Gate (keluar)',
+                                'photo' => $fileName,
+                            ]);
+                        }
+                    }
+                }
+            }else {
+                return 'Status BC is HOLD or FLAGING, please unlock!!!';
             }
         }
     }

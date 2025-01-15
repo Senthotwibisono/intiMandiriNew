@@ -287,6 +287,7 @@ Route::controller(DokumenController::class)->group(function (){
         Route::get('/lcl/manifest', 'index')->name('lcl.manifest.idex');
         Route::get('/lcl/manifest/data', 'indexData')->name('lcl.manifest.data');
         Route::get('/lcl/manifest/detail-{id?}', 'detail')->name('lcl.manifest.detail');
+        Route::get('/lcl/manifest/detailManifestData-{id?}', 'detailManifestData');
         Route::post('/lcl/manifest/create', 'create')->name('lcl.manifest.create');
         Route::post('/lcl/manifest/excel', 'excel')->name('lcl.manifest.excel');
         Route::post('/lcl/manifest/excelNew', 'newExcel')->name('lcl.manifest.new');
@@ -318,6 +319,7 @@ Route::controller(DokumenController::class)->group(function (){
     // Delivery
     Route::controller(DeliveryController::class)->group(function(){
         Route::get('/lcl/delivery/behandle/index', 'indexBehandle')->name('lcl.delivery.behandle');
+        Route::get('/lcl/delivery/behandle/behandleData', 'behandleData');
         Route::post('/lcl/delivery/behandle/spjmCheck', 'spjmBehandle')->name('lcl.delivery.spjmCheck');
         Route::post('/lcl/delivery/behandle/update', 'behandle')->name('lcl.delivery.updateBehandle');
         Route::get('/lcl/realisasi/behandle-detail{id?}', 'detailBehandle')->name('lcl.delivery.detailBehandle');
@@ -325,6 +327,7 @@ Route::controller(DokumenController::class)->group(function (){
         Route::post('/lcl/delivery/behandle/finishCheck-{id?}', 'finishBehandle')->name('lcl.delivery.finishBehandle');
         
         Route::get('/lcl/delivery/gateOut', 'indexGateOut')->name('lcl.delivery.gateOut');
+        Route::get('/lcl/delivery/dataGateOut', 'dataGateOut');
         Route::post('/lcl/delivery/gateOut/check', 'dokumenGateOut')->name('lcl.delivery.DokumenGateOut');
         Route::post('/lcl/delivery/gateOut/update', 'gateOut')->name('lcl.delivery.updateGateOut');
         Route::get('/lcl/realisasi/GateOut-detail{id?}', 'detailGateOut')->name('lcl.delivery.detailGateOut');
@@ -336,7 +339,9 @@ Route::controller(DokumenController::class)->group(function (){
 
     Route::controller(RackingController::class)->group(function(){
         Route::get('/lcl/realisasi/racking', 'index')->name('lcl.racking.index');
+        Route::get('/lcl/realisasi/indexData', 'indexTable');
         Route::get('/lcl/realisasi/racking/detail-{id?}', 'detail')->name('lcl.racking.detail');
+        Route::get('/lcl/realisasi/racking/itemTableData-{id?}', 'itemTableData');
         Route::post('/lcl/realisasi/racking/update', 'update')->name('lcl.racking.update');
         Route::get('/lcl/realisasi/racking/itemBarcode-{id?}', 'itemBarcode')->name('lcl.racking.itemBarcode');
         Route::post('/lcl/realisasi/racking/unPlace-{id?}', 'unPlace')->name('lcl.racking.unPlace');
@@ -354,11 +359,13 @@ Route::controller(DokumenController::class)->group(function (){
         Route::post('/lcl/realisasi/gateIn-detailDelete', 'detailDelete')->name('lcl.gateIn.delete.detail');
         
         Route::get('/lcl/realisasi/seal', 'indexSeal')->name('lcl.seal.index');
+        Route::get('/lcl/realisasi/dataSeal', 'dataSeal')->name('lcl.seal.data');
         Route::post('/lcl/realisasi/seal-update', 'updateSeal')->name('lcl.seal.update');
         Route::post('/lcl/realisasi/easyGo-send', 'easyGoSend');
         Route::post('/lcl/realisasi/easyGo-closeDO', 'closeDO');
         
         Route::get('/lcl/realisasi/buangMT', 'indexMt')->name('lcl.mty.index');
+        Route::get('/lcl/realisasi/emptyTable', 'emptyTable');
         Route::get('/lcl/realisasi/mty-detail{id?}', 'detailMt')->name('lcl.mty.detail');
         Route::post('/lcl/realisasi/mty-update', 'updateMt')->name('lcl.mty.update');
         Route::post('/lcl/realisasi/mty-barcodeGate', 'createBarcode')->name('lcl.mty.barcode.gate');
@@ -439,11 +446,13 @@ Route::controller(EasyGoController::class)->group(function(){
 Route::controller(ReportController::class)->group(function(){
     // Container
     Route::get('/lcl/report/cont', 'indexCont')->name('report.lcl.cont');
+    Route::get('/lcl/report/dataCont', 'dataCont');
     Route::get('/lcl/report/contPhoto{id?}', 'photoCont')->name('report.lcl.photoCont');
     Route::get('/lcl/report/contGenerate', 'generateCont')->name('report.lcl.generateCont');
 
     // Manifest
     Route::get('/lcl/report/manifest', 'indexManifest')->name('report.lcl.manifest');
+    Route::get('/lcl/report/manifestDataTable', 'manifestDataTable');
     Route::get('/lcl/report/manifestPhoto{id?}', 'photoManifest')->name('report.lcl.photoManifest');
     Route::get('/lcl/report/manifestGenerate', 'generateManifest')->name('report.lcl.generateManifest');
 
@@ -613,7 +622,9 @@ Route::controller(LclController::class)->group(function(){
             Route::get('/detail-{id}', 'detail');
             Route::get('/containerEdit{id}', 'editContainer');
             Route::post('/create', 'create')->name('fcl.register.create');
+            Route::post('/uodate', 'uodate')->name('fcl.register.update');
             Route::post('/updateContainer', 'updateContainer')->name('fcl.register.updateCont');
+            Route::post('/createContainer', 'createContainer')->name('fcl.register.container.create');
             Route::post('/postPLP', 'postPLP')->name('fcl.register.updatePLP');
             Route::delete('/containerDelete{id}', 'deleteContainer');
             Route::post('/barcodeGate', 'createBarcode');

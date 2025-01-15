@@ -33,6 +33,8 @@ use App\Models\RackTier as RT;
 use App\Models\InvoiceHeader as Header;
 use App\Models\KeteranganPhoto as KP;
 
+use DataTables;
+
 class DeliveryController extends Controller
 {
     public function __construct()
@@ -44,11 +46,125 @@ class DeliveryController extends Controller
     public function indexBehandle()
     {
         $data['title'] = 'Manifest Behandle';
-        $data['manifest'] = Manifest::get();
         $data['locs'] = PM::where('use_for', 'B')->get();
         $data['kets'] = KP::where('tipe', 'Manifest')->where('kegiatan', '=', 'behandle')->get();
 
         return view('lcl.delivery.behandleIndex', $data);
+    }
+
+    public function behandleData(Request $request)
+    {
+        // var_dump($request->all());
+        // die;
+        switch ($request->filter) {
+            case 'all':
+                $manifest = Manifest::with(['shipperM', 'customer', 'packing', 'packingTally'])->whereNotNull('tglmasuk')->whereNull('tglbuangmty')->get();
+                break;
+            case 'behandled':
+                $manifest = Manifest::with(['shipperM', 'customer', 'packing', 'packingTally'])->whereNotNull('status_behandle')->get();
+                break;
+            case 'ready':
+                $manifest = Manifest::with(['shipperM', 'customer', 'packing', 'packingTally'])->where('status_behandle', '2')->get();
+                break;
+            case 'finish':
+                $manifest = Manifest::with(['shipperM', 'customer', 'packing', 'packingTally'])->where('status_behandle', '3')->get();
+                break;
+            case 'proses':
+                $manifest = Manifest::with(['shipperM', 'customer', 'packing', 'packingTally'])->where('status_behandle', '1')->get();
+                break;
+            default:
+                $manifest = Manifest::with(['shipperM', 'customer', 'packing', 'packingTally'])->whereNotNull('tglmasuk')->whereNull('tglbuangmty')->get();
+                break;
+        }
+        
+
+        return DataTables::of($manifest)
+        ->addColumn('edit', function($manifest){
+            return '<button class="btn btn-warning editButton" data-id="'.$manifest->id.'"><i class="fa fa-pencil"></i></button>';
+        })
+        ->addColumn('detil', function($manifest){
+            $herf = '/lcl/realisasi/behandle-detail';
+            return '<a href="javascript:void(0)" onclick="openWindow(\''.$herf.$manifest->id.'\')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>';
+        })
+        ->addColumn('behandleButton', function($manifest){
+            if ($manifest->no_spjm != null) {
+                if ($manifest->status_behandle == 1) {
+                    return '<button class="btn btn-outline-primary ReadyChcek" data-id="'.$manifest->id.'">Make It Ready</button>';
+                }elseif ($manifest->status_behandle == 2) {
+                    return '<button class="btn btn-primary FinishBehandle" data-id="'.$manifest->id.'">Finish</button>';
+                }
+            }else {
+                return '';
+            }
+        })
+        ->addColumn('statusBehandle', function($manifest){
+            if ($manifest->status_behandle == 1) {
+                return '<span class="badge bg-light-warning">On Progress</span>';
+            }elseif ($manifest->status_behandle == 2) {
+                return '<span class="badge bg-light-success">Ready</span>';
+            }elseif ($manifest->status_behandle == 3) {
+                return '<span class="badge bg-light-info">Finish</span>';
+            }else {
+                return '-';
+            }
+        })
+        ->addColumn('nohbl', function($manifest){
+            return $manifest->nohbl ?? '-';
+        })
+        ->addColumn('tgl_hbl', function($manifest){
+            return $manifest->tgl_hbl ?? '-';
+        })
+        ->addColumn('notally', function($manifest){
+            return $manifest->notally ?? '-';
+        })
+        ->addColumn('shipper', function($manifest){
+            return $manifest->shipperM->name ?? '-';
+        })
+        ->addColumn('customer', function($manifest){
+            return $manifest->customer->name ?? '-';
+        })
+        ->addColumn('quantity', function($manifest){
+            return $manifest->quantity ?? '-';
+        })
+        ->addColumn('final_qty', function($manifest){
+            return $manifest->final_qty ?? '-';
+        })
+        ->addColumn('packingName', function($manifest){
+            return $manifest->packing->name ?? '-';
+        })
+        ->addColumn('packingCode', function($manifest){
+            return $manifest->packing->code ?? '-';
+        })
+        ->addColumn('desc', function($manifest){
+            $desc = $manifest->descofgoods ?? '-';
+            return '<textarea class="form-control" cols="3" readonly>'. $desc .'</textarea>';
+        })
+        ->addColumn('weight', function($manifest){
+            return $manifest->weight ?? '';
+        })
+        ->addColumn('meas', function($manifest){
+            return $manifest->meas ?? '-';
+        })
+        ->addColumn('packingTally', function($manifest){
+            return $manifest->packingTally->name ?? '-';
+        })
+        ->addColumn('noSPJM', function($manifest){
+            return $manifest->no_spjm ?? '-';
+        })
+        ->addColumn('tglSPJM', function($manifest){
+            return $manifest->tgl_spjm ?? '-';
+        })
+        ->addColumn('highlight', function($manifest){
+            $statusClasses = [
+                1 => 'highlight-yellow',
+                2 => 'highlight-green',
+                3 => 'highlight-blue',
+            ];
+        
+            return $statusClasses[$manifest->status_behandle] ?? '';
+        })
+        ->rawColumns(['behandleButton', 'edit', 'detil', 'statusBehandle', 'desc'])
+        ->make(true);
     }
 
     public function spjmBehandle(Request $request)
@@ -229,6 +345,85 @@ class DeliveryController extends Controller
         $data['doks'] = Kode::orderBy('kode', 'asc')->get();
         $data['kets'] = KP::where('kegiatan', '=', 'gate-out')->get();
         return view('lcl.delivery.gateOut', $data);
+    }
+
+    public function dataGateOut(Request $request)
+    {
+        $manifest = Manifest::whereNotNull('tglstripping')->get();
+
+        return DataTables::of($manifest)
+        ->addColumn('highlight', function($manifest){
+            $statusClasses = [
+                'HOLD' => 'highlight-yellow',
+                'HOLDP2' => 'highlight-red text-white',
+            ];
+        
+            return $statusClasses[$manifest->status_bc] ?? '';
+        })
+        ->addColumn('edit', function($manifest){
+            return '<button class="btn btn-warning editButton" data-id="'.$manifest->id.'"><i class="fa fa-pencil"></i></button>';
+        })
+        ->addColumn('detail', function($manifest){
+            $herf = '/lcl/realisasi/GateOut-detail';
+            return '<a href="javascript:void(0)" onclick="openWindow(\''.$herf.$manifest->id.'\')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>';
+        })
+        ->addColumn('barcode', function($manifest){
+            return '<button class="btn btn-danger printBarcode" data-id="'.$manifest->id.'"><i class="fa fa-print"></i></button>';
+        })
+        ->addColumn('status_bc', function($manifest){
+            return $manifest->status_bc ?? '-';
+        })
+        ->addColumn('nohbl', function($manifest){
+            return $manifest->nohbl ?? '-';
+        })
+        ->addColumn('tgl_hbl', function($manifest){
+            return $manifest->tgl_hbl ?? '-';
+        })
+        ->addColumn('notally', function($manifest){
+            return $manifest->notally ?? '-';
+        })
+        ->addColumn('shipper', function($manifest){
+            return $manifest->shipperM->name ?? '-';
+        })
+        ->addColumn('customer', function($manifest){
+            return $manifest->customer->name ?? '-';
+        })
+        ->addColumn('quantity', function($manifest){
+            return $manifest->quantity ?? '-';
+        })
+        ->addColumn('final_qty', function($manifest){
+            return $manifest->final_qty ?? '-';
+        })
+        ->addColumn('packingName', function($manifest){
+            return $manifest->packing->name ?? '-';
+        })
+        ->addColumn('packingCode', function($manifest){
+            return $manifest->packing->code ?? '-';
+        })
+        ->addColumn('desc', function($manifest){
+            $desc = $manifest->descofgoods ?? '-';
+            return '<textarea class="form-control" cols="3" readonly>'. $desc .'</textarea>';
+        })
+        ->addColumn('weight', function($manifest){
+            return $manifest->weight ?? '';
+        })
+        ->addColumn('meas', function($manifest){
+            return $manifest->meas ?? '-';
+        })
+        ->addColumn('packingTally', function($manifest){
+            return $manifest->packingTally->name ?? '-';
+        })
+        ->addColumn('dokumen', function($manifest){
+            return $manifest->dokumen->name ?? '-';
+        })
+        ->addColumn('no_dok', function($manifest){
+            return $manifest->no_dok ?? '-';
+        })
+        ->addColumn('tglDok', function($manifest){
+            return $manifest->tgl_dok ?? '-';
+        })
+        ->rawColumns(['edit', 'detail', 'barcode', 'desc'])
+        ->make(true);
     }
 
     public function dokumenGateOut(Request $request)
@@ -437,11 +632,11 @@ class DeliveryController extends Controller
             ]);
         }
         if ($manifest->status_bc == 'release') {
-            $action = 'release';
+            $action = 'active';
         }else {
             $action = 'hold';
         }
-        $barcode = Barcode::where('ref_id', $manifest->id)->where('ref_type', '=', 'Manifest')->where('ref_action', $action)->first();
+        $barcode = Barcode::where('ref_id', $manifest->id)->where('ref_type', '=', 'Manifest')->where('ref_action', 'gate-out')->first();
         if ($barcode) {
             $barcode->update([
                 'expired'=> $header->expired_date,
@@ -458,10 +653,10 @@ class DeliveryController extends Controller
             $newBarcode = Barcode::create([
                 'ref_id'=>$manifest->id,
                 'ref_type'=>'Manifest',
-                'ref_action'=> $action,
+                'ref_action'=> 'gate-out',
                 'ref_number'=>$manifest->notally,
                 'barcode'=> $uniqueBarcode,
-                'status'=>'active',
+                'status'=> $action,
                 'expired'=> $header->expired_date,
                 'uid'=> Auth::user()->id,
                 'created_at'=> Carbon::now(),

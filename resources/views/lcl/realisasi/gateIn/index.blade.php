@@ -1,43 +1,40 @@
 @extends('partial.main')
-
+@section('custom_style')
+<style>
+    .table-fixed td,
+    .table-fixed th {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+@endsection
 @section('content')
 <section>
     <div class="card">
-        <div class="card-body fixed-height-cardBody">
+        <div class="card-body">
             <br>
-            <table class="tabelCustom table table-bordered table-striped" style="overflow-x:auto;">
-                <thead>
-                    <tr>
-                        <th>Action</th>
-                        <th>No Job Order</th>
-                        <th>No SPK</th>
-                        <th>No Container</th>
-                        <th>No MBL</th>
-                        <th>ETA</th>
-                        <th>Vessel</th>
-                        <th>UID</th>
-                    </tr>
-                    <tbody>
-                        @foreach($conts as $cont)
-                            <tr>
-                                <td>
-                                    <div class="button-container">
-                                        <buttpn class="btn btn-outline-warning editButton" data-id="{{$cont->id}}"><i class="fa fa-pen"></i></buttpn>
-                                        <a href="javascript:void(0)" onclick="openWindow('/lcl/realisasi/gateIn-detail{{$cont->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
-                                    </div>
-                                </td>
-                                <td>{{$cont->job->nojoborder}}</td>
-                                <td>{{$cont->job->nospk}}</td>
-                                <td>{{$cont->nocontainer}}</td>
-                                <td>{{$cont->job->nombl}}</td>
-                                <td>{{$cont->job->eta}}</td>
-                                <td>{{$cont->job->Kapal->name ?? ''}}</td>
-                                <td>{{$cont->user->name}}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </thead>
-            </table>
+            <div class="table table-fixed">
+                <table class="table table-hover table-stripped" id="tableGateIn">
+                    <thead>
+                        <tr>
+                            <th class="text-center">Edit</th>
+                            <th class="text-center">Detil</th>
+                            <th class="text-center">No Job Order</th>
+                            <th class="text-center">No Container</th>
+                            <th class="text-center">No SPK</th>
+                            <th class="text-center">No MBL</th>
+                            <th class="text-center">DO</th>
+                            <th class="text-center">Tgl Disapatche</th>
+                            <th class="text-center">Jam Disapatche</th>
+                            <th class="text-center">ETA</th>
+                            <th class="text-center">Vessel</th>
+                            <th class="text-center">Seal</th>
+                            <th class="text-center">UID</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
         </div>
     </div>
 </section>
@@ -140,6 +137,32 @@
 @endsection
 
 @section('custom_js')
+
+<script>
+    $(document).ready(function(){
+        $('#tableGateIn').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '/lcl/realisasi/dataSeal',
+            columns: [
+                {data:'edit', name: 'edit', className: 'text-center'},
+                {data:'detil', name: 'detil', className: 'text-center'},
+                {data:'joborder', name: 'joborder', className: 'text-center'},
+                {data:'nocontainer', name: 'nocontainer', className: 'text-center'},
+                {data:'nospk', name: 'nospk', className: 'text-center'},
+                {data:'nombl', name: 'nombl', className: 'text-center'},
+                {data:'doId', name: 'doId', className: 'text-center'},
+                {data:'tglDispatche', name: 'tglDispatche', className: 'text-center'},
+                {data:'jam_dispatche', name: 'jam_dispatche', className: 'text-center'},
+                {data:'eta', name: 'eta', className: 'text-center'},
+                {data:'nameKapal', name: 'nameKapal', className: 'text-center'},
+                {data:'code', name: 'code', className: 'text-center'},
+                {data:'name', name: 'name', className: 'text-center'},
+
+            ]
+        })
+    });
+</script>
 <script>
 $(document).ready(function() {
     // When Cancel button is clicked
