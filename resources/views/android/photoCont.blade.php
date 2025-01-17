@@ -24,16 +24,27 @@
                             <input type="file" class="form-control" id="photos" name="photos[]" multiple accept="image/*">
                         </div>
                     </div>
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label for="">Kegiatan</label>
-                            <select name="action" id="" style="width: 100%;" class="js-example-basic-single form-select select2">
-                                <option value="stripping">Stripping</option>
-                                <option value="placement">Placement</option>
-                                <option value="gate_in">Gate In</option>
-                                <option value="gate_out">Gate Out</option>
-                            </select>
-                        </div>
+                    <div class="form-group">
+                        <label for="">Kegiatan</label>
+                        <select name="action" id="kegiatan" style="width: 100%;" class="js-example-basic-single form-select select2">
+                            <option disabled selected value>Pilih Satu Kegiatan!</option>
+                            <option value="gate-in">Gate In</option>
+                            <option value="buang-mty">Buang Empty</option>
+                            <option value="stripping">stripping</option>
+                            <option value="placement">placement</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="">Keterangan</label>
+                        <select name="detil" id="detilPhoto" style="width:100%;" class="js-example-basic-single select2 form-select">
+                            <option disabled selected>PIlih Kegiatan Terlebih Dahulu!</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="">List Photo Taken</label>
+                        <textarea name="" class="form-control" id="photoTaken" cols="30" rows="10" readonly>
+
+                        </textarea>
                     </div>
                 </div>
             </div>
@@ -48,11 +59,72 @@
 </section>
 @endsection
 @section('custom_js')
+<script>
+$(document).ready(function(){
+    $('#kegiatan').on('change', function(){
+        let kegiatan = $(this).val();
+        console.log('kegiatan = ' + kegiatan);
+        swal.fire({
+            title: 'Processing...',
+            text: 'Please wait',
+            icon: 'info',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                }
+        });
+        $.ajax({
+            type: 'GET',
+            url: '/getContainerLclKeterangan',
+            cache: false,
+            data: {
+              kegiatan: kegiatan
+            },
+            dataType: 'json',
 
+            success: function(response){
+                Swal.close();
+                Swal.fire({
+                    title: 'success!',
+                    text: 'Data di Temukan',
+                    icon: 'success',
+                    confirmButton: 'Ok',
+                })
+
+                console.log(response);
+                $('#detilPhoto').empty().append('<option disabled selected>Pilih Satu!</option>');
+                    Object.values(response).forEach(function(detil) {
+                    $('#detilPhoto').append(`<option value="${detil}">${detil}</option>`);
+                });
+            },
+            error: function(data) {
+              console.log('error:', data);
+                  Swal.fire({
+                      title: 'Error',
+                      text: 'Data tidak ditemukan',
+                      icon: 'error',
+                      confirmButtonText: 'OK'
+                  });
+            }
+        })
+    })
+})
+</script>
 <script>
 $(document).ready(function() {
     // Attach an event handler for the change event on the element with ID #cont
     $(document).on('change', '#cont', function() {
+        swal.fire({
+            title: 'Processing...',
+            text: 'Please wait',
+            icon: 'info',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                }
+        });
         // Retrieve the ID from the data-id attribute
         let id = $(this).val();
         $('.photo').attr('onclick', `openWindow('/lcl/report/contPhoto${id}')`);
@@ -68,6 +140,13 @@ $(document).ready(function() {
             dataType: 'json',
 
             success: function(response) {
+                Swal.close();
+                Swal.fire({
+                    title: 'success!',
+                    text: 'Data di Temukan',
+                    icon: 'success',
+                    confirmButton: 'Ok',
+                })
                 // Log the response to the console
                 console.log(response);
 
@@ -75,6 +154,8 @@ $(document).ready(function() {
                 $("#tglstripping").val(response.data.tglstripping);
                 $("#jamstripping").val(response.data.jamstripping);
                 $("#endstripping").val(response.data.endstripping);
+                let photoList = response.listPhoto.map(photo => photo.detil).join('\n');
+                $("#photoTaken").val(photoList);
             },
 
             error: function(data) {

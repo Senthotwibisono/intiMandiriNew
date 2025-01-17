@@ -17,6 +17,7 @@ use App\Models\Item;
 use App\Models\PlacementManifest as PM;
 use App\Models\RackingDetil as Rack;
 use App\Models\KeteranganPhoto as KP;
+use App\Models\Photo;
 
 class LclController extends Controller
 {
@@ -48,8 +49,11 @@ class LclController extends Controller
         // var_dump($id);
         // die;
         $cont = Cont::find($id);
+
+        $photoTake = Photo::where('type', 'lcl')->where('master_id', $id)->get();
         if ($cont) {
             return response()->json([
+                'listPhoto' => $photoTake,
                 'data' => $cont,
                 'message' => 'Data Ditemukan',
                 'success' => true,
@@ -137,6 +141,14 @@ class LclController extends Controller
         
         $data['title'] = "Photo Manifest || " . $manifest->nohbl;
         $data['manifest'] = $manifest;
+
+        $photoTake = Photo::where('type', 'manifest')
+             ->where('master_id', $manifest->id)
+             ->get();
+            
+         // Extract unique actions for "kegiatan" and pass all photos for "detil"
+         $data['kegiatan'] = $photoTake->pluck('action')->unique();
+         $data['detil'] = $photoTake;
 
         return view('android.photoManifestDetil', $data);
     }

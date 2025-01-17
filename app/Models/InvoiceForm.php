@@ -38,6 +38,7 @@ class InvoiceForm extends Model
         'grand_total_m',
         'created_at',
         'uid',
+        'forwarding_id',
     ];
 
     public function user()
@@ -52,5 +53,9 @@ class InvoiceForm extends Model
     public function Customer()
     {
         return $this->belongsTo(Customer::class, 'customer_id', 'id');
+    }
+    public function Forwarding()
+    {
+        return $this->belongsTo(Customer::class, 'forwarding_id', 'id');
     }
 }

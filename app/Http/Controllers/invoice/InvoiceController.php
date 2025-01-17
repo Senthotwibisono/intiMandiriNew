@@ -50,60 +50,54 @@ class InvoiceController extends Controller
         return view('invoice.unpaid.index', $data);
     }
 
-    // public function unpaidData(Request $request)
-    // {
-    //     $invoice = Header::with(['manifest', 'customer', 'kasir'])->where('status', 'N')->orderBy('order_at', 'desc')->get();
-    //     // dd($invoice);
+    public function unpaidData(Request $request)
+    {
+        $header = Header::with(['manifest', 'customer', 'kasir'])->where('status', 'N')
+        ->where('type', null)
+        ->orderBy('order_at', 'desc')
+        ->get();
 
-    //     return DataTables::of($invoice)
-    //     ->addColumn('orderNo', function ($invoice) {
-    //         return $invoice->order_no ?? '-';
-    //     })
-    //     ->addColumn('hbl', function ($invoice) {
-    //         return $invoice->manifest->nohbl ?? '-';
-    //     })
-    //     ->addColumn('tglHBL', function ($invoice) {
-    //         return $invoice->manifest->tgl_hbl ?? '-';
-    //     })
-    //     ->addColumn('quantity', function ($invoice) {
-    //         return $invoice->manifest->quantity ?? '-';
-    //     })
-    //     ->addColumn('customer', function ($invoice) {
-    //         return $invoice->customer->name ?? '-';
-    //     })
-    //     ->addColumn('kasir', function ($invoice) {
-    //         return $invoice->kasir->name ?? '-';
-    //     })
-    //     ->addColumn('orderAt', function ($invoice) {
-    //         return $invoice->order_at ?? '-';
-    //     })
-    //     ->addColumn('pranota', function ($invoice) {
-    //         $disabled = $invoice->status === 'C' ? 'disabled' : '';
-    //         return '<a type="button" href="/invoice/pranota-' . $invoice->id . '" target="_blank" class="btn btn-sm btn-warning text-white ' . $disabled . '">
-    //                     <i class="fa fa-file"></i>
-    //                 </a>';
-    //     })
-    //     ->addColumn('photoKTP', function ($invoice) {
-    //         $disabled = $invoice->status === 'C' ? 'disabled' : '';
-    //         return '<a href="javascript:void(0)" onclick="openWindow(\'/invoice/photoKTP-' . $invoice->id . '\')" class="btn btn-sm btn-info ' . $disabled . '">
-    //                     <i class="fa fa-eye"></i>
-    //                 </a>';
-    //     })
-    //     ->addColumn('action', function ($invoice) {
-    //         $disabled = $invoice->status === 'C' ? 'disabled' : '';
-    //         return '<div class="button-container text-center">
-    //                     <button class="btn btn-danger cancelInvoice" data-id="' . $invoice->id . '" ' . $disabled . '>
-    //                         <i class="fa fa-trash"></i>
-    //                     </button>
-    //                     <button type="button" id="pay" data-id="' . $invoice->id . '" class="btn btn-sm btn-success pay ' . $disabled . '">
-    //                         <i class="fa fa-cogs"></i>
-    //                     </button>
-    //                     <a href="" class="btn btn-primary ' . $disabled . '">Revisi</a>
-    //                 </div>';
-    //     })
-    //     ->rawColumns(['pranota', 'photoKTP', 'action']) // Render HTML pada kolom ini
-    //     ->make(true);
-    // }
+        return DataTables::of($header)
+        ->addColumn('order_no', function($header){
+            return $header->order_no ?? '-';
+        })
+        ->addColumn('nohbl', function($header){
+            return $header->manifest->nohbl ?? '-';
+        })
+        ->addColumn('tgl_hbl', function($header){
+            return $header->manifest->tgl_hbl ?? '-';
+        })
+        ->addColumn('quantity', function($header){
+            return $header->manifest->quantity ??  '-';
+        })
+        ->addColumn('customerName', function($header){
+            return $header->customer->name ?? '-';
+        })
+        ->addCOlumn('kasir', function($header){
+            return $header->kasir->name ?? '-';
+        })
+        ->addColumn('orderAt', function($header){
+            return $header->order_at ?? '-';
+        })
+        ->addColumn('pranota', function($header){
+            return '<a type="button" href="/invoice/pranota-'. $header->id .'" target="_blank" class="btn btn-sm btn-warning text-white"><i class="fa fa-file"></i></a>';
+        })
+        ->addColumn('ktp', function($header){
+            $herf = '/invoice/photoKTP-' . $header->id;
+            return '<a href="javascript:void(0)" onclick="openWindow(\''.$herf.'\')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>';
+        })
+        ->addColumn('cancel', function($header){
+            return '<button class="btn btn-danger cancelInvoice" data-id="'.$header->id.'"><i class="fa fa-trash"></i></button>';
+        })
+        ->addColumn('pay', function($header){
+            return '<button type="button" id="pay" data-id="'.$header->id.'" class="btn btn-sm btn-success pay"><i class="fa fa-cogs"></i></button>';
+        })
+        ->addColumn('revisi', function($header){
+            return '<button class="btn btn-primary revisiInvoice" data-id="'.$header->form_id.'">Revisi</button>';
+        })
+        ->rawColumns(['pranota', 'ktp', 'cancel', 'pay', 'revisi'])
+        ->make(true);
+    }
 
     public function pranotaIndex($id)
     {
@@ -133,20 +127,15 @@ class InvoiceController extends Controller
             // Find the related form record
             $form = Form::find($header->form_id);
 
-            if ($form) {
-                $allHeader = Header::where('form_id', $form->id)->get();
-                foreach ($allHeader as $header) {
-                    $header->update([
-                        'status' => 'C',
-                        'cancel_at' => carbon::now(),
-                        'cancel_id' => Auth::user()->name,
-                    ]);
-                }
-
-                return response()->json(['success' => 'Invoice deleted successfully']);
-            } else {
-                return response()->json(['error' => 'Form not found'], 404);
+            $allHeader = Header::where('form_id', $header->form_id)->get();
+            foreach ($allHeader as $header) {
+                $header->update([
+                    'status' => 'C',
+                    'cancel_at' => carbon::now(),
+                    'cancel_id' => Auth::user()->name,
+                ]);
             }
+            return response()->json(['success' => 'Invoice deleted successfully']);
         } else {
             return response()->json(['error' => 'Header not found'], 404);
         }
@@ -228,7 +217,11 @@ class InvoiceController extends Controller
             if ($header->invoice_no != null) {
                 $noInvoice = $header->invoice_no;
             }else {
-                $consolidatorCode = $header->manifest->cont->job->consolidator->code;
+                // dd($header->Form->Forwarding->code);
+                $forwardingCode = substr($header->Form->Forwarding->code, 0, 3);
+                if (!$forwardingCode) {
+                    return redirect()->back()->with('status', ['type' => 'error', 'message' => 'Forwarding belum memiliki code, harap lengkapi terlebih dahulu']);
+                }
 
                 // Get the last two digits of the current year
                 $year = Carbon::now()->format('y'); // '24' for 2024
@@ -257,7 +250,7 @@ class InvoiceController extends Controller
                 $newSequence = str_pad($lastSequence + 1, 6, '0', STR_PAD_LEFT);
             
                 // Construct the new invoice number
-                $noInvoice = 'LKB-' . $consolidatorCode . '/' . $year . '/' . $newSequence;
+                $noInvoice = 'ITM-' . $forwardingCode . '/' . $year . '/' . $newSequence;
             }
         }
         // dd($noInvoice);

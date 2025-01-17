@@ -8,54 +8,26 @@
 <section>
     <div class="card">
         <div class="card-body">
-            <table class="tabelCustom">
-                <thead>
-                    <tr>
-                        <th class="text-center">Order No</th>
-                        <th class="text-center">No HBL</th>
-                        <th class="text-center">Tgl. HBL</th>
-                        <th class="text-center">Quantity</th>
-                        <th class="text-center">Customer</th>
-                        <th class="text-center">Kasir</th>
-                        <th class="text-center">Order At</th>
-                        <th class="text-center">Pranota</th>
-                        <th class="text-center">Photo KTP</th>
-                        <th class="text-center">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($headers as $form)
+            <div class="table">
+                <table class="table-hover" id="tableUnpaidData">
+                    <thead>
                         <tr>
-                            <td class="text-center">{{$form->order_no}}</td>
-                            <td class="text-center">{{$form->manifest->nohbl ?? ''}}</td>
-                            <td class="text-center">{{$form->manifest->tgl_hbl ?? ''}}</td>
-                            <td class="text-center">{{$form->manifest->quantity ?? ''}}</td>
-                            <td class="text-center">{{$form->customer->name ?? ''}}</td>
-                            <td class="text-center">{{$form->kasir->name ?? ''}}</td>
-                            <td class="text-center">{{$form->order_at}}</td>
-                            <td class="text-center">
-                                <a type="button" href="/invoice/pranota-{{$form->id}}" target="_blank" class="btn btn-sm btn-warning text-white {{ $form->status === 'C' ? 'disabled' : '' }}"><i class="fa fa-file"></i></a>
-                            </td>
-                            <td class="text-center">
-                                <a href="javascript:void(0)" onclick="openWindow('/invoice/photoKTP-{{$form->id}}')" class="btn btn-sm btn-info {{ $form->status === 'C' ? 'disabled' : '' }}"><i class="fa fa-eye"></i></a>
-                            </td>
-                            <td class="">
-                                <div class="button-container text-center">
-                                    <button class="btn btn-danger cancelInvoice" data-id="{{ $form->id }}" 
-                                        {{ $form->status === 'C' ? 'disabled' : '' }}>
-                                        <i class="fa fa-trash"></i>
-                                    </button>
-                                    <button type="button" id="pay" data-id="{{$form->id}}" class="btn btn-sm btn-success pay" 
-                                        {{ $form->status === 'C' ? 'disabled' : '' }}>
-                                        <i class="fa fa-cogs"></i>
-                                    </button>
-                                    <button class="btn btn-primary {{ $form->status === 'C' ? 'disabled' : '' }} revisiInvoice" data-id="{{$form->Form->id}}">Revisi</button>
-                                </div>
-                            </td>
+                            <th class="text-center">Order No</th>
+                            <th class="text-center">No HBL</th>
+                            <th class="text-center">Tgl. HBL</th>
+                            <th class="text-center">Quantity</th>
+                            <th class="text-center">Customer</th>
+                            <th class="text-center">Kasir</th>
+                            <th class="text-center">Order At</th>
+                            <th class="text-center">Pranota</th>
+                            <th class="text-center">Photo KTP</th>
+                            <th class="text-center">Cancel</th>
+                            <th class="text-center">Pay</th>
+                            <th class="text-center">Revisi</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                </table>
+            </div>
         </div>
     </div>
 </section>
@@ -121,9 +93,35 @@
 
 <script>
     $(document).ready(function(){
-        $('.revisiInvoice').on('click', function(){
-            let id = $(this).data('id');
-            console.log("logId" + id);
+        $('#tableUnpaidData').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '/invoice/form/unpaidData',
+            columns:[
+                { data: 'order_no', name: 'order_no' },
+                { data: 'nohbl', name: 'nohbl' },
+                { data: 'tgl_hbl', name: 'tgl_hbl' },
+                { data: 'quantity', name: 'quantity' },
+                { data: 'customerName', name: 'customerName' },
+                { data: 'kasir', name: 'kasir' },
+                { data: 'orderAt', name: 'orderAt' },
+                { data: 'pranota', name: 'pranota' },
+                { data: 'ktp', name: 'ktp' },
+                { data: 'cancel', name: 'cancel' },
+                { data: 'pay', name: 'pay' },
+                { data: 'revisi', name: 'revisi' },
+            ],
+        });
+    })
+</script>
+
+<script>
+    $(document).ready(function() {
+        // Attach click event to dynamically created buttons
+        $(document).on('click', '.revisiInvoice', function() {
+            let id = $(this).data('id'); // Get the form ID from data attribute
+            console.log("logId: " + id);
+            
             Swal.fire({
                 title: 'Are you sure?',
                 text: "Apakah anda yakin untuk melakukan revisi pada invoice ini?",
@@ -144,31 +142,10 @@
                             Swal.showLoading();
                         }
                     });
+                    // Redirect to the specified URL with form ID
                     window.location.href = '/invoice/form/formStep1/' + id;
                 }
             });
-        })
-    })
-</script>
-
-<script>
-    $(document).ready(function (){
-        $('#dataUnpaid').DataTable({
-            processing : true,
-            serverSide : false,
-            ajax : '/invoice/form/unpaidData',
-            column : [
-                { data: 'orderNo', name: 'orderNo', className: 'text-center' },
-                { data: 'hbl', name: 'hbl', className: 'text-center' },
-                { data: 'tglHBL', name: 'tglHBL', className: 'text-center' },
-                { data: 'quantity', name: 'quantity', className: 'text-center' },
-                { data: 'customer', name: 'customer', className: 'text-center' },
-                { data: 'kasir', name: 'kasir', className: 'text-center' },
-                { data: 'orderAt', name: 'orderAt', className: 'text-center' },
-                { data: 'pranota', name: 'pranota', className: 'text-center', orderable: false, searchable: false },
-                { data: 'photoKTP', name: 'photoKTP', className: 'text-center', orderable: false, searchable: false },
-                { data: 'action', name: 'action', className: 'text-center', orderable: false, searchable: false },
-            ],
         });
     });
 </script>

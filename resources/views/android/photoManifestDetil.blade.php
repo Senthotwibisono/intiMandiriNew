@@ -28,16 +28,34 @@
                             <input type="file" class="form-control" id="photos" name="photos[]" multiple accept="image/*">
                         </div>
                     </div>
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label for="">Kegiatan</label>
-                            <select name="action" id="" style="width: 100%;" class="js-example-basic-single form-select select2">
-                                <option value="stripping">Stripping</option>
-                                <option value="placement">Placement</option>
-                                <option value="gate_in">Gate In</option>
-                                <option value="gate_out">Gate Out</option>
-                            </select>
-                        </div>
+                    <div class="form-group">
+                        <label for="">Kegiatan</label>
+                        <select name="action" id="kegiatan" style="width: 100%;" class="js-example-basic-single form-select select2">
+                            <option value disabled selected>Pilih Satu!</option>
+                            <option value="stripping">Stripping</option>
+                            <option value="behandle">Behandle</option>
+                            <option value="gate-out">Gate Out</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="">Keterangan</label>
+                        <select name="detil" id="detilPhoto" style="width:100%;" class="js-example-basic-single select2 form-select">
+                            <option disabled selected>Pilih Kegiatan Terlebih Dahulu!</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="">List Photo Taken</label>
+                        <textarea name="" class="form-control" id="photoTaken" cols="30" rows="10" readonly>
+                        @foreach($kegiatan as $keg)
+                        {{ $keg }}:
+                        @foreach($detil as $det)
+                        @if($det->action == $keg)
+                        - {{ $det->detil }}
+                        @endif
+                        @endforeach
+                        
+                        @endforeach
+                        </textarea>
                     </div>
                 </div>
             </div>
@@ -53,7 +71,58 @@
 @endsection
 @section('custom_js')
 
+<script>
+$(document).ready(function(){
+    $('#kegiatan').on('change', function(){
+        let kegiatan = $(this).val();
+        console.log('kegiatan = ' + kegiatan);
+        swal.fire({
+            title: 'Processing...',
+            text: 'Please wait',
+            icon: 'info',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                }
+        });
+        $.ajax({
+            type: 'GET',
+            url: '/getManifestLclKeterangan',
+            cache: false,
+            data: {
+              kegiatan: kegiatan
+            },
+            dataType: 'json',
 
+            success: function(response){
+                Swal.close();
+                Swal.fire({
+                    title: 'success!',
+                    text: 'Data di Temukan',
+                    icon: 'success',
+                    confirmButton: 'Ok',
+                })
+
+                console.log(response);
+                $('#detilPhoto').empty().append('<option disabled selected>Pilih Satu!</option>');
+                    Object.values(response).forEach(function(detil) {
+                    $('#detilPhoto').append(`<option value="${detil}">${detil}</option>`);
+                });
+            },
+            error: function(data) {
+              console.log('error:', data);
+                  Swal.fire({
+                      title: 'Error',
+                      text: 'Data tidak ditemukan',
+                      icon: 'error',
+                      confirmButtonText: 'OK'
+                  });
+            }
+        })
+    })
+})
+</script>
 
 <script>
     function openWindow(url) {

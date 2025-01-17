@@ -7,14 +7,13 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
   <title> {{$title}} | Icon Sarana</title>
-  <link rel="stylesheet" href="{{asset('dist/assets/css/main/app.css')}}">
   <link rel="shortcut icon" href="{{asset('logo/icon.png')}}" type="image/x-icon">
   <link rel="shortcut icon" href="{{asset('logo/icon.png')}}" type="image/png">
 
   <style>
     /* Set ukuran kertas A5 landscape */
     @page {
-      width: 120mm;
+      width: 137mm;
       height: 100mm;
       margin: 0cm; /* Tambahkan margin jika diperlukan */
     }
@@ -28,9 +27,8 @@
     }
 
     .card {
-      width: 100%;
-      height: 100%;
-      margin: auto;
+      width: 137mm;
+      height: auto;
       border: 1px solid black;
     }
 
@@ -54,6 +52,10 @@
 
     .col-12 {
         width: 100%; /* Full width */
+    }
+
+    .col-6 {
+        width: 50%
     }
 
     .text-center {
@@ -82,43 +84,42 @@
         <div class="row" style="border-bottom: 1px solid black;">
             <div class="col-8" style="border-right: 1px solid black;">
                 <div class="row">
-                    <div class="col-4" style="border-right: 1px solid black;">
-                        <div class="img">
-                            <img src="/logo/IntiMandiri.png" class="img" alt="">
-                        </div>
-                    </div>
-                    <div class="col-8">
+                    <div class="col-12">
                         <div class="row">
                             <div class="col-12">
-                                <div class="text-center">
-                                    <br>
-                                    <span>PT. Inti Mandiri Utama Trans</span>
-                                    <hr>
-                                    <p>Consolidation Warehoude & Logistic</p>
+                                <div class="row">
+                                    <!-- Logo -->
+                                    <div class="col-4" style="border-right: 1px solid black;">
+                                        <div class="img">
+                                            <img src="/logo/IntiMandiri.png" class="img" alt="">
+                                        </div>
+                                    </div>
+                                    <div class="col-8">
+                                        <div class="text-center">
+                                            <br>
+                                            <span>PT. Inti Mandiri Utama Trans</span>
+                                            <hr>
+                                            <p>Consolidation Warehoude & Logistic</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div class="row" style="border-top: 1px solid black;">
-                            <div class="col-12">
-                                <div class="text-center">
-                                    <span>CONSIGGNEE</span>
-                                </div>
+                            <div class="col-12 text-center" style="line-height: 1.5;">
+                                <span>CONSIGGNEE</span>
                             </div>
                         </div>
                         <div class="row" style="border-top: 1px solid black;">
-                            <div class="col-12">
-                                <div class="text-center">
-                                    <span>{{$item->manifest->customer->name ?? ''}}</span>
-                                </div>
+                            <div class="col-12 text-center" style="line-height: 1.5;">
+                                <span>{{$item->manifest->customer->name ?? ''}}</span>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="row mt-0 mb-0" style="border-top: 1px solid black;">
-                    <div class="col-12">
-                        <div class="text-center">
-                            <span>ADDRESS</span>
-                        </div>
+                    <div class="col-12 text-center" style="line-height: 1.5;">
+                        <span>ADDRESS</span>
                     </div>
                 </div>
             </div>
@@ -131,24 +132,30 @@
          <div class="row" style="border-bottom: 1px solid black;">
             <div class="col-8" style="border-right: 1px solid black;">
                 <div class="row">
-                    <div class="col-12">
-                        <p>{{$item->manifest->customer->alamat ?? ''}}</p>
+                    <div class="col-12" style="margin-left: 5px;">
+                        <p style="font-size: 10px;">{{$item->manifest->customer->alamat ?? ''}}</p>
                     </div>
                 </div>
-                <div class="row" style="border-top: 1px solid black;">
-                    <div class="col-3" style="border-right: 1px solid black;">
-                        <p>Type</p>    
-                    </div>
-                    <div class="col-3" style="border-right: 1px solid black;">
-                        <p>
-                            {{$item->manifest->packing->code ?? ''}}
-                        </p>
-                    </div>
-                    <div class="col-3" style="border-right: 1px solid black;">
-                        Party
-                    </div>
-                    <div class="col-3">
-                        {{$item->manifest->quantity}}
+                <div class="col-12">
+                    <div class="row" style="border-top: 1px solid black;">
+                        <div class="col-45" style="border-right: 1px solid black;">
+                            <p>Type</p>    
+                        </div>
+                        <div class="col-45 text-center" style="border-right: 1px solid black;">
+                            <p>
+                                {{$item->manifest->packing->code ?? ''}}
+                            </p>
+                        </div>
+                        <div class="col-45" style="border-right: 1px solid black;">
+                            <p>
+                                Party
+                            </p>
+                        </div>
+                        <div class="col-45 text-center">
+                            <p>
+                                {{$item->manifest->quantity}}
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -158,8 +165,9 @@
                         <span>ETA</span>
                     </div>
                 </div>
+                <hr>
                 <div class="row">
-                <div class="col-12 text-center">
+                    <div class="col-12 text-center">
                         <span>{{$item->manifest->cont->job->eta}}</span>
                     </div>
                 </div>
@@ -170,14 +178,37 @@
         <div class="row">
             <div class="col-12">
                 <div class="row">
-                    <div class="col-45 text-center" style="border-right: 1px solid black;">
-                        <p>Vessel : {{$item->manifest->cont->job->Kapal->name ?? ''}}</p>
+                    <div class="col-8" style="border-right: 1px solid black;">
+                        <div class="row">
+                            <div class="col-6 text-center" style="border-right: 1px solid black;">
+                                <p>Vessel</p>
+                            </div>
+                            <div class="col-6 text-center">
+                                <p>HBL</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-45 text-center" style="border-right: 1px solid black;">
-                        <p>HBL : {{$item->manifest->nohbl ?? ''}} - {{$item->nomor}}</p>
+                    <div class="col-4 text-center">                       
+                        <p>Forwarding</p>
                     </div>
-                    <div class="col-45 text-center">
-                        <p>Forwarding : {{$item->manifest->cont->job->Forwarding->name ?? ''}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12" style="border-top: 1px solid black;">
+                <div class="row">
+                    <div class="col-8" style="border-right: 1px solid black;">
+                        <div class="row">
+                            <div class="col-6 text-center" style="border-right: 1px solid black;">
+                                <p>{{$item->manifest->cont->job->Kapal->name ?? ''}}</p>
+                            </div>
+                            <div class="col-6 text-center">
+                                <p>{{$item->manifest->nohbl ?? ''}} - {{$item->nomor}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4 text-center">
+                        <p>{{$item->manifest->cont->job->Forwarding->name ?? ''}}</p>
                     </div>
                 </div>
             </div>

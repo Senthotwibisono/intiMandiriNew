@@ -94,6 +94,12 @@ class FormController extends Controller
     public function delete($id)
     {
         $form = Form::where('id', $id)->first();
+        $invoice = Header::where('form_id', $id)->get();
+        if ($invoice) {
+            foreach ($invoice as $inv) {
+                $inv->delete();
+            }
+        }
         if ($form) {
         $form->delete();
         $tarif = FormT::where('form_id', $id)->delete();
@@ -147,6 +153,7 @@ class FormController extends Controller
             $form->update([
                 'manifest_id'=>$request->manifest_id,
                 'customer_id'=>$request->customer_id,
+                'forwarding_id'=>$request->forwarding_id,
                 'cbm'=>$request->cbm,
                 'time_in' => $request->time_in,
                 'expired_date' => $request->expired_date,

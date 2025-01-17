@@ -201,6 +201,9 @@ class DeliveryController extends Controller
     public function behandle(Request $request)
     {
         $manifest = Manifest::where('id', $request->id)->first();
+        if ($manifest->no_spjm == null) {
+            return redirect()->back()->with('status', ['type' => 'error', 'message' => 'Anda Belum Memasukkan Dokumen Behandle']);
+        }
         if ($manifest->date_ready_behandle == null) {
             $date_ready_behandle = Carbon::now();
         } else {

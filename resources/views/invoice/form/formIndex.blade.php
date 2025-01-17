@@ -101,10 +101,10 @@
                     <div class="col-sm-4">
                         <div class="form-group">
                             <label for="">Forwarding</label>
-                            <select name="customer_id" id="customer_id" class="js-example-basic-single select2 form-select" style="width:100%;">
+                            <select name="forwarding_id" id="forwarding_id" class="js-example-basic-single select2 form-select" style="width:100%;">
                                 <option disabled selected value>Pilih Satu!</option>
                                 @foreach($customer as $cus)
-                                    <option value="{{$cus->id}}" {{$form->customer_id == $cus->id ? 'selected' : ''}}>{{$cus->name}}</option>
+                                    <option value="{{$cus->id}}" {{$form->forwarding_id == $cus->id ? 'selected' : ''}}>{{$cus->name}}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -112,13 +112,13 @@
                     <div class="col-sm-4">
                         <div class="form-group">
                             <label for="">NPWP</label>
-                            <input type="text" class="form-control" id="npwp" value="{{$form->customer->npwp ?? ''}}" readonly>
+                            <input type="text" class="form-control" id="npwpF" value="{{$form->customer->npwp ?? ''}}" readonly>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-group">
                             <label for="">Phone</label>
-                            <input type="text" class="form-control" id="phone" value="{{$form->customer->phone ?? ''}}" readonly>
+                            <input type="text" class="form-control" id="phoneF" value="{{$form->customer->phone ?? ''}}" readonly>
                         </div>
                     </div>
                 </div>
@@ -227,21 +227,38 @@
 </script>
 <script>
     $(document).ready(function() {
+        
         $('#manifest_id').on('change', function() {
             var manifestId = $(this).val();
-
+            swal.fire({
+                title: 'Processing...',
+                text: 'Please wait',
+                icon: 'info',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                    willOpen: () => {
+                        Swal.showLoading();
+                    }
+            });
             if (manifestId) {
                 $.ajax({
                     url: '/get-manifest-data/' + manifestId,
                     type: 'GET',
                     dataType: 'json',
                     success: function(data) {
+                        Swal.close();
+                        Swal.fire({
+                            title: 'success!',
+                            text: 'Data di Temukan',
+                            icon: 'success',
+                            confirmButton: 'Ok',
+                        })
                         // Populate the form fields with the returned data
                         $('#quantity').val(data.quantity);
                         $('#weight').val(data.weight);
                         $('#meas').val(data.meas);
                         $('#cbm').val(data.cbm);
-                        $('#forwarding').val(data.forwarding);
+                        $('#forwarding').val(data.forwarding).trigger('change');
                         $('#time_in').val(data.tglmasuk);
                         $('#customer_id').val(data.cust).trigger('change');
                     }
@@ -254,6 +271,7 @@
                 $('#cbm').val('');
                 $('#time_in').val('');
                 $('#customer_id').val('').trigger('change');
+                $('#forwarding_id').val('').trigger('change');
             }
         });
     });
@@ -279,6 +297,31 @@
                 // Clear the fields if no manifest is selected
                 $('#npwp').val('');
                 $('#phone').val('');
+            }
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('#forwarding_id').on('change', function() {
+            var customerId = $(this).val();
+
+            if (customerId) {
+                $.ajax({
+                    url: '/get-customer-data/' + customerId,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        // Populate the form fields with the returned data
+                        $('#npwpF').val(data.npwp);
+                        $('#phoneF').val(data.phone);
+                    }
+                });
+            } else {
+                // Clear the fields if no manifest is selected
+                $('#npwpF').val('');
+                $('#phoneF').val('');
             }
         });
     });
