@@ -333,6 +333,8 @@ Route::controller(DokumenController::class)->group(function (){
         Route::get('/lcl/realisasi/GateOut-detail{id?}', 'detailGateOut')->name('lcl.delivery.detailGateOut');
         Route::post('/lcl/delivery/gateOut-barcodeGate', 'createBarcode')->name('lcl.delivery.barcodeGate');
 
+        Route::get('/lcl/delivery/cetakSuratJalan-{id?}', 'cetakSuratJalan');
+
         Route::get('/barcode/autoGate-indexManifest{id?}', 'manifestBarcode');
 
     });
@@ -369,6 +371,7 @@ Route::controller(DokumenController::class)->group(function (){
         Route::get('/lcl/realisasi/mty-detail{id?}', 'detailMt')->name('lcl.mty.detail');
         Route::post('/lcl/realisasi/mty-update', 'updateMt')->name('lcl.mty.update');
         Route::post('/lcl/realisasi/mty-barcodeGate', 'createBarcode')->name('lcl.mty.barcode.gate');
+        Route::get('/lcl/realisasi/suratJalan-BuangEmpty{id?}', 'suratJalan');
     });
 
 // Photo

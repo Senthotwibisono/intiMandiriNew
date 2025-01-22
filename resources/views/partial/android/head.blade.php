@@ -94,6 +94,28 @@
 }
 
 </style>
+
+<!-- Cmaera Qr -->
+<style>
+    #qr-reader-container {
+        position: relative;
+        width: 100%; /* Sesuai dengan lebar card */
+        padding-top: 56.25%; /* Aspect ratio 16:9 */
+    }
+
+    #video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Agar video tetap proporsional */
+    }
+
+    #canvas {
+        display: none; /* Sembunyikan canvas dari tampilan */
+    }
+</style>
 @if(View::hasSection('custom_styles'))
 @yield('custom_styles')
 @endif

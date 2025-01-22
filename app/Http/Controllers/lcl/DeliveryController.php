@@ -680,6 +680,17 @@ class DeliveryController extends Controller
 
         return view('barcode.indexManifest', $data);
     }
+
+    public function cetakSuratJalan($id)
+    {
+        $manifest = Manifest::find($id);
+
+        $data['title'] = "Cetak Surat Jalan Manifest - " . $manifest->nohbl;
+
+        $data['manifest'] = $manifest;
+
+        return view('lcl.delivery.cetakSuratJalan', $data);
+    }
 }
 
 

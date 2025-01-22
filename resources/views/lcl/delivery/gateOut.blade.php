@@ -152,7 +152,8 @@
             </div>
             <div class="card-footer">
                 <button type="button" class="btn btn-outline-danger" id="cancelButton">Cancel</button>
-                <button type="button" class="btn btn-outline-success updateButton" id="updateButton">Submit</button>      
+                <button type="button" class="btn btn-outline-success updateButton" id="updateButton">Submit</button>
+                <button type="button" class="btn btn-outline-warning cetakSuratJalan" id="cetakSuratJalan">Cetak Surat Jalan</button>      
             </div>
         </form>
     </div>
@@ -208,6 +209,44 @@ $(document).ready(function() {
         location.reload();
     });
 });
+</script>
+
+<script>
+    $(document).ready(function(){
+        $('#cetakSuratJalan').click(function(){
+            var manifestId = $("#id_edit").val();
+
+            if (manifestId == null || manifestId == '') {
+                Swal.fire('Error', 'Anda belum memilih manifest, harap pilih manifest terlebih dahulu', 'error');
+            } else {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Apakah anda yakin menerbitakn surat jalan untuk manifest ini?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        swal.fire({
+                            title: 'Processing...',
+                            text: 'Please wait',
+                            icon: 'info',
+                            allowOutsideClick: false,
+                            showConfirmButton: false,
+                                willOpen: () => {
+                                    Swal.showLoading();
+                                }
+                        });
+    
+                        window.open('/lcl/delivery/cetakSuratJalan-' + manifestId, "preview bon muat","width=600,height=600,menubar=no,status=no,scrollbars=yes");
+                        swal.close();
+                    }
+                });
+            }
+        })
+    })
 </script>
 
 <script>
