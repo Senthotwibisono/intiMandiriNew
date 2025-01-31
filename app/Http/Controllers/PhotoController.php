@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 use App\Models\Container as Cont;
+use App\Models\ContainerFCL as ContF;
 use App\Models\JobOrder as Job;
 use App\Models\Manifest;
 use App\Models\Photo;
@@ -35,6 +36,14 @@ class PhotoController extends Controller
         $data['conts'] = Cont::orderBy('joborder_id', 'asc')->get();
 
         return view('photo.lcl.cont.index', $data);
+    }
+
+    public function indexFclContainer()
+    {
+        $data['title'] = "Photo Container";
+        $data['conts'] = ContF::orderBy('joborder_id', 'asc')->get();
+
+        return view('photo.fcl.index', $data);
     }
 
     public function storeManifest(Request $request)
@@ -72,6 +81,30 @@ class PhotoController extends Controller
                     $newPhoto = Photo::create([
                         'master_id' => $cont->id,
                         'type' => 'lcl',
+                        'action' => $request->action,
+                        'photo' => $fileName,
+                        'detil'=> $request->detil,
+                    ]);
+                }
+            }
+            return redirect()->back()->with('status', ['type'=>'success', 'message'=>'Data Berhasil di Update']);
+            
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Oopss, Something Wrong'. $e->getMessage()]);
+        }
+    
+    }
+    public function storeContainerFcl(Request $request)
+    {
+        $cont = ContF::where('id', $request->id)->first();
+        try {
+            if ($request->hasFile('photos')) {
+                foreach ($request->file('photos') as $photo) {
+                    $fileName = $photo->getClientOriginalName();
+                    $photo->storeAs('imagesInt', $fileName, 'public'); 
+                    $newPhoto = Photo::create([
+                        'master_id' => $cont->id,
+                        'type' => 'fcl',
                         'action' => $request->action,
                         'photo' => $fileName,
                         'detil'=> $request->detil,

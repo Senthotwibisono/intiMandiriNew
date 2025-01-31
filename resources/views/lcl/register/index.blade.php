@@ -8,6 +8,11 @@
         text-overflow: ellipsis;
     }
 </style>
+<style>
+    #tableJob td, #tableJob th {
+        white-space: nowrap; /* Membuat teks tetap dalam satu baris */
+    }
+</style>
 @endsection
 @section('content')
 <section>
@@ -19,7 +24,7 @@
                 </div>
             </div>
             <br>
-            <div class="table table-responsive">
+            <div class="table">
                 <table class="table table-hover table-striped" id="tableJob">
                     <thead>
                         <tr>
@@ -223,8 +228,9 @@
 <script>
     $(document).ready(function(){
         $('#tableJob').DataTable({
-            precessing: true,
+            processing: true,
             serverSide: true,
+            scrollX: true,
             ajax: '/lcl/registerData',
             columns: [
                 { data: 'actions', name: 'actions', orderable: false, searchable: false },

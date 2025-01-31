@@ -15,7 +15,9 @@ class ContainerFCL extends Model
     protected $fillable = [
         'nocontainer',
         'joborder_id',
+        'cust_id',
         'type',
+        'ctr_type',
         'size',
         'teus',
         'layout',
@@ -61,6 +63,8 @@ class ContainerFCL extends Model
         'no_seal',
         'nombl',
         'tgl_master_bl',
+        'nobl',
+        'tgl_bl_awb',
         'jumlah_bl',
         'kd_tps_tujuan',
         'tglstripping',
@@ -124,6 +128,7 @@ class ContainerFCL extends Model
         'photo_stripping',
         'photo_empty',
         'status_bc',
+        'alasan_hold',
         'release_bc',
         'release_bc_date',
         'release_bc_uid',
@@ -140,11 +145,21 @@ class ContainerFCL extends Model
         'date_finish_behandle',
         'desc_check_behandle',
         'desc_finish_behandle',
+
+        'kode_dokumen',
+        'kd_dok_inout',
+        'no_dok',
+        'tgl_dok',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class, 'uid', 'id');
+    }
+
+    public function Customer()
+    {
+        return $this->belongsTo(Customer::class, 'cust_id', 'id');
     }
 
     public function userMasuk()
@@ -155,6 +170,11 @@ class ContainerFCL extends Model
     public function job()
     {
         return $this->belongsTo(JobOrderFCL::class, 'joborder_id', 'id');
+    }
+
+    public function dokumen()
+    {
+        return $this->belongsTo(KodeDok::class, 'kd_dok_inout', 'kode');
     }
 
     public function seal()

@@ -49,6 +49,13 @@ use App\Http\Controllers\pengiriman\CoariCodecoController;
  use App\Http\Controllers\FCL\RegisterFCLController;
  use App\Http\Controllers\FCL\Realisasi\GateInFCLCotroller;
  use App\Http\Controllers\FCL\Delivery\DeliveryFCLController;
+ use App\Http\Controllers\FCL\ContainerDokController;
+ 
+ //  Invoice Fcl
+ use App\Http\Controllers\invoiceFCL\InvoiceFCLMainController;
+ use App\Http\Controllers\invoiceFCL\MasterTarifFCLController;
+ use App\Http\Controllers\invoiceFCL\FormFCLController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -233,33 +240,38 @@ Route::controller(DokumenController::class)->group(function (){
 
      // SPPB BC23
      Route::get('/dokumen/bc23', 'bc23Index')->name('dokumen.bc23.index');
+     Route::get('/dokumen/bc23Container/{id?}', 'bc23ContainerList')->name('dokumen.bc23.containerList');
      Route::get('/dokumen/bc23Data', 'bc23Data')->name('dokumen.bc23.data');
      Route::get('/dokumen/bc23/detail{id?}', 'bc23Detail')->name('dokumen.bc23.detail');
      Route::get('/dokumen/bc23/cont{id?}', 'bc23Cont')->name('dokumen.bc23.detailCont');
      Route::post('/dokumen/bc23/updateDetail', 'bc23UpdateDetail')->name('dokumen.bc23.update.detail');
      Route::post('/dokumen/bc23-getData', 'GetImpor_SPPBBC23_OnDemand')->name('dokumen.bc23.onDemand');
      Route::post('/dokumen/bc23-getData-automatic', 'GetBC23Permit')->name('dokumen.bc23.permit');
-
-      // SPPB
-      Route::get('/dokumen/sppb', 'sppbIndex')->name('dokumen.sppb.index');
-      Route::get('/dokumen/sppbData', 'sppbData')->name('dokumen.sppb.data');
-      Route::get('/dokumen/sppb/detail{id?}', 'sppbDetail')->name('dokumen.sppb.detail');
-      Route::get('/dokumen/sppb/cont{id?}', 'sppbCont')->name('dokumen.sppb.detailCont');
-      Route::post('/dokumen/sppb/updateDetail', 'sppbUpdateDetail')->name('dokumen.sppb.update.detail');
-      Route::post('/dokumen/sppb-getData', 'GetImpor_SPPB_OnDemand')->name('dokumen.sppb.onDemand');
-      Route::post('/dokumen/sppb-getData-automatic', 'GetImporPermit')->name('dokumen.sppb.import');
-
-    //   manual
-      Route::get('/dokumen/manual', 'manualIndex')->name('dokumen.manual.index');
-      Route::get('/dokumen/manualData', 'manualData')->name('dokumen.manual.data');
-      Route::get('/dokumen/manual/detail{id?}', 'manualDetail')->name('dokumen.manual.detail');
-      Route::get('/dokumen/manual/cont{id?}', 'manualCont')->name('dokumen.manual.detailCont');
-      Route::post('/dokumen/manual/updateDetail', 'manualUpdateDetail')->name('dokumen.manual.update.detail');
-      Route::post('/dokumen/manual-getData', 'GetDokumenManual_OnDemand')->name('dokumen.manual.onDemand');
-
-    //   Pabean
-      Route::get('/dokumen/pabean', 'pabeanIndex')->name('dokumen.pabean.index');
-      Route::get('/dokumen/pabeanData', 'pabeanData')->name('dokumen.pabean.data');
+     
+     // SPPB
+     Route::get('/dokumen/sppb', 'sppbIndex')->name('dokumen.sppb.index');
+     Route::get('/dokumen/sppbData', 'sppbData')->name('dokumen.sppb.data');
+     Route::get('/dokumen/sppbContainer/{id?}', 'SPPBContainerList')->name('dokumen.sppb.containerList');
+     Route::get('/dokumen/sppb/detail{id?}', 'sppbDetail')->name('dokumen.sppb.detail');
+     Route::get('/dokumen/sppb/cont{id?}', 'sppbCont')->name('dokumen.sppb.detailCont');
+     Route::post('/dokumen/sppb/updateDetail', 'sppbUpdateDetail')->name('dokumen.sppb.update.detail');
+     Route::post('/dokumen/sppb-getData', 'GetImpor_SPPB_OnDemand')->name('dokumen.sppb.onDemand');
+     Route::post('/dokumen/sppb-getData-automatic', 'GetImporPermit')->name('dokumen.sppb.import');
+     
+     //   manual
+     Route::get('/dokumen/manual', 'manualIndex')->name('dokumen.manual.index');
+     Route::get('/dokumen/manualData', 'manualData')->name('dokumen.manual.data');
+     Route::get('/dokumen/manualContainer/{id?}', 'manualContainerList')->name('dokumen.manual.containerList');
+     Route::get('/dokumen/manual/detail{id?}', 'manualDetail')->name('dokumen.manual.detail');
+     Route::get('/dokumen/manual/cont{id?}', 'manualCont')->name('dokumen.manual.detailCont');
+     Route::post('/dokumen/manual/updateDetail', 'manualUpdateDetail')->name('dokumen.manual.update.detail');
+     Route::post('/dokumen/manual-getData', 'GetDokumenManual_OnDemand')->name('dokumen.manual.onDemand');
+     Route::post('/dokumen/manual-getData-automatic', 'GetDokumenManual')->name('dokumen.manual.auto');
+     
+     //   Pabean
+     Route::get('/dokumen/pabean', 'pabeanIndex')->name('dokumen.pabean.index');
+     Route::get('/dokumen/pabeanData', 'pabeanData')->name('dokumen.pabean.data');
+     Route::get('/dokumen/pabeanContainer/{id?}', 'pabeanContainerList')->name('dokumen.pabean.containerList');
       Route::get('/dokumen/pabean/detail{id?}', 'pabeanDetail')->name('dokumen.pabean.detail');
       Route::get('/dokumen/pabean/cont{id?}', 'pabeanCont')->name('dokumen.pabean.detailCont');
       Route::post('/dokumen/pabean/updateDetail', 'pabeanUpdateDetail')->name('dokumen.pabean.update.detail');
@@ -378,9 +390,12 @@ Route::controller(DokumenController::class)->group(function (){
 Route::controller(PhotoController::class)->group(function(){
     Route::get('/photo/lcl/manifest', 'indexLclManifest')->name('photo.lcl.manifest');
     Route::get('/photo/lcl/container', 'indexLclContainer')->name('photo.lcl.container');
+    Route::get('/photo/fcl/container', 'indexFclContainer')->name('photo.fcl.container');
 
     Route::post('/photo/lcl/manifestPost', 'storeManifest')->name('photo.lcl.storeManifest');
     Route::post('/photo/lcl/ContainerPost', 'storeContainer')->name('photo.lcl.storeContainer');
+
+    Route::post('/photo/fcl/ContainerPost', 'storeContainerFcl')->name('photo.fcl.storeContainer');
 
     Route::get('/getContainerLclKeterangan', 'getKeteranganContainerLcl');
     Route::get('/getManifestLclKeterangan', 'getKeteranganManifestLcl');
@@ -388,6 +403,7 @@ Route::controller(PhotoController::class)->group(function(){
 // Barcode
 Route::controller(BarcodeAutoGateController::class)->group(function(){
     Route::get('/barcode/autoGate-index{id?}', 'index')->name('barcode.autoGate.index');
+    Route::get('/barcode/autoGate-PrintAll{id?}', 'indexViewAll');
     Route::get('/barcode/autoGate-photoIn{id?}', 'photoIn');
     Route::get('/barcode/autoGate-photoOut{id?}', 'photoOut');
     Route::get('/autoGate-barcode', 'indexAll')->name('barcode.autoGate.indexAll');
@@ -623,14 +639,16 @@ Route::controller(LclController::class)->group(function(){
             Route::get('/index', 'index')->name('fcl.register.index');
             Route::get('/data', 'indexData');
             Route::get('/detail-{id}', 'detail');
+            Route::get('/detailDataContainer-{id}', 'detilData');
             Route::get('/containerEdit{id}', 'editContainer');
             Route::post('/create', 'create')->name('fcl.register.create');
-            Route::post('/uodate', 'uodate')->name('fcl.register.update');
+            Route::post('/update', 'update')->name('fcl.register.update');
             Route::post('/updateContainer', 'updateContainer')->name('fcl.register.updateCont');
             Route::post('/createContainer', 'createContainer')->name('fcl.register.container.create');
             Route::post('/postPLP', 'postPLP')->name('fcl.register.updatePLP');
             Route::delete('/containerDelete{id}', 'deleteContainer');
             Route::post('/barcodeGate', 'createBarcode');
+            Route::post('/barcodeGateAll', 'createBarcodeAll');
         });
 
         Route::prefix('/realisasi')->controller(GateInFCLCotroller::class)->group(function(){
@@ -659,5 +677,42 @@ Route::controller(LclController::class)->group(function(){
 
             Route::get('/gateOut', 'indexGateOut');
             
+        });
+
+        Route::prefix('/containerList')->controller(ContainerDokController::class)->group(function(){
+            Route::get('/index', 'index');
+            Route::get('/dataTable', 'dataTable');
+            Route::post('/dataDok', 'dataDok');
+            Route::post('/updateCont', 'updateCont')->name('fcl.containerList.update');
+        });
+    });
+
+    Route::prefix('/invoiceFCL')->group(function(){
+        Route::get('/dashboard', [InvoiceFCLMainController::class, 'dashboardInvoiceFCL']);
+        Route::prefix('/masterTarif')->group(function(){
+            Route::get('/index', [InvoiceFCLMainController::class, 'indexMasterTarif']);
+            Route::controller(MasterTarifFCLController::class)->group(function(){
+                // Tarif TPS
+                Route::get('/dataTarifTPS', 'dataTableTPS');
+                Route::post('/createTarifTPS', 'postTarifTPS')->name('invoice.fcl.createTarifTPS');
+                Route::get('/editTarif{id?}', 'editTarifTPS');
+                Route::post('/updateTarifTPS', 'updateTarifTPS')->name('invoice.fcl.updateTarifTPS');
+                
+                // Tarif WMS
+                Route::get('/dataTarifWMS', 'dataTableWMS');
+                Route::post('/createTarifWMS', 'postTarifWMS')->name('invoice.fcl.createTarifWMS');
+                Route::get('/editTarifWMS/{id?}', 'editTarifWMS');
+                Route::post('/updateTarifWMS', 'updateTarifWMS')->name('invoice.fcl.updateTarifWMS');
+                
+            });
+        });
+        Route::prefix('/form')->group(function(){
+            Route::get('/index', [InvoiceFCLMainController::class, 'indexForm']);
+            Route::controller(FormFCLController::class)->group(function(){
+                Route::get('/createIndex/Step1', 'indexStep1');
+                Route::get('/getBLAWB', 'getBLAWB');
+                Route::get('/getBLData/{bl?}', 'getBLData');
+                Route::post('/step1Post', 'postStep1');
+            });
         });
     });

@@ -127,6 +127,9 @@
             <li class="submenu-item @if(Request::is('fcl/register') || Request::is('fcl/register/*')) active @endif">
                 <a href="{{ url('/fcl/register/index')}}">Register</a>
             </li>
+            <li class="submenu-item @if(Request::is('fcl/containerList') || Request::is('fcl/containerList/*')) active @endif">
+                <a href="{{ url('/fcl/containerList/index')}}">Container List</a>
+            </li>
             <!-- Realisasi -->
             <li class="sidebar-item has-sub @if(Request::is('fcl/realisasi/*')) active @endif">
                 <a href="#" class='sidebar-link'>
@@ -200,13 +203,8 @@
             </li>
 
             <!-- Delivery -->
-            <li class="sidebar-item has-sub @if(Request::is('photo/fcl/*')) active @endif">
-                <a href="#" class='sidebar-link'>
-                    <span>FCL</span>
-                </a>
-                <ul class="submenu @if(Request::is('photo/fcl/*')) active @endif">
-                   
-                </ul>
+            <li class="submenu-item  @if(Request::is('photo/fcl/*')) active @endif">
+                <a href="{{ url('/photo/fcl/container')}}">FCL</a>
             </li>
         </ul>
     </li>
@@ -286,6 +284,7 @@
         </ul>
     </li>
     <hr>
+    <!-- Invoice LCL -->
     <li class="sidebar-item has-sub @if(Request::is('invoice/*')) active @endif">
         <a href="#" class='sidebar-link'>
             <i class="fa-solid fa-dollar"></i>
@@ -335,6 +334,46 @@
                     </li>
                 </ul>
             </li>
+            <li class="submenu-item @if(Request::is('invoice/report')) active @endif">
+                <a href="{{ url('/invoice/report')}}">Rport Invoice</a>
+            </li>
+        </ul>
+    </li>
+    <!-- Invoice FCL -->
+    <li class="sidebar-item has-sub @if(Request::is('invoiceFCL/*')) active @endif">
+        <a href="#" class='sidebar-link'>
+            <i class="fa-solid fa-dollar"></i>
+            <span>Invoice FCL</span>
+        </a>
+        <ul class="submenu @if(Request::is('invoiceFCL/*')) active @endif">
+            <li class="sidebar-item @if(Request::is('invoiceFCL/dashboard') || Request::is('/invoiceFCL/dashboard')) active @endif">
+                <a href="/invoiceFCL/dashboard" class='sidebar-link'>
+                    <i class="bi bi-grid-fill"></i>
+                    <span>Dashboard Invoice FCL</span>
+                </a>
+            </li>
+            <!--  -->
+            <li class="sidebar-item has-sub @if(Request::is('invoiceFCL/masterTarif/*')) active @endif">
+                <a href="#" class='sidebar-link'>
+                    <span>Master</span>
+                </a>
+                <ul class="submenu @if(Request::is('invoiceFCL/masterTarif/*')) active @endif">
+                    <li class="submenu-item @if(Request::is('invoiceFCL/masterTarif/index')) active @endif">
+                        <a href="{{ url('/invoiceFCL/masterTarif/index')}}">Tarif</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="sidebar-item has-sub @if(Request::is('invoiceFCL/form/*')) active @endif">
+                <a href="#" class='sidebar-link'>
+                    <span>Form</span>
+                </a>
+                <ul class="submenu @if(Request::is('invoiceFCL/form/*')) active @endif">
+                    <li class="submenu-item @if(Request::is('invoiceFCL/form/index')) active @endif">
+                        <a href="{{ url('/invoiceFCL/form/index')}}">Form Index</a>
+                    </li>
+                </ul>
+            </li>
+            
             <li class="submenu-item @if(Request::is('invoice/report')) active @endif">
                 <a href="{{ url('/invoice/report')}}">Rport Invoice</a>
             </li>

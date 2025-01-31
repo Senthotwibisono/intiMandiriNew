@@ -229,53 +229,40 @@
             <h4><strong>Container Job</strong></h4>
         </div>
         <div class="card-body fixed-header-card">
-            <table class="tabelCustom">
+            <table class="table table-hover" id="tableContainer">
                 <thead>
                     <tr>
-                        <th>Action</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                        <th>No BL AWB</th>
+                        <th>Tgl BL AWB</th>
                         <th>Container No</th>
                         <th>Container Size</th>
+                        <th>Container Type</th>
                         <th>Teus</th>
                         <th>Seal</th>
                         <th>Weight</th>
                         <th>Measurement</th>
+                        <th>Customer</th>
                         <th>Tgl Entry</th>
                         <th>UID</th>
                     </tr>
                 </thead>
-                <tbody>
-                    @foreach($conts as $cont)
-                       <tr>
-                             <td>
-                                 <button class="btn btn-warning formEdit" data-id="{{ $cont->id }}" id="formEdit"><i class="fa fa-pen"></i></button>
-                                 <button class="btn btn-danger" data-id="{{ $cont->id }}" id="deleteUser-{{ $cont->id }}"><i class="fa fa-trash"></i></button>
-                             </td>
-                             <td>{{$cont->nocontainer}}</td>
-                             <td>{{$cont->size}}</td>
-                             <td>{{$cont->teus}}</td>
-                             <td>{{$cont->no_seal}}</td>
-                             <td>{{$cont->weight}}</td>
-                             <td>{{$cont->meas}}</td>
-                             <td>{{$cont->job->eta ?? ' '}}</td>
-                             <td>{{$cont->user->name}}</td>
-                       </tr>
-                    @endforeach
-                </tbody>
             </table>
         </div>
-        <!-- <div class="card-footer">
+        <div class="card-footer">
             <div class="row">
                 <div class="col-auto">
                     <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addManual"><i class="fas fa-plus"></i></button>
                 </div>
-                <div class="col-auto">
+                <!-- <div class="col-auto">
                     <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#excelModal"><i class="fas fa-file-excel"></i></button>
                 </div>
                 <div class="col-auto">
                     <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#newFormatModal"><i class="fas fa-file-excel"></i> || New Format</button>
-                </div>
+                </div> -->
             </div>
-        </div> -->
+        </div>
     </div>
 </section>
 
@@ -287,9 +274,9 @@
                 <h5 class="modal-title" id="exampleModalCenterTitle">Add Data Container</h5>
                 <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"> <i data-feather="x"></i></button>
             </div>
-            <form action="{{ route('fcl.register.container.create')}}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="modal-body">
+            <div class="modal-body">
+                    <form action="/fcl/register/createContainer" method="POST" enctype="multipart/form-data" id="createContianerForm">
+                        @csrf
                     <div class="row mb-5">
                         <div class="col-sm-12">
                             <div class="form-group">
@@ -305,6 +292,46 @@
                                 </select>
                             </div>
                             <div class="form-group">
+                                <label>Jenis Container</label>
+                                <select class="customSelect form-control select2" name="ctr_type" style="width: 100%;" required>
+                                    <option disabled selected value>Choose Jenis Container</option>
+                                    <option value="Class BB Standar 3">Class BB Standar 3</option>
+                                    <option value="Class BB Standar 8">Class BB Standar 8</option>
+                                    <option value="Class BB Standar 9">Class BB Standar 9</option>
+                                    <option value="Class BB Standar 4,1">Class BB Standar 4,1</option>
+                                    <option value="Class BB Standar 4,2">Class BB Standar 4,2</option>   
+				            		<option value="Class BB Standar 4,3">Class BB Standar 4,3</option>   
+                                    <option value="Class BB Standar 6">Class BB Standar 6</option>
+                                    <option value="Class BB Standar 2,2">Class BB Standar 2,2</option>
+                                    <option value="Class BB Standar 2,3">Class BB Standar 2,3</option>    
+                                    <option value="Class BB High Class 2,1">Class BB High Class 2,1</option>
+                                    <option value="Class BB High Class 5,1">Class BB High Class 5,1</option>
+                                    <option value="Class BB High Class 6,1">Class BB High Class 6,1</option>
+                                    <option value="Class BB High Class 5,2">Class BB High Class 5,2</option>
+                                    <option value="REEFER RF">REEFER RF</option>
+                                    <option value="REEFER RECOOLING">REEFER RECOOLING</option>
+				            		<option value="REEFER RECOOLING BB 3">REEFER RECOOLING BB 3</option>
+				            		<option value="REEFER RECOOLING BB 8">REEFER RECOOLING BB 8</option>                           
+				            		<option value="REEFER RECOOLING BB 6">REEFER RECOOLING BB 6</option>\		
+				            		<option value="REEFER RECOOLING BB 9">REEFER RECOOLING BB 9</option>
+				            		<option value="REEFER RECOOLING BB 2.1">REEFER RECOOLING BB 2.1</option>
+				            		<option value="REEFER RECOOLING BB 2.2">REEFER RECOOLING BB 2.2</option>
+				            		<option value="REEFER RECOOLING BB 2.3">REEFER RECOOLING BB 2.3</option>			
+				            		<option value="REEFER RECOOLING BB 4.1">REEFER RECOOLING BB 4.1</option>
+				            		<option value="REEFER RECOOLING BB 4.2">REEFER RECOOLING BB 4.2</option>
+                                    <option value="REEFER RECOOLING BB 5.1">REEFER RECOOLING BB 5.1</option>
+                                    <option value="REEFER RECOOLING BB 5.2">REEFER RECOOLING BB 5.2</option>
+                                    <option value="REEFER RECOOLING BB 6.1">REEFER RECOOLING BB 6.1</option>
+				            		<option value="FLAT TRACK RF">FLAT TRACK RF</option>
+                                    <option value="FLAT TRACK OH">FLAT TRACK OH</option>
+                                    <option value="FLAT TRACK OW">FLAT TRACK OW</option>
+                                    <option value="FLAT TRACK OL">FLAT TRACK OL</option>
+                                    <option value="DRY">DRY</option>
+                                    <option value="OPEN TOP">OPEN TOP</option>
+				            		<option value="OH">OH</option>
+                                 </select>
+                            </div>
+                            <div class="form-group">
                                 <label for="">Seal</label>
                                 <input type="text" class="form-control" name="no_seal">
                             </div>
@@ -317,13 +344,34 @@
                             <label for="">Measurement</label>
                             <input type="text" class="form-control" name="meas">
                         </div>
+                        <div class="form-group">
+                            <label for="">No BL AWB</label>
+                            <input type="text" name="nobl" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="">Tgl BL AWB</label>
+                            <input type="date" name="tgl_bl_awb" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="">ETA</label>
+                            <input type="datetime-local" class="form-control" name="eta" id="">
+                        </div>
+                        <div class="form-group">
+                            <label for="">Customer</label>
+                            <select name="cust_id" id="" class="customSelect form-select selcet2" style="width: 100%;">
+                                <option disabled selected value>Pilih Satu!</option>
+                                @foreach($customer as $cust)
+                                    <option value="{{$cust->id}}">{{$cust->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal"> <i class="bx bx-x d-block d-sm-none"></i> <span class="d-none d-sm-block">Close</span> </button>
-                    <button type="submit" class="btn btn-primary ml-1" data-bs-dismiss="modal"> <i class="bx bx-check d-block d-sm-none"></i> <span class="d-none d-sm-block">Submit</span> </button>
-                </div>
-            </form>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal"> <i class="bx bx-x d-block d-sm-none"></i> <span class="d-none d-sm-block">Close</span> </button>
+                <button type="button" id="createContianerButton" class="btn btn-primary ml-1" data-bs-dismiss="modal"> <i class="bx bx-check d-block d-sm-none"></i> <span class="d-none d-sm-block">Submit</span> </button>
+            </div>
         </div>
     </div>
 </div>
@@ -332,12 +380,12 @@
     <div class="modal-dialog modal-dialog-centered modal-dialog-centered modal-dialog-scrollable modal-lg"role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalCenterTitle">Edit Data Consolidator</h5>
+                <h5 class="modal-title" id="exampleModalCenterTitle">Edit Data Container</h5>
                 <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"> <i data-feather="x"></i></button>
             </div>
-            <form action="{{ route('fcl.register.updateCont')}}" method="POST" id="updateForm" enctype="multipart/form-data">
-                @csrf
-                <div class="modal-body">
+            <div class="modal-body">
+                    <form action="{{ route('fcl.register.updateCont')}}" method="POST" id="updateForm" enctype="multipart/form-data">
+                        @csrf
                     <div class="row mb-5">
                         <div class="col-sm-12">
                             <div class="form-group">
@@ -348,10 +396,50 @@
                             </div>
                             <div class="form-group">
                                 <label for="">Size</label>
-                                <select name="size" id="size_edit" id="" class="editSelect form-select select2" style="width: 100%;">
+                                <select name="size" id="size_edit" class="editSelect form-select select2" style="width: 100%;">
                                     <option value="20">20</option>
                                     <option value="40">40</option>
                                 </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Jenis Container</label>
+                                <select class="editSelect form-control select2" id="ctr_type_edit" name="ctr_type" style="width: 100%;" required>
+                                    <option disabled selected value>Choose Jenis Container</option>
+                                    <option value="Class BB Standar 3">Class BB Standar 3</option>
+                                    <option value="Class BB Standar 8">Class BB Standar 8</option>
+                                    <option value="Class BB Standar 9">Class BB Standar 9</option>
+                                    <option value="Class BB Standar 4,1">Class BB Standar 4,1</option>
+                                    <option value="Class BB Standar 4,2">Class BB Standar 4,2</option>   
+				            		<option value="Class BB Standar 4,3">Class BB Standar 4,3</option>   
+                                    <option value="Class BB Standar 6">Class BB Standar 6</option>
+                                    <option value="Class BB Standar 2,2">Class BB Standar 2,2</option>
+                                    <option value="Class BB Standar 2,3">Class BB Standar 2,3</option>    
+                                    <option value="Class BB High Class 2,1">Class BB High Class 2,1</option>
+                                    <option value="Class BB High Class 5,1">Class BB High Class 5,1</option>
+                                    <option value="Class BB High Class 6,1">Class BB High Class 6,1</option>
+                                    <option value="Class BB High Class 5,2">Class BB High Class 5,2</option>
+                                    <option value="REEFER RF">REEFER RF</option>
+                                    <option value="REEFER RECOOLING">REEFER RECOOLING</option>
+				            		<option value="REEFER RECOOLING BB 3">REEFER RECOOLING BB 3</option>
+				            		<option value="REEFER RECOOLING BB 8">REEFER RECOOLING BB 8</option>                           
+				            		<option value="REEFER RECOOLING BB 6">REEFER RECOOLING BB 6</option>\		
+				            		<option value="REEFER RECOOLING BB 9">REEFER RECOOLING BB 9</option>
+				            		<option value="REEFER RECOOLING BB 2.1">REEFER RECOOLING BB 2.1</option>
+				            		<option value="REEFER RECOOLING BB 2.2">REEFER RECOOLING BB 2.2</option>
+				            		<option value="REEFER RECOOLING BB 2.3">REEFER RECOOLING BB 2.3</option>			
+				            		<option value="REEFER RECOOLING BB 4.1">REEFER RECOOLING BB 4.1</option>
+				            		<option value="REEFER RECOOLING BB 4.2">REEFER RECOOLING BB 4.2</option>
+                                    <option value="REEFER RECOOLING BB 5.1">REEFER RECOOLING BB 5.1</option>
+                                    <option value="REEFER RECOOLING BB 5.2">REEFER RECOOLING BB 5.2</option>
+                                    <option value="REEFER RECOOLING BB 6.1">REEFER RECOOLING BB 6.1</option>
+				            		<option value="FLAT TRACK RF">FLAT TRACK RF</option>
+                                    <option value="FLAT TRACK OH">FLAT TRACK OH</option>
+                                    <option value="FLAT TRACK OW">FLAT TRACK OW</option>
+                                    <option value="FLAT TRACK OL">FLAT TRACK OL</option>
+                                    <option value="DRY">DRY</option>
+                                    <option value="OPEN TOP">OPEN TOP</option>
+				            		<option value="OH">OH</option>
+                                 </select>
                             </div>
                             <div class="form-group">
                                 <label for="">Seal</label>
@@ -366,19 +454,91 @@
                             <label for="">Measurement</label>
                             <input type="text" class="form-control" name="meas" id="meas_edit">
                         </div>
+                        <div class="form-group">
+                            <label for="">No BL AWB</label>
+                            <input type="text" name="nobl" id="nobl_edit" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="">Tgl BL AWB</label>
+                            <input type="date" name="tgl_bl_awb" id="tgl_bl_awb_edit" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="">ETA</label>
+                            <input type="date" class="form-control" name="eta" id="eta_edit">
+                        </div>
+                        <div class="form-group">
+                            <label for="">Customer</label>
+                            <select name="cust_id" id="customerEdit" class="editSelect form-select selcet2" style="width: 100%;">
+                                <option disabled selected value>Pilih Satu!</option>
+                                @foreach($customer as $cust)
+                                    <option value="{{$cust->id}}">{{$cust->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal"> <i class="bx bx-x d-block d-sm-none"></i> <span class="d-none d-sm-block">Close</span> </button>
-                    <button type="button" id="updateButton" class="btn btn-primary ml-1" data-bs-dismiss="modal"> <i class="bx bx-check d-block d-sm-none"></i> <span class="d-none d-sm-block">Submit</span> </button>
-                </div>
-            </form>
+                </form>
+            </div>
+             <div class="modal-footer">
+                 <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal"> <i class="bx bx-x d-block d-sm-none"></i> <span class="d-none d-sm-block">Close</span> </button>
+                 <button type="button" id="updateButton" class="btn btn-primary ml-1" data-bs-dismiss="modal"> <i class="bx bx-check d-block d-sm-none"></i> <span class="d-none d-sm-block">Submit</span> </button>
+             </div>
         </div>
     </div>
 </div>
 @endsection
 
 @section('custom_js')
+
+<script>
+    $(document).ready(function (){
+        var id = {{$job->id}};
+        $('#tableContainer').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax : '/fcl/register/detailDataContainer-' + id,
+            columns : [
+                {data: 'edit', name: 'edit'},
+                {data: 'delete', name: 'delete'},
+                {data: 'nobl', name: 'nobl'},
+                {data: 'tgl_bl_awb', name: 'tgl_bl_awb'},
+                {data: 'nocontainer', name: 'nocontainer'},
+                {data: 'size', name: 'size'},
+                {data: 'ctr_type', name: 'ctr_type'},
+                {data: 'teus', name: 'teus'},
+                {data: 'no_seal', name: 'no_seal'},
+                {data: 'weight', name: 'weight'},
+                {data: 'meas', name: 'meas'},
+                {data: 'customer', name: 'customer'},
+                {data: 'eta', name: 'eta'},
+                {data: 'user', name: 'user'},
+            ]
+        });
+    })
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Attach event listener to the update button
+        document.getElementById('createContianerButton').addEventListener('click', function (e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Show SweetAlert confirmation dialog
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to update this record?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, update it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Submit the form programmatically if confirmed
+                    document.getElementById('createContianerForm').submit();
+                }
+            });
+        });
+    });
+</script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Attach event listener to the update button
@@ -473,9 +633,14 @@
         $("#editCust #nocontainer_edit").val(response.data.nocontainer);
         $("#editCust #id_edit").val(response.data.id);
         $("#editCust #size_edit").val(response.data.size).trigger('change');
+        $("#editCust #ctr_type_edit").val(response.data.ctr_type).trigger('change');
         $("#editCust #weight_edit").val(response.data.weight);
         $("#editCust #no_seal_edit").val(response.data.no_seal);
         $("#editCust #meas_edit").val(response.data.meas);
+        $("#editCust #nobl_edit").val(response.data.nobl);
+        $("#editCust #tgl_bl_awb_edit").val(response.data.tgl_bl_awb);
+        $("#editCust #eta_edit").val(response.data.eta);
+        $("#editCust #customerEdit").val(response.data.cust_id).trigger('change');
       },
       error: function(data) {
         console.log('error:', data)

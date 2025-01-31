@@ -57,12 +57,16 @@ class RegisterFCLController extends Controller
                     return $containers->map(function($container) use ($job) {
                         return [
                             'actions' => '<div class="button-container"><a href="/fcl/register/detail-'.$container->joborder_id.'" class="btn btn-warning"><i class="fa fa-pen"></i></a> 
-                                          <button class="btn btn-danger printBarcode" data-id="'.$container->id.'"><i class="fa fa-print"></i></button> </div>',
+                                          <button class="btn btn-danger printBarcode" data-id="'.$container->id.'"><i class="fa fa-print"></i></button>
+                                          <button class="btn btn-secondary printBarcodeAll" data-id="'.$job->id.'"><i class="fa fa-print"></i></button>
+                                          </div>',
                             'nojoborder' => $job->nojoborder,
                             'nospk' => $job->nospk,
                             'forwarding' => $job->Forwarding->name ?? '',
                             'nocontainer' => $container->nocontainer,
-                            'nombl' => $job->nombl,
+                            'nombl' => $job->nombl ?? '-',
+                            'no_bl_awb' => $container->nobl ?? '-',
+                            'tgl_bl_awb' => $container->tgl_bl_awb ?? '-',
                             'no_plp'=>$job->PLP->no_plp ?? '',
                             'tgl_plp'=>$job->PLP->tgl_plp ?? '',
                             'kd_kantor'=>$job->PLP->kd_kantor ?? '',
@@ -87,6 +91,8 @@ class RegisterFCLController extends Controller
                         'forwarding' => $job->Forwarding->name ?? '',
                         'nocontainer' => 'Belum ada Container',
                         'nombl' => $job->nombl,
+                        'no_bl_awb' => '-',
+                        'tgl_bl_awb' => '-',
                         'no_plp'=>$job->PLP->no_plp ?? '',
                         'tgl_plp'=>$job->PLP->tgl_plp ?? '',
                         'kd_kantor'=>$job->PLP->kd_kantor ?? '',
@@ -172,12 +178,35 @@ class RegisterFCLController extends Controller
         $data['loks'] = LS::get();
         $data['gudangs'] = Gudang::get();
         $data['seals'] = Eseal::get();
-        $data['conts'] = Cont::where('joborder_id', $id)->get(); 
         $data['forwardings'] = Customer::get();
+        $data['customer'] = Customer::get();
 
-        $data['manifestJob'] = Manifest::where('joborder_id', $id)->get();
 
         return view('fcl.register.detil', $data);
+    }
+
+    public function detilData($id, Request $request)
+    {
+        $cont = Cont::with(['user', 'Customer', 'job'])->where('joborder_id', $id)->get();
+        
+        return DataTables::of($cont)
+        ->addColumn('edit', function($cont){
+            return '<button class="btn btn-warning formEdit" data-id="'. $cont->id .'" id="formEdit"><i class="fa fa-pen"></i></button>';
+        })
+        ->addColumn('delete', function($cont){
+            return '<button class="btn btn-danger" data-id="'. $cont->id .'" id="deleteUser-{{ $cont->id }}"><i class="fa fa-trash"></i></button>';
+        })
+        ->addColumn('customer', function($cont){
+            return $cont->Customer->name ?? '-';
+        })
+        ->addColumn('eta', function($cont){
+            return $cont->eta ?? $cont->job->eta ?? '';
+        })
+        ->addColumn('user', function($cont){
+            return $cont->user->name ?? '-';
+        })
+        ->rawColumns(['edit', 'delete', 'user'])
+        ->make(true);
     }
 
     public function update(Request $request)
@@ -206,6 +235,10 @@ class RegisterFCLController extends Controller
                 'uid'=> Auth::user()->id,
                 'forwarding_id' => $request->forwarding_id,
             ]);
+
+            $conts = Cont::where('joborder_id', $job->id)->update([
+                'lokasisandar_id'=>$request->lokasisandar_id,
+            ]);
             return redirect()->back()->with('status', ['type' => 'success', 'message' => 'Data berhasil di update']);
         }else {
             return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Oopss, Something Wrong']);
@@ -228,11 +261,17 @@ class RegisterFCLController extends Controller
                 'type'=>'fcl',
                 'joborder_id'=>$request->joborder_id,
                 'size'=>$request->size,
+                'ctr_type'=>$request->ctr_type,
                 'no_seal'=>$request->no_seal,
                 'weight'=>$request->weight,
                 'meas'=>$request->meas,
                 'teus'=>$teus,
                 'uid' => Auth::user()->id,
+                'cust_id' => $request->cust_id,
+                'nobl' =>$request->nobl,
+                'tgl_bl_awb' =>$request->tgl_bl_awb,
+                'eta' => $request->eta,
+                'lokasisandar_id'=>$request->lokasisandar_id,
             ]);
             $oldWeight = $job->grossweight ?? 0;
             $newWeight = $oldWeight + $request->weight;
@@ -279,11 +318,16 @@ class RegisterFCLController extends Controller
                 'nocontainer'=>$request->nocontainer,
                 'joborder_id'=>$request->joborder_id,
                 'size'=>$request->size,
+                'ctr_type'=>$request->ctr_type,
                 'no_seal'=>$request->no_seal,
                 'weight'=>$request->weight,
                 'meas'=>$request->meas,
                 'teus'=>$teus,
                 'uid' => Auth::user()->id,
+                'cust_id' => $request->cust_id,
+                'nobl' =>$request->nobl,
+                'tgl_bl_awb' =>$request->tgl_bl_awb,
+                'eta' => $request->eta,
             ]);
             $newWeight = $oldWeight + $request->weight;
             $newMeas = $oldMeas + $request->meas;
@@ -414,5 +458,56 @@ class RegisterFCLController extends Controller
                 'data'    => $newBarcode,
             ]);
         }
+    }
+
+    public function createBarcodeAll(Request $request)
+    {
+        $conts = Cont::where('joborder_id', $request->id)->get();
+        $jobId = $request->id;
+        try {
+            foreach ($conts as $cont) {
+                $barcode = Barcode::where('ref_id', $cont->id)->where('ref_type', '=', 'FCL')->where('ref_action', 'get')->first();
+                if ($barcode) {
+                        $now = Carbon::now();
+                        if ($barcode->status == 'inactive' || $barcode->expired <= $now) {
+                            do {
+                                $uniqueBarcode = Str::random(20);
+                            } while (Barcode::where('barcode', $uniqueBarcode)->exists());
+                            $barcode->update([
+                                'barcode'=> $uniqueBarcode,
+                                'status'=>'active',
+                                'expired'=> Carbon::now()->addDays(3),
+                            ]);
+                        }
+                }else {
+                    do {
+                        $uniqueBarcode = Str::random(20);
+                    } while (Barcode::where('barcode', $uniqueBarcode)->exists());    
+                    $newBarcode = Barcode::create([
+                        'ref_id'=>$cont->id,
+                        'ref_type'=>'FCL',
+                        'ref_action'=>'get',
+                        'ref_number'=>$cont->nocontainer,
+                        'barcode'=> $uniqueBarcode,
+                        'status'=>'active',
+                        'expired'=> Carbon::now()->addDays(3),
+                        'uid'=> Auth::user()->id,
+                        'created_at'=> Carbon::now(),
+                    ]);
+                    
+                }
+            }
+            return response()->json([
+                'success' => true,
+                'message' => 'updated successfully!',
+                'jobId'    => $jobId,
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Something Wring : ' . $th->getMessage(),
+            ]);
+        }
+        
     }
 }

@@ -34,6 +34,17 @@ class BarcodeAutoGateController extends Controller
         return view('barcode.index', $data);
     }
 
+    public function indexViewAll($id)
+    {
+        $cont = Cont::where('joborder_id', $id)->pluck('id');
+        // dd($cont);
+        $data['barcodes'] = Barcode::whereIn('ref_id', $cont)->where('ref_type', '=', 'FCL')->get();
+       
+        $data['title'] = "Gate Pass"; 
+
+        return view('barcode.indexPrintAll', $data);
+    }
+
     public function manifest($id)
     {
         $data['barcode'] = Barcode::where('id', $id)->first();

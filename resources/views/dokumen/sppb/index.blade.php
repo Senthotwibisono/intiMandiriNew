@@ -1,11 +1,8 @@
 @extends('partial.main')
 @section('custom_styles')
 <style>
-    .table-fixed td,
-    .table-fixed th {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+    #tableSPPB td, #tableSPPB th {
+        white-space: nowrap; /* Membuat teks tetap dalam satu baris */
     }
 </style>
 @endsection
@@ -24,10 +21,11 @@
             <br>
             
             <div class="table">
-                <table class="table-fixed table-hover table-stripped" id="tableSPPB">
+                <table class="table-hover table-stripped" id="tableSPPB">
                     <thead>
                         <tr>
                             <th>Action</th>
+                            <th>List Container</th>
                             <th>car</th>
                             <th>no_sppb</th>
                             <th>tgl_sppb</th>
@@ -85,9 +83,99 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="containerListModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-centered modal-dialog-scrollable modal-lg"role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="noDokumen"></h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"> <i data-feather="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="table">
+                    <table id="containerTable" class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>No Kontainer</th>
+                                <th>Ukuran Dok</th>
+                                <th>Ukuran Asli</th>
+                                <th>Tanggal Masuk</th>
+                                <th>Tanggal Keluar</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('custom_js')
+<script>
+    $(document).on('click', '.detilContainer', function(){
+        let id = $(this).data('id');
+            // console.log("Id Dokumen yg dipilih = " + id); // Untuk mengecek nilai di console
+        Swal.fire({
+            title: 'Processing...',
+            text: 'Please wait',
+            icon: 'info',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            willOpen: () => {
+                Swal.showLoading();
+            }
+        });  
+
+        $.ajax({
+            url: '/dokumen/sppbContainer/' + id,
+            type: 'GET',
+            data: {
+                _token: "{{ csrf_token() }}",
+                id : id,
+            },
+
+            success: function(response) {
+                swal.close();
+                if (response.success) {
+                    console.log(response);
+                    $('#containerListModal').modal('show');
+                    $('#containerListModal #noDokumen').text(response.noDokumen);
+                    if ($.fn.DataTable.isDataTable('#containerTable')) {
+                    $('#containerTable').DataTable().destroy();
+                }
+
+                // Inisialisasi ulang DataTable dengan data baru
+                $('#containerTable').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    scrollY: true,
+                    paging: false,      // Disable pagination
+                    searching: false,
+                    ajax: {
+                        url: '/dokumen/sppbContainer/' + id,
+                        type: 'GET'
+                    },
+                    columns: [
+                        { data: 'noCont', name: 'noCont' },
+                        { data: 'ukuranDok', name: 'ukuranDok' },
+                        { data: 'sizeCont', name: 'sizeCont' },
+                        { data: 'tglMasuk', name: 'tglMasuk' },
+                        { data: 'tglKeluar', name: 'tglKeluar' }
+                    ]
+                });
+                   
+                } else {
+                    Swal.fire('Error', response.message, 'error')
+                        .then(() => {
+                            // Memuat ulang halaman setelah berhasil menyimpan data
+                            window.location.reload();
+                        });
+                }
+            }
+        })
+    })
+</script>
 <script>
     $(document).on('click', '#otomaticButton', function () {
         Swal.fire({
@@ -297,12 +385,22 @@
         $('#tableSPPB').DataTable({
             processing: true,
             serverSide: true,
+            scrollX: true,
             ajax: '/dokumen/sppbData',
             columns:[
                 {data:'id', name:'id', className:'text-center',
                     render: function(data, row){
                         return `<a href="/dokumen/sppb/detail${data}" class="btn btn-warning"><i class="fa fa-pen"></i></a>
 `
+                    }
+                },
+                {
+                    data:'id',
+                    name: 'detil',
+                    className: 'text-center',
+                    render: function(data, row){
+                        const formId = row.id;
+                        return `<button type="button" class="btn btn-info detilContainer" data-id="${data}"><i class="fa fa-eye"></i></button>`;
                     }
                 },
                 {data:'car', name:'car', className:'text-center'},

@@ -1,36 +1,41 @@
 @extends('partial.main')
-
+@section('custom_styles')
+<style>
+    #tableManual td, #tableManual th {
+        white-space: nowrap; /* Membuat teks tetap dalam satu baris */
+    }
+</style>
+@endsection
 @section('content')
 <section>
     <div class="card">
         <div class="card-body">
             <div class="row">
                 <div class="col-auto">
-                    <button type="button" class="btn btn-success" disabled>get Data</button>
+                    <button type="button" class="btn btn-success" id="otomaticButton">get Data</button>
                 </div>
                 <div class="col-auto ms-2">
                     <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addManual">Dok Manual On Demand</button>
                 </div>
             </div>
             <br>
-            <div style="overflow-x:auto;">
-                <div class="table table-responsive">
-                    <table class="table table-hover table-stripped" id="tableManual">
-                        <thead>
-                            <tr>
-                                <th>Action</th>
-                                <th>Id</th>
-                                <th>Kode Dokumen</th>
-                                <th>Nomor Dokumen</th>
-                                <th>Tanggal Dokumen</th>
-                                <th>No BC11</th>
-                                <th>Tanggal BC11</th>
-                                <th>Tanggal Upload</th>
-                                <th>Jam Upload</th>
-                            </tr>
-                        </thead>
-                    </table>
-                </div>
+            <div class="table">
+                <table class="table table-hover table-stripped" id="tableManual">
+                    <thead class="align-item-center">
+                        <tr>
+                            <th>Action</th>
+                            <th>Container List</th>
+                            <th>Id</th>
+                            <th>Kode Dokumen</th>
+                            <th>Nomor Dokumen</th>
+                            <th>Tanggal Dokumen</th>
+                            <th>No BC11</th>
+                            <th>Tanggal BC11</th>
+                            <th>Tanggal Upload</th>
+                            <th>Jam Upload</th>
+                        </tr>
+                    </thead>
+                </table>
             </div>
         </div>
     </div>
@@ -53,7 +58,7 @@
                                 <select name="kd_dok" id="" style="width: 100%;" class="choices">
                                     <option value disabled selected>Pilih Satu!</option>
                                     @foreach($codes as $code)
-                                        <option value="{{$code->kode}}">{{$code->kode}}</option>
+                                        <option value="{{$code->kode}}">{{$code->name}}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -80,9 +85,168 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="containerListModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-centered modal-dialog-scrollable modal-lg"role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="noDokumen"></h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"> <i data-feather="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="table">
+                    <table id="containerTable" class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>No Kontainer</th>
+                                <th>Ukuran Dok</th>
+                                <th>Ukuran Asli</th>
+                                <th>Tanggal Masuk</th>
+                                <th>Tanggal Keluar</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('custom_js')
+<script>
+    $(document).on('click', '.detilContainer', function(){
+        let id = $(this).data('id');
+            // console.log("Id Dokumen yg dipilih = " + id); // Untuk mengecek nilai di console
+        Swal.fire({
+            title: 'Processing...',
+            text: 'Please wait',
+            icon: 'info',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            willOpen: () => {
+                Swal.showLoading();
+            }
+        });  
+
+        $.ajax({
+            url: '/dokumen/manualContainer/' + id,
+            type: 'GET',
+            data: {
+                _token: "{{ csrf_token() }}",
+                id : id,
+            },
+
+            success: function(response) {
+                swal.close();
+                if (response.success) {
+                    console.log(response);
+                    $('#containerListModal').modal('show');
+                    $('#containerListModal #noDokumen').text(response.noDokumen);
+                    if ($.fn.DataTable.isDataTable('#containerTable')) {
+                    $('#containerTable').DataTable().destroy();
+                }
+
+                // Inisialisasi ulang DataTable dengan data baru
+                $('#containerTable').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    scrollY: true,
+                    paging: false,      // Disable pagination
+                    searching: false,
+                    ajax: {
+                        url: '/dokumen/manualContainer/' + id,
+                        type: 'GET'
+                    },
+                    columns: [
+                        { data: 'noCont', name: 'noCont' },
+                        { data: 'ukuranDok', name: 'ukuranDok' },
+                        { data: 'sizeCont', name: 'sizeCont' },
+                        { data: 'tglMasuk', name: 'tglMasuk' },
+                        { data: 'tglKeluar', name: 'tglKeluar' }
+                    ]
+                });
+                   
+                } else {
+                    Swal.fire('Error', response.message, 'error')
+                        .then(() => {
+                            // Memuat ulang halaman setelah berhasil menyimpan data
+                            window.location.reload();
+                        });
+                }
+            }
+        })
+    })
+</script>
+<script>
+    $(document).on('click', '#otomaticButton', function () {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you want to update this record?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, update it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Processing...',
+                    text: 'Please wait',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    willOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                // Perform the AJAX request
+                $.ajax({
+                    url: "{{ route('dokumen.manual.auto') }}", // Laravel route helper
+                    type: 'POST',
+                    data: {
+                        _token: "{{ csrf_token() }}", // Include CSRF token for security
+                        // Additional data can be added here
+                    },
+                    success: function(response) {
+                        console.log(response);
+                        if (response.success) {
+                            Swal.fire('Saved!', '', 'success')
+                                .then(() => {
+                                    // Memuat ulang halaman setelah berhasil menyimpan data
+                                    window.location.reload();
+                                });
+                        } else {
+                            Swal.fire('Error', response.message, 'error')
+                                .then(() => {
+                                    // Memuat ulang halaman setelah berhasil menyimpan data
+                                    window.location.reload();
+                                });
+                        }
+                    },
+                    error: function(response) {
+                        var errors = response.responseJSON.errors;
+                        if (errors) {
+                            var errorMessage = '';
+                            $.each(errors, function(key, value) {
+                                errorMessage += value[0] + '<br>';
+                            });
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Validation Error',
+                                html: errorMessage,
+                            });
+                        } else {
+                            console.log('error:', response);
+                        }
+                    },
+                });
+            }
+        });
+    });
+</script>
+
 <script>
     $(document).ready(function(){
         $('#tableManual').DataTable({
@@ -90,9 +254,18 @@
             serverSide: true,
             ajax: '/dokumen/manualData',
             columns:[
-                {data:'id', name:'id', className:'text-center',
+                {data:'idm', name:'id', className:'text-center',
                     render: function(data,row){
                         return `<a href="/dokumen/manual/detail${data}" class="btn btn-warning"><i class="fa fa-pen"></i></a>`
+                    }
+                },
+                {
+                    data:'idm',
+                    name: 'detil',
+                    className: 'text-center',
+                    render: function(data, row){
+                        const formId = row.id;
+                        return `<button type="button" class="btn btn-info detilContainer" data-id="${data}"><i class="fa fa-eye"></i></button>`;
                     }
                 },
                 {data:'id', name:'id', className:'text-center'},

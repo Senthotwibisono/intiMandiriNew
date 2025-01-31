@@ -10,50 +10,50 @@
                     <div class="col-sm-6">
                         <div class="form-group">
                             <label for="">Id</label>
-                            <input type="text" class="form-control" name="id" value="{{$dok->id}}">
-                            <input type="hidden" class="form-control" name="idm" value="{{$dok->idm}}">
+                            <input type="text" class="form-control" name="id" value="{{$dok->id ?? ' '}}">
+                            <input type="hidden" class="form-control" name="idm" value="{{$dok->idm ?? ' '}}">
                         </div>
                         <div class="form-group">
                             <label for="">No Dokumen</label>
-                            <input type="text" class="form-control" name="no_dok_inout" value="{{$dok->no_dok_inout}}">
+                            <input type="text" class="form-control" name="no_dok_inout" value="{{$dok->no_dok_inout ?? ' '}}">
                         </div>
                         <div class="form-group">
                             <label for="">Tgl Dokumen</label>
-                            <input type="date" class="form-control" name="tgl_dok_inout" value="{{ \Carbon\Carbon::createFromFormat('d/m/Y', $dok->tgl_dok_inout)->format('Y-m-d') }}">            
+                            <input type="date" class="form-control" name="tgl_dok_inout" value="{{ !empty($dok->tgl_dok_inout) ?\Carbon\Carbon::createFromFormat('d/m/Y', $dok->tgl_dok_inout)->format('Y-m-d') : ' ' }}">            
                         </div>
                         <div class="form-group">
                             <label for="">No BC11</label>
-                            <input type="text" class="form-control" name="no_bc11" value="{{$dok->no_bc11}}">
+                            <input type="text" class="form-control" name="no_bc11" value="{{$dok->no_bc11 ?? ' '}}">
                         </div>
                         <div class="form-group">
                             <label for="">Tanggal BC11</label>
-                            <input type="date" class="form-control" name="tgl_bc11" value="{{ \Carbon\Carbon::parse($dok->tgl_bc11)->format('Y-m-d') }}">                        
+                            <input type="date" class="form-control" name="tgl_bc11" value="{{ !empty($dok->tgl_bc11) ?\Carbon\Carbon::parse($dok->tgl_bc11)->format('Y-m-d') : ' '}}">                        
                         </div>
                         <div class="form-group">
                             <label for="">No POS BC 11</label>
-                            <input type="text" class="form-control" name="no_pos_bc11" value="{{$dok->no_pos_bc11}}">
+                            <input type="text" class="form-control" name="no_pos_bc11" value="{{$dok->no_pos_bc11 ?? ' '}}">
                         </div>
                     </div>
                     <div class="col-sm-6">
                         <div class="form-group">
                             <label for="">Nama Angkut</label>
-                            <input type="text" class="form-control" name="nm_angkut" value="{{$dok->nm_angkut}}">
+                            <input type="text" class="form-control" name="nm_angkut" value="{{$dok->nm_angkut ?? ' '}}">
                         </div>
                         <div class="form-group">
                             <label for="">No Voy Filght</label>
-                            <input type="text" class="form-control" name="no_voy_flight" value="{{$dok->no_voy_flight}}">
+                            <input type="text" class="form-control" name="no_voy_flight" value="{{$dok->no_voy_flight ?? ' '}}">
                         </div>
                         <div class="form-group">
                             <label for="">Jumlash Container</label>
-                            <input type="number" class="form-control" name="jml_cont" value="{{$dok->jml_cont}}">
+                            <input type="number" class="form-control" name="jml_cont" value="{{$dok->jml_cont ?? ' '}}">
                         </div>
                         <div class="form-group">
                             <label for="">No BL AWB</label>
-                            <input type="text" class="form-control" name="no_bl_awb" value="{{$dok->no_bl_awb}}">
+                            <input type="text" class="form-control" name="no_bl_awb" value="{{$dok->no_bl_awb ?? ' '}}">
                         </div>
                         <div class="form-group">
                             <label for="">Tgl BL AWB</label>
-                            <input type="date" class="form-control" name="tgl_bl_awb" value="{{ \Carbon\Carbon::parse($dok->tgl_bl_awb)->format('Y-m-d') }}">                        
+                            <input type="date" class="form-control" name="tgl_bl_awb" value="{{ !empty($dok->tgl_bl_awb) ?\Carbon\Carbon::parse($dok->tgl_bl_awb)->format('Y-m-d') : ' ' }}">                        
                         </div>
                     </div>
                 </div>

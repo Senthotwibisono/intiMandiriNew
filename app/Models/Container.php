@@ -61,6 +61,8 @@ class Container extends Model
         'no_seal',
         'nombl',
         'tgl_master_bl',
+        'nobl',
+        'tgl_bl_awb',
         'jumlah_bl',
         'kd_tps_tujuan',
         'tglstripping',

@@ -177,6 +177,13 @@
         $(".editSelect").select2({
         dropdownParent: $('#editCust .modal-content')
         });
+        $(".customSelectWMS").select2({
+        dropdownParent: $('#addTarifWMS .modal-content')
+        });
+
+        $(".editSelectWMS").select2({
+        dropdownParent: $('#editCustWMS .modal-content')
+        });
     });
     </script>
 

@@ -8,6 +8,11 @@
         text-overflow: ellipsis;
     }
 </style>
+<style>
+    #tableJob td, #tableJob th {
+        white-space: nowrap; /* Membuat teks tetap dalam satu baris */
+    }
+</style>
 @endsection
 @section('content')
 <section>
@@ -19,8 +24,8 @@
                 </div>
             </div>
             <br>
-            <div class="table table-fixed">
-                <table class="table table-hover table-stripped" id="tableJob">
+            <div class="table">
+                <table class="table-hover table-stripped" id="tableJob">
                     <thead>
                         <tr>
                             <th>Action</th>
@@ -29,6 +34,8 @@
                             <th class="text-center">Forwarding</th>
                             <th class="text-center">No Container</th>
                             <th class="text-center">No MBL</th>
+                            <th class="text-center">No BL AWB</th>
+                            <th class="text-center">Tgl BL AWB</th>
                             <th class="text-center">No PLP</th>
                             <th class="text-center">Tgl PLP</th>
                             <th class="text-center">Kd Kantor</th>
@@ -234,6 +241,8 @@
                 { data: 'forwarding', name: 'forwarding' },
                 { data: 'nocontainer', name: 'nocontainer' },
                 { data: 'nombl', name: 'nombl' },
+                { data: 'no_bl_awb', name: 'no_bl_awb' },
+                { data: 'tgl_bl_awb', name: 'tgl_bl_awb' },
                 { data: 'no_plp', name: 'no_plp' },
                 { data: 'tgl_plp', name: 'tgl_plp' },
                 { data: 'kd_kantor', name: 'kd_kantor' },
@@ -282,6 +291,63 @@
                                 .then(() => {
                                     var barcodeId = response.data.id;
                                     window.open('/barcode/autoGate-index' + barcodeId, '_blank', 'width=600,height=800');
+                                });
+                        } else {
+                            Swal.fire('Error', response.message, 'error');
+                        }
+                    },
+                    error: function(response) {
+                        var errors = response.responseJSON.errors;
+                        if (errors) {
+                            var errorMessage = '';
+                            $.each(errors, function(key, value) {
+                                errorMessage += value[0] + '<br>';
+                            });
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Validation Error',
+                                html: errorMessage,
+                            });
+                        } else {
+                            Swal.fire('Error', 'An error occurred while processing your request', 'error');
+                        }
+                    },
+                });
+            }
+        });
+    });
+</script>
+
+<script>
+    $(document).on('click', '.printBarcodeAll', function(e) {
+        e.preventDefault();
+        var jobId = $(this).data('id');
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        Swal.fire({
+            icon: 'question',
+            title: 'Do you want to generate the barcode?',
+            showCancelButton: true,
+            confirmButtonText: 'Generate',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/fcl/register/barcodeGateAll',
+                    data: { id: jobId },
+                    cache: false,
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire('Generated!', '', 'success')
+                                .then(() => {
+                                    var jobId = response.jobId;
+                                    window.open('/barcode/autoGate-PrintAll' + jobId, '_blank', 'width=600,height=800');
                                 });
                         } else {
                             Swal.fire('Error', response.message, 'error');

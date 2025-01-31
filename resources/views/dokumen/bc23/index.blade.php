@@ -1,5 +1,11 @@
 @extends('partial.main')
-
+@section('custom_styles')
+<style>
+    #tableBC23 td, #tableBC23 th {
+        white-space: nowrap; /* Membuat teks tetap dalam satu baris */
+    }
+</style>
+@endsection
 @section('content')
 <section>
     <div class="card">
@@ -13,46 +19,45 @@
                 </div>
             </div>
             <br>
-            <div style="overflow-x:auto;">
-                <div class="table table-responsive">
-                    <table class="table table-hover table-stripped" id="tableBC23">
-                        <thead>
-                            <tr>
-                                <th>Action</th>
-                                <th>car</th>
-                                <th>no_sppb</th>
-                                <th>tgl_sppb</th>
-                                <th>nojoborder</th>
-                                <th>kd_kantor_pengawas</th>
-                                <th>kd_kantor_bongkar</th>
-                                <th>no_pib</th>
-                                <th>tgl_pib</th>
-                                <th>nama_imp</th>
-                                <th>npwp_imp</th>
-                                <th>alamat_imp</th>
-                                <th>npwp_ppjk</th>
-                                <th>nama_ppjk</th>
-                                <th>alamat_ppjk</th>
-                                <th>nm_angkut</th>
-                                <th>no_voy_flight</th>
-                                <th>bruto</th>
-                                <th>netto</th>
-                                <th>gudang</th>
-                                <th>status_jalur</th>
-                                <th>jml_cont</th>
-                                <th>no_bc11</th>
-                                <th>tgl_bc11</th>
-                                <th>no_pos_bc11</th>
-                                <th>no_bl_awb</th>
-                                <th>tgl_bl_awb</th>
-                                <th>no_master_bl_awb</th>
-                                <th>tgl_master_bl_awb</th>
-                                <th>tgl_upload</th>
-                                <th>jam_upload</th>
-                            </tr>
-                        </thead>
-                    </table>
-                </div>
+            <div class="table">
+                <table class="table table-hover table-stripped" id="tableBC23">
+                    <thead>
+                        <tr>
+                            <th>Action</th>
+                            <th>View</th>
+                            <th>car</th>
+                            <th>no_sppb</th>
+                            <th>tgl_sppb</th>
+                            <th>nojoborder</th>
+                            <th>kd_kantor_pengawas</th>
+                            <th>kd_kantor_bongkar</th>
+                            <th>no_pib</th>
+                            <th>tgl_pib</th>
+                            <th>nama_imp</th>
+                            <th>npwp_imp</th>
+                            <th>alamat_imp</th>
+                            <th>npwp_ppjk</th>
+                            <th>nama_ppjk</th>
+                            <th>alamat_ppjk</th>
+                            <th>nm_angkut</th>
+                            <th>no_voy_flight</th>
+                            <th>bruto</th>
+                            <th>netto</th>
+                            <th>gudang</th>
+                            <th>status_jalur</th>
+                            <th>jml_cont</th>
+                            <th>no_bc11</th>
+                            <th>tgl_bc11</th>
+                            <th>no_pos_bc11</th>
+                            <th>no_bl_awb</th>
+                            <th>tgl_bl_awb</th>
+                            <th>no_master_bl_awb</th>
+                            <th>tgl_master_bl_awb</th>
+                            <th>tgl_upload</th>
+                            <th>jam_upload</th>
+                        </tr>
+                    </thead>
+                </table>
             </div>
         </div>
     </div>
@@ -97,9 +102,100 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="containerListModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-centered modal-dialog-scrollable modal-lg"role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="noDokumen"></h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"> <i data-feather="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="table">
+                    <table id="containerTable" class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>No Kontainer</th>
+                                <th>Ukuran Dok</th>
+                                <th>Ukuran Asli</th>
+                                <th>Tanggal Masuk</th>
+                                <th>Tanggal Keluar</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('custom_js')
+<script>
+    $(document).on('click', '.detilContainer', function(){
+        let id = $(this).data('id');
+            // console.log("Id Dokumen yg dipilih = " + id); // Untuk mengecek nilai di console
+        Swal.fire({
+            title: 'Processing...',
+            text: 'Please wait',
+            icon: 'info',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            willOpen: () => {
+                Swal.showLoading();
+            }
+        });  
+
+        $.ajax({
+            url: '/dokumen/bc23Container/' + id,
+            type: 'GET',
+            data: {
+                _token: "{{ csrf_token() }}",
+                id : id,
+            },
+
+            success: function(response) {
+                swal.close();
+                if (response.success) {
+                    console.log(response);
+                    $('#containerListModal').modal('show');
+                    $('#containerListModal #noDokumen').text(response.noDokumen);
+                    if ($.fn.DataTable.isDataTable('#containerTable')) {
+                    $('#containerTable').DataTable().destroy();
+                }
+
+                // Inisialisasi ulang DataTable dengan data baru
+                $('#containerTable').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    scrollY: true,
+                    paging: false,      // Disable pagination
+                    searching: false,
+                    ajax: {
+                        url: '/dokumen/bc23Container/' + id,
+                        type: 'GET'
+                    },
+                    columns: [
+                        { data: 'noCont', name: 'noCont' },
+                        { data: 'ukuranDok', name: 'ukuranDok' },
+                        { data: 'sizeCont', name: 'sizeCont' },
+                        { data: 'tglMasuk', name: 'tglMasuk' },
+                        { data: 'tglKeluar', name: 'tglKeluar' }
+                    ]
+                });
+                   
+                } else {
+                    Swal.fire('Error', response.message, 'error')
+                        .then(() => {
+                            // Memuat ulang halaman setelah berhasil menyimpan data
+                            window.location.reload();
+                        });
+                }
+            }
+        })
+    })
+</script>
+
 <script>
     $(document).on('click', '#otomaticButton', function () {
         Swal.fire({
@@ -309,6 +405,7 @@
         $('#tableBC23').DataTable({
             processing: true,
             serverSide: true,
+            scrollX: true,
             ajax: '/dokumen/bc23Data',
             columns: [
                 {
@@ -318,6 +415,15 @@
                     render: function(data, row){
                         const formId = row.id;
                         return `<a href="/dokumen/bc23/detail${data}" class="btn btn-warning"><i class="fa fa-pen"></i></a>`;
+                    }
+                },
+                {
+                    data:'id',
+                    name: 'detil',
+                    className: 'text-center',
+                    render: function(data, row){
+                        const formId = row.id;
+                        return `<button type="button" class="btn btn-info detilContainer" data-id="${data}"><i class="fa fa-eye"></i></button>`;
                     }
                 },
                 {data:'car', name:'car', className:'text-center'},

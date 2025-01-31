@@ -32,6 +32,7 @@ use App\Models\Customer;
 use App\Models\Packing;
 use App\Models\Item;
 use App\Models\Vessel;
+use App\Models\LokasiSandar;
 
 use Auth;
 use Illuminate\Support\Str;
@@ -649,6 +650,57 @@ class DokumenController extends Controller
         return view('dokumen.bc23.detail', $data);
     }
 
+    public function bc23ContainerList($id)
+    {
+        try {
+            $bc23 = BC23::find($id);
+            if (!$bc23) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Dokumen tidak ditemukan.',
+                ]);
+            }
+        
+            $noDokumen = $bc23->no_sppb ?? '';
+            $contDok = BC23Cont::where('sppb23_id', $id)->get();
+            $cont = ContF::where('no_dok', $bc23->no_sppb)->get();
+        
+            $data = $contDok->map(function ($item) use ($cont) {
+                $contReal = $cont->where('nocontainer', $item->no_cont)->first();
+                if ($contReal) {
+                    $sizeCont = $contReal->size ?? '';
+                    $tglMasuk = $contReal->tglmasuk ?? 'Belum Masuk';
+                    $tglKeluar = $contReal->tglkeluar ?? 'Belum Masuk';
+                }else {
+                    $sizeCont = 'Data Container Tidak Ditemukan';
+                    $tglMasuk = 'Data Container Tidak Ditemukan';
+                    $tglKeluar = 'Data Container Tidak Ditemukan';
+                }
+                return [
+                    'noCont' => $item->no_cont ?? '',
+                    'ukuranDok' => $item->size ?? '',
+                    'sizeCont' =>  $sizeCont,
+                    'tglMasuk' =>  $tglMasuk,
+                    'tglKeluar' => $tglKeluar,
+                ];
+            });
+        
+            return response()->json([
+                'success' => true,
+                'noDokumen' => $noDokumen,
+                'data' => $data
+            ]);
+        
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => $th->getMessage(),
+            ]);
+        }
+    }
+
+
+
     public function bc23UpdateDetail(Request $request)
     {
         $bc23 = BC23::where('id', $request->id)->first();
@@ -809,6 +861,38 @@ class DokumenController extends Controller
                         'size' => $detail->SIZE,
                         'jns_muat' => $detail->JNS_MUAT,
                     ]);
+                    
+                    if ($bc23->jml_cont > 0) {
+                        $contF = ContF::whereNull('tglkeluar')->where('nocontainer', $detail->NO_CONT)->first();
+                        if ($contF) {
+                            if ($contF->size == $detail->SIZE) {
+                                $alasanSize = '& Ukuran Fisik Size Berbeda';
+                            }else {
+                                $alasanSize = null;
+                            }
+    
+                            $alasanFinal = 'Bukan Dokumen SPPB. ' . $alasanFinal;
+                            $cust = Customer::where('name', $bc23->nama_imp)->first();
+                            $newCust = null;
+                            if (!$cust && $bc23->nama_imp != null) {
+                                $newCust = Customer::create([
+                                    'name' => $bc23->nama_imp,
+                                    'npwp' => $bc23->npwp_imp,
+                                    'alamat' => $bc23->alamat_imp,
+                                ]);
+                            }
+                            $contF->update([
+                                'kd_dok_inout' => 2,
+                                'no_dok' => $bc23->no_sppb,
+                                'tgl_dok' => Carbon::createFromFormat('d/m/Y', $bc23->tgl_sppb)->format('Y-m-d'),
+                                'status_bc' => 'HOLD',
+                                'alasan_hold' => $alasanFinal,
+                                'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
+                                'nobl' => $bc23->no_bl_awb,
+                                'tgl_bl_awb' => $bc23->tgl_bl_awb ? Carbon::createFromFormat('m/d/Y', $bc23->tgl_bl_awb)->format('Y-m-d') : null,
+                            ]);
+                        }
+                    }
                 }
             }
             return back()->with('status', ['type' => 'success', 'message' => 'Data ditemukan']);
@@ -913,6 +997,36 @@ class DokumenController extends Controller
                         'size' => $detailCont->SIZE,
                         'jns_muat' => $detailCont->JNS_MUAT,
                     ]);
+
+                    if ($bc23->jml_cont > 0) {
+                        $contF = ContF::whereNull('tglkeluar')->where('nocontainer', $detailCont->NO_CONT)->where('size', $detailCont->SIZE)->first();
+                        if ($contF) {
+                            if ($contF->size == $detailCont->SIZE) {
+                                $alasanSize = '& Ukuran Fisik Size Berbeda';
+                            }else {
+                                $alasanSize = null;
+                            }
+                            $alasanFinal = 'Bukan Dokumen SPPB. ' . $alasanFinal;
+                            $newCust = null;
+                            if (!$cust && $bc23->nama_imp != null) {
+                                $newCust = Customer::create([
+                                    'name' => $bc23->nama_imp,
+                                    'npwp' => $bc23->npwp_imp,
+                                    'alamat' => $bc23->alamat_imp,
+                                ]);
+                            }
+                            $contF->update([
+                               'kd_dok_inout' => 2,
+                                'no_dok' => $bc23->no_sppb,
+                                'tgl_dok' => Carbon::createFromFormat('d/m/Y', $bc23->tgl_sppb)->format('Y-m-d'),
+                                'status_bc' => 'HOLD',
+                                'alasan_hold' => $alasanFinal,
+                                'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
+                                'nobl' => $bc23->no_bl_awb,
+                                'tgl_bl_awb' => $bc23->tgl_bl_awb ? Carbon::createFromFormat('m/d/Y', $bc23->tgl_bl_awb)->format('Y-m-d') : null,
+                            ]);
+                        }
+                    }
                 }    
                 foreach ($group->DETIL->KMS as $detailKMS) {
                     $bcKMS = BC23Kms::create([
@@ -944,6 +1058,57 @@ class DokumenController extends Controller
     {
         $dokumen = SPPB::get();
         return DataTables::of($dokumen)->make('true');
+    }
+
+    public function SPPBContainerList($id)
+    {
+        try {
+            $sppb = SPPB::find($id);
+            if (!$sppb) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Dokumen tidak ditemukan.',
+                ]);
+            }
+        
+            $noDokumen = $sppb->no_sppb ?? '';
+            $contDok = SPPBCont::where('sppb_id', $id)->get();
+            $cont = ContF::where('no_dok', $sppb->no_sppb)->get();
+            // var_dump($cont);
+        
+            $data = $contDok->map(function ($item) use ($cont) {
+                $contReal = $cont->where('nocontainer', $item->no_cont)->first();
+                // var_dump($item, $contReal);
+                if ($contReal) {
+                    $sizeCont = $contReal->size ?? '';
+                    $tglMasuk = $contReal->tglmasuk ?? 'Belum Masuk';
+                    $tglKeluar = $contReal->tglkeluar ?? 'Belum Masuk';
+                }else {
+                    $sizeCont = 'Data Container Tidak Ditemukan';
+                    $tglMasuk = 'Data Container Tidak Ditemukan';
+                    $tglKeluar = 'Data Container Tidak Ditemukan';
+                }
+                return [
+                    'noCont' => $item->no_cont ?? '',
+                    'ukuranDok' => $item->size ?? '',
+                    'sizeCont' =>  $sizeCont,
+                    'tglMasuk' =>  $tglMasuk,
+                    'tglKeluar' => $tglKeluar,
+                ];
+            });
+        
+            return response()->json([
+                'success' => true,
+                'noDokumen' => $noDokumen,
+                'data' => $data
+            ]);
+        
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => $th->getMessage(),
+            ]);
+        }
     }
 
     public function sppbDetail($id)
@@ -1124,6 +1289,39 @@ class DokumenController extends Controller
                         'size' => $detail->SIZE,
                         'jns_muat' => $detail->JNS_MUAT,
                     ]);
+
+                    if ($sppb->jml_cont > 0) {
+                        $contF = ContF::whereNull('tglkeluar')->where('nocontainer', $detail->NO_CONT)->first();
+                        if ($contF) {
+                            if ($contF->size == $detail->SIZE) {
+                                $alasanSize = 'Ukuran Fisik Size Berbeda';
+                                $statusBC = 'HOLD';
+                            }else {
+                                $alasanSize = null;
+                                $statusBC = 'release';
+                            }
+                            $cust = Customer::where('name', $sppb->nama_imp)->first();
+                            $newCust = null;
+                            if (!$cust && $sppb->nama_imp != null) {
+                                $newCust = Customer::create([
+                                    'name' => $sppb->nama_imp,
+                                    'npwp' => $sppb->npwp_imp,
+                                    'alamat' => $sppb->alamat_imp,
+                                ]);
+                            }
+                            $contF->update([
+                                'kd_dok_inout' => 1,
+                                 'no_dok' => $sppb->no_sppb,
+                                 'tgl_dok' => Carbon::createFromFormat('d/m/Y', $sppb->tgl_sppb)->format('Y-m-d'),
+                                 'status_bc' => $statusBC,
+                                 'alasan_hold' => $alasanSize,
+                                 'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
+                                 'nobl' => $sppb->no_bl_awb,
+                                 'tgl_bl_awb' => $sppb->tgl_bl_awb ? Carbon::createFromFormat('m/d/Y', $sppb->tgl_bl_awb)->format('Y-m-d') : null,
+ 
+                             ]);
+                        }
+                    }
                 }
             }
             return back()->with('status', ['type' => 'success', 'message' => 'Data ditemukan']);
@@ -1224,6 +1422,38 @@ class DokumenController extends Controller
                         'size' => $detailCont->SIZE,
                         'jns_muat' => $detailCont->JNS_MUAT,
                     ]);
+
+                    if ($sppb->jml_cont > 0) {
+                        $contF = ContF::whereNull('tglkeluar')->where('nocontainer', $detailCont->NO_CONT)->where('size', $detailCont->SIZE)->first();
+                        if ($contF) {
+                            if ($contF->size == $detail->SIZE) {
+                                $alasanSize = 'Ukuran Fisik Size Berbeda';
+                                $statusBC = 'HOLD';
+                            }else {
+                                $alasanSize = null;
+                                $statusBC = 'release';
+                            }
+                            $cust = Customer::where('name', $sppb->nama_imp)->first();
+                            $newCust = null;
+                            if (!$cust && $sppb->nama_imp != null) {
+                                $newCust = Customer::create([
+                                    'name' => $sppb->nama_imp,
+                                    'npwp' => $sppb->npwp_imp,
+                                    'alamat' => $sppb->alamat_imp,
+                                ]);
+                            }
+                            $contF->update([
+                                'kd_dok_inout' => 1,
+                                 'no_dok' => $sppb->no_sppb,
+                                 'tgl_dok' => Carbon::createFromFormat('d/m/Y', $sppb->tgl_sppb)->format('Y-m-d'),
+                                 'status_bc' => $statusBC,
+                                 'alasan_hold' => $alasanSize,
+                                 'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
+                                 'nobl' => $sppb->no_bl_awb,
+                                 'tgl_bl_awb' => $sppb->tgl_bl_awb ? Carbon::createFromFormat('m/d/Y', $sppb->tgl_bl_awb)->format('Y-m-d') : null,
+                             ]);
+                        }
+                    }
                 }    
                 foreach ($group->DETIL->KMS as $detailKMS) {
                     # code...
@@ -1258,7 +1488,6 @@ class DokumenController extends Controller
                     $plpDetails = PLPdetail::where('plp_id', $plp->id)->get();
     
                     $this->createContainers($plpDetails, $job);
-                    $this->createManifests($plpDetails, $job);
     
                     $plp->update([
                         'joborder_id' => $job->id,
@@ -1339,7 +1568,19 @@ class DokumenController extends Controller
                 'name'=> $plp->nm_angkut,
                 'call_sign'=> $plp->call_sign,
             ]);
+
         }
+        $lokasiSndar = LokasiSandar::where('kd_tps_asal', $plp->kd_tps_asal)->first();
+        if ($lokasiSndar) {
+            $lokId = $lokasiSndar->id;
+        }else {
+            $newLokasiSnadar = LokasiSandar::create([
+                'kd_tps_asal' => $plp->kd_tps_asal,
+            ]);
+
+            $lokId = $newLokasiSnadar->id;
+        }
+
         return Job::create([
             'nojoborder' => $noJob,
             'plp_id' => $plp->id,
@@ -1355,6 +1596,8 @@ class DokumenController extends Controller
             'call_sign' => $plp->call_sign,
             'nospk' => $request->nospk,
             'forwarding_id' => $request->forwarding_id,
+            'eta' => $plp->tgl_tiba,
+            'lokasisandar_id' => $lokId,
         ]);
     }
 
@@ -1368,6 +1611,17 @@ class DokumenController extends Controller
                 'name'=> $plp->nm_angkut,
                 'call_sign'=> $plp->call_sign,
             ]);
+        }
+
+        $lokasiSndar = LokasiSandar::where('kd_tps_asal', $plp->kd_tps_asal)->first();
+        if ($lokasiSndar) {
+            $lokId = $lokasiSndar->id;
+        }else {
+            $newLokasiSnadar = LokasiSandar::create([
+                'kd_tps_asal' => $plp->kd_tps_asal,
+            ]);
+
+            $lokId = $newLokasiSnadar->id;
         }
         return JobF::create([
             'nojoborder' => $noJob,
@@ -1384,6 +1638,8 @@ class DokumenController extends Controller
             'call_sign' => $plp->call_sign,
             'nospk' => $request->nospk,
             'forwarding_id' => $request->forwarding_id,
+            'eta' => $plp->tgl_tiba,
+            'lokasisandar_id' => $lokId,
         ]);
     }
 
@@ -1401,6 +1657,10 @@ class DokumenController extends Controller
                 'size' => $cont->uk_cont,
                 'teus' => $teus,
                 'uid' => Auth::user()->id,
+                'nobl' => $cont->no_bl_awb,
+                'tgl_bl_awb' => $cont->tgl_bl_awbl ? Carbon::createFromFormat('Ymd', $cont->tgl_bl_awb)->format('Y-m-d') : null,
+                'eta'=> $job->eta,
+                'lokasisandar_id' => $job->lokasisandar_id,
             ]);
         }
     }
@@ -1408,6 +1668,8 @@ class DokumenController extends Controller
     private function createContainersFCL($plpDetails, $job)
     {
         $conts = $plpDetails->unique('no_cont');
+
+        // dd($conts);
 
         foreach ($conts as $cont) {
             $teus = $this->calculateTeus($cont->uk_cont);
@@ -1419,6 +1681,10 @@ class DokumenController extends Controller
                 'size' => $cont->uk_cont,
                 'teus' => $teus,
                 'uid' => Auth::user()->id,
+                'nobl' => $cont->no_bl_awb,
+                'tgl_bl_awb' => $cont->tgl_bl_awbl ? Carbon::createFromFormat('Ymd', $cont->tgl_bl_awb)->format('Y-m-d') : null,
+                'eta'=> $job->eta,
+                'lokasisandar_id' => $job->lokasisandar_id,
             ]);
         }
     }
@@ -1428,72 +1694,72 @@ class DokumenController extends Controller
         return $size === '20' ? 1 : ($size === '40' ? 2 : 0);
     }
 
-    private function createManifests($plpDetails, $job)
-    {
-        $plpKms = $plpDetails->unique('no_bl_awb');
+    // private function createManifests($plpDetails, $job)
+    // {
+    //     $plpKms = $plpDetails->unique('no_bl_awb');
 
-        foreach ($plpKms as $kms) {
-            $contKMS = Cont::where('joborder_id', $job->id)
-                ->where('nocontainer', $kms->no_cont)
-                ->first();
+    //     foreach ($plpKms as $kms) {
+    //         $contKMS = Cont::where('joborder_id', $job->id)
+    //             ->where('nocontainer', $kms->no_cont)
+    //             ->first();
 
-            $cust = Customer::where('name', $kms->consignee)->first();
-            $pack = Packing::where('name', $kms->jns_kms)->first();
-            $noTally = $this->generateTallyNumber($job);
+    //         $cust = Customer::where('name', $kms->consignee)->first();
+    //         $pack = Packing::where('name', $kms->jns_kms)->first();
+    //         $noTally = $this->generateTallyNumber($job);
 
-            $manifest = Manifest::create([
-                'notally' => $noTally,
-                'validasi' => 'N',
-                'barcode' => $this->generateUniqueBarcode(),
-                'nohbl' => $kms->no_bl_awb,
-                'container_id' => $contKMS->id ?? null,
-                'joborder_id' => $job->id,
-                'tgl_hbl' => $kms->tgl_bl_awb,
-                'customer_id' => $cust->id ?? null,
-                'quantity' => $kms->jml_kms ?? null,
-                'packing_id' => $pack->id ?? null,
-                'uid' => Auth::user()->id,
-            ]);
+    //         $manifest = Manifest::create([
+    //             'notally' => $noTally,
+    //             'validasi' => 'N',
+    //             'barcode' => $this->generateUniqueBarcode(),
+    //             'nohbl' => $kms->no_bl_awb,
+    //             'container_id' => $contKMS->id ?? null,
+    //             'joborder_id' => $job->id,
+    //             'tgl_hbl' => $kms->tgl_bl_awb,
+    //             'customer_id' => $cust->id ?? null,
+    //             'quantity' => $kms->jml_kms ?? null,
+    //             'packing_id' => $pack->id ?? null,
+    //             'uid' => Auth::user()->id,
+    //         ]);
 
-            $this->createItems($manifest);
-        }
-    }
+    //         $this->createItems($manifest);
+    //     }
+    // }
 
-    private function generateTallyNumber($job)
-    {
-        $lastTally = Manifest::where('joborder_id', $job->id)
-            ->orderBy('id', 'desc')
-            ->first();
+    // private function generateTallyNumber($job)
+    // {
+    //     $lastTally = Manifest::where('joborder_id', $job->id)
+    //         ->orderBy('id', 'desc')
+    //         ->first();
 
-        $lastTallyNumber = $lastTally ? intval(substr($lastTally->notally, 15, 3)) : 0;
-        $newTallyNumber = str_pad($lastTallyNumber + 1, 3, '0', STR_PAD_LEFT);
+    //     $lastTallyNumber = $lastTally ? intval(substr($lastTally->notally, 15, 3)) : 0;
+    //     $newTallyNumber = str_pad($lastTallyNumber + 1, 3, '0', STR_PAD_LEFT);
 
-        return $job->nojoborder . '-' . $newTallyNumber;
-    }
+    //     return $job->nojoborder . '-' . $newTallyNumber;
+    // }
 
-    private function generateUniqueBarcode()
-    {
-        do {
-            $uniqueBarcode = Str::random(19);
-        } while (Manifest::where('barcode', $uniqueBarcode)->exists());
+    // private function generateUniqueBarcode()
+    // {
+    //     do {
+    //         $uniqueBarcode = Str::random(19);
+    //     } while (Manifest::where('barcode', $uniqueBarcode)->exists());
 
-        return $uniqueBarcode;
-    }
+    //     return $uniqueBarcode;
+    // }
 
-    private function createItems($manifest)
-    {
-        if ($manifest->quantity) {
-            for ($i = 1; $i <= $manifest->quantity; $i++) {
-                Item::create([
-                    'manifest_id' => $manifest->id,
-                    'barcode' => $manifest->barcode . $i,
-                    'nomor' => $i,
-                    'stripping' => 'N',
-                    'uid' => Auth::user()->id,
-                ]);
-            }
-        }
-    }
+    // private function createItems($manifest)
+    // {
+    //     if ($manifest->quantity) {
+    //         for ($i = 1; $i <= $manifest->quantity; $i++) {
+    //             Item::create([
+    //                 'manifest_id' => $manifest->id,
+    //                 'barcode' => $manifest->barcode . $i,
+    //                 'nomor' => $i,
+    //                 'stripping' => 'N',
+    //                 'uid' => Auth::user()->id,
+    //             ]);
+    //         }
+    //     }
+    // }
 
     public function manualIndex()
     {
@@ -1510,10 +1776,60 @@ class DokumenController extends Controller
         return DataTables::of($dokumen)->make(true);
     }
 
+    public function manualContainerList($id)
+    {
+        try {
+            $manual = Manual::where('idm', $id)->first();
+            if (!$manual) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Dokumen tidak ditemukan.',
+                ]);
+            }
+        
+            $noDokumen = $manual->no_dok_inout ?? '';
+            $contDok = ManualCont::where('manual_id', $id)->get();
+            $cont = ContF::where('no_dok', $manual->no_dok_inout)->get();
+        
+            $data = $contDok->map(function ($item) use ($cont) {
+                $contReal = $cont->where('nocontainer', $item->no_cont)->first();
+                if ($contReal) {
+                    $sizeCont = $contReal->size ?? '';
+                    $tglMasuk = $contReal->tglmasuk ?? 'Belum Masuk';
+                    $tglKeluar = $contReal->tglkeluar ?? 'Belum Masuk';
+                }else {
+                    $sizeCont = 'Data Container Tidak Ditemukan';
+                    $tglMasuk = 'Data Container Tidak Ditemukan';
+                    $tglKeluar = 'Data Container Tidak Ditemukan';
+                }
+                return [
+                    'noCont' => $item->no_cont ?? '',
+                    'ukuranDok' => $item->size ?? '',
+                    'sizeCont' =>  $sizeCont,
+                    'tglMasuk' =>  $tglMasuk,
+                    'tglKeluar' => $tglKeluar,
+                ];
+            });
+        
+            return response()->json([
+                'success' => true,
+                'noDokumen' => $noDokumen,
+                'data' => $data
+            ]);
+        
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => $th->getMessage(),
+            ]);
+        }
+    }
+
     public function manualDetail($id)
     {
         $manual = Manual::where('idm', $id)->first();
-        $data['title'] = "Detail manual PIB ". $manual->no_dok_inout;
+        $noManual = $manual->no_dok_inout ?? '';
+        $data['title'] = "Detail manual PIB ". $noManual;
         $data['dok'] = $manual;
         $data['conts'] = ManualCont::where('manual_id', $id)->get();
         $data['kmss'] = ManualKms::where('manual_id', $id)->get();
@@ -1627,19 +1943,168 @@ class DokumenController extends Controller
             }
             if ($cont) {
                 foreach ($cont as $detail) {
-                    $sppbCont = ManualCont::create([
+                    $manualCont = ManualCont::create([
                         'manual_id'=>$manual->idm,
                         'id'=>$detail->ID,
                         'no_cont'=>$detail->NO_CONT,
                         'size'=>$detail->SIZE,
                         'jns_muat'=>$detail->JNS_MUAT,
                     ]);
+                    $contF = ContF::whereNull('tglkeluar')->where('nocontainer', $detail->NO_CONT)->where('size', $detail->SIZE)->first();
+                    if ($contF) {
+                        if ($contF->size == $detail->SIZE) {
+                            $alasanSize = '& Ukuran Fisik Size Berbeda';
+                        }else {
+                            $alasanSize = null;
+                        }
+                        $alasanFinal = 'Bukan Dokumen SPPB. ' . $alasanFinal;
+                        $cust = Customer::where('name', $manual->consignee)->first();
+                            $newCust = null;
+                            if (!$cust && $manual->consignee != null) {
+                                $newCust = Customer::create([
+                                    'name' => $manual->consignee,
+                                ]);
+                            }
+                        $contF->update([
+                           'kd_dok_inout' => $manual->kd_dok_inout,
+                           'no_dok' => $manual->no_dok_inout,
+                           'tgl_dok' => Carbon::createFromFormat('d/m/Y', $manual->tgl_dok_inout)->format('Y-m-d'),
+                           'status_bc' => 'HOLD',
+                           'alasan_hold' => $alasanFinal,
+                           'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
+                         ]);
+                    }
                 }
             }
             return back()->with('status', ['type' => 'success', 'message' => 'Data ditemukan']);
         }else {
             return back()->with('status', ['type' => 'error', 'message' => 'Something Wrong']);
         }
+    }
+
+    public function GetDokumenManual()
+    {
+        \SoapWrapper::add(function ($service) {
+            $service
+                ->name('TpsOnline_GetDokumenManual')
+                ->wsdl($this->wsdl)
+                ->trace(true)                                                                                                  
+//                ->certificate()                                                 
+//                ->cache(WSDL_CACHE_NONE)                                        
+                ->options([
+                    'stream_context' => stream_context_create([
+                        'ssl' => array(
+                            'verify_peer' => false,
+                            'verify_peer_name' => false,
+                            'allow_self_signed' => true
+                        )
+                    ])
+                ]);                                                     
+        });
+        
+        $data = [
+            'UserName' => $this->user, 
+            'Password' => $this->password,
+            'Kd_Tps' => $this->kode
+        ];
+        
+        // Using the added service
+        \SoapWrapper::service('TpsOnline_GetDokumenManual', function ($service) use ($data) {        
+            $this->response = $service->call('GetDokumenManual', [$data])->GetDokumenManualResult;      
+        });
+        
+        libxml_use_internal_errors(true);
+        $xml = simplexml_load_string($this->response);
+        if(!$xml || !$xml->children()){
+            return response()->json([
+             'success' => false,
+             'message' => 'Error : ' . $this->response,
+            ]);
+         }
+        
+         $groups = [];
+         $nextGroup = [];
+         $header = [];
+         $valueTest = [];
+         $detil = [];
+         
+         foreach ($xml->children() as $child) {
+             $groups[] = $child;
+         }
+         
+         foreach ($groups as $group) {
+             $header = $group->header ?? $group->HEADER;
+             $oldManual = Manual::where('id', $header->ID)->first();
+             if (!$oldManual) {
+                $manual = Manual::create([
+                        'id'=>$header->ID,
+                        'kd_kantor'=>$header->KD_KANTOR,
+                        'kd_dok_inout'=>$header->KD_DOK_INOUT,
+                        'no_dok_inout'=>$header->NO_DOK_INOUT,
+                        'tgl_dok_inout'=>$header->TGL_DOK_INOUT,
+                        'id_consignee'=>$header->ID_CONSIGNEE,
+                        'consignee'=>$header->CONSIGNEE,
+                        'npwp_ppjk'=>$header->NPWP_PPJK,
+                        'nama_ppjk'=>$header->NAMA_PPJK,
+                        'nm_angkut'=>$header->NM_ANGKUT,
+                        'no_voy_flight'=>$header->NO_VOY_FLIGHT,
+                        'kd_gudang'=>$header->KD_GUDANG,
+                        'jml_cont'=>$header->JML_CONT,
+                        'no_bc11'=>$header->NO_BC11,
+                        'tgl_bc11'=>$header->TGL_BC11,
+                        'no_pos_bc11'=>$header->NO_POS_BC11,
+                        'no_bl_awb'=>$header->NO_BL_AWB,
+                        'tgl_bl_awb'=>$header->TGL_BL_AWB,
+                        'fl_segel'=>$header->FL_SEGEL,
+                        'tgl_upload'=>Carbon::today()->format('Y-m-d'),
+                        'jam_upload'=>Carbon::now()->format('H:i:s'),
+                    ]);
+
+                 $detil[]  = $group->DETIL ?? $group->detil;       
+                 foreach ($group->DETIL->CONT as $detailCont) {
+                    $manualCont = ManualCont::create([
+                        'manual_id'=>$manual->idm,
+                        'id'=>$detail->ID,
+                        'no_cont'=>$detail->NO_CONT,
+                        'size'=>$detail->SIZE,
+                        'jns_muat'=>$detail->JNS_MUAT,
+                    ]);
+ 
+                     if ($manualCont->jml_cont > 0) {
+                         $contF = ContF::whereNull('tglkeluar')->where('nocontainer', $detailCont->NO_CONT)->where('size', $detailCont->SIZE)->first();
+                         if ($contF) {
+                            if ($contF->size == $detailCont->SIZE) {
+                                $alasanSize = '& Ukuran Fisik Size Berbeda';
+                            }else {
+                                $alasanSize = null;
+                            }
+                            $alasanFinal = 'Bukan Dokumen SPPB. ' . $alasanFinal;
+                            $cust = Customer::where('name', $manual->consignee)->first();
+                            $newCust = null;
+                            if (!$cust && $manual->consignee != null) {
+                                $newCust = Customer::create([
+                                    'name' => $manual->consignee,
+                                ]);
+                            }
+                             $contF->update([
+                                'kd_dok_inout' => $manual->kd_dok_inout,
+                                'no_dok' => $manual->no_dok_inout,
+                                'tgl_dok' => Carbon::createFromFormat('d/m/Y', $manual->tgl_dok_inout)->format('Y-m-d'),
+                                'status_bc' => 'HOLD',
+                                'alasan_hold' => $alasanFinal,
+                                'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
+                              ]);
+                         }
+                     }
+                 }    
+             }
+         }
+         
+        return response()->json([
+         'success' => true,
+         'message' => 'Data Successed added',
+        ]);
+        
     }
 
     public function pabeanIndex()
@@ -1655,6 +2120,57 @@ class DokumenController extends Controller
     {
         $dokumen = Pabean::with('dokumen')->get();
         return DataTables::of($dokumen)->make(true);
+    }
+
+    public function pabeanContainerList($id)
+    {
+        try {
+            $pabean = Pabean::find($id);
+            if (!$pabean) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Dokumen tidak ditemukan.',
+                ]);
+            }
+        
+            $noDokumen = $pabean->no_dok_inout ?? '';
+            $contDok = PabeanCont::where('pabean_id', $id)->get();
+            $cont = ContF::where('no_dok', $pabean->no_dok_inout)->get();
+            // var_dump($cont);
+        
+            $data = $contDok->map(function ($item) use ($cont) {
+                $contReal = $cont->where('nocontainer', $item->no_cont)->first();
+                // var_dump($item, $contReal);
+                if ($contReal) {
+                    $sizeCont = $contReal->size ?? '';
+                    $tglMasuk = $contReal->tglmasuk ?? 'Belum Masuk';
+                    $tglKeluar = $contReal->tglkeluar ?? 'Belum Masuk';
+                }else {
+                    $sizeCont = 'Data Container Tidak Ditemukan';
+                    $tglMasuk = 'Data Container Tidak Ditemukan';
+                    $tglKeluar = 'Data Container Tidak Ditemukan';
+                }
+                return [
+                    'noCont' => $item->no_cont ?? '',
+                    'ukuranDok' => $item->size ?? '',
+                    'sizeCont' =>  $sizeCont,
+                    'tglMasuk' =>  $tglMasuk,
+                    'tglKeluar' => $tglKeluar,
+                ];
+            });
+        
+            return response()->json([
+                'success' => true,
+                'noDokumen' => $noDokumen,
+                'data' => $data
+            ]);
+        
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => $th->getMessage(),
+            ]);
+        }
     }
 
     public function pabeanDetail($id)
@@ -1793,6 +2309,37 @@ class DokumenController extends Controller
                         'size' => $detail->SIZE,
                         'jns_muat' => $detail->JNS_MUAT,
                     ]);
+                    if ($pabean->jml_cont > 0) {
+                        $contF = ContF::whereNull('tglkeluar')->where('nocontainer', $detail->NO_CONT)->first();
+                        if ($contF) {
+                            if ($contF->size == $detail->SIZE) {
+                                $alasanSize = '& Ukuran Fisik Size Berbeda';
+                            }else {
+                                $alasanSize = null;
+                            }
+    
+                            $alasanFinal = 'Bukan Dokumen SPPB. ' . $alasanFinal;
+                            $cust = Customer::where('name', $pabean->nm_imp)->first();
+                            $newCust = null;
+                            if (!$cust && $pabean->nama_imp != null) {
+                                $newCust = Customer::create([
+                                    'name' => $pabean->nm_imp,
+                                    'npwp' => $pabean->npwp_imp,
+                                    'alamat' => $pabean->al_imp,
+                                ]);
+                            }
+                            $contF->update([
+                                'kd_dok_inout' => $pabean->kd_dok_inout,
+                                'no_dok' => $pabean->no_dok_inout,
+                                'tgl_dok' => Carbon::createFromFormat('Ymd', $pabean->tgl_dok_inout)->format('Y-m-d'),
+                                'status_bc' => 'HOLD',
+                                'alasan_hold' => $alasanFinal,
+                                'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
+                                'nobl' => $pabean->no_bl_awb,
+                                'tgl_bl_awb' => $pabean->tgl_bl_awb ? Carbon::createFromFormat('m/d/Y', $pabean->tgl_bl_awb)->format('Y-m-d') : null,
+                            ]);
+                        }
+                    }
                 }
             }
             return back()->with('status', ['type' => 'success', 'message' => 'Data ditemukan']);
@@ -1902,6 +2449,38 @@ class DokumenController extends Controller
                         'size' => $detailCont->SIZE,
                         'jns_muat' => $detailCont->JNS_MUAT,
                     ]);
+
+                    if ($pabean->jml_cont > 0) {
+                        $contF = ContF::whereNull('tglkeluar')->where('nocontainer', $detailCont->NO_CONT)->first();
+                        if ($contF) {
+                            if ($contF->size == $detailCont->SIZE) {
+                                $alasanSize = '& Ukuran Fisik Size Berbeda';
+                            }else {
+                                $alasanSize = null;
+                            }
+    
+                            $alasanFinal = 'Bukan Dokumen SPPB. ' . $alasanFinal;
+                            $cust = Customer::where('name', $pabean->nm_imp)->first();
+                            $newCust = null;
+                            if (!$cust && $pabean->nama_imp != null) {
+                                $newCust = Customer::create([
+                                    'name' => $pabean->nm_imp,
+                                    'npwp' => $pabean->npwp_imp,
+                                    'alamat' => $pabean->al_imp,
+                                ]);
+                            }
+                            $contF->update([
+                                'kd_dok_inout' => $pabean->kd_dok_inout,
+                                'no_dok' => $pabean->no_dok_inout,
+                                'tgl_dok' => Carbon::createFromFormat('Ymd', $pabean->tgl_dok_inout)->format('Y-m-d'),
+                                'status_bc' => 'HOLD',
+                                'alasan_hold' => $alasanFinal,
+                                'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
+                                'nobl' => $pabean->no_bl_awb,
+                                'tgl_bl_awb' => $pabean->tgl_bl_awb ? Carbon::createFromFormat('m/d/Y', $pabean->tgl_bl_awb)->format('Y-m-d') : null,
+                            ]);
+                        }
+                    }
                 }    
                 foreach ($group->DETIL->KMS as $detailKMS) {
                     # code...
