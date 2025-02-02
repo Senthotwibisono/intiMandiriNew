@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use App\Models\LokasiSandar; // Tambahkan ini
 use App\Models\User; // Jika User tidak berada di namespace yang sama
+use App\Models\Customer;
 
 class FormFCL extends Model
 {
@@ -32,6 +33,11 @@ class FormFCL extends Model
         return $this->belongsTo(LokasiSandar::class, 'lokasi_sandar_id', 'id');
     }
 
+    public function Cust()
+    {
+        return $this->belongsTo(Customer::class, 'cust_id', 'id');
+    }
+    
     public function user()
     {
         return $this->belongsTo(User::class, 'uid', 'id');

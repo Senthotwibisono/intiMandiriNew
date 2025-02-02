@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use App\Models\Customer;
 use App\Models\user;
-use App\Models\ContanerFCL as ContF;
+use App\Models\ContainerFCL as ContF;
 
 class FormContainerFCL extends Model
 {

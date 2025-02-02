@@ -90,7 +90,7 @@ class ContainerDokController extends Controller
             return $cont->job->nombl ?? '-';
         })
         ->addColumn('nocontainer', function($cont){
-            return $cont->nocontianer ?? '-';
+            return $cont->nocontainer ?? '-';
         })
         ->addColumn('nobl', function($cont){
             return $cont->nobl ?? '-';

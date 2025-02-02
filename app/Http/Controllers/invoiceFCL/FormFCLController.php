@@ -6,20 +6,50 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Auth;
 use Carbon\Carbon;
+use DataTables;
 
 use App\Models\Customer;
 use App\Models\ContainerFCL as ContF;
+use App\Models\JobOrderFCL as JobF;
 use App\Models\FCL\FormContainerFCL as FormC;
 use App\Models\FCL\FormFCL as Form;
+use App\Models\FCL\MTarifTPS as TTPS;
+use App\Models\FCL\MTarifWMS as TWMS;
+use App\Models\FCL\InvoiceHeader as Header;
+use App\Models\FCL\InvoiceDetil as Detil;
 
 class FormFCLController extends Controller
 {
+    public function dataTable(Request $request)
+    {
+        $form = Form::whereNot('status', 'Y')->get();
+        return DataTables::of($form)
+        ->addColumn('action', function($form){
+            return '<a href="/invoiceFCL/form/createEdit/Step1/'.$form->id.'" class="btn btn-warning"><i class="fa fa-pencil"></i></a>';
+        })
+        ->rawColumns(['action'])
+        ->make(true);
+    }
+    
     public function indexStep1()
     {
         $data['title'] = 'Create Invoice FCL - Step 1';
         $data['customers'] = Customer::get();
 
         return view('invoiceFCL.form.step1', $data);
+    }
+
+    public function editStep1($id)
+    {
+        $data['title'] = 'Create Invoice FCL - Step 1';
+        $data['customers'] = Customer::get();
+
+        $data['form'] = Form::find($id);
+        $data['containerInvoice'] = FormC::where('form_id', $id)->get();
+
+        // dd($data);
+
+        return view('invoiceFCL.form.step1Edit', $data);
     }
 
     public function getBLAWB(Request $request)
@@ -132,21 +162,432 @@ class FormFCLController extends Controller
                 ]);
             }
 
-            return redirect()->back()->with('status', ['type'=>'success', 'message' => 'Data Berhasil Disimpan']);
+            return redirect('/invoiceFCL/form/indexStep2/'.$form->id)->with('status', ['type'=>'success', 'message' => 'Data Berhasil Disimpan']);
 
         } catch (\Throwable $th) {
             return redirect()->back()->with('status', ['type'=>'error', 'message' => 'Something Wrong: '. $th->getMessage()]);
         }
     }
 
+    public function updateStep1(Request $request)
+    {
+        try {
+            // Pastikan container_id tidak kosong
+            if (!$request->container_id || empty($request->container_id)) {
+                return redirect()->back()->with('status', ['type'=>'error', 'message' => 'Silakan pilih setidaknya satu container.']);
+            }
+
+            // Ambil data container berdasarkan ID yang dipilih
+            $cont = ContF::whereIn('id', $request->container_id)->get();
+
+            // Validasi ETA harus sama
+            $etaValues = $cont->pluck('eta')->unique();
+            if ($etaValues->count() > 1) {
+                return redirect()->back()->with('status', ['type'=>'error', 'message' => 'Terdapat nilai ETA yang berbeda.']);
+            }
+
+            // Validasi Tanggal Masuk harus sama
+            $checkMasuk = $cont->pluck('tglmasuk')->unique();
+            if ($checkMasuk->count() > 1) {
+                return redirect()->back()->with('status', ['type'=>'error', 'message' => 'Terdapat nilai Tanggal Masuk yang berbeda.']);
+            }
+
+            $checkBelumMasuk = $cont->whereNull('tglmasuk');
+            if ($checkBelumMasuk->count() > 0) {
+                return redirect()->back()->with('status', ['type'=>'error', 'message' => 'Terdapat Container Belum Memiliki tgl Masuk: ' . $checkBelumMasuk->pluck('nocontainer')->implode(', ')]);
+            }
+
+            // Ambil ETA yang sudah dipastikan unik
+            $eta = $etaValues->first();
+
+            // Validasi ETA tidak boleh lebih besar dari ETD
+            if ($eta >= $request->etd) {
+                return redirect()->back()->with('status', ['type'=>'error', 'message' => 'Tanggal Rencana Keluar harus lebih besar dari ETA.']);
+            }
+
+            // Ambil satu container untuk referensi data lokasi sandar
+            $singleCont = $cont->first();
+
+            // Cari form berdasarkan ID
+            $form = Form::find($request->id);
+            if (!$form) {
+                return redirect()->back()->with('status', ['type'=>'error', 'message' => 'Data form tidak ditemukan.']);
+            }
+
+            // Update Form
+            // dd($cont, $request->container_id);
+            $form->update([
+                'lokasi_sandar_id' => $singleCont->lokasisandar_id ?? $singleCont->job->lokasisandar_id,
+                'nobl' => $singleCont->nobl,
+                'tgl_bl_awb' => $singleCont->tgl_bl_awb,
+                'cust_id' => $request->cust_id,
+                'eta' => $eta,
+                'etd' => $request->etd,
+                'status' => 'N',
+                'uid' => Auth::user()->id,
+                'created_at' => Carbon::now(),
+            ]);
+
+            // Hapus container lama yang tidak termasuk dalam request terbaru
+            FormC::where('form_id', $form->id)
+                ->whereNotIn('container_id', $request->container_id)
+                ->delete();
+
+            // Loop setiap container untuk disimpan di FormC
+            foreach ($cont as $ct) {
+                $statusBehandle = $ct->tglbehandle ? 'Y' : 'N';
+
+                // Cek apakah sudah ada di FormC
+                $existingContainer = FormC::where('form_id', $form->id)
+                                          ->where('container_id', $ct->id)
+                                          ->exists();
+                if (!$existingContainer) {
+                    FormC::create([
+                        'form_id' => $form->id,
+                        'container_id' => $ct->id,
+                        'size' => $ct->size,
+                        'ctr_type' => $ct->ctr_type,
+                        'behandle_yn' => $statusBehandle,
+                        'uid' => Auth::user()->id,
+                        'created_at' => Carbon::now(),
+                    ]);
+                }
+            }
+
+            return redirect('/invoiceFCL/form/indexStep2/'.$form->id)->with('status', ['type'=>'success', 'message' => 'Data Berhasil Disimpan']);
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('status', ['type'=>'error', 'message' => 'Something Wrong: '. $th->getMessage()]);
+        }
+    }
+
+    public function cancelForm($id)
+    {
+        try {
+            FormC::where('form_id', $id)->delete();
+            Form::where('id', $id)->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data Telah di Hapus'
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Something Wrong: ' . $th->getMessage()
+            ]);
+        }
+    }
+
     public function indexStep2($id)
     {
-        $data['title'] = "Create Invoice FCL - Step 1";
+        $data['title'] = "Pre-Invoice FCL";
 
         $data['form'] = Form::find($id);
 
         $data['containerInvoice'] = FormC::where('form_id', $id)->get();
 
-        return view('invoiceFCL.form.step1', $data);
+        // Checking Master Tarif WMS
+        $tarifWMS = TWMS::select('size', 'type')->get()->toArray();
+        $invalidContainers = $data['containerInvoice']->filter(function ($container) use ($tarifWMS) {
+            return !in_array(['size' => $container->size, 'type' => $container->ctr_type], $tarifWMS);
+        });
+
+        if ($invalidContainers->isNotEmpty()) {
+            $invalidContainerNumbers = $invalidContainers->pluck('cont.nocontainer')->implode(', ');
+            return redirect('/invoiceFCL/form/createEdit/Step1/'. $id)->with('status', ['type'=> 'error', 'message' => 'Tidak ada tarif WMS yang cocok untuk container :' . $invalidContainerNumbers]);
+        }
+
+        // Check Tarif TPS
+        $tarifTPS = TTPS::where('lokasi_sandar_id', $data['form']->lokasi_sandar_id)->select('size', 'type')->get()->toArray();
+        $invalidContainersTPS = $data['containerInvoice']->filter(function ($container) use ($tarifWMS) {
+            return !in_array(['size' => $container->size, 'type' => $container->ctr_type], $tarifWMS);
+        });
+        if ($invalidContainersTPS->isNotEmpty()) {
+            $invalidContainerNumbersTPS = $invalidContainersTPS->pluck('cont.nocontainer')->implode(', ');
+            return redirect('/invoiceFCL/form/createEdit/Step1/'. $id)->with('status', ['type'=> 'error', 'message' => 'Tidak ada tarif TPS yang cocok untuk container :' . $invalidContainerNumbersTPS]);
+        }
+
+        $container = FormC::where('form_id', $id)->get();
+        $containerSize = $container->pluck('size')->unique()->toArray();
+        $containerType = $container->pluck('ctr_type')->unique()->toArray();
+
+        $wmsPay = TWMS::whereIn('size', $containerSize)->whereIn('type', $containerType)->get();
+        $data['tarifWMS'] = $wmsPay;
+        $tpsPay = TTPS::where('lokasi_sandar_id', $data['form']->lokasi_sandar_id)->whereIn('size', $containerSize)->whereIn('type', $containerType)->get();
+        $data['tarifTPS'] = $tpsPay;
+
+        $singleCont = $container->first();
+        $data['singleCont'] = $singleCont;
+
+        $data['jenisContainer'] = $container->pluck('size')->unique()->implode(', ');
+        $data['typeContainer'] = $container->pluck('ctr_type')->unique()->implode(', ');
+
+        $data['size'] = $container->pluck('size')->unique();
+        $data['type'] = $container->pluck('ctr_type')->unique();
+        $data['nocontainer'] = $container->pluck('cont.nocontainer')->implode(', ');
+
+        $tglMasukTerawal = $singleCont->cont->tglmasuk;
+        $data['jumlahHariWMS'] = Carbon::parse($tglMasukTerawal)->diffInDays(Carbon::parse($data['form']->etd)) + 1;
+
+        // Hari TPS
+        $jumlahHariTPS = Carbon::parse($data['form']->eta)->diffInDays(Carbon::parse($tglMasukTerawal));
+        if ($jumlahHariTPS > 1) {
+            $massa3 = $jumlahHariTPS - 1;
+            $massa2 = 1;
+        }elseif ($jumlahHariTPS == 1) {
+            $massa3 = 0;
+            $massa2 = 1;
+        }else {
+            $massa2 = 0;
+            $massa3 = 0;
+        }
+
+        $data['massa2'] = $massa2 ?? 0;
+        $data['massa3'] = $massa3 ?? 0;
+
+        // dd($data['massa2'], $data['massa3']);
+        // dd($data['form']->eta, $tglMasukTerawal, $jumlahHariTPS);
+        // dd($data['jumlahHariWMS']);
+        // dd($singleCont);
+        // dd($wmsPay);
+
+        return view('invoiceFCL.form.step2', $data);
+    }
+
+    public function postStep2(Request $request)
+    {
+        
+        try {
+            $job = JobF::find($request->job_id);
+            $form = Form::find($request->form_id);
+            $formC = FormC::where('form_id', $request->form_id)->get();
+            $cust = Customer::find($form->cust_id);
+    
+            $grandTotal = $request->grand_total;
+            if ($grandTotal >= 5000000) {
+                $sumGrandTotal = $grandTotal + 10000;
+            }else {
+                $sumGrandTotal = $grandTotal;
+            }
+            $form->update([
+                'status' => 'Y'
+            ]);
+            $header = Header::create([
+                'proforma_no' => $this->getNextOrderNo(),
+                'kd_tps_asal' => $request->kd_tps_asal,
+                'form_id' => $form->id,
+                'job_id' => $job->id,
+                'nobl' => $form->nobl,
+                'tgl_bl_awb' => $form->tgl_bl_awb,
+                'cust_id' => $cust->id,
+                'cust_name' => $cust->name,
+                'cust_alamat' => $cust->alamat,
+                'cust_npwp'  => $cust->npwp,
+                'eta' => $form->eta,
+                'tglmasuk' => $request->tglmasuk,
+                'etd'=> $form->etd,
+                'total_tps' => $request->total_tps,
+                'total_wms' => $request->total_wms,
+                'total' => $request->total,
+                'admin' => $request->admin,
+                'ppn' => $request->ppn,
+                'grand_total' => $sumGrandTotal,
+                'status' => 'N',
+                'uidCreate' => Auth::user()->id,
+                'created_at' => Carbon::now(),
+                'kapal_voy' => $request->kapal_voy,
+            ]);
+    
+            $contFilter = $formC->groupBy(['size', 'ctr_type']);
+    
+            foreach ($contFilter as $size => $types) {
+                foreach ($types as $ctr_type => $containers) {
+                    $jumlah = $containers->count();
+                    
+                    // TPS Tarif 
+                    $tarifTPS = TTPS::where('lokasi_sandar_id', $form->lokasi_sandar_id)->where('size', $size)->where('type', $ctr_type)->first();
+                    // Penumpukkan Massa1
+                    Detil::create([
+                        'form_id' => $form->id,
+                        'invoice_id' => $header->id,
+                        'tps' => $request->kd_tps_asal,
+                        'keterangan' => 'Penumpukkan Massa 1 (' . $size . ' / ' .$ctr_type.' )',
+                        'size' => $size,
+                        'type' => $ctr_type,
+                        'tarif_dasar' => 0,
+                        'satuan' => '0',
+                        'jumlah' => 0,
+                        'jumlah_hari' => 1,
+                        'total' => 0,
+                    ]);
+                    // Penumpukkan Massa2
+                    $tarifDasarMassa2 = ($tarifTPS->tarif_dasar_massa * $tarifTPS->massa2) / 100;
+                    $totalMassa2TPS = $tarifDasarMassa2 * $jumlah;
+                    Detil::create([
+                        'form_id' => $form->id,
+                        'invoice_id' => $header->id,
+                        'tps' => $request->kd_tps_asal,
+                        'keterangan' => 'Penumpukkan Massa 2 (' . $size . ' / ' .$ctr_type.' )',
+                        'size' => $size,
+                        'type' => $ctr_type,
+                        'tarif_dasar' => $tarifDasarMassa2,
+                        'satuan' => $tarifTPS->massa2,
+                        'jumlah' => $jumlah,
+                        'jumlah_hari' => 1,
+                        'total' => $totalMassa2TPS,
+                    ]);
+                    // Penumpukkan Massa3
+                    $tarifDasarMassa3 = ($tarifTPS->tarif_dasar_massa * $tarifTPS->massa3) / 100;
+                    $totalMassa3TPS = $tarifDasarMassa3 * $jumlah * $request->massa3TPS;
+                    Detil::create([
+                        'form_id' => $form->id,
+                        'invoice_id' => $header->id,
+                        'tps' => $request->kd_tps_asal,
+                        'keterangan' => 'Penumpukkan Massa 3 (' . $size . ' / ' .$ctr_type.' )',
+                        'size' => $size,
+                        'type' => $ctr_type,
+                        'tarif_dasar' => $tarifTPS->tarif_dasar_massa,
+                        'satuan' => $tarifTPS->massa3,
+                        'jumlah' => $jumlah,
+                        'jumlah_hari' => 1,
+                        'total' => $totalMassa3TPS,
+                    ]);
+                    // liftOn
+                    $totalLiftOn = $tarifTPS->lift_on * $jumlah;
+                    Detil::create([
+                        'form_id' => $form->id,
+                        'invoice_id' => $header->id,
+                        'tps' => $request->kd_tps_asal,
+                        'keterangan' => 'Lift On (' . $size . ' / ' .$ctr_type.' )',
+                        'size' => $size,
+                        'type' => $ctr_type,
+                        'tarif_dasar' => $tarifTPS->lift_on,
+                        'satuan' => '0',
+                        'jumlah' => $jumlah,
+                        'jumlah_hari' => 0,
+                        'total' => $totalLiftOn,
+                    ]);
+                    // Gate Pass
+                    $totalGatePass = $tarifTPS->gate_pass * $jumlah;
+                    Detil::create([
+                        'form_id' => $form->id,
+                        'invoice_id' => $header->id,
+                        'tps' => $request->kd_tps_asal,
+                        'keterangan' => 'Gate Pass (' . $size . ' / ' .$ctr_type.' )',
+                        'size' => $size,
+                        'type' => $ctr_type,
+                        'tarif_dasar' => $tarifTPS->gate_pass,
+                        'satuan' => '0',
+                        'jumlah' => $jumlah,
+                        'jumlah_hari' => 0,
+                        'total' => $totalGatePass,
+                    ]);
+    
+                    // Tarif WMS
+                    $tarifWMS = TWMS::where('size', $size)->where('type', $ctr_type)->first();
+                    // Paket PLP
+                    $totalPLP = $tarifWMS->paket_plp*$jumlah;
+                    Detil::create([
+                        'form_id' => $form->id,
+                        'invoice_id' => $header->id,
+                        'tps' => 'Depo',
+                        'keterangan' => 'Paket PLP (' . $size . ' / ' .$ctr_type.' )',
+                        'size' => $size,
+                        'type' => $ctr_type,
+                        'tarif_dasar' => $tarifWMS->paket_plp,
+                        'satuan' => '0',
+                        'jumlah' => $jumlah,
+                        'jumlah_hari' => 0,
+                        'total' => $totalPLP,
+                    ]);
+                    // Massa
+                    $tarifDasarMassa = ($tarifWMS->tarif_dasar_massa * $tarifWMS->massa)/100;
+                    $totalMassaWMS = $tarifDasarMassa*$jumlah * $request->massaWMS;
+                    Detil::create([
+                        'form_id' => $form->id,
+                        'invoice_id' => $header->id,
+                        'tps' => 'Depo',
+                        'keterangan' => 'Penumpukan (' . $size . ' / ' .$ctr_type.' )',
+                        'size' => $size,
+                        'type' => $ctr_type,
+                        'tarif_dasar' => $tarifWMS->paket_plp,
+                        'satuan' => '0',
+                        'jumlah' => $jumlah,
+                        'jumlah_hari' => $request->massaWMS,
+                        'total' => $totalMassaWMS,
+                    ]);
+                    // lift On
+                    $totalLiftOnWMS = $tarifWMS->lift_on*$jumlah;
+                    Detil::create([
+                        'form_id' => $form->id,
+                        'invoice_id' => $header->id,
+                        'tps' => 'Depo',
+                        'keterangan' => 'Lift On (' . $size . ' / ' .$ctr_type.' )',
+                        'size' => $size,
+                        'type' => $ctr_type,
+                        'tarif_dasar' => $tarifWMS->lift_on,
+                        'satuan' => '0',
+                        'jumlah' => $jumlah,
+                        'jumlah_hari' => 0,
+                        'total' => $totalLiftOnWMS,
+                    ]);
+                    // lift Off
+                    $totalLiftOffWMS = $tarifWMS->lift_off*$jumlah;
+                    Detil::create([
+                        'form_id' => $form->id,
+                        'invoice_id' => $header->id,
+                        'tps' => 'Depo',
+                        'keterangan' => 'Lift Off (' . $size . ' / ' .$ctr_type.' )',
+                        'size' => $size,
+                        'type' => $ctr_type,
+                        'tarif_dasar' => $tarifWMS->lift_off,
+                        'satuan' => '0',
+                        'jumlah' => $jumlah,
+                        'jumlah_hari' => 0,
+                        'total' => $totalLiftOffWMS,
+                    ]);
+    
+                    if ($tarifWMS->surcharge != null || $tarifWMS->surcharge != 0) {
+                        // lift surcharge
+                    $totalSurcharge = (($totalPLP + $totalLiftOffWMS + $totalLiftOnWMS + $totalMassaWMS)*$tarifWMS->surcharge)/100;
+                    Detil::create([
+                        'form_id' => $form->id,
+                        'invoice_id' => $header->id,
+                        'tps' => 'Depo',
+                        'keterangan' => 'Surcharge (' . $size . ' / ' .$ctr_type.' )',
+                        'size' => $size,
+                        'type' => $ctr_type,
+                        'tarif_dasar' => $tarifWMS->surcharge,
+                        'satuan' => '0',
+                        'jumlah' => $jumlah,
+                        'jumlah_hari' => 0,
+                        'total' => $totalSurcharge,
+                    ]);
+                    }
+                }
+            }
+            
+            return redirect('/invoiceFCL/form/index')->with('status', ['type'=> 'success', 'message' => 'Data Berhasil di Simpan']);
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('status', ['type'=> 'error', 'message' => 'Something gone wrong : ' . $th->getMessage()]);
+            //throw $th;
+        }
+        
+    }
+
+    private function getNextOrderNo()
+    {
+        $latestOrder = Header::orderBy('proforma_no', 'desc')->first();
+
+        if ($latestOrder) {
+            // Ambil angka terakhir setelah "FCL-"
+            $latestNumber = intval(str_replace('FCL-', '', $latestOrder->proforma_no));
+            $nextOrderNo = $latestNumber + 1;
+        } else {
+            $nextOrderNo = 1;
+        }
+
+        // Format dengan leading zeros (15 digit)
+        return 'FCL-' . str_pad($nextOrderNo, 15, '0', STR_PAD_LEFT);
     }
 }

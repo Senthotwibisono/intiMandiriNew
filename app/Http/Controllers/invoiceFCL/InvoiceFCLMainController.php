@@ -38,4 +38,11 @@ class InvoiceFCLMainController extends Controller
         return view('invoiceFCL.form.index', $data);
     }
 
+    public function invoiceIndex()
+    {
+        $data['title'] = 'Invoice - FCL';
+
+        return view('invoiceFCL.invoice.index', $data);
+    }
+
 }

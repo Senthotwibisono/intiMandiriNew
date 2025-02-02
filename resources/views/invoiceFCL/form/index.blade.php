@@ -8,12 +8,38 @@
                     <button type="button" class="btn btn-primary createForm"><i class="fa fa-plus"></i></button>
                 </div>
             </div>
+            <div class="card-body">
+                <div class="table">
+                    <table class="table-hover" id="tableForm">
+                        <thead>
+                            <tr>
+                                <th>No Bl AWB</th>
+                                <th>Tgl Bl AWB</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
         </div>
     </body>
 @endsection
 
 @section('custom_js')
-
+<script>
+    $(document).ready(function(){
+        $('#tableForm').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '/invoiceFCL/form/dataTable',
+            columns: [
+                {data:'nobl', name:'nobl'},
+                {data:'tgl_bl_awb', name:'tgl_bl_awb'},
+                {data:'action', name:'action'},
+            ]
+        })
+    })
+</script>
 <script>
     $(document).on('click', '.createForm', function(){
         Swal.fire({

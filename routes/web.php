@@ -55,6 +55,7 @@ use App\Http\Controllers\pengiriman\CoariCodecoController;
  use App\Http\Controllers\invoiceFCL\InvoiceFCLMainController;
  use App\Http\Controllers\invoiceFCL\MasterTarifFCLController;
  use App\Http\Controllers\invoiceFCL\FormFCLController;
+ use App\Http\Controllers\invoiceFCL\BackendInvoiceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -709,10 +710,28 @@ Route::controller(LclController::class)->group(function(){
         Route::prefix('/form')->group(function(){
             Route::get('/index', [InvoiceFCLMainController::class, 'indexForm']);
             Route::controller(FormFCLController::class)->group(function(){
+                Route::get('/dataTable', 'dataTable');
                 Route::get('/createIndex/Step1', 'indexStep1');
+                Route::get('/createEdit/Step1/{id?}', 'editStep1');
                 Route::get('/getBLAWB', 'getBLAWB');
                 Route::get('/getBLData/{bl?}', 'getBLData');
                 Route::post('/step1Post', 'postStep1');
+                Route::post('/step1Update', 'updateStep1');
+                // Step 2
+                Route::get('/indexStep2/{id?}', 'indexStep2');
+                Route::post('/postStep2', 'postStep2')->name('invoice.lcl.postStep2');
+
+                // Cancel Form
+                Route::post('/cancelForm/{id?}', 'cancelForm');
+            });
+        });
+        Route::prefix('/invoice')->group(function(){
+            Route::get('/index', [InvoiceFCLMainController::class, 'invoiceIndex']);
+            Route::controller(BackendInvoiceController::class)->group(function(){
+                Route::get('/dataTable', 'dataTable');
+                Route::get('/pranota-{id?}', 'pranota');
+                Route::get('/invoice-{id?}', 'Invoice');
+                Route::post('/paidInvoice', 'paidInvoice');
             });
         });
     });

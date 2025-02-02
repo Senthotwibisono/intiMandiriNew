@@ -373,6 +373,12 @@
                     </li>
                 </ul>
             </li>
+            <li class="sidebar-item @if(Request::is('invoiceFCL/invoice/index') || Request::is('/invoiceFCL/invoice/index')) active @endif">
+                <a href="/invoiceFCL/invoice/index" class='sidebar-link'>
+                    <i class="bi bi-grid-fill"></i>
+                    <span>List Invoice FCL</span>
+                </a>
+            </li>
             
             <li class="submenu-item @if(Request::is('invoice/report')) active @endif">
                 <a href="{{ url('/invoice/report')}}">Rport Invoice</a>
