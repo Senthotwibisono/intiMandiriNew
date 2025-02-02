@@ -81,13 +81,13 @@
                             <div class="col-6">
                                 <div class="form-group">
                                     <label for="">Size</label>
-                                    <input type="text" name="size" id="size" class="form-control" readonly>
+                                    <input type="text" name="size" id="size" class="form-control">
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="form-group">
                                     <label for="">Weight</label>
-                                    <input type="text" name="weight" id="weight" class="form-control" readonly>
+                                    <input type="text" name="weight" id="weight" class="form-control">
                                 </div>
                             </div>
                         </div>

@@ -142,6 +142,8 @@ class GateInFCLCotroller extends Controller
                 $cont->update([
                     'nopol' => $request->nopol,
                     'no_seal' => $request->no_seal,
+                    'size' => $request->size,
+                    'weight' => $request->weight,
                 ]);
                 return redirect()->back()->with('status', ['type' => 'success', 'message' => 'Data Berhasil di Update']);
             }
