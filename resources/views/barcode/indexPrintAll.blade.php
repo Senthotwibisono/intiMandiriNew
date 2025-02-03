@@ -165,20 +165,6 @@
 @foreach($barcodes as $barcode)
 
 <div class="container">
-    <div class="row">
-        <div class="col-12">
-            <div class="d-flex align-items-center">
-                <div class="logo img me-3">
-                    <img src="/logo/IntiMandiri.PNG" class="img-fluid" alt="" style="">
-                </div>
-                <div class="text-center flex-grow-1">
-                    {{$title}}
-                </div>
-            </div>
-        </div>
-    </div>
-    <br>
-    <hr>
     <!-- <div class="row">
         <div class="col-3">
             <a herf="" class="btn btn-danger">Cetak PDF</a>
@@ -192,6 +178,16 @@
     <div class="row">
         <div class="card">
             <div class="card-header">
+                <div class="col-12">
+                    <div class="d-flex align-items-center">
+                        <div class="logo img me-3">
+                            <img src="/logo/IntiMandiri.PNG" class="img-fluid" alt="" style="">
+                        </div>
+                        <div class="text-center flex-grow-1">
+                            {{$title}} {{$barcode->cont->nocontainer}}
+                        </div>
+                    </div>
+                </div>
                 {{strtoupper($barcode->ref_type).' - '.strtoupper($barcode->ref_action)}}
                 <small class="pull-right"><strong>Expired Date:</strong> {{ date('d F, Y', strtotime($barcode->expired)) }}</small>
             </div>
