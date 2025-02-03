@@ -25,9 +25,9 @@
                 <tbody>
                     @foreach($seals as $seal)
                     <tr>
-                        <td>{{$seal->code}}</td>
-                        <td><textarea class="form-control" id="exampleFormControlTextarea1" name="alamat" rows="3" readonly>{{$seal->keterangan}}</textarea></td>
-                        <td>{{$seal->user->name}}</td>
+                        <td>{{$seal->code ?? ''}}</td>
+                        <td><textarea class="form-control" id="exampleFormControlTextarea1" name="alamat" rows="3" readonly>{{$seal->keterangan ?? ' '}}</textarea></td>
+                        <td>{{$seal->user->name ?? ' '}}</td>
                         <td>
                             <button class="btn btn-warning formEdit" data-id="{{ $seal->id }}" id="formEdit"><i class="fa fa-pen"></i></button>
                             <button class="btn btn-danger" data-id="{{ $seal->id }}" id="deleteUser-{{ $seal->id }}"><i class="fa fa-trash"></i></button>

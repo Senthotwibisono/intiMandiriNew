@@ -30,14 +30,14 @@
                 <tbody>
                     @foreach($loks as $lok)
                     <tr>
-                        <td>{{$lok->name}}</td>
-                        <td>{{$lok->kd_tps_asal}}</td>
+                        <td>{{$lok->name ?? ' '}}</td>
+                        <td>{{$lok->kd_tps_asal ?? ' '}}</td>
                         <td>{{$lok->jabatan ?? 'Data Belum di Isi'}}</td>
                         <td>{{$lok->perusahaan->name ?? 'Data Belum di Isi'}}</td>
                         <td>{{$lok->pelabuhan->name ?? 'Data Belum di Isi'}}</td>
-                        <td>{{$lok->kota}}</td>
-                        <td>{{$lok->negara->name}}</td>
-                        <td>{{$lok->user->name}}</td>
+                        <td>{{$lok->kota ?? ' '}}</td>
+                        <td>{{$lok->negara->name ?? ''}}</td>
+                        <td>{{$lok->user->name ?? ''}}</td>
                         <td>
                             <button class="btn btn-warning formEdit" data-id="{{ $lok->id }}" id="formEdit"><i class="fa fa-pen"></i></button>
                             <button class="btn btn-danger" data-id="{{ $lok->id }}" id="deleteUser-{{ $lok->id }}"><i class="fa fa-trash"></i></button>

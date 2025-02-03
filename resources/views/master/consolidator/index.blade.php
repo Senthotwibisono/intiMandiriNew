@@ -35,19 +35,19 @@
                 <tbody>
                     @foreach($consolidators as $cons)
                     <tr>
-                        <td>{{$cons->namaconsolidator}}</td>
-                        <td>{{$cons->code}}</td>
-                        <td>{{$cons->notelp}}</td>
-                        <td>{{$cons->contactperson}}</td>
-                        <td>{{$cons->nocano}}</td>
-                        <td>{{$cons->tglakhirkontrak}}</td>
-                        <td>{{$cons->kontrak}}</td>
-                        <td>{{$cons->user->name}}</td>
-                        <td>{{$cons->npwp}}</td>
-                        <td>{{$cons->ppn}}</td>
-                        <td>{{$cons->materai}}</td>
-                        <td>{{$cons->nppkp}}</td>
-                        <td><textarea class="form-control" id="exampleFormControlTextarea1" rows="3" readonly>{{$cons->keterangan}}</textarea></td>
+                        <td>{{$cons->namaconsolidator ?? ''}}</td>
+                        <td>{{$cons->code ?? ''}}</td>
+                        <td>{{$cons->notelp ?? ' '}}</td>
+                        <td>{{$cons->contactperson ?? ''}}</td>
+                        <td>{{$cons->nocano ?? ' '}}</td>
+                        <td>{{$cons->tglakhirkontrak ?? ' '}}</td>
+                        <td>{{$cons->kontrak ?? ' '}}</td>
+                        <td>{{$cons->user->name ?? ' '}}</td>
+                        <td>{{$cons->npwp ?? ' '}}</td>
+                        <td>{{$cons->ppn ?? ''}}</td>
+                        <td>{{$cons->materai ?? ''}}</td>
+                        <td>{{$cons->nppkp ?? ''}}</td>
+                        <td><textarea class="form-control" id="exampleFormControlTextarea1" rows="3" readonly>{{$cons->keterangan ?? ''}}</textarea></td>
                         <td>
                             <button class="btn btn-warning formEdit" data-id="{{ $cons->id }}" id="formEdit"><i class="fa fa-pen"></i></button>
                             <button class="btn btn-danger" data-id="{{ $cons->id }}" id="deleteUser-{{ $cons->id }}"><i class="fa fa-trash"></i></button>

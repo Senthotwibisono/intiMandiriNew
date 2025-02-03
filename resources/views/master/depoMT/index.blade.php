@@ -24,7 +24,7 @@
                 <tbody>
                     @foreach($depos as $depo)
                     <tr>
-                        <td>{{$depo->name}}</td>
+                        <td>{{$depo->name ?? ' '}}</td>
                         <td>{{$depo->user->name ?? ''}}</td>
                         <td>
                             <button class="btn btn-warning formEdit" data-id="{{ $depo->id }}" id="formEdit"><i class="fa fa-pen"></i></button>

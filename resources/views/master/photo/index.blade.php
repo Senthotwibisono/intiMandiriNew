@@ -22,9 +22,9 @@
                 <tbody>
                     @foreach($photos as $photo)
                         <tr>
-                            <td>{{$photo->tipe}}</td>
-                            <td>{{$photo->kegiatan}}</td>
-                            <td>{{$photo->keterangan}}</td>
+                            <td>{{$photo->tipe ?? ' '}}</td>
+                            <td>{{$photo->kegiatan ?? ''}}</td>
+                            <td>{{$photo->keterangan ?? ''}}</td>
                             <td>
                                 <div class="button-container">
                                     <button class="btn btn-warning formEdit" data-id="{{ $photo->id }}" id="formEdit"><i class="fa fa-pen"></i></button>

@@ -25,8 +25,8 @@
                 <tbody>
                     @foreach($ppjks as $ppjk)
                     <tr>
-                        <td>{{$ppjk->name}}</td>
-                        <td>{{$ppjk->phone}}</td>
+                        <td>{{$ppjk->name ?? ''}}</td>
+                        <td>{{$ppjk->phone ?? ''}}</td>
                         <td>{{$ppjk->user->name ?? ''}}</td>
                         <td>
                             <button class="btn btn-warning formEdit" data-id="{{ $ppjk->id }}" id="formEdit"><i class="fa fa-pen"></i></button>

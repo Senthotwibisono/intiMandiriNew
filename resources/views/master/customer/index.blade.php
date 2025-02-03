@@ -27,11 +27,11 @@
                 <tbody>
                     @foreach($customers as $customer)
                     <tr>
-                        <td>{{$customer->name}}</td>
-                        <td>{{$customer->email}}</td>
-                        <td>{{$customer->phone}}</td>
-                        <td><textarea class="form-control" id="exampleFormControlTextarea1" name="alamat" rows="3" readonly>{{$customer->alamat}}</textarea></td>
-                        <td>{{$customer->fax}}</td>
+                        <td>{{$customer->name ?? ' '}}</td>
+                        <td>{{$customer->email ?? ' '}}</td>
+                        <td>{{$customer->phone ?? ' '}}</td>
+                        <td><textarea class="form-control" id="exampleFormControlTextarea1" name="alamat" rows="3" readonly>{{$customer->alamat ?? ''}}</textarea></td>
+                        <td>{{$customer->fax ?? ' '}}</td>
                         <td>
                             <button class="btn btn-warning formEdit" data-id="{{ $customer->id }}" id="formEdit"><i class="fa fa-pen"></i></button>
                             <button class="btn btn-danger" data-id="{{ $customer->id }}" id="deleteUser-{{ $customer->id }}"><i class="fa fa-trash"></i></button>

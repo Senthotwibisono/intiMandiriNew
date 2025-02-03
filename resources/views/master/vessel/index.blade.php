@@ -27,11 +27,11 @@
                 <tbody>
                     @foreach($vessel as $ves)
                     <tr>
-                        <td>{{$ves->name}}</td>
-                        <td>{{$ves->code}}</td>
-                        <td>{{$ves->call_sign}}</td>
-                        <td>{{$ves->negara->name}}</td>
-                        <td>{{$ves->user->name}}</td>
+                        <td>{{$ves->name ?? ''}}</td>
+                        <td>{{$ves->code ?? ''}}</td>
+                        <td>{{$ves->call_sign ?? ''}}</td>
+                        <td>{{$ves->negara->name ?? ''}}</td>
+                        <td>{{$ves->user->name ?? ''}}</td>
                         <td>
                             <button class="btn btn-warning formEdit" data-id="{{ $ves->id }}" id="formEdit"><i class="fa fa-pen"></i></button>
                             <button class="btn btn-danger" data-id="{{ $ves->id }}" id="deleteUser-{{ $ves->id }}"><i class="fa fa-trash"></i></button>

@@ -27,9 +27,9 @@
                 <tbody>
                     @foreach($pelabuhans as $pelabuhan)
                     <tr>
-                        <td>{{$pelabuhan->name}}</td>
-                        <td>{{$pelabuhan->kode}}</td>
-                        <td>{{$pelabuhan->jenis}}</td>
+                        <td>{{$pelabuhan->name ?? ' '}}</td>
+                        <td>{{$pelabuhan->kode ?? ' '}}</td>
+                        <td>{{$pelabuhan->jenis ?? ''}}</td>
                         <td>{{$pelabuhan->negara->name ?? ''}}</td>
                         <td>{{$pelabuhan->user->name ?? ''}}</td>
                         <td>

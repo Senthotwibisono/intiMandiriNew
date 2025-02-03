@@ -25,9 +25,9 @@
                 <tbody>
                     @foreach($packs as $pack)
                     <tr>
-                        <td>{{$pack->name}}</td>
-                        <td>{{$pack->code}}</td>
-                        <td>{{$pack->uid}}</td>
+                        <td>{{$pack->name ?? ''}}</td>
+                        <td>{{$pack->code ?? ''}}</td>
+                        <td>{{$pack->uid ?? ''}}</td>
                         <td>
                             <button class="btn btn-warning formEdit" data-id="{{ $pack->id }}" id="formEdit"><i class="fa fa-pen"></i></button>
                             <button class="btn btn-danger" data-id="{{ $pack->id }}" id="deleteUser-{{ $pack->id }}"><i class="fa fa-trash"></i></button>

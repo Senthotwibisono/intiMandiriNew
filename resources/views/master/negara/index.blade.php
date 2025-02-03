@@ -25,9 +25,9 @@
                 <tbody>
                     @foreach($countries as $country)
                     <tr>
-                        <td>{{$country->name}}</td>
-                        <td>{{$country->code}}</td>
-                        <td>{{$country->uid}}</td>
+                        <td>{{$country->name ?? ''}}</td>
+                        <td>{{$country->code ?? ''}}</td>
+                        <td>{{$country->uid ?? ''}}</td>
                         <td>
                             <button class="btn btn-warning formEdit" data-id="{{ $country->id }}" id="formEdit"><i class="fa fa-pen"></i></button>
                             <button class="btn btn-danger" data-id="{{ $country->id }}" id="deleteUser-{{ $country->id }}"><i class="fa fa-trash"></i></button>

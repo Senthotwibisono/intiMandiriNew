@@ -37,17 +37,17 @@
                     <tr>
                         <td>{{$pers->name}}</td>
                         <td><textarea class="form-control" id="exampleFormControlTextarea1" rows="3" readonly>{{$pers->alamat}}</textarea></td>
-                        <td>{{$pers->kota}}</td>
-                        <td>{{$pers->phone}}</td>
-                        <td>{{$pers->fax}}</td>
-                        <td>{{$pers->email}}</td>
-                        <td>{{$pers->cp}}</td>
-                        <td>{{$pers->roles}}</td>
-                        <td>{{$pers->npwp}}</td>
-                        <td>{{$pers->ppn}}</td>
-                        <td>{{$pers->materai}}</td>
-                        <td>{{$pers->nppkp}}</td>
-                        <td>{{$pers->user->name}}</td>
+                        <td>{{$pers->kota ?? ''}}</td>
+                        <td>{{$pers->phone ?? ''}}</td>
+                        <td>{{$pers->fax ?? ''}}</td>
+                        <td>{{$pers->email ?? ''}}</td>
+                        <td>{{$pers->cp ?? ''}}</td>
+                        <td>{{$pers->roles ?? ''}}</td>
+                        <td>{{$pers->npwp ?? ''}}</td>
+                        <td>{{$pers->ppn ?? ''}}</td>
+                        <td>{{$pers->materai ?? ''}}</td>
+                        <td>{{$pers->nppkp ?? ''}}</td>
+                        <td>{{$pers->user->name ?? ''}}</td>
                         <td>
                             <button class="btn btn-warning formEdit" data-id="{{ $pers->id }}" id="formEdit"><i class="fa fa-pen"></i></button>
                             <button class="btn btn-danger" data-id="{{ $pers->id }}" id="deleteUser-{{ $pers->id }}"><i class="fa fa-trash"></i></button>

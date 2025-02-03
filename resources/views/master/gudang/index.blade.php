@@ -26,9 +26,9 @@
                 <tbody>
                     @foreach($gudangs as $gudang)
                     <tr>
-                        <td>{{$gudang->nama_gudang}}</td>
-                        <td>{{$gudang->kode_gudang}}</td>
-                        <td>{{$gudang->kode_kantor}}</td>
+                        <td>{{$gudang->nama_gudang ?? ' '}}</td>
+                        <td>{{$gudang->kode_gudang ?? ' '}}</td>
+                        <td>{{$gudang->kode_kantor ?? ' '}}</td>
                         <td>{{$gudang->user->name ?? ''}}</td>
                         <td>
                             <button class="btn btn-warning formEdit" data-id="{{ $gudang->id }}" id="formEdit"><i class="fa fa-pen"></i></button>
