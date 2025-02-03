@@ -9,6 +9,8 @@ use Carbon\Carbon;
 
 use App\Models\Container as Cont;
 use App\Models\JobOrder as Job;
+use App\Models\ContainerFCL as ContF;
+use App\Models\JobOrderFCL as JobF;
 use App\Models\BarcodeGate as Barcode;
 use App\Models\Manifest;
 use App\Models\Photo;
@@ -440,5 +442,86 @@ class BeaCukaiController extends Controller
             ]);
         }
         return redirect()->back()->with('status', ['type'=>'success', 'message'=>'Data Berhasil di Update']);
+    }
+
+    public function HoldContainerIndex()
+    {
+        $data['title'] = 'Hold Contianer- FCL';
+
+        return view('bc.fcl.hold', $data);
+    }
+
+    public function holdContainerDataTable(Request $request)
+    {
+        $cont = ContF::where('status_bc', 'HOLD')->get();
+
+        return DataTables::of($cont)
+        ->setRowClass('highlight-yellow') // Menjadikan seluruh row berwarna kuning
+        ->addColumn('release', function($cont){
+            return '<button type="button" class="btn btn-info releaseButton" id="releaseButton" data-id="'.$cont->id.'">Release</button>';
+        })
+        ->addColumn('photo', function($cont){
+            return '<button class="btn btn-outline-info photoButton" data-id="'.$cont->id.'"><i class="fa fa-camera"></i></button>';
+        })
+        ->addColumn('nojob', function($cont){
+            return $cont->job->nojoborder ?? '-';
+        })
+        ->addColumn('nombl', function($cont){
+            return $cont->job->nombl ?? '-';
+        })
+        ->addColumn('nocontainer', function($cont){
+            return $cont->nocontainer ?? '-';
+        })
+        ->addColumn('nobl', function($cont){
+            return $cont->nobl ?? '-';
+        })
+        ->addColumn('tglBL', function($cont){
+            return $cont->tgl_bl_awb ?? '-';
+        })
+        ->addColumn('tglmasuk', function($cont){
+            return $cont->tglmasuk ?? 'Belum Masuk';
+        })
+        ->addColumn('jammasuk', function($cont){
+            return $cont->jammasuk ?? 'Belum Masuk';
+        })
+        ->addColumn('tglkeluar', function($cont){
+            return $cont->tglkeluar ?? 'Belum keluar';
+        })
+        ->addColumn('jamkeluar', function($cont){
+            return $cont->jamkeluar ?? 'Belum keluar';
+        })
+        ->addColumn('kodeDok', function($cont){
+            return $cont->dokumen->name ?? '-';
+        })
+        ->addColumn('noDok', function($cont){
+            return $cont->no_dok ?? '-';
+        })
+        ->addColumn('tglDok', function($cont){
+            return $cont->tgl_dok ?? '-';
+        })
+        ->rawColumns(['release', 'photo'])
+        ->make(true);
+    }
+
+    public function releaseFCLCont(Request $request)
+    {
+        $cont = ContF::find($request->id);
+        try {
+            $cont->update([
+                'status_bc' => 'release',
+                'release_bc_date' => Carbon::now(),
+                'release_bc_uid' =>  Auth::user()->name,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data Berhasil di Update',
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Oops Something Wrong: ' . $th->getMessage(),
+            ]);
+        }
     }
 }
