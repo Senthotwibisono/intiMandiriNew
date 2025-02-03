@@ -14,6 +14,11 @@
 
 
 <style>
+ @page {
+      width: 100mm;
+      height: auto;
+      margin: 0cm; /* Tambahkan margin jika diperlukan */
+    }
  .section {
       padding-top: 5%;
     }
@@ -85,8 +90,8 @@
         width:15%;   
     }
     .logo img{
-        width:45px;
-        height:45px;
+        width:50px;
+        height:auto;
         padding-top:30px;
     }
     .logo span{
@@ -162,16 +167,17 @@
 <div class="container">
     <div class="row">
         <div class="col-12">
-            <div class="text-center">
-                    <img src="/logo/IntiMandiri.PNG" class="img" alt="">
-               
+            <div class="d-flex align-items-center">
+                <div class="logo img me-3">
+                    <img src="/logo/IntiMandiri.PNG" class="img-fluid" alt="" style="">
+                </div>
+                <div class="text-center flex-grow-1">
+                    {{$title}}
+                </div>
             </div>
-       </div>
+        </div>
     </div>
     <br>
-    <div class="text-center">
-        {{$title}}
-    </div>
     <hr>
     <!-- <div class="row">
         <div class="col-3">
@@ -195,7 +201,7 @@
                         <td>&nbsp;&nbsp;:&nbsp;&nbsp;</td>
                         <td>{{ $barcode->barcode }}</td>
                         <br>
-                    {!!QrCode::margin(0)->size(300)->generate($barcode->barcode)!!}
+                    {!!QrCode::margin(0)->size(150)->generate($barcode->barcode)!!}
                 </div>
                 <br>
                 <div class="text-center">

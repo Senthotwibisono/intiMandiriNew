@@ -14,6 +14,11 @@
 
 
 <style>
+    @page {
+      width: 100mm;
+      height: auto;
+      margin: 0cm; /* Tambahkan margin jika diperlukan */
+    }
  .section {
       padding-top: 5%;
     }
@@ -85,8 +90,8 @@
         width:15%;   
     }
     .logo img{
-        width:45px;
-        height:45px;
+        width:50px;
+        height:auto;
         padding-top:30px;
     }
     .logo span{
@@ -157,67 +162,60 @@
     }
 </style>
 
-<div class="container">
-    <div class="row">
-        <div class="col-12">
-            <div class="text-center">
-                    <img src="/logo/IntiMandiri.PNG" class="img" alt="">
-               
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex align-items-center">
+                    <div class="logo img me-3">
+                        <img src="/logo/IntiMandiri.PNG" class="img-fluid" alt="" style="">
+                    </div>
+                    <div class="text-center flex-grow-1">
+                        {{$title}}
+                    </div>
+                </div>
             </div>
-       </div>
-    </div>
-    <br>
-    <div class="text-center">
-        {{$title}}
-    </div>
-    <hr>
-    <!-- <div class="row">
-        <div class="col-3">
-            <a herf="" class="btn btn-danger">Cetak PDF</a>
         </div>
-        <div class="col-3">
-            <a herf="" class="btn btn-success">Cetak Excel</a>
-        </div>
-    </div>
-    <br>
-    <hr> -->
-    <div class="row">
-        <div class="card">
-            <div class="card-header">
-                {{strtoupper($barcode->ref_type).' - '.strtoupper($barcode->ref_action)}}
-                <small class="pull-right"><strong>Expired Date:</strong> {{ date('d F, Y', strtotime($barcode->expired)) }}</small>
-            </div>
-            <div class="card-body">
-                <div class="text-center">
-                        <td><b>Code</b></td>
-                        <td>&nbsp;&nbsp;:&nbsp;&nbsp;</td>
-                        <td>{{ $barcode->barcode }}</td>
+        <br>
+        <hr>
+        <div class="row">
+            <div class="card">
+                <div class="card-header">
+                    {{strtoupper($barcode->ref_type).' - '.strtoupper($barcode->ref_action)}}
+                    <small class="pull-right"><strong>Expired Date:</strong> {{ date('d F, Y', strtotime($barcode->expired)) }}</small>
+                </div>
+                <div class="card-body">
+                    <div class="text-center">
+                            <td><b>Code</b></td>
+                            <td>&nbsp;&nbsp;:&nbsp;&nbsp;</td>
+                            <td>{{ $barcode->barcode }}</td>
+                            <br>
+                        {!!QrCode::margin(0)->size(150)->generate($barcode->barcode)!!}
+                    </div>
+                    <br>
+                    <div class="text-center">
+                        <tr>
+                            <td>Container</td>
+                            <td> : </td>
+                            <td>{{$barcode->cont->nocontainer}}</td>
+                        </tr>
                         <br>
-                    {!!QrCode::margin(0)->size(300)->generate($barcode->barcode)!!}
-                </div>
-                <br>
-                <div class="text-center">
-                    <tr>
-                        <td>Container</td>
-                        <td> : </td>
-                        <td>{{$barcode->cont->nocontainer}}</td>
-                    </tr>
-                    <br>
-                    <tr>
-                        <td>Size</td>
-                        <td> : </td>
-                        <td>{{$barcode->cont->size}}</td>
-                    </tr>
-                    <br>
-                    <tr>
-                        <td>Ex. Kapal</td>
-                        <td> : </td>
-                        <td>{{$barcode->cont->job->kapal->name ?? ''}}</td>
-                    </tr>
+                        <tr>
+                            <td>Size</td>
+                            <td> : </td>
+                            <td>{{$barcode->cont->size}}</td>
+                        </tr>
+                        <br>
+                        <tr>
+                            <td>Ex. Kapal</td>
+                            <td> : </td>
+                            <td>{{$barcode->cont->job->kapal->name ?? ''}}</td>
+                        </tr>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</body>
 
 </html>
