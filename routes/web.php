@@ -451,9 +451,14 @@ Route::controller(BeaCukaiController::class)->group(function(){
     Route::get('/bc/lcl/delivery/gateOut', 'gateOut')->name('bc.gateOut.index');
     Route::post('/bc/lcl/delivery/gateOutapprove-{id?}', 'approveGateOut')->name('bc.gateOut.approve');
 
+    // FCL
     Route::get('/bc/fcl/holdContainerIndex', 'HoldContainerIndex');
     Route::get('/bc/fcl/holdContainerDataTable', 'holdContainerDataTable');
     Route::post('/bc/fcl/releaseFCLCont', 'releaseFCLCont');
+    
+    Route::get('/bc/fcl/releaseContainerIndex', 'ReleaseContainerIndex');
+    Route::get('/bc/fcl/releaseContainerDataTable', 'releaseContainerDataTable');
+    Route::post('/bc/fcl/holdFCLCont', 'holdFCLCont');
 });
 
 // Qr Reader

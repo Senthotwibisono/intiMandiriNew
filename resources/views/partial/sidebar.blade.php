@@ -544,19 +544,22 @@
         </ul>
     </li>
 
-    <li class="sidebar-item has-sub @if(Request::is('/bc/fcl/*')) active @endif">
+    <li class="sidebar-item has-sub @if(Request::is('bc/fcl/*')) active @endif">
         <a href="#" class='sidebar-link'>
             <i class="fa-solid fa-window-restore"></i>
             <span>FCL</span>
         </a>
-        <ul class="submenu @if(Request::is('fcl/*')) active @endif">
+        <ul class="submenu @if(Request::is('bc/fcl/*')) active @endif">
             <!-- Realisasi -->
             <li class="submenu-item @if(Request::is('bc/fcl/holdContainerIndex') || Request::is('/bc/fcl/holdContainerIndex')) active @endif">
-                <a href="{{ url('/bc/fcl/holdContainerIndex')}}">HoldContainer</a>
+                <a href="{{ url('/bc/fcl/holdContainerIndex')}}">Hold Container</a>
+            </li>
+            <li class="submenu-item @if(Request::is('bc/fcl/releaseContainerIndex') || Request::is('/bc/fcl/releaseContainerIndex')) active @endif">
+                <a href="{{ url('/bc/fcl/releaseContainerIndex')}}">Release Container</a>
             </li>
 
             <!-- Delivery -->
-            <li class="sidebar-item has-sub @if(Request::is('fcl/delivery/*')) active @endif">
+            <!-- <li class="sidebar-item has-sub @if(Request::is('fcl/delivery/*')) active @endif">
                 <a href="#" class='sidebar-link'>
                     <span>Delivery</span>
                 </a>
@@ -568,7 +571,7 @@
                         <a href="{{ url('/fcl/delivery/gateOut')}}">Gate Out</a>
                     </li>
                 </ul>
-            </li>
+            </li> -->
 
             <!-- Report -->
             <li class="sidebar-item has-sub @if(Request::is('fcl/report/*')) active @endif">

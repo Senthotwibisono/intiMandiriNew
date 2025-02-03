@@ -524,4 +524,83 @@ class BeaCukaiController extends Controller
             ]);
         }
     }
+
+    public function ReleaseContainerIndex()
+    {
+        $data['title'] = 'Release Contianer- FCL';
+
+        return view('bc.fcl.release', $data);
+    }
+
+    public function releaseContainerDataTable(Request $request)
+    {
+        $cont = ContF::where('status_bc', 'release')->get();
+
+        return DataTables::of($cont)
+        ->setRowClass('highlight-blue') // Menjadikan seluruh row berwarna kuning
+        ->addColumn('hold', function($cont){
+            return '<button type="button" class="btn btn-danger holdButton" id="holdButton" data-id="'.$cont->id.'">Hold</button>';
+        })
+        ->addColumn('photo', function($cont){
+            return '<button class="btn btn-outline-info photoButton" data-id="'.$cont->id.'"><i class="fa fa-camera"></i></button>';
+        })
+        ->addColumn('nojob', function($cont){
+            return $cont->job->nojoborder ?? '-';
+        })
+        ->addColumn('nombl', function($cont){
+            return $cont->job->nombl ?? '-';
+        })
+        ->addColumn('nocontainer', function($cont){
+            return $cont->nocontainer ?? '-';
+        })
+        ->addColumn('nobl', function($cont){
+            return $cont->nobl ?? '-';
+        })
+        ->addColumn('tglBL', function($cont){
+            return $cont->tgl_bl_awb ?? '-';
+        })
+        ->addColumn('tglmasuk', function($cont){
+            return $cont->tglmasuk ?? 'Belum Masuk';
+        })
+        ->addColumn('jammasuk', function($cont){
+            return $cont->jammasuk ?? 'Belum Masuk';
+        })
+        ->addColumn('tglkeluar', function($cont){
+            return $cont->tglkeluar ?? 'Belum keluar';
+        })
+        ->addColumn('jamkeluar', function($cont){
+            return $cont->jamkeluar ?? 'Belum keluar';
+        })
+        ->addColumn('kodeDok', function($cont){
+            return $cont->dokumen->name ?? '-';
+        })
+        ->addColumn('noDok', function($cont){
+            return $cont->no_dok ?? '-';
+        })
+        ->addColumn('tglDok', function($cont){
+            return $cont->tgl_dok ?? '-';
+        })
+        ->rawColumns(['hold', 'photo'])
+        ->make(true);
+    }
+
+    public function holdFCLCont(Request $request)
+    {
+        $cont = ContF::find($request->id);
+        try {
+            $cont->update([
+                'status_bc' => 'HOLD',
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data Berhasil di Update',
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Oops Something Wrong: ' . $th->getMessage(),
+            ]);
+        }
+    }
 }
