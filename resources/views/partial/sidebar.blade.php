@@ -466,9 +466,26 @@
             </li>
         </ul>
     </li>
+
+    <li class="sidebar-item has-sub @if(Request::is('bc-p2/fcl/*') || Request::is('/bc-p2/fcl/*')) active @endif">
+        <a href="#" class='sidebar-link'>
+            <i class="fa-solid fa-window-restore"></i>
+            <span>FCL</span>
+        </a>
+        <ul class="submenu @if(Request::is('bc-p2/fcl/*') || Request::is('/bc-p2/fcl/*')) active @endif">
+            <!-- Realisasi -->
+            <li class="submenu-item @if(Request::is('bc-p2/fcl/list-container') || Request::is('/bc-p2/fcl/list-container')) active @endif">
+                <a href="{{ url('/bc-p2/fcl/list-container')}}">List Container</a>
+            </li>
+            <li class="submenu-item @if(Request::is('/bc-p2/fcl/list-segelMerah') || Request::is('/bc-p2/fcl/list-segelMerah')) active @endif">
+                <a href="{{ url('/bc-p2/fcl/list-segelMerah')}}">List Segel Merah</a>
+            </li>
+        </ul>
+    </li>
+
     <li class="sidebar-item has-sub @if(Request::is('lcl/report/*')) active @endif">
         <a href="#" class='sidebar-link'>
-            <span>Report</span>
+            <span>Report LCL</span>
         </a>
         <ul class="submenu @if(Request::is('lcl/report/*')) active @endif">
             <li class="submenu-item @if(Request::is('lcl/report/cont')) active @endif">

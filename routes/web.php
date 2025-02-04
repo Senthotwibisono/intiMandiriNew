@@ -633,6 +633,16 @@ Route::controller(AndroidGateController::class)->group(function(){
         Route::get('/bc-p2/list-segelMerah/data', 'listSegelData');
         Route::post('/bc-p2/list-segelMerah/unlockSubmit', 'unlockSubmit');
 
+        Route::get('/bc-p2/fcl/list-container', 'indexListContainer');
+        Route::get('/bc-p2/fcl/containerData', 'listContainerData');
+        Route::get('/bc-p2/fcl/list-container/lockModal{id?}', 'listContainerModal');
+        Route::post('/bc-p2/fcl/list-container/lockSubmit', 'lockSubmitFCL');
+
+        Route::get('/bc-p2/fcl/list-segelMerah', 'listSegelIndexFCL');
+        Route::get('/bc-p2/fcl/list-segelMerah/dataFCL', 'listSegelDataFCL');
+        Route::post('/bc-p2/fcl/list-segelMerah/unlockSubmitFCL', 'unlockSubmitFCL');
+
+
         Route::get('/bc-p2/detil-log/{id?}', 'logDetil');
     });
 

@@ -150,11 +150,28 @@ class ContainerFCL extends Model
         'kd_dok_inout',
         'no_dok',
         'tgl_dok',
+        // BCP2
+        'alasan_segel',
+        'alasan_lepas_segel',
+        'flag_segel_merah',
+        'tanggal_segel_merah',
+        'tanggal_lepas_segel_merah',
+        'uid_segel',
+        'uid_lepas_segel',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class, 'uid', 'id');
+    }
+    public function uidSegel()
+    {
+        return $this->belongsTo(User::class, 'uid_segel', 'id');
+    }
+
+    public function uidLepasSegel()
+    {
+        return $this->belongsTo(User::class, 'uid_lepas_segel', 'id');
     }
 
     public function Customer()
