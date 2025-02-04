@@ -5,7 +5,7 @@ namespace App\Models\FCL;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Customer;
-use App\Models\user;
+use App\Models\User;
 use App\Models\JobOrderFCL as JobF;
 
 class InvoiceHeader extends Model

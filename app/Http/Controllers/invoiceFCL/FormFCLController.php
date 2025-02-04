@@ -75,7 +75,7 @@ class FormFCLController extends Controller
     public function getBLData($bl)
     {
         try {
-            $cont = ContF::whereNull('tglkeluar')->where('nobl', $bl)->get();
+            $cont = ContF::whereNotNull('tglmasuk')->whereNull('tglkeluar')->where('nobl', $bl)->get();
             if (!$cont) {
                 return response()->json([
                     'success'=> false,
@@ -108,6 +108,12 @@ class FormFCLController extends Controller
         try {
             
             $cont = ContF::whereIn('id', $request->container_id)->get();
+            if ($cont->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Container belum bisa di pilih',
+                ]);
+            }
             $etaValues = $cont->pluck('eta')->unique();
             if ($etaValues->count() > 1) {
                 return redirect()->back()->with('status', ['type'=>'error', 'message' => 'Terdapat nilai ETA yang berbeda.']);
@@ -315,6 +321,7 @@ class FormFCLController extends Controller
         $data['tarifWMS'] = $wmsPay;
         $tpsPay = TTPS::where('lokasi_sandar_id', $data['form']->lokasi_sandar_id)->whereIn('size', $containerSize)->whereIn('type', $containerType)->get();
         $data['tarifTPS'] = $tpsPay;
+        // dd($tpsPay, $wmsPay, $tarifTPS);
 
         $singleCont = $container->first();
         $data['singleCont'] = $singleCont;

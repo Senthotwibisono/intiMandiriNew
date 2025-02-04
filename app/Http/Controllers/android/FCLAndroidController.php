@@ -37,7 +37,7 @@ class FCLAndroidController extends Controller
         // die;
         $cont = Cont::find($id);
 
-        $photoTake = Photo::where('type', 'lcl')->where('master_id', $id)->get();
+        $photoTake = Photo::where('type', 'FCL')->where('master_id', $id)->get();
         if ($cont) {
             return response()->json([
                 'listPhoto' => $photoTake,

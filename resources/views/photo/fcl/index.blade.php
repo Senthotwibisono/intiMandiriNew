@@ -29,7 +29,7 @@
                                 <td>
                                     <div class="button-container">
                                         <buttpn class="btn btn-outline-warning editButton" data-id="{{$cont->id}}"><i class="fa fa-pen"></i></buttpn>
-                                        <a href="javascript:void(0)" onclick="openWindow('/lcl/report/contPhoto{{$cont->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
+                                        <a href="javascript:void(0)" onclick="openWindow('/fcl/report/contPhoto{{$cont->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
                                     </div>
                                 </td>
                                 <td>{{$cont->job->nojoborder}}</td>
@@ -37,13 +37,13 @@
                                 <td>{{$cont->nocontainer}}</td>
                                 <td>{{$cont->job->nombl}}</td>
                                 <td>
-                                    <a href="javascript:void(0)" onclick="openWindow('/lcl/realisasi/gateIn-detail{{$cont->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
+                                    <a href="javascript:void(0)" onclick="openWindow('/fcl/realisasi/gateIn-detail{{$cont->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
                                 </td>
                                 <td>
-                                    <a href="javascript:void(0)" onclick="openWindow('/lcl/realisasi/stripping-photoCont{{$cont->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
+                                    <a href="javascript:void(0)" onclick="openWindow('/fcl/realisasi/stripping-photoCont{{$cont->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
                                 </td>
                                 <td>
-                                    <a href="javascript:void(0)" onclick="openWindow('/lcl/realisasi/mty-detail{{$cont->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
+                                    <a href="javascript:void(0)" onclick="openWindow('/fcl/realisasi/mty-detail{{$cont->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
                                 </td>
                             </tr>
                         @endforeach

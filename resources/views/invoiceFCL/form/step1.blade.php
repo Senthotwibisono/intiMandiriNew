@@ -127,7 +127,7 @@
                 console.log(response);
 
                 $('#tgl_bl_awb').val(response.data);
-                $('#cust_id').val(response.customer.id).trigger('change');
+                $('#cust_id').val(response.customer ? response.customer.id : '').trigger('change');
 
                 let selectContainer = $('#container_available');
                 selectContainer.empty();
