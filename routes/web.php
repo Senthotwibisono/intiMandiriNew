@@ -25,6 +25,7 @@ use App\Http\Controllers\TestJsonController;
 use App\Http\Controllers\android\AndroidHomeController;
 use App\Http\Controllers\android\LclController;
 use App\Http\Controllers\android\AndroidGateController;
+use App\Http\Controllers\android\FCLAndroidController;
 
 // invoice
 use App\Http\Controllers\invoice\DashboardInvoiceController;
@@ -519,6 +520,10 @@ Route::controller(LclController::class)->group(function(){
     Route::get('/android/photo/photoManifest-{qr?}', 'photoManifestDetil');
 });
 
+    Route::controller(FCLAndroidController::class)->group(function(){
+        Route::get('/android/photo/photoContFCL', 'photoCont');
+        Route::get('/android/fcl/searchCont{id?}', 'searchCont');
+    });
 // Android Gate
 
 Route::controller(AndroidGateController::class)->group(function(){

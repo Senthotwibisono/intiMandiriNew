@@ -80,7 +80,9 @@
                     <span>FCL</span>
                 </a>
                 <ul class="submenu @if(Request::is('photo/fcl/*')) active @endif">
-                   
+                    <li class="submenu-item @if(Request::is('android/photo/photoContFCL') || Request::is('android/photo/photoContFCL/*')) active @endif">
+                        <a href="{{ url('/android/photo/photoContFCL')}}">Container</a>
+                    </li>
                 </ul>
             </li>
         </ul>

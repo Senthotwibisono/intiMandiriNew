@@ -36,7 +36,7 @@ class BarcodeAutoGateController extends Controller
 
     public function indexViewAll($id)
     {
-        $cont = Cont::where('joborder_id', $id)->pluck('id');
+        $cont = ContF::where('joborder_id', $id)->pluck('id');
         // dd($cont);
         $data['barcodes'] = Barcode::whereIn('ref_id', $cont)->where('ref_type', '=', 'FCL')->get();
        

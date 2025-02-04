@@ -155,6 +155,7 @@ class GateInFCLCotroller extends Controller
     public function easyGoSend(Request $request)
     {
         $cont = Cont::find($request->id);
+        // var_dump($cont->job->sandar->kd_tps_asal);
         // var_dump($cont);
         // die;
         $data = [
@@ -182,7 +183,7 @@ class GateInFCLCotroller extends Controller
             "driver_code"=> "",
             "asal" => [
                 [
-                    "geo_code"=> $cont->job->PLP->kd_tps_asal,
+                    "geo_code"=> $cont->job->sandar->kd_tps_asal,
                     "plan_loading_time"=> "",
                     "description"=> "",
                     "lon"=> null,
@@ -192,7 +193,7 @@ class GateInFCLCotroller extends Controller
             ],
             "tujuan" => [
                 [
-                    "geo_code"=> $cont->job->PLP->gudang_tujuan,
+                    "geo_code"=> 'INTI',
                     "no_sj"=> "",
                     "description"=> "",
                     "cust_alert_telegram"=> [],

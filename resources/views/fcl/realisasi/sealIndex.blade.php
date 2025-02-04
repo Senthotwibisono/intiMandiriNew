@@ -168,12 +168,15 @@ $(document).ready(function() {
     });
 });
 </script>
+<meta name="csrf-token" content="{{ csrf_token() }}">
+
 <script>
     $(document).ready(function () {
-        $('.sendEasyGo').on('click', function () {
+        $(document).on('click', '.sendEasyGo', function () {
             var contId = $(this).data('id');
 
-            // SweetAlert confirmation dialog
+            console.log("Data Id = " + contId);
+
             Swal.fire({
                 title: 'Apakah Anda yakin?',
                 text: "Anda akan mengirim E-Seal untuk container ini!",
@@ -184,57 +187,43 @@ $(document).ready(function() {
                 confirmButtonText: 'Ya, kirim sekarang!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    swal.fire({
+                    Swal.fire({
                         title: 'Processing...',
                         text: 'Please wait',
                         icon: 'info',
                         allowOutsideClick: false,
                         showConfirmButton: false,
-                            willOpen: () => {
-                                Swal.showLoading();
-                            }
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
                     });
-                    // Prepare the data
-                    var data = {
-                        id: contId,
-                        _token: '{{ csrf_token() }}' // Include CSRF token for security
-                    };
 
-                    // Send POST request to the controller
                     $.ajax({
-                        url: '/fcl/realisasi/easyGo-send', // Replace with your actual route
+                        url: '/fcl/realisasi/easyGo-send',
                         type: 'POST',
-                        data: data,
-                        success: function (response) {
-                            if (response.success) {
-                                // Show success alert
-                                Swal.fire(
-                                    'Berhasil!',
-                                    'E-Seal berhasil dikirim!',
-                                    'success'
-                                    ).then(() => {
-                                    location.reload(); // Reload the page after success
-                                });
-                            } else {
-                                // Show error alert
-                                Swal.fire(
-                                    'Gagal!',
-                                    response.message,
-                                    'error'
-                                    ).then(() => {
-                                    location.reload(); // Reload the page after success
-                                });
-                            }
+                        data: {
+                            id: contId,
+                            _token: $('meta[name="csrf-token"]').attr('content')
                         },
-                        error: function (xhr, status, error) {
-                            // Show error alert
-                            Swal.fire(
-                                'Terjadi Kesalahan!',
-                                'Gagal mengirim E-Seal. Silakan coba lagi.',
-                                'error'
-                                ).then(() => {
-                                    location.reload(); // Reload the page after success
-                                });
+                        success: function (response) {
+                            Swal.fire({
+                                title: response.success ? 'Berhasil!' : 'Gagal!',
+                                text: response.success ? 'E-Seal berhasil dikirim!' : response.message,
+                                icon: response.success ? 'success' : 'error'
+                            }).then(() => {
+                                if (response.success) {
+                                    // Bisa reload sebagian elemen jika perlu, misal:
+                                    // $("#container_" + contId).text("Terkirim");
+                                    location.reload(); 
+                                }
+                            });
+                        },
+                        error: function () {
+                            Swal.fire({
+                                title: 'Terjadi Kesalahan!',
+                                text: 'Gagal mengirim E-Seal. Silakan coba lagi.',
+                                icon: 'error'
+                            });
                         }
                     });
                 }
@@ -242,6 +231,7 @@ $(document).ready(function() {
         });
     });
 </script>
+
 <script>
    $(document).on('click', '.editButton', function() {
     swal.fire({

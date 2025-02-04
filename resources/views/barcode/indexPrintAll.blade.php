@@ -181,7 +181,7 @@
                 <div class="col-12">
                     <div class="d-flex align-items-center">
                         <div class="logo img me-3">
-                            <img src="/logo/IntiMandiri.PNG" class="img-fluid" alt="" style="">
+                            <img src="/logo/IntiMandiri.png" class="img-fluid" alt="" style="">
                         </div>
                         <div class="text-center flex-grow-1">
                             {{$title}} {{$barcode->cont->nocontainer}}
@@ -224,6 +224,7 @@
     </div>
 </div>
 
+<div class="page-break"></div>
 @endforeach
 
 
