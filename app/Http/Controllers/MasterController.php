@@ -825,7 +825,7 @@ class MasterController extends Controller
         $data['title'] = "Depo Empty";
         $data['depos'] = DepoMTy::get();
 
-        return view('master.depoMt.index', $data);
+        return view('master.depoMT.index', $data);
     }
 
     public function depoMTPost(Request $request)

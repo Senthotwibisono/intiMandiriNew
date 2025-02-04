@@ -24,6 +24,7 @@ use App\Http\Controllers\TestJsonController;
 // Android
 use App\Http\Controllers\android\AndroidHomeController;
 use App\Http\Controllers\android\LclController;
+use App\Http\Controllers\android\AndroidGateController;
 
 // invoice
 use App\Http\Controllers\invoice\DashboardInvoiceController;
@@ -518,6 +519,13 @@ Route::controller(LclController::class)->group(function(){
     Route::get('/android/photo/photoManifest-{qr?}', 'photoManifestDetil');
 });
 
+// Android Gate
+
+Route::controller(AndroidGateController::class)->group(function(){
+    Route::get('/android/gate/index', 'index');
+    Route::get('/android/gate/reciving/{qr?}', 'recivingBarcode');
+});
+
 // Invoice
     Route::controller(DashboardInvoiceController::class)->group(function(){
         Route::get('/dashboard-invoice', 'dashboard');
@@ -609,6 +617,7 @@ Route::controller(LclController::class)->group(function(){
     Route::controller(BeacukaiP2Controller::class)->group(function(){
         Route::get('/bc-p2/dashboard', 'indexDashboard');
         Route::get('/bc-p2/logData', 'logData');
+        Route::get('/bc-p2/logDataFCL', 'logDataFCL');
 
         Route::get('/bc-p2/lcl/list-manifest', 'listManifestIndex');
         Route::get('/bc-p2/lcl/list-manifest/data', 'listManifestData');

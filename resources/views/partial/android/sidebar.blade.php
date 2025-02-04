@@ -44,6 +44,14 @@
         </ul>
     </li>
 
+    <!-- Gate -->
+    <li class="sidebar-item @if(Request::is('android/gate/*') || Request::is('/android/gate/*')) active @endif">
+        <a href="/android/gate/index" class='sidebar-link'>
+            <i class="fa-solid fa-door-open"></i>
+            <span>Gate</span>
+        </a>
+    </li>
+
     <!-- Photo -->
     <li class="sidebar-item has-sub @if(Request::is('photo/*')) active @endif">
         <a href="#" class='sidebar-link'>

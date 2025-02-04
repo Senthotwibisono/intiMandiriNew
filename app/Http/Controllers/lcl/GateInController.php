@@ -33,7 +33,7 @@ class GateInController extends Controller
         $this->middleware('auth');
 
         $this->url = 'https://vtsapi.easygo-gps.co.id/api/eseal/newDoPLP';
-        $this->token = '73612D582EF54F119F8E41845405B8D6';
+        $this->token = '5C66E78BC581410BA2A7B896B25BEDFB';
         $this->client = new Client(); // Inisialisasi Guzzle Client
     }
 

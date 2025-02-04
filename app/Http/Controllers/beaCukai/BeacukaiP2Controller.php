@@ -9,6 +9,7 @@ use App\Models\LogSegel as Log;
 use App\Models\AlasanSegel as Alasan;
 use App\Models\PhotoSegel as Photo;
 use App\Models\Manifest;
+use App\Models\ContainerFCL as ContF;
 
 use Auth;
 use carbon\Carbon;
@@ -30,7 +31,7 @@ class BeacukaiP2Controller extends Controller
 
     public function logData(Request $request)
     {
-        $log = Log::with(['user', 'manifest'])->orderBy('created_at', 'desc')->get();
+        $log = Log::with(['user', 'manifest'])->where('ref_type', 'LCL')->orderBy('created_at', 'desc')->get();
 
         return DataTables::of($log)
         ->addColumn('ref_name', function($log){
@@ -38,9 +39,33 @@ class BeacukaiP2Controller extends Controller
         })
         ->addColumn('container', function($log){
             return $log->manifest->cont->nocontainer ?? '-';
+           
         })
         ->addColumn('jobOrder', function($log){
             return $log->manifest->cont->job->nojoborder ?? '-';
+
+        })
+        ->addColumn('user', function($log){
+            return $log->user->name ?? '-';
+        })
+        ->make(true);
+    }
+
+    public function logDataFCL(Request $request)
+    {
+        $log = Log::with(['user', 'manifest'])->where('ref_type', 'FCL')->orderBy('created_at', 'desc')->get();
+
+        return DataTables::of($log)
+        ->addColumn('ref_name', function($log){
+           return $log->fcl->nobl ?? '-';
+        })
+        ->addColumn('container', function($log){
+            return $log->fcl->nocontainer ?? '-';
+           
+        })
+        ->addColumn('jobOrder', function($log){
+            return $log->fcl->job->nojoborder ?? '-';
+
         })
         ->addColumn('user', function($log){
             return $log->user->name ?? '-';
@@ -246,10 +271,10 @@ class BeacukaiP2Controller extends Controller
         $logs = Log::where('ref_id', $id)->get();
         $data['title'] = "Detil Segel Merah " . $manifest->nohbl . '/' . $manifest->cont->nocontainer;
         $data['manifest'] = $manifest;
-        $data['lockSegel'] =  Log::where('ref_id', $id)->where('action', 'lock')->first();
+        $data['lockSegel'] =  Log::where('ref_type', 'LCL')->where('ref_id', $id)->where('action', 'lock')->first();
         $data['photoLock'] = Photo::where('log_id', $data['lockSegel']->id)->get();
-        $data['unlockSegel'] =  Log::where('ref_id', $id)->where('action', 'unlock')->first();
-        $data['photoUnlock'] = Photo::where('log_id', $data['unlockSegel']->id)->get();
+        $data['unlockSegel'] =  Log::where('ref_type', 'LCL')->where('ref_id', $id)->where('action', 'unlock')->first();
+        $data['photoUnlock'] = Photo::where('log_id', $data['unlockSegel']->id??0)->get();
         
         return view('beacukai.p2.detilSegel', $data);
     }

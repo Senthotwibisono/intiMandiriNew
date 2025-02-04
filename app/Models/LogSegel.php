@@ -33,4 +33,9 @@ class LogSegel extends Model
     {
         return $this->belongsTo(Manifest::class, 'ref_id', 'id');
     }
+
+    public function fcl()
+    {
+        return $this->belongsTo(ContainerFCL::class, 'ref_id', 'id');
+    }
 }
