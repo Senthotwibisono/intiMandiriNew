@@ -213,11 +213,24 @@
                         <td>{{$barcode->cont->size}}</td>
                     </tr>
                     <br>
-                    <tr>
-                        <td>Ex. Kapal</td>
-                        <td> : </td>
-                        <td>{{$barcode->cont->job->kapal->name ?? ''}}</td>
-                    </tr>
+                        <tr>
+                            <td>Ex. Kapal/Voy</td>
+                            <td> : </td>
+                            <td>{{$barcode->cont->job->kapal->name ?? ''}} / {{$barcode->cont->job->voy ?? '-'}}</td>
+                        </tr>
+                        <br>
+                        <tr>
+                            <td>Kode TPS Asal</td>
+                            <td> : </td>
+                            <td>{{$barcode->cont->job->sandar->kd_tps_asal ?? ''}}</td>
+                        </tr>
+                        <br>
+                        <tr>
+                            <td>Consignee/NPWP/FAX/EMAIL</td>
+                            <td> : </td>
+                            <br>
+                            <td>{{$barcode->cont->Customer->name ?? ''}} / {{$barcode->cont->Customer->npwp ?? ''}} / {{$barcode->cont->Customer->fax ?? ''}} / {{$barcode->cont->Customer->email ?? ''}}</td>
+                        </tr>
                 </div>
             </div>
         </div>

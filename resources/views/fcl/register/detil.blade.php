@@ -255,6 +255,9 @@
                 <div class="col-auto">
                     <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addManual"><i class="fas fa-plus"></i></button>
                 </div>
+                <div class="col-auto">
+                    <a href="/fcl/register/generateExcelPLP/{{$job->id}}" class="btn btn-success"><i class="fas fa-file-excel"></i> || Export to Excel</a>
+                </div>
                 <!-- <div class="col-auto">
                     <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#excelModal"><i class="fas fa-file-excel"></i></button>
                 </div>

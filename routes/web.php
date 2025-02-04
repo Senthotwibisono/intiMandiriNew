@@ -644,6 +644,7 @@ Route::controller(AndroidGateController::class)->group(function(){
 
 
         Route::get('/bc-p2/detil-log/{id?}', 'logDetil');
+        Route::get('/bc-p2/detil-logFCL/{id?}', 'logDetilFCL');
     });
 
     Route::prefix('/dokumen/pengiriman')->controller(PengirimanController::class)->group(function(){
@@ -683,6 +684,8 @@ Route::controller(AndroidGateController::class)->group(function(){
             Route::delete('/containerDelete{id}', 'deleteContainer');
             Route::post('/barcodeGate', 'createBarcode');
             Route::post('/barcodeGateAll', 'createBarcodeAll');
+
+            Route::get('/generateExcelPLP/{id?}', 'generateExcel');
         });
 
         Route::prefix('/realisasi')->controller(GateInFCLCotroller::class)->group(function(){

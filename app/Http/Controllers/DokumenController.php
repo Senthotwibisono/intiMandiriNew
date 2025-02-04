@@ -1649,7 +1649,18 @@ class DokumenController extends Controller
 
         foreach ($conts as $cont) {
             $teus = $this->calculateTeus($cont->uk_cont);
-
+            $customer = Customer::where('name', $cont->consignee)->first();
+            if (!$customer) {
+                $customer = Customer::create([
+                    'name' => $cont->consignee,
+                    'code' => '000',
+                    'alamat' => '-',
+                    'npwp' => '111111111',
+                    'email' => '-',
+                    'fax' => '111111',
+                    'phone' => '111111111',
+                ]);
+            }
             Cont::create([
                 'nocontainer' => $cont->no_cont,
                 'type' => 'lcl',
@@ -1658,9 +1669,10 @@ class DokumenController extends Controller
                 'teus' => $teus,
                 'uid' => Auth::user()->id,
                 'nobl' => $cont->no_bl_awb,
-                'tgl_bl_awb' => $cont->tgl_bl_awbl ? Carbon::createFromFormat('Ymd', $cont->tgl_bl_awb)->format('Y-m-d') : null,
+                'tgl_bl_awb' => $cont->tgl_bl_awbl ? Carbon::createFromFormat('Ymd', $cont->tgl_bl_awb)->format('Y-m-d H:i:s') : null,
                 'eta'=> $job->eta,
                 'lokasisandar_id' => $job->lokasisandar_id,
+                'cust_id' => $customer->id
             ]);
         }
     }
@@ -1670,10 +1682,23 @@ class DokumenController extends Controller
         $conts = $plpDetails->unique('no_cont');
 
         // dd($conts);
-
+        
         foreach ($conts as $cont) {
             $teus = $this->calculateTeus($cont->uk_cont);
-
+            
+            $customer = Customer::where('name', $cont->consignee)->first();
+            if (!$customer) {
+                $customer = Customer::create([
+                    'name' => $cont->consignee,
+                    'code' => '000',
+                    'alamat' => '-',
+                    'npwp' => '111111111',
+                    'email' => '-',
+                    'fax' => '111111',
+                    'phone' => '111111111',
+                ]);
+            }
+            
             ContF::create([
                 'nocontainer' => $cont->no_cont,
                 'type' => 'fcl',
@@ -1682,9 +1707,10 @@ class DokumenController extends Controller
                 'teus' => $teus,
                 'uid' => Auth::user()->id,
                 'nobl' => $cont->no_bl_awb,
-                'tgl_bl_awb' => $cont->tgl_bl_awbl ? Carbon::createFromFormat('Ymd', $cont->tgl_bl_awb)->format('Y-m-d') : null,
+                'tgl_bl_awb' => $cont->tgl_bl_awbl ? Carbon::createFromFormat('Ymd', $cont->tgl_bl_awb)->format('Y-m-d H:i:s') : null,
                 'eta'=> $job->eta,
                 'lokasisandar_id' => $job->lokasisandar_id,
+                'cust_id' => $customer->id
             ]);
         }
     }

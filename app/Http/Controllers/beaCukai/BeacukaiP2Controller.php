@@ -278,8 +278,21 @@ class BeacukaiP2Controller extends Controller
         
         return view('beacukai.p2.detilSegel', $data);
     }
-
+    
     // FCL
+    public function logDetilFCL($id)
+    {
+        $cont = ContF::find($id);
+        $logs = Log::where('ref_type', 'FCL')->where('ref_id', $id)->get();
+        $data['title'] = "Detil Segel Merah " . $cont->nobl . '/' . $cont->nocontainer;
+        $data['cont'] = $cont;
+        $data['lockSegel'] =  Log::where('ref_type', 'FCL')->where('ref_id', $id)->where('action', 'lock')->first();
+        $data['photoLock'] = Photo::where('log_id', $data['lockSegel']->id)->get();
+        $data['unlockSegel'] =  Log::where('ref_type', 'FCL')->where('ref_id', $id)->where('action', 'unlock')->first();
+        $data['photoUnlock'] = Photo::where('log_id', $data['unlockSegel']->id??0)->get();
+        
+        return view('beacukai.p2.detilSegelFCL', $data);
+    }
 
     public function indexListContainer()
     {
@@ -429,7 +442,7 @@ class BeacukaiP2Controller extends Controller
             : '';
         })
         ->addColumn('detil', function ($cont){
-            $herf = '/bc-p2/detil-log/' . $cont->id;
+            $herf = '/bc-p2/detil-logFCL/' . $cont->id;
             return '<a href="javascript:void(0)" onclick="openWindow(\'' . $herf . '\')" class="btn btn-sm btn-info">
                         <i class="fa fa-eye"></i>
                     </a>';

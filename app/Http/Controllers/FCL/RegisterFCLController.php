@@ -8,6 +8,9 @@ use Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use DataTables;
+use Maatwebsite\Excel\Facades\Excel;
+
+use App\Exports\fcl\plpCont;
 
 use App\Models\JobOrderFCL as Job;
 use App\Models\ContainerFCL as Cont;
@@ -509,5 +512,14 @@ class RegisterFCLController extends Controller
             ]);
         }
         
+    }
+
+    public function generateExcel($id)
+    {
+        $job = Job::find($id);
+
+        
+        $fileName = 'ReportContainer-jobNumber-plp'. $job->PLP->noplp .'.xlsx' ;
+        return Excel::download(new plpCont($id), $fileName);
     }
 }
