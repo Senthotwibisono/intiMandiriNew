@@ -23,12 +23,33 @@ class plpCont implements FromCollection, WithMapping, WithHeadings, ShouldAutoSi
     /**
      * Mengambil semua data berdasarkan joborder_id
      */
+
+     public function collection()
+     {
+         return $this->conts;
+     }
     public function map($cont): array
     {
         $tglPLP = $cont->job->ttgl_plp ?  Carbon::parse($cont->job->ttgl_plp)->format('d-m-Y') : '-';
         $tglBC11 = $cont->job->ttgl_bc11 ?  Carbon::parse($cont->job->ttgl_bc11)->format('d-m-Y') : '-';
         $tglmasuk = $cont->tglmasuk ? Carbon::parse($cont->tglmasuk)->format('d-m-Y') : 'Belum Masuk';
-        
+
+        $kapal = $cont->job->Kapal->name ?? '-';
+        $voy = $cont->job->voy ?? '-';
+        $kapalVoy = $kapal.'/'.$voy;
+
+        if (!$cont->tglmasuk) {
+            $lamaHari = 'Belum Masuk';
+            $longStay = 'N';
+        } else {
+            $lamaHari = Carbon::parse($cont->tglmasuk)->diffInDays($cont->tglkeluar ?? now()) . ' hari';
+
+            if (Carbon::parse($cont->tglmasuk)->diffInDays($cont->tglkeluar ?? now()) >= 25 ) {
+                $longStay = 'Y';
+            }else {
+                $longStay = 'N';
+            }
+        }
         return [
            $cont->job->noplp ?? '-',
            $tglPLP,
@@ -46,13 +67,13 @@ class plpCont implements FromCollection, WithMapping, WithHeadings, ShouldAutoSi
            $tglmasuk,
            $cont->jammasuk ?? '-',
            $cont->nopol ?? '-',
-           'Lama Hari',
-           'Status Normal/Longstay',
-           'Nama Kapal',
-           'Tgl Tiba Kapal',
-           'Tgl Keluar TPS',
-           'Jam Keluar TPS',
-           'No Polisi Keluar',
+           $lamaHari,
+           $longStay,
+           $kapalVoy,
+           $cont->job->eta ?? '-',
+           $cont->tglkeluar ?? 'Belum Keluar',
+           $cont->jamkeluar ?? 'Belum Keluar',
+           $cont->nopol_mty ?? '-',
         ];
     }
 
