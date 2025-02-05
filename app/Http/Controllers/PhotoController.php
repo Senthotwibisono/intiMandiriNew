@@ -98,6 +98,12 @@ class PhotoController extends Controller
     {
         $cont = ContF::where('id', $request->id)->first();
         try {
+            if ($cont) {
+                $cont->update([
+                    'nopol' => $request->nopol,
+                    'nopol_mty' => $request->nopol_mty,
+                ]);
+            }
             if ($request->hasFile('photos')) {
                 foreach ($request->file('photos') as $photo) {
                     $fileName = $photo->getClientOriginalName();

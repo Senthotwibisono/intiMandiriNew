@@ -17,6 +17,18 @@
                         </select>
                     </div>
                 </div>
+                <div class="col-12">
+                    <div class="form-group">
+                        <label for="">Nopol Masuk</label>
+                        <input type="text" name="nopol" id="nopol" class="form-control">
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="form-group">
+                        <label for="">Nopol Keluar</label>
+                        <input type="text" name="nopol_mty" id="nopol_mty" class="form-control">
+                    </div>
+                </div>
                 <div class="row mt-0">
                     <div class="col-sm-6">
                         <div class="form-group">
@@ -154,6 +166,8 @@ $(document).ready(function() {
                 $("#tglstripping").val(response.data.tglstripping);
                 $("#jamstripping").val(response.data.jamstripping);
                 $("#endstripping").val(response.data.endstripping);
+                $("#nopol").val(response.data.nopol);
+                $("#nopol_mty").val(response.data.nopol_mty);
                 let photoList = response.listPhoto.map(photo => photo.detil).join('\n');
                 $("#photoTaken").val(photoList);
             },
