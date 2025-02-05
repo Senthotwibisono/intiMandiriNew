@@ -34,6 +34,15 @@ class BarcodeAutoGateController extends Controller
         return view('barcode.index', $data);
     }
 
+    public function bonmuat($id)
+    {
+        $data['barcode'] = Barcode::where('id', $id)->first();
+        $barcode = $data['barcode'];
+        $data['title'] = "Gate Pass & Bon Muat" . $barcode->cont->nocontainer; 
+
+        return view('barcode.bonmuat', $data);
+    }
+
     public function indexViewAll($id)
     {
         $cont = ContF::where('joborder_id', $id)->pluck('id');
@@ -360,5 +369,15 @@ class BarcodeAutoGateController extends Controller
                 return 'Status BC is HOLD or FLAGING, please unlock!!!';
             }
         }
+    }
+
+    public function cetakSP2FCL($id)
+    {
+        $cont = ContF::find($id);
+
+        $data['title'] = "Surat Penarikan Petikemas (SP2)";
+        $data['cont'] = $cont;
+
+        return view('barcode.sp2', $data);
     }
 }

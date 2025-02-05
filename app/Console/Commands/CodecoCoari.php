@@ -29,8 +29,10 @@ class CodecoCoari extends Command
 
         // Panggil semua function
         $controller->coariCont(); // Ganti dengan nama function pertama
+        $controller->coariContFCL(); // Ganti dengan nama function pertama
         $controller->CoariKms(); // Ganti dengan nama function kedua
         $controller->CodecoCont(); // Ganti dengan nama function ketiga
+        $controller->CodecoContFCL(); // Ganti dengan nama function ketiga
         $controller->CodecoKms(); // Ganti dengan nama function keempat
 
         $this->info('All daily functions have been executed successfully!');

@@ -70,6 +70,11 @@ use App\Http\Controllers\pengiriman\CoariCodecoController;
 |
 */
 
+Route::middleware(['auth', 'check.segel'])->group(function () {
+    Route::put('/tcontainer_fcl/{tcontainer_fcl}', [TcontainerFclController::class, 'update']);
+});
+
+
 Route::get('/', function () {
     return redirect('/login');
 });
@@ -406,12 +411,14 @@ Route::controller(PhotoController::class)->group(function(){
 // Barcode
 Route::controller(BarcodeAutoGateController::class)->group(function(){
     Route::get('/barcode/autoGate-index{id?}', 'index')->name('barcode.autoGate.index');
+    Route::get('/barcode/autoGate-bonmuat{id?}', 'bonmuat')->name('barcode.autoGate.bonmuat');
     Route::get('/barcode/autoGate-PrintAll{id?}', 'indexViewAll');
     Route::get('/barcode/autoGate-photoIn{id?}', 'photoIn');
     Route::get('/barcode/autoGate-photoOut{id?}', 'photoOut');
     Route::get('/autoGate-barcode', 'indexAll')->name('barcode.autoGate.indexAll');
     Route::get('/autoGate-barcode/data', 'indexData')->name('barcode.autoGate.indexData');
     Route::post('/autoGate', 'autoGateNotification')->name('autoGate.autoGateNotification');
+    Route::get('/fcl/sp2/{id?}', 'cetakSP2FCL');
 });
 
 Route::controller(PlacementContainerController::class)->group(function(){
@@ -709,6 +716,7 @@ Route::controller(AndroidGateController::class)->group(function(){
             Route::post('/prosesCheckBehandle{id}', 'prosesCheckBehandle');
             Route::post('/finishCheckBehandle{id}', 'finishCheckBehandle');
             Route::post('/behandleUpdate', 'updateDataBehandle')->name('fcl.delivery.updateBehandle');
+            Route::post('/gatePassBonMuat', 'gatePassBonMuat')->name('fcl.delivery.gatePassBonMuat');
 
             Route::get('/behandleDetil{id}', 'detailBehandle');
 
@@ -768,6 +776,10 @@ Route::controller(AndroidGateController::class)->group(function(){
                 Route::get('/pranota-{id?}', 'pranota');
                 Route::get('/invoice-{id?}', 'Invoice');
                 Route::post('/paidInvoice', 'paidInvoice');
+                Route::post('/cancelInvoice', 'cancelInvoice');
+                Route::post('/deleteInvoice', 'deleteInvoice');
+                Route::get('/edit/{id?}', 'editInvoice');
+                Route::post('/updateInvoice', 'updateInvoice');
             });
         });
     });

@@ -15,7 +15,8 @@
 }
 
 body {
-    margin: 0;
+    margin-top: 1px;
+    margin-bottom: 3px;
     padding: 0;
     background: #eee;
     font-family: Arial, sans-serif;
@@ -26,7 +27,8 @@ body {
     width: 210mm; /* Lebar A4 */
     height: auto; /* Tinggi A4 */
     background: #fff;
-    margin: 0 auto;
+    margin-top: 1px;
+    margin-bottom: 3px;
 }
     .invoice-title h2, .invoice-title .small {
         display: inline-block;
@@ -83,7 +85,7 @@ body {
     }
 
     .img {
-        max-width: 70%;
+        max-width: 50px;
         height: auto;
         display: flex;
         justify-content: center;
@@ -101,10 +103,10 @@ body {
     }
 
     table.tabel-stripped {
-        width: 100%;
+        width: 90%;
         border-collapse: collapse;
         text-align: center;
-        font-size: 12px; /* Ukuran font lebih kecil agar muat di A4 */
+        font-size: 11px; /* Ukuran font lebih kecil agar muat di A4 */
     }
 
     /* Header tabel */
@@ -115,7 +117,7 @@ body {
     }
 
     table.tabel-stripped thead th {
-        padding: 8px;
+        padding: 5px;
         border: 1px solid #ddd;
     }
 
@@ -144,10 +146,14 @@ body {
 <body>
     <div class="container">
         <div class="card-header">
-            <div class="divider divider-left">
-                <div class="divider-text">
+            <div class="divider divider-center">
+                <div class="divider-text d-flex justify-content-center align-items-center">
+                    <div class="logo img me-3 text-center">
+                        <img src="/logo/IntiMandiri.PNG" class="img-fluid" alt="" style="">
+                    </div>
                     No Job Order : {{$header->job->nojoborder}}
                 </div>
+                <hr>
             </div>
             <div class="text-center">
                 <h4><strong>Nota dan Perhitungan Pelayanan Jasa :</strong> Penumpukan dan Pergerakan Ekstra</h4> 
@@ -321,12 +327,15 @@ body {
                     </div>
                     <div class="col-6 text-right">
                         <div class="text-center">
-                            Jakarta, {{Carbon\Carbon::now()}} 
+                            Jakarta, {{Carbon\Carbon::parse($header->created_at)->format('Y-m-d')}} 
                             <br>
                             <br>
                             <br>
                             <br>
-                            <span style="text-decoration: underline;">{{ Auth::user()->name }}</span>
+                            <br>
+                            <br>
+                            <br>
+                            <span style="text-decoration: underline;">{{ $header->userCreate->name }}</span>
                             <br>
                             Kasir
                         </div>

@@ -26,25 +26,60 @@ class BackendInvoiceController extends Controller
 
         return DataTables::of($header)
         ->addColumn('invoiceNo', function($header){
-            return $header->invoice_no ?? 'Anda belum Melakukan Pembayaran';
+            if ($header->status == 'C') {
+                return '<span class="badge bg-danger text-white">Canceled</span>';
+            }else {
+                # code...
+                return $header->invoice_no ?? 'Anda belum Melakukan Pembayaran';
+            }
         })
         ->addColumn('createdBy', function($header){
             return $header->userCreate->name ?? '-';
         })
         ->addColumn('pranota', function($header){
-            return '<a type="button" href="/invoiceFCL/invoice/pranota-'.$header->id.'" target="_blank" class="btn btn-sm btn-warning text-white"><i class="fa fa-file"></i></a>';
-        })
-        ->addColumn('invoice', function($header){
-            return '<a type="button" href="/invoiceFCL/invoice/invoice-'.$header->id.'" target="_blank" class="btn btn-sm btn-info text-white"><i class="fa fa-file"></i></a>';
-        })
-        ->addColumn('action', function($header){
-            if ($header->status != 'Y') {
-                return '<button class="btn btn-success" id="paidButton" data-id="'.$header->id.'">Action</button>';
+            if ($header->status == 'C') {
+                return '<span class="badge bg-danger text-white">Canceled</span>';
             }else {
-                return '<span class="badge bg-info text-white">Lunas</span>';
+                # code...
+                return '<a type="button" href="/invoiceFCL/invoice/pranota-'.$header->id.'" target="_blank" class="btn btn-sm btn-warning text-white"><i class="fa fa-file"></i></a>';
             }
         })
-        ->rawColumns(['pranota', 'invoice', 'action'])
+        ->addColumn('invoice', function($header){
+            if ($header->status == 'C') {
+                return '<span class="badge bg-danger text-white">Canceled</span>';
+            }else {
+                # code...
+                return '<a type="button" href="/invoiceFCL/invoice/invoice-'.$header->id.'" target="_blank" class="btn btn-sm btn-info text-white"><i class="fa fa-file"></i></a>';
+            }
+        })
+        ->addColumn('action', function($header){
+            if ($header->status == 'Y') {
+                return '<span class="badge bg-info text-white">Lunas</span>';
+            }elseif ($header->status == 'C') {
+                return '<span class="badge bg-danger text-white">Canceled</span>';
+            } else {
+                return '<button class="btn btn-success" id="paidButton" data-id="'.$header->id.'">Action</button>';
+            }
+        })
+        ->addColumn('deleteOrCancel', function($header){
+            if ($header->status == 'Y') {
+                return '<button type="button" data-id="'.$header->id.'" class="btn btn-danger cancelButton">Cancel</button>';
+            }elseif ($header->status == 'C') {
+                return '<span class="badge bg-danger text-white">Canceled</span>';
+            }else {
+                return '<button type="button" data-id="'.$header->id.'" class="btn btn-danger deleteInvoice"><i class="fa fa-trash"></i></button>';
+            }
+        })
+        ->addColumn('edit', function($header){
+            if ($header->status == 'Y') {
+                return '<a href="/invoiceFCL/invoice/edit/'.$header->id.'" class="btn btn-info editInvoice"><i class="fa fa-pencil"></i></a>';
+            }elseif ($header->status == 'C') {
+                return '<span class="badge bg-danger text-white">Canceled</span>';
+            } else {
+                return '<span class="badge bg-warning text-white">Belum Lunas</span>';
+            }
+        })
+        ->rawColumns(['invoiceNo', 'pranota', 'invoice', 'action', 'deleteOrCancel', 'edit'])
         ->make(true);
     }
 
@@ -154,10 +189,70 @@ class BackendInvoiceController extends Controller
             'status' => 'Y',
         ]);
 
+        $form = Form::find($header->form_id);
+       
+
+        $formCont = FormC::where('form_id', $form->id)->get();
+        // var_dump($formCont);
+
+        foreach ($formCont as $fc) {
+            $cont = ContF::find($fc->container_id);
+
+            $cont->update([
+                'active_to' => $form->etd,
+            ]);
+        }
+
+
         return response()->json([
             'success' => true,
             'message' => 'Invoice Has Been Paid',
         ]);
+    }
+
+    public function cancelInvoice(Request $request)
+    {
+        try {
+            $header = Header::find($request->id);
+
+            $header->update([
+                'status' => 'C'
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Invoice Has Been Canceled',
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Opsss Somtehing wrong: '. $th->getMessage(),
+            ]);
+        }
+    }
+
+    public function deleteInvoice(Request $request)
+    {
+        try {
+            $header = Header::find($request->id);
+
+            $form = Form::find($header->form_id);
+
+            FormC::where('form_id', $form->id)->delete();
+            Detil::where('invoice_id', $header->id)->delete();
+            $header->delete();
+            $form->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Invoice Has Been Deleted',
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Opsss Somtehing wrong: '. $th->getMessage(),
+            ]);
+        }
     }
 
     private function terbilang($number)
@@ -189,5 +284,33 @@ class BackendInvoiceController extends Controller
         }
 
         return $result;
+    }
+
+    public function editInvoice($id)
+    {
+        $header = Header::find($id);
+        $data['title'] = 'Edit Invoice -'.$header->invoice_no;
+        $data['header'] = $header;
+
+        $data['formC'] = FormC::where('form_id', $header->form_id)->get();
+
+        return view('invoiceFCL.invoice.editInvoice', $data);
+    }
+
+    public function updateInvoice(Request $request)
+    {
+        $header = Header::find($request->id);
+
+        try {
+            $header->update([
+                'created_at' => $request->created_at,
+                'lunas_at' => $request->lunas_at,
+            ]);
+
+            return redirect()->back()->with('status', ['type'=>'success', 'message'=>'Data berhasil di update']);
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Opss Somethingwrong: '. $th->getMessage()]);
+            //throw $th;
+        }
     }
 }

@@ -238,7 +238,7 @@ $(document).ready(function() {
             if (result.isConfirmed) {
                 $.ajax({
                     type: 'POST',
-                    url: '/lcl/realisasi/mty-barcodeGate',
+                    url: '/fcl/delivery/gatePassBonMuat',
                     data: { id: containerId },
                     cache: false,
                     dataType: 'json',
@@ -247,7 +247,7 @@ $(document).ready(function() {
                             Swal.fire('Generated!', '', 'success')
                                 .then(() => {
                                     var barcodeId = response.data.id;
-                                    window.open('/barcode/autoGate-index' + barcodeId, '_blank', 'width=600,height=800');
+                                    window.open('/barcode/autoGate-bonmuat' + barcodeId, '_blank', 'width=600,height=800');
                                 });
                         } else {
                             Swal.fire('Error', response.message, 'error');

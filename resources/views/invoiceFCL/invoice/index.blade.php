@@ -24,6 +24,8 @@
                             <th>Pranota</th>
                             <th>Invoice</th>
                             <th>Action</th>
+                            <th>Delete or Cancel</th>
+                            <th>Edit</th>
                         </tr>
                     </thead>
                 </table>
@@ -35,6 +37,130 @@
 @endsection
 
 @section('custom_js')
+<script>
+    $(document).on('click', '.cancelButton', function(){
+        let id = $(this).data('id');  // Assuming 'data-id' attribute holds the value
+
+        console.log('Id Header = ' + id);
+
+        // SweetAlert2 confirmation before proceeding
+        Swal.fire({
+            title: "Are you sure?",
+            text: "Do you want to process this canceliation payment?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Show SweetAlert processing message
+                Swal.fire({
+                    title: "Processing...",
+                    text: "Please wait while we process your request.",
+                    icon: "info",
+                    showConfirmButton: false
+                });
+
+                // Perform AJAX request
+                $.ajax({
+                    url: '/invoiceFCL/invoice/cancelInvoice',  // Replace with your endpoint
+                    method: 'POST',
+                    data: {
+                        id: id,
+                        _token: '{{ csrf_token() }}'  // Add CSRF token for security in Laravel
+                    },
+                    success: function(response) {
+                        // Close the SweetAlert
+                        Swal.close();
+
+                        // Check for success response
+                        if(response.success) {
+                            // Show success alert
+                            Swal.fire("Success!", "The canceliation payment has been processed.", "success");
+                            location.reload();
+                        } else {
+                            // Show error alert if there’s any issue
+                            Swal.fire("Error!", "There was an issue processing the payment.", "error");
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        // Close the SweetAlert on error
+                        Swal.close();
+
+                        // Show error alert on failure
+                        Swal.fire("Error!", "An error occurred while processing your request.", "error");
+                    }
+                });
+            } else {
+                // If user cancels the action
+                Swal.fire("Cancelled", "The payment was not processed.", "info");
+            }
+        });
+    })
+</script>
+<script>
+    $(document).on('click', '.deleteInvoice', function(){
+        let id = $(this).data('id');  // Assuming 'data-id' attribute holds the value
+
+        console.log('Id Header = ' + id);
+
+        // SweetAlert2 confirmation before proceeding
+        Swal.fire({
+            title: "Are you sure?",
+            text: "Do you want to process this canceliation payment?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Show SweetAlert processing message
+                Swal.fire({
+                    title: "Processing...",
+                    text: "Please wait while we process your request.",
+                    icon: "info",
+                    showConfirmButton: false
+                });
+
+                // Perform AJAX request
+                $.ajax({
+                    url: '/invoiceFCL/invoice/deleteInvoice',  // Replace with your endpoint
+                    method: 'POST',
+                    data: {
+                        id: id,
+                        _token: '{{ csrf_token() }}'  // Add CSRF token for security in Laravel
+                    },
+                    success: function(response) {
+                        // Close the SweetAlert
+                        Swal.close();
+
+                        // Check for success response
+                        if(response.success) {
+                            // Show success alert
+                            Swal.fire("Success!", "The canceliation payment has been processed.", "success");
+                            location.reload();
+                        } else {
+                            // Show error alert if there’s any issue
+                            Swal.fire("Error!", "There was an issue processing the payment.", "error");
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        // Close the SweetAlert on error
+                        Swal.close();
+
+                        // Show error alert on failure
+                        Swal.fire("Error!", "An error occurred while processing your request.", "error");
+                    }
+                });
+            } else {
+                // If user cancels the action
+                Swal.fire("Cancelled", "The payment was not processed.", "info");
+            }
+        });
+    })
+</script>
 <script>
     $(document).ready(function(){
         $('#tableInvoice').dataTable({
@@ -54,6 +180,8 @@
                 {data:'pranota', name:'pranota'},
                 {data:'invoice', name:'invoice'},
                 {data:'action', name:'action'},
+                {data:'deleteOrCancel', name:'deleteOrCancel'},
+                {data:'edit', name:'edit'},
             ]
         })
     })

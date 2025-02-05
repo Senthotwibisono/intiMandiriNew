@@ -119,10 +119,10 @@ class FormFCLController extends Controller
                 return redirect()->back()->with('status', ['type'=>'error', 'message' => 'Terdapat nilai ETA yang berbeda.']);
             }
 
-            $checkMasuk = $cont->pluck('tglmasuk')->unique();
-            if ($checkMasuk->count() > 1) {
-                return redirect()->back()->with('status', ['type'=>'error', 'message' => 'Terdapat nilai Tanggal Masuk yang berbeda.']);
-            }
+            // $checkMasuk = $cont->pluck('tglmasuk')->unique();
+            // if ($checkMasuk->count() > 1) {
+            //     return redirect()->back()->with('status', ['type'=>'error', 'message' => 'Terdapat nilai Tanggal Masuk yang berbeda.']);
+            // }
 
             // $checkDok = $cont->whereNull('no_dok');
             // if ($checkDok->count() > 1) {
@@ -165,6 +165,7 @@ class FormFCLController extends Controller
                     'behandle_yn' => $statusBehandle,
                     'uid' => Auth::user()->id,
                     'created_at' => Carbon::now(),
+                    'tglmasuk' => $ct->tglmasuk
                 ]);
             }
 
@@ -193,10 +194,10 @@ class FormFCLController extends Controller
             }
 
             // Validasi Tanggal Masuk harus sama
-            $checkMasuk = $cont->pluck('tglmasuk')->unique();
-            if ($checkMasuk->count() > 1) {
-                return redirect()->back()->with('status', ['type'=>'error', 'message' => 'Terdapat nilai Tanggal Masuk yang berbeda.']);
-            }
+            // $checkMasuk = $cont->pluck('tglmasuk')->unique();
+            // if ($checkMasuk->count() > 1) {
+            //     return redirect()->back()->with('status', ['type'=>'error', 'message' => 'Terdapat nilai Tanggal Masuk yang berbeda.']);
+            // }
 
             $checkBelumMasuk = $cont->whereNull('tglmasuk');
             if ($checkBelumMasuk->count() > 0) {
@@ -240,14 +241,25 @@ class FormFCLController extends Controller
                 ->delete();
 
             // Loop setiap container untuk disimpan di FormC
+            // dd($cont);
             foreach ($cont as $ct) {
                 $statusBehandle = $ct->tglbehandle ? 'Y' : 'N';
 
                 // Cek apakah sudah ada di FormC
                 $existingContainer = FormC::where('form_id', $form->id)
                                           ->where('container_id', $ct->id)
-                                          ->exists();
-                if (!$existingContainer) {
+                                          ->first();
+                if ($existingContainer) {
+                    $existingContainer->update([
+                        'size' => $ct->size,
+                        'ctr_type' => $ct->ctr_type,
+                        'behandle_yn' => $statusBehandle,
+                        'uid' => Auth::user()->id,
+                        'created_at' => Carbon::now(),
+                        'tglmasuk' => $ct->tglmasuk
+                    ]);
+                }else {
+                    
                     FormC::create([
                         'form_id' => $form->id,
                         'container_id' => $ct->id,
@@ -256,6 +268,7 @@ class FormFCLController extends Controller
                         'behandle_yn' => $statusBehandle,
                         'uid' => Auth::user()->id,
                         'created_at' => Carbon::now(),
+                        'tglmasuk' => $ct->tglmasuk
                     ]);
                 }
             }
@@ -305,8 +318,8 @@ class FormFCLController extends Controller
 
         // Check Tarif TPS
         $tarifTPS = TTPS::where('lokasi_sandar_id', $data['form']->lokasi_sandar_id)->select('size', 'type')->get()->toArray();
-        $invalidContainersTPS = $data['containerInvoice']->filter(function ($container) use ($tarifWMS) {
-            return !in_array(['size' => $container->size, 'type' => $container->ctr_type], $tarifWMS);
+        $invalidContainersTPS = $data['containerInvoice']->filter(function ($container) use ($tarifTPS) {
+            return !in_array(['size' => $container->size, 'type' => $container->ctr_type], $tarifTPS);
         });
         if ($invalidContainersTPS->isNotEmpty()) {
             $invalidContainerNumbersTPS = $invalidContainersTPS->pluck('cont.nocontainer')->implode(', ');
@@ -316,6 +329,10 @@ class FormFCLController extends Controller
         $container = FormC::where('form_id', $id)->get();
         $containerSize = $container->pluck('size')->unique()->toArray();
         $containerType = $container->pluck('ctr_type')->unique()->toArray();
+        $tglMasuk = $container->pluck('tglmasuk')->unique()->toArray();
+       
+        $data['tglMasuk'] = $tglMasuk;
+        $data['tglMasukView'] = $container->pluck('tglmasuk')->unique()->implode(', ');
 
         $wmsPay = TWMS::whereIn('size', $containerSize)->whereIn('type', $containerType)->get();
         $data['tarifWMS'] = $wmsPay;
@@ -379,6 +396,22 @@ class FormFCLController extends Controller
             $form->update([
                 'status' => 'Y'
             ]);
+
+            foreach ($formC as $cont) {
+                $tcWMS = TWMS::where('size', $cont->size)->where('type', $cont->ctr_type)->first();
+                if ($tcWMS) {
+                    $cont->update([
+                        'tarif_wms_id' => $tcWMS->id
+                    ]);
+                }
+                $tcTPS = TTPS::where('lokasi_sandar_id', $form->lokasi_sandar_id)->where('size', $cont->size)->where('type', $cont->ctr_type)->first();
+                if ($tcTPS) {
+                    $cont->update([
+                        'tarif_tps_id' => $tcTPS->id
+                    ]);
+                }
+            }
+
             $header = Header::create([
                 'proforma_no' => $this->getNextOrderNo(),
                 'kd_tps_asal' => $request->kd_tps_asal,
@@ -406,6 +439,7 @@ class FormFCLController extends Controller
             ]);
     
             $contFilter = $formC->groupBy(['size', 'ctr_type']);
+            $tglMasuks = $formC->pluck('tglmasuk')->unique()->toArray();
     
             foreach ($contFilter as $size => $types) {
                 foreach ($types as $ctr_type => $containers) {
@@ -423,42 +457,59 @@ class FormFCLController extends Controller
                         'type' => $ctr_type,
                         'tarif_dasar' => 0,
                         'satuan' => '0',
-                        'jumlah' => 0,
+                        'jumlah' => $jumlah,
                         'jumlah_hari' => 1,
                         'total' => 0,
                     ]);
-                    // Penumpukkan Massa2
-                    $tarifDasarMassa2 = ($tarifTPS->tarif_dasar_massa * $tarifTPS->massa2) / 100;
-                    $totalMassa2TPS = $tarifDasarMassa2 * $jumlah;
-                    Detil::create([
-                        'form_id' => $form->id,
-                        'invoice_id' => $header->id,
-                        'tps' => $request->kd_tps_asal,
-                        'keterangan' => 'Penumpukkan Massa 2 (' . $size . ' / ' .$ctr_type.' )',
-                        'size' => $size,
-                        'type' => $ctr_type,
-                        'tarif_dasar' => $tarifDasarMassa2,
-                        'satuan' => $tarifTPS->massa2,
-                        'jumlah' => $jumlah,
-                        'jumlah_hari' => 1,
-                        'total' => $totalMassa2TPS,
-                    ]);
-                    // Penumpukkan Massa3
-                    $tarifDasarMassa3 = ($tarifTPS->tarif_dasar_massa * $tarifTPS->massa3) / 100;
-                    $totalMassa3TPS = $tarifDasarMassa3 * $jumlah * $request->massa3TPS;
-                    Detil::create([
-                        'form_id' => $form->id,
-                        'invoice_id' => $header->id,
-                        'tps' => $request->kd_tps_asal,
-                        'keterangan' => 'Penumpukkan Massa 3 (' . $size . ' / ' .$ctr_type.' )',
-                        'size' => $size,
-                        'type' => $ctr_type,
-                        'tarif_dasar' => $tarifTPS->tarif_dasar_massa,
-                        'satuan' => $tarifTPS->massa3,
-                        'jumlah' => $jumlah,
-                        'jumlah_hari' => 1,
-                        'total' => $totalMassa3TPS,
-                    ]);
+                    foreach ($tglMasuks as $tglmasuk) {
+                        $eta = Carbon::parse($form->eta);
+                        $masuk = Carbon::parse($tglmasuk);
+                        $jumlahHari = $eta->diffInDays($masuk);
+                        // Tentukan massa2TPS dan massa3TPS
+                        if ($jumlahHari > 1) {
+                            $massa2TPS = 1;
+                            $massa3TPS = $jumlahHari - 1;
+                        } else {
+                            $massa2TPS = 0;
+                            $massa3TPS = 0;
+                        }
+
+                        $jumlahContByMassa = $containers->where('tglmasuk', $tglmasuk)->count();
+                        // dd($jumlahContByMassa);
+                        $tarifDasarMassa2 = ($tarifTPS->tarif_dasar_massa * $tarifTPS->massa2) / 100;
+                        $totalMassa2TPS = $tarifDasarMassa2 * $jumlahContByMassa * $massa2TPS;
+                        if ($jumlahContByMassa > 0) {
+                            # code...
+                            Detil::create([
+                                'form_id' => $form->id,
+                                'invoice_id' => $header->id,
+                                'tps' => $request->kd_tps_asal,
+                                'keterangan' => 'Penumpukkan Massa 2 (' . $size . ' / ' .$ctr_type.' ) masuk pd ' . $masuk->format('Y-m-d'),
+                                'size' => $size,
+                                'type' => $ctr_type,
+                                'tarif_dasar' => $tarifDasarMassa2,
+                                'satuan' => $tarifTPS->massa2,
+                                'jumlah' => $jumlahContByMassa,
+                                'jumlah_hari' => $massa2TPS,
+                                'total' => $totalMassa2TPS,
+                            ]);
+                            $tarifDasarMassa3 = ($tarifTPS->tarif_dasar_massa * $tarifTPS->massa3) / 100;
+                            $totalMassa3TPS = $tarifDasarMassa3 * $jumlahContByMassa * $massa3TPS;
+                            Detil::create([
+                                'form_id' => $form->id,
+                                'invoice_id' => $header->id,
+                                'tps' => $request->kd_tps_asal,
+                                'keterangan' => 'Penumpukkan Massa 3 (' . $size . ' / ' .$ctr_type.' ) masuk pd ' . $masuk->format('Y-m-d'),
+                                'size' => $size,
+                                'type' => $ctr_type,
+                                'tarif_dasar' => $tarifTPS->tarif_dasar_massa,
+                                'satuan' => $tarifTPS->massa3,
+                                'jumlah' => $jumlah,
+                                'jumlah_hari' => $massa3TPS,
+                                'total' => $totalMassa3TPS,
+                            ]);
+                        }
+                    }
                     // liftOn
                     $totalLiftOn = $tarifTPS->lift_on * $jumlah;
                     Detil::create([
@@ -507,22 +558,32 @@ class FormFCLController extends Controller
                         'jumlah_hari' => 0,
                         'total' => $totalPLP,
                     ]);
+                    foreach ($tglMasuks as $tglmasuk) {
+                        $etd = Carbon::parse($form->etd);
+                        $masuk = Carbon::parse($tglmasuk);
+                        $jumlahHariWMS = $masuk->diffInDays($etd) + 1;
+                        $jumlahContByMassaWMS = $containers->where('tglmasuk', $tglmasuk)->count();
+
+                        $tarifDasarMassa = ($tarifWMS->tarif_dasar_massa * $tarifWMS->massa)/100;
+                        $totalMassaWMS = $tarifDasarMassa*$jumlahContByMassaWMS * $jumlahHariWMS;
+                        if ($jumlahContByMassaWMS) {
+                            # code...
+                            Detil::create([
+                                'form_id' => $form->id,
+                                'invoice_id' => $header->id,
+                                'tps' => 'Depo',
+                                'keterangan' => 'Penumpukan (' . $size . ' / ' .$ctr_type.' ) Masuk pd ' . $masuk->format('Y-m-d'),
+                                'size' => $size,
+                                'type' => $ctr_type,
+                                'tarif_dasar' => $tarifWMS->paket_plp,
+                                'satuan' => '0',
+                                'jumlah' => $jumlahContByMassaWMS,
+                                'jumlah_hari' => $jumlahHariWMS,
+                                'total' => $totalMassaWMS,
+                            ]);
+                        }
+                    }
                     // Massa
-                    $tarifDasarMassa = ($tarifWMS->tarif_dasar_massa * $tarifWMS->massa)/100;
-                    $totalMassaWMS = $tarifDasarMassa*$jumlah * $request->massaWMS;
-                    Detil::create([
-                        'form_id' => $form->id,
-                        'invoice_id' => $header->id,
-                        'tps' => 'Depo',
-                        'keterangan' => 'Penumpukan (' . $size . ' / ' .$ctr_type.' )',
-                        'size' => $size,
-                        'type' => $ctr_type,
-                        'tarif_dasar' => $tarifWMS->paket_plp,
-                        'satuan' => '0',
-                        'jumlah' => $jumlah,
-                        'jumlah_hari' => $request->massaWMS,
-                        'total' => $totalMassaWMS,
-                    ]);
                     // lift On
                     $totalLiftOnWMS = $tarifWMS->lift_on*$jumlah;
                     Detil::create([

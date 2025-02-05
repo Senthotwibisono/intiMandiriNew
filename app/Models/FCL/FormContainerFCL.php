@@ -24,6 +24,9 @@ class FormContainerFCL extends Model
         'behandle_yn',
         'uid',
         'created_at',
+        'tarif_tps_id',
+        'tarif_wms_id',
+        'tglmasuk',
     ];
 
     public function form()

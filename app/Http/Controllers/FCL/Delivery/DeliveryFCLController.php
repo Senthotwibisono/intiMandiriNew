@@ -246,4 +246,60 @@ class DeliveryFCLController extends Controller
         $data['user'] = Auth::user()->id;
         return view('fcl.delivery.gateOut', $data);
     }
+
+    public function gatePassBonMuat(Request $request)
+    {
+        $cont = Cont::where('id', $request->id)->first();
+        if ($cont->active_to == null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Harap melunasi invoice terlebih dahulu',
+            ]);
+        }
+        $barcode = Barcode::where('ref_id', $cont->id)->where('ref_type', '=', 'FCL')->where('ref_action', 'release')->first();
+        if ($barcode) {
+                $now = Carbon::now();
+                if ($barcode->status == 'inactive' || $barcode->expired <= $now) {
+                    do {
+                        $uniqueBarcode = Str::random(20);
+                    } while (Barcode::where('barcode', $uniqueBarcode)->exists());
+                    $barcode->update([
+                        'barcode'=> $uniqueBarcode,
+                        'status'=>'active',
+                        'expired'=> Carbon::now()->addDays(3),
+                    ]);
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'updated successfully!',
+                        'data'    => $barcode,
+                    ]);
+                }else {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'updated successfully!',
+                        'data'    => $barcode,
+                    ]);
+                }
+        }else {
+            do {
+                $uniqueBarcode = Str::random(20);
+            } while (Barcode::where('barcode', $uniqueBarcode)->exists());    
+            $newBarcode = Barcode::create([
+                'ref_id'=>$cont->id,
+                'ref_type'=>'FCL',
+                'ref_action'=>'release',
+                'ref_number'=>$cont->nocontainer,
+                'barcode'=> $uniqueBarcode,
+                'status'=>'active',
+                'expired'=> $cont->active_to,
+                'uid'=> Auth::user()->id,
+                'created_at'=> Carbon::now(),
+            ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'updated successfully!',
+                'data'    => $newBarcode,
+            ]);
+        }
+    }
 }
