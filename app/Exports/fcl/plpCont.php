@@ -3,25 +3,57 @@
 namespace App\Exports\fcl;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Collection;
+use Carbon\Carbon;
+
 use App\Models\ContainerFCL as Contf;
 
-class plpCont implements FromCollection, WithHeadings
+class plpCont implements FromCollection, WithMapping, WithHeadings, ShouldAutoSize
 {
-    protected $joborder_id;
+    protected $conts;
 
-    public function __construct($joborder_id)
+    public function __construct($conts)
     {
-        $this->joborder_id = $joborder_id;
+        $this->conts = $conts;
     }
 
     /**
      * Mengambil semua data berdasarkan joborder_id
      */
-    public function collection()
+    public function map($cont): array
     {
-        return Contf::where('joborder_id', $this->joborder_id)->get();
+        $tglPLP = $cont->job->ttgl_plp ?  Carbon::parse($cont->job->ttgl_plp)->format('d-m-Y') : '-';
+        $tglBC11 = $cont->job->ttgl_bc11 ?  Carbon::parse($cont->job->ttgl_bc11)->format('d-m-Y') : '-';
+        $tglmasuk = $cont->tglmasuk ? Carbon::parse($cont->tglmasuk)->format('d-m-Y') : 'Belum Masuk';
+        
+        return [
+           $cont->job->noplp ?? '-',
+           $tglPLP,
+           $cont->job->tno_bc11 ?? '-',
+           $tglBC11,
+           $cont->Customer->name ?? '-',
+           $cont->nocontainer ?? '-',
+           '-',
+           $cont->ctr_type ?? '-',
+           $cont->dokumen->name ?? '-',
+           $cont->size ?? '-',
+           $cont->job->sandar->kd_tps_asal ?? '-',
+           '-',
+           '-',
+           $tglmasuk,
+           $cont->jammasuk ?? '-',
+           $cont->nopol ?? '-',
+           'Lama Hari',
+           'Status Normal/Longstay',
+           'Nama Kapal',
+           'Tgl Tiba Kapal',
+           'Tgl Keluar TPS',
+           'Jam Keluar TPS',
+           'No Polisi Keluar',
+        ];
     }
 
     /**
@@ -29,6 +61,30 @@ class plpCont implements FromCollection, WithHeadings
      */
     public function headings(): array
     {
-        return Schema::getColumnListing((new Contf)->getTable());
+        return [
+           'PLP',
+           'TGL PLP',
+           'BC 1.1',
+           'TGL BC 1.1',
+           'Consigne',
+           'No Container',
+           'Keterangan Batal',
+           'Jenis Container',
+           'Jenis Dok',
+           'Size',
+           'Kd TPS Asal',
+           'Out TPS Asal (Tanggal)',
+           'Out TPS Asal (Jam)',
+           'Tgl Masuk',
+           'Jam Masuk',
+           'No Polisi Masuk',
+           'Lama Hari',
+           'Status Normal/Longstay',
+           'Nama Kapal',
+           'Tgl Tiba Kapal',
+           'Tgl Keluar TPS',
+           'Jam Keluar TPS',
+           'No Polisi Keluar',
+        ];
     }
 }

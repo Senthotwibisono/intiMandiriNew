@@ -133,7 +133,7 @@
                             <div class="col-3">
                                 <div class="form-group">
                                     <label for="">Kode Dokumen</label>
-                                    <select name="kd_dok" id="kd_dok_edit" style="width: 100%; " class="js-example-basic-single form-select select2">
+                                    <select name="kd_dok_inout" id="kd_dok_edit" style="width: 100%; " class="js-example-basic-single form-select select2">
                                         <option value disabled selected>Pilih Satu</option>
                                         @foreach($doks as $dok)
                                             <option value="{{$dok->kode}}">{{$dok->name}}</option>
@@ -258,7 +258,7 @@ $(document).ready(function() {
         $("#tglmasuk").val(response.data.tglmasuk);
         $("#jammasuk").val(response.data.jammasuk);
         $("#ctr_type_edit").val(response.data.ctr_type).trigger('change');
-        $("#kd_dok_edit").val(response.data.kd_dok).trigger('change');
+        $("#kd_dok_edit").val(response.data.kd_dok_inout).trigger('change');
         $("#no_dok_edit").val(response.data.no_dok);
         $("#tgl_dok_edit").val(response.data.tgl_dok);
       },

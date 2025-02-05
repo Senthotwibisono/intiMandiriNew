@@ -518,8 +518,10 @@ class RegisterFCLController extends Controller
     {
         $job = Job::find($id);
 
+        $conts = Cont::where('joborder_id', $job->id)->get();
+
         
         $fileName = 'ReportContainer-jobNumber-plp'. $job->PLP->noplp .'.xlsx' ;
-        return Excel::download(new plpCont($id), $fileName);
+        return Excel::download(new plpCont($conts), $fileName);
     }
 }
