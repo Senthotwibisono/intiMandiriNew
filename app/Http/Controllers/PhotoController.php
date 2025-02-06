@@ -102,6 +102,8 @@ class PhotoController extends Controller
                 $cont->update([
                     'nopol' => $request->nopol,
                     'nopol_mty' => $request->nopol_mty,
+                    'tglkeluar' => $request->tglkeluar,
+                    'jamkeluar' => $request->jamkeluar,
                 ]);
             }
             if ($request->hasFile('photos')) {

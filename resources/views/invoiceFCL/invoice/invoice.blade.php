@@ -149,7 +149,7 @@ body {
             <div class="divider divider-center">
                 <div class="divider-text d-flex justify-content-center align-items-center">
                     <div class="logo img me-3 text-center">
-                        <img src="/logo/IntiMandiri.PNG" class="img-fluid" alt="" style="">
+                        <img src="/logo/IntiMandiri.png" class="img-fluid" alt="" style="">
                     </div>
                     No Job Order : {{$header->job->nojoborder}}
                 </div>

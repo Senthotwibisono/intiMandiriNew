@@ -102,7 +102,7 @@
                 </div>
             </div>
             <div class="text-center">
-                <img src="/images/EIR.PNG" alt="EIR" class="imgeEir">
+                <img src="/images/EIR.png" alt="EIR" class="imgeEir">
             </div>
         </div>
     </div>

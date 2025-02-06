@@ -865,7 +865,7 @@ class DokumenController extends Controller
                     if ($bc23->jml_cont > 0) {
                         $contF = ContF::whereNull('tglkeluar')->where('nocontainer', $detail->NO_CONT)->first();
                         if ($contF) {
-                            if ($contF->size == $detail->SIZE) {
+                            if ($contF->size != $detail->SIZE) {
                                 $alasanSize = '& Ukuran Fisik Size Berbeda';
                             }else {
                                 $alasanSize = null;
@@ -1001,7 +1001,7 @@ class DokumenController extends Controller
                     if ($bc23->jml_cont > 0) {
                         $contF = ContF::whereNull('tglkeluar')->where('nocontainer', $detailCont->NO_CONT)->where('size', $detailCont->SIZE)->first();
                         if ($contF) {
-                            if ($contF->size == $detailCont->SIZE) {
+                            if ($contF->size != $detailCont->SIZE) {
                                 $alasanSize = '& Ukuran Fisik Size Berbeda';
                             }else {
                                 $alasanSize = null;
@@ -1293,7 +1293,7 @@ class DokumenController extends Controller
                     if ($sppb->jml_cont > 0) {
                         $contF = ContF::whereNull('tglkeluar')->where('nocontainer', $detail->NO_CONT)->first();
                         if ($contF) {
-                            if ($contF->size == $detail->SIZE) {
+                            if ($contF->size != $detail->SIZE) {
                                 $alasanSize = 'Ukuran Fisik Size Berbeda';
                                 $statusBC = 'HOLD';
                             }else {
@@ -1427,11 +1427,11 @@ class DokumenController extends Controller
                         $contF = ContF::whereNull('tglkeluar')->where('nocontainer', $detailCont->NO_CONT)->where('size', $detailCont->SIZE)->first();
                         if ($contF) {
                             if ($contF->size == $detail->SIZE) {
-                                $alasanSize = 'Ukuran Fisik Size Berbeda';
-                                $statusBC = 'HOLD';
-                            }else {
                                 $alasanSize = null;
                                 $statusBC = 'release';
+                            }else {
+                                $alasanSize = 'Ukuran Fisik Size Berbeda';
+                                $statusBC = 'HOLD';
                             }
                             $cust = Customer::where('name', $sppb->nama_imp)->first();
                             $newCust = null;
@@ -1978,7 +1978,7 @@ class DokumenController extends Controller
                     ]);
                     $contF = ContF::whereNull('tglkeluar')->where('nocontainer', $detail->NO_CONT)->where('size', $detail->SIZE)->first();
                     if ($contF) {
-                        if ($contF->size == $detail->SIZE) {
+                        if ($contF->size != $detail->SIZE) {
                             $alasanSize = '& Ukuran Fisik Size Berbeda';
                         }else {
                             $alasanSize = null;
@@ -2099,7 +2099,7 @@ class DokumenController extends Controller
                      if ($manualCont->jml_cont > 0) {
                          $contF = ContF::whereNull('tglkeluar')->where('nocontainer', $detailCont->NO_CONT)->where('size', $detailCont->SIZE)->first();
                          if ($contF) {
-                            if ($contF->size == $detailCont->SIZE) {
+                            if ($contF->size != $detailCont->SIZE) {
                                 $alasanSize = '& Ukuran Fisik Size Berbeda';
                             }else {
                                 $alasanSize = null;
@@ -2338,7 +2338,7 @@ class DokumenController extends Controller
                     if ($pabean->jml_cont > 0) {
                         $contF = ContF::whereNull('tglkeluar')->where('nocontainer', $detail->NO_CONT)->first();
                         if ($contF) {
-                            if ($contF->size == $detail->SIZE) {
+                            if ($contF->size != $detail->SIZE) {
                                 $alasanSize = '& Ukuran Fisik Size Berbeda';
                             }else {
                                 $alasanSize = null;
@@ -2479,7 +2479,7 @@ class DokumenController extends Controller
                     if ($pabean->jml_cont > 0) {
                         $contF = ContF::whereNull('tglkeluar')->where('nocontainer', $detailCont->NO_CONT)->first();
                         if ($contF) {
-                            if ($contF->size == $detailCont->SIZE) {
+                            if ($contF->size != $detailCont->SIZE) {
                                 $alasanSize = '& Ukuran Fisik Size Berbeda';
                             }else {
                                 $alasanSize = null;

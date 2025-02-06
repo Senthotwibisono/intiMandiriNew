@@ -25,8 +25,26 @@
                 </div>
                 <div class="col-12">
                     <div class="form-group">
+                        <label for="">Status Beacukai</label>
+                        <input type="text" id="status_bc" class="form-control" readonly>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="form-group">
                         <label for="">Nopol Keluar</label>
                         <input type="text" name="nopol_mty" id="nopol_mty" class="form-control">
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="form-group">
+                        <label for="">Tanggal Keluar</label>
+                        <input type="date" name="tglkeluar" id="tglkeluar" class="form-control">
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="form-group">
+                        <label for="">Jam Keluar</label>
+                        <input type="time" name="jamkeluar" id="jamkeluar" class="form-control">
                     </div>
                 </div>
                 <div class="row mt-0">
@@ -168,6 +186,9 @@ $(document).ready(function() {
                 $("#endstripping").val(response.data.endstripping);
                 $("#nopol").val(response.data.nopol);
                 $("#nopol_mty").val(response.data.nopol_mty);
+                $("#jamkeluar").val(response.data.jamkeluar);
+                $("#tglkeluar").val(response.data.tglkeluar);
+                $("#status_bc").val(response.data.status_bc);
                 let photoList = response.listPhoto.map(photo => photo.detil).join('\n');
                 $("#photoTaken").val(photoList);
             },
