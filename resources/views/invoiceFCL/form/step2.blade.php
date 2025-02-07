@@ -442,10 +442,10 @@
                     <div class="row text-white p-3">
                         <div class="col-6">
                             @php
-                                $total = $totalWMS + $totalTPS;
+                                $total = $totalWMS + $totalTPS + $totalAdmin;
                                 $ppn = ($total * 11)/100;
                                 $totalAdmin = $adminTPS + $adminWMS;
-                                $grandTotal = $total + $ppn + $totalAdmin;
+                                $grandTotal = $total + $ppn;
                             @endphp
                             <h4 class="lead ">Total</h4>
                             <h4 class="lead ">PPN 11%</h4>
