@@ -98,11 +98,17 @@ class ContainerDokController extends Controller
         ->addColumn('tglBL', function($cont){
             return $cont->tgl_bl_awb ?? '-';
         })
+        ->addColumn('nopol', function($cont){
+            return $cont->nopol ?? '-';
+        })
         ->addColumn('tglmasuk', function($cont){
             return $cont->tglmasuk ?? 'Belum Masuk';
         })
         ->addColumn('jammasuk', function($cont){
             return $cont->jammasuk ?? 'Belum Masuk';
+        })
+        ->addColumn('nopol_mty', function($cont){
+            return $cont->nopol_mty ?? '-';
         })
         ->addColumn('tglkeluar', function($cont){
             return $cont->tglkeluar ?? 'Belum keluar';

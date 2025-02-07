@@ -26,8 +26,10 @@
                         <th>Container Type</th>
                         <th>No BL AWB</th>
                         <th>Tgl BL AWB</th>
+                        <th>No Polisi Masuk</th>
                         <th>Tgl Masuk</th>
                         <th>Jam Masuk</th>
+                        <th>No Polisi Keluar</th>
                         <th>Tgl Keluar</th>
                         <th>Jam Keluar</th>
                         <th>Jenis Dok</th>
@@ -212,8 +214,10 @@
                 {data:'ctr_type', name:'ctr_type'},
                 {data:'nobl', name:'nobl'},
                 {data:'tglBL', name:'tglBL'},
+                {data:'nopol', name:'nopol'},
                 {data:'tglmasuk', name:'tglmasuk'},
                 {data:'jammasuk', name:'jammasuk'},
+                {data:'nopol_mty', name:'nopol_mty'},
                 {data:'tglkeluar', name:'tglkeluar'},
                 {data:'jamkeluar', name:'jamkeluar'},
                 {data:'kodeDok', name:'kodeDok'},
