@@ -98,6 +98,15 @@ class ContainerDokController extends Controller
         ->addColumn('tglBL', function($cont){
             return $cont->tgl_bl_awb ?? '-';
         })
+        ->addColumn('customer', function($cont){
+            return $cont->Customer->name ?? '-';
+        })
+        ->addColumn('npwp', function($cont){
+            return $cont->Customer->npwp ?? '-';
+        })
+        ->addColumn('email', function($cont){
+            return $cont->Customer->email ?? '-';
+        })
         ->addColumn('nopol', function($cont){
             return $cont->nopol ?? '-';
         })

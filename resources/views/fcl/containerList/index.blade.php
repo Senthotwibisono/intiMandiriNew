@@ -26,6 +26,9 @@
                         <th>Container Type</th>
                         <th>No BL AWB</th>
                         <th>Tgl BL AWB</th>
+                        <th>Customer Name</th>
+                        <th>Customer NPWP</th>
+                        <th>Customer Email</th>
                         <th>No Polisi Masuk</th>
                         <th>Tgl Masuk</th>
                         <th>Jam Masuk</th>
@@ -214,6 +217,9 @@
                 {data:'ctr_type', name:'ctr_type'},
                 {data:'nobl', name:'nobl'},
                 {data:'tglBL', name:'tglBL'},
+                {data:'customer', name:'customer'},
+                {data:'npwp', name:'npwp'},
+                {data:'email', name:'email'},
                 {data:'nopol', name:'nopol'},
                 {data:'tglmasuk', name:'tglmasuk'},
                 {data:'jammasuk', name:'jammasuk'},
