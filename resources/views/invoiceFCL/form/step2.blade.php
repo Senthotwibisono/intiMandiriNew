@@ -444,8 +444,8 @@
                             @php
                                 $total = $totalWMS + $totalTPS;
                                 $ppn = ($total * 11)/100;
-                                $grandTotal = $total + $ppn;
                                 $totalAdmin = $adminTPS + $adminWMS;
+                                $grandTotal = $total + $ppn + $totalAdmin;
                             @endphp
                             <h4 class="lead ">Total</h4>
                             <h4 class="lead ">PPN 11%</h4>
