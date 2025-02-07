@@ -201,7 +201,6 @@
             processing: true,
             serverSide: true,
             scrollX: true,
-            scrollY: '300px',
             ajax: '/fcl/containerList/dataTable',
             columns: [
                 {data:'edit', name:'edit'},
