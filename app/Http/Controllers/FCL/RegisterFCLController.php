@@ -275,6 +275,7 @@ class RegisterFCLController extends Controller
                 'tgl_bl_awb' =>$request->tgl_bl_awb,
                 'eta' => $request->eta,
                 'lokasisandar_id'=>$request->lokasisandar_id,
+                'type_class' => $request->type_class,
             ]);
             $oldWeight = $job->grossweight ?? 0;
             $newWeight = $oldWeight + $request->weight;
@@ -331,6 +332,7 @@ class RegisterFCLController extends Controller
                 'nobl' =>$request->nobl,
                 'tgl_bl_awb' =>$request->tgl_bl_awb,
                 'eta' => $request->eta,
+                'type_class' => $request->type_class,
             ]);
             $newWeight = $oldWeight + $request->weight;
             $newMeas = $oldMeas + $request->meas;

@@ -1,11 +1,25 @@
 @extends('partial.main')
 @section('custom_styles')
 <style>
-    .highlight-yellow {
-        background-color: yellow !important;
-    }
     #tableContainer td, #tableContainer th {
         white-space: nowrap; /* Membuat teks tetap dalam satu baris */
+    }
+</style>
+<style>
+    .highlight-yellow {
+        background-color: yellow !important;;
+    }
+</style>
+
+<style>
+    .highlight-blue {
+        background-color: lightblue !important;;
+    }
+</style>
+
+<style>
+    .highlight-red {
+        background-color: red !important;;
     }
 </style>
 @endsection
@@ -19,11 +33,14 @@
                     <tr>
                         <th>Edit</th>
                         <th>Photo</th>
+                        <th>Status Beacukai</th>
+                        <th>Segel Merah</th>
                         <th>No Job Order</th>
                         <th>No MBL</th>
                         <th>No Container</th>
                         <th>Size</th>
                         <th>Container Type</th>
+                        <th>Type Class</th>
                         <th>No BL AWB</th>
                         <th>Tgl BL AWB</th>
                         <th>Customer Name</th>
@@ -94,8 +111,20 @@
                         </div>
                         <div class="col-12">
                             <div class="form-group">
+                                <label for="">Ctr Type</label>
+                                <select name="ctr_type" id="ctr_type_edit" type="width:100%;" class="js-example-basic-single form-select select2">
+                                     <option disabled selected value>Pilih Satu</option>
+                                     <option value="DRY">DRY</option>
+                                     <option value="BB">BB</option>
+                                     <option value="OH">OH</option>
+                                     <!-- <option value="OPEN TOP">OPEN TOP</option> -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
                                 <label>Jenis Container</label>
-                                <select class="js-example-basic-single form-control select2" name="ctr_type" id="ctr_type_edit" style="width: 100%;" required>
+                                <select class="js-example-basic-single form-control select2" name="type_class" id="type_class_edit" style="width: 100%;" required>
                                     <option disabled selected value>Choose Jenis Container</option>
                                     <option value="Class BB Standar 3">Class BB Standar 3</option>
                                     <option value="Class BB Standar 8">Class BB Standar 8</option>
@@ -210,11 +239,14 @@
             columns: [
                 {data:'edit', name:'edit'},
                 {data:'photo', name:'photo'},
+                {data:'status_bc', name:'status_bc'},
+                {data:'flag_segel_merah', name:'flag_segel_merah'},
                 {data:'nojob', name:'nojob'},
                 {data:'nombl', name:'nombl'},
                 {data:'nocontainer', name:'nocontainer'},
                 {data:'size', name:'size'},
                 {data:'ctr_type', name:'ctr_type'},
+                {data:'type_class', name:'type_class'},
                 {data:'nobl', name:'nobl'},
                 {data:'tglBL', name:'tglBL'},
                 {data:'customer', name:'customer'},
@@ -230,6 +262,15 @@
                 {data:'noDok', name:'noDok'},
                 {data:'tglDok', name:'tglDok'},
             ],
+            createdRow: function (row, data, dataIndex) {
+                if (data.flag_segel_merah === 'Y') {
+                    $(row).addClass('highlight-red text-white');
+                } else if (data.status_bc === 'HOLD') {
+                    $(row).addClass('highlight-yellow');
+                } else if (data.status_bc === 'release'){
+                    $(row).addClass('highlight-blue');
+                }
+            }
         })
     })
 </script>
@@ -267,6 +308,7 @@ $(document).ready(function() {
         $("#tglmasuk").val(response.data.tglmasuk);
         $("#jammasuk").val(response.data.jammasuk);
         $("#ctr_type_edit").val(response.data.ctr_type).trigger('change');
+        $("#type_class_edit").val(response.data.type_class).trigger('change');
         $("#kd_dok_edit").val(response.data.kd_dok_inout).trigger('change');
         $("#no_dok_edit").val(response.data.no_dok);
         $("#tgl_dok_edit").val(response.data.tgl_dok);

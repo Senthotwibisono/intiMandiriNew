@@ -160,6 +160,7 @@ class ContainerFCL extends Model
         'uid_lepas_segel',
 
         'active_to',
+        'type_class',
     ];
 
     public function user()

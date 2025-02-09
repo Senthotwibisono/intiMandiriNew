@@ -1478,6 +1478,7 @@ class DokumenController extends Controller
     public function createJob(Request $request)
     {
         $plp = PLP::where('id', $request->id)->first();
+        $ctr_type = $request->ctr_type;
         if ($plp) {
             try {
                 // dd($request->all());
@@ -1487,7 +1488,7 @@ class DokumenController extends Controller
     
                     $plpDetails = PLPdetail::where('plp_id', $plp->id)->get();
     
-                    $this->createContainers($plpDetails, $job);
+                    $this->createContainers($plpDetails, $job, $ctr_type);
     
                     $plp->update([
                         'joborder_id' => $job->id,
@@ -1502,14 +1503,14 @@ class DokumenController extends Controller
     
                     $plpDetails = PLPdetail::where('plp_id', $plp->id)->get();
     
-                    $this->createContainersFCL($plpDetails, $job);
+                    $this->createContainersFCL($plpDetails, $job, $ctr_type);
     
                     $plp->update([
                         'joborder_id' => $job->id,
                         'type' => $request->type,
                     ]);
     
-                    return redirect()->route('fcl.register.index')
+                    return redirect()->route('fcl.register.detail', ['id' => $job->id])
                         ->with('status', ['type' => 'success', 'message' => 'Data berhasil dibuat']);
                 }
             } catch (\Throwable $e) {
@@ -1643,7 +1644,7 @@ class DokumenController extends Controller
         ]);
     }
 
-    private function createContainers($plpDetails, $job)
+    private function createContainers($plpDetails, $job, $ctr_type)
     {
         $conts = $plpDetails->unique('no_cont');
 
@@ -1672,12 +1673,13 @@ class DokumenController extends Controller
                 'tgl_bl_awb' => $cont->tgl_bl_awbl ? Carbon::createFromFormat('Ymd', $cont->tgl_bl_awb)->format('Y-m-d H:i:s') : null,
                 'eta'=> $job->eta,
                 'lokasisandar_id' => $job->lokasisandar_id,
-                'cust_id' => $customer->id
+                'cust_id' => $customer->id,
+                'ctr_type' => $ctr_type,
             ]);
         }
     }
 
-    private function createContainersFCL($plpDetails, $job)
+    private function createContainersFCL($plpDetails, $job, $ctr_type)
     {
         $conts = $plpDetails->unique('no_cont');
 
@@ -1710,7 +1712,9 @@ class DokumenController extends Controller
                 'tgl_bl_awb' => $cont->tgl_bl_awbl ? Carbon::createFromFormat('Ymd', $cont->tgl_bl_awb)->format('Y-m-d H:i:s') : null,
                 'eta'=> $job->eta,
                 'lokasisandar_id' => $job->lokasisandar_id,
-                'cust_id' => $customer->id
+                'cust_id' => $customer->id,
+                'ctr_type' => $ctr_type,
+                'status_bc' => 'HOLD',
             ]);
         }
     }

@@ -8,6 +8,23 @@
         text-overflow: ellipsis;
     }
 </style>
+<style>
+    .highlight-yellow {
+        background-color: yellow !important;;
+    }
+</style>
+
+<style>
+    .highlight-blue {
+        background-color: lightblue !important;;
+    }
+</style>
+
+<style>
+    .highlight-red {
+        background-color: red !important;;
+    }
+</style>
 @endsection
 @section('content')
 
@@ -234,11 +251,14 @@
                     <tr>
                         <th>Edit</th>
                         <th>Delete</th>
+                        <th>Status Beacukai</th>
+                        <th>Segel Merah</th>
                         <th>No BL AWB</th>
                         <th>Tgl BL AWB</th>
                         <th>Container No</th>
                         <th>Container Size</th>
                         <th>Container Type</th>
+                        <th>Type Class</th>
                         <th>Teus</th>
                         <th>Seal</th>
                         <th>Weight</th>
@@ -294,9 +314,20 @@
                                     <option value="40">40</option>
                                 </select>
                             </div>
+                            
                             <div class="form-group">
-                                <label>Jenis Container</label>
-                                <select class="customSelect form-control select2" name="ctr_type" style="width: 100%;" required>
+                                <label for="">Ctr Type</label>
+                                <select name="ctr_type" id="" type="width:100%;" class="customSelect form-select select2">
+                                     <option disabled selected value>Pilih Satu</option>
+                                     <option value="DRY">DRY</option>
+                                     <option value="BB">BB</option>
+                                     <option value="OH">OH</option>
+                                     <!-- <option value="OPEN TOP">OPEN TOP</option> -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Kelas Container</label>
+                                <select class="customSelect form-control select2" name="type_class" style="width: 100%;" required>
                                     <option disabled selected value>Choose Jenis Container</option>
                                     <option value="Class BB Standar 3">Class BB Standar 3</option>
                                     <option value="Class BB Standar 8">Class BB Standar 8</option>
@@ -405,8 +436,18 @@
                                 </select>
                             </div>
                             <div class="form-group">
+                                <label for="">Ctr Type</label>
+                                <select name="ctr_type" id="ctr_type_edit" type="width:100%;" class="editSelect form-select select2">
+                                     <option disabled selected value>Pilih Satu</option>
+                                     <option value="DRY">DRY</option>
+                                     <option value="BB">BB</option>
+                                     <option value="OH">OH</option>
+                                     <!-- <option value="OPEN TOP">OPEN TOP</option> -->
+                                </select>
+                            </div>
+                            <div class="form-group">
                                 <label>Jenis Container</label>
-                                <select class="editSelect form-control select2" id="ctr_type_edit" name="ctr_type" style="width: 100%;" required>
+                                <select class="editSelect form-control select2" id="type_class_edit" name="type_class" style="width: 100%;" required>
                                     <option disabled selected value>Choose Jenis Container</option>
                                     <option value="Class BB Standar 3">Class BB Standar 3</option>
                                     <option value="Class BB Standar 8">Class BB Standar 8</option>
@@ -498,15 +539,19 @@
         $('#tableContainer').DataTable({
             processing: true,
             serverSide: true,
+            scrollX: true,
             ajax : '/fcl/register/detailDataContainer-' + id,
             columns : [
                 {data: 'edit', name: 'edit'},
                 {data: 'delete', name: 'delete'},
+                {data: 'status_bc', name: 'status_bc'},
+                {data: 'flag_segel_merah', name: 'flag_segel_merah'},
                 {data: 'nobl', name: 'nobl'},
                 {data: 'tgl_bl_awb', name: 'tgl_bl_awb'},
                 {data: 'nocontainer', name: 'nocontainer'},
                 {data: 'size', name: 'size'},
                 {data: 'ctr_type', name: 'ctr_type'},
+                {data: 'type_class', name: 'type_class'},
                 {data: 'teus', name: 'teus'},
                 {data: 'no_seal', name: 'no_seal'},
                 {data: 'weight', name: 'weight'},
@@ -514,7 +559,16 @@
                 {data: 'customer', name: 'customer'},
                 {data: 'eta', name: 'eta'},
                 {data: 'user', name: 'user'},
-            ]
+            ],
+            createdRow: function (row, data, dataIndex) {
+                if (data.flag_segel_merah === 'Y') {
+                    $(row).addClass('highlight-red text-white');
+                } else if (data.status_bc === 'HOLD') {
+                    $(row).addClass('highlight-yellow');
+                } else if (data.status_bc === 'release'){
+                    $(row).addClass('highlight-blue');
+                }
+            }
         });
     })
 </script>
@@ -637,6 +691,7 @@
         $("#editCust #id_edit").val(response.data.id);
         $("#editCust #size_edit").val(response.data.size).trigger('change');
         $("#editCust #ctr_type_edit").val(response.data.ctr_type).trigger('change');
+        $("#editCust #type_class_edit").val(response.data.type_class).trigger('change');
         $("#editCust #weight_edit").val(response.data.weight);
         $("#editCust #no_seal_edit").val(response.data.no_seal);
         $("#editCust #meas_edit").val(response.data.meas);

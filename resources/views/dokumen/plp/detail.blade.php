@@ -144,13 +144,13 @@
             <div class="card-body">
                 <input type="hidden" name="id" value="{{ $plp->id }}">
                 <div class="row">
-                   <div class="col-4">
+                   <div class="col-3">
                        <div class="form-group">
                            <label for="">No SPK</label>
                            <input type="text" name="nospk" id="" class="form-control">
                        </div>
                    </div>
-                   <div class="col-4">
+                   <div class="col-3">
                        <div class="form-group">
                            <label for="">Forwarding</label>
                            <select name="forwarding_id" id="" type="width:100%;" class="js-example-basic-single form-select select2">
@@ -161,7 +161,19 @@
                            </select>
                        </div>
                    </div>
-                   <div class="col-4">
+                   <div class="col-3">
+                       <div class="form-group">
+                           <label for="">Ctr Type</label>
+                           <select name="ctr_type" id="" type="width:100%;" class="js-example-basic-single form-select select2">
+                                <option disabled selected value>Pilih Satu</option>
+                                <option value="DRY">DRY</option>
+                                <option value="BB">BB</option>
+                                <option value="OH">OH</option>
+                                <!-- <option value="OPEN TOP">OPEN TOP</option> -->
+                           </select>
+                       </div>
+                   </div>
+                   <div class="col-3">
                        <div class="form-group">
                            <label for="">Type</label>
                            <select name="type" id="" type="width:100%;" class="form-select">

@@ -239,6 +239,7 @@ class ContainerDokController extends Controller
                 'tglmasuk' => $request->tglmasuk,
                 'jammasuk' => $request->jammasuk,
                 'ctr_type' => $request->ctr_type,
+                'type_class' => $request->type_class,
                 'kd_dok' => $request->kd_dok,
                 'no_dok' => $request->no_dok,
                 'tgl_dok' => $request->tgl_dok,
