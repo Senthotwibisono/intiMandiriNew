@@ -72,18 +72,18 @@ class FormFCLController extends Controller
         ]);
     }
 
-    public function getBLData($bl)
+    public function getBLData(Request $request)
     {
         try {
-            $cont = ContF::whereNotNull('tglmasuk')->whereNull('tglkeluar')->where('nobl', $bl)->get();
-            if (!$cont) {
+            $cont = ContF::whereNotNull('tglmasuk')->whereNull('tglkeluar')->where('nobl', $request->bl)->get();
+            if ($cont->isEmpty()) {
                 return response()->json([
                     'success'=> false,
                     'message'=> 'Tidak ada container yang dapat dipilih !!',
                 ]);
             }
-            $dateBL = ContF::where('nobl', $bl)->value('tgl_bl_awb');
-            $custId = ContF::where('nobl', $bl)->value('cust_id');
+            $dateBL = ContF::where('nobl', $request->bl)->value('tgl_bl_awb');
+            $custId = ContF::where('nobl', $request->bl)->value('cust_id');
             $customer = Customer::find($custId);
 
             // var_dump($customer);

@@ -758,7 +758,7 @@ Route::controller(AndroidGateController::class)->group(function(){
                 Route::get('/createIndex/Step1', 'indexStep1');
                 Route::get('/createEdit/Step1/{id?}', 'editStep1');
                 Route::get('/getBLAWB', 'getBLAWB');
-                Route::get('/getBLData/{bl?}', 'getBLData');
+                Route::get('/getBLData', 'getBLData');
                 Route::post('/step1Post', 'postStep1');
                 Route::post('/step1Update', 'updateStep1');
                 // Step 2

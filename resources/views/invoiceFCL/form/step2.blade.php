@@ -243,48 +243,48 @@
                                                 @endphp
                                                 <tr>
                                                     <td>Penumpukkan Massa 2 (Masuk pd {{$masuk->format('Y-m-d')}})</td>
-                                                    <td>{{number_format($hargaTPS->tarif_dasar_massa,2)}} * {{number_format($hargaTPS->massa2)}}%</td>
+                                                    <td>{{number_format($hargaTPS->tarif_dasar_massa,0)}} * {{number_format($hargaTPS->massa0)}}%</td>
                                                     <td>{{$jumlahContMassa}}</td>
                                                     <td>{{$massa2TPS}}</td>
                                                     @php
-                                                        $totalPenumpukanMassa2 = (($hargaTPS->tarif_dasar_massa * $hargaTPS->massa2)/100)*$jumlahContMassa*$massa2TPS;
+                                                        $totalPenumpukanMassa2 = (($hargaTPS->tarif_dasar_massa * $hargaTPS->massa0)/100)*$jumlahContMassa*$massa2TPS;
                                                         $totalTPS += $totalPenumpukanMassa2;
                                                     @endphp
-                                                    <td>{{number_format($totalPenumpukanMassa2, 2)}}</td>
+                                                    <td>{{number_format($totalPenumpukanMassa2, 0)}}</td>
                                                 </tr>
                                                 <tr>
                                                     <td>Penumpukkan Massa 3 (Masuk pd {{$masuk->format('Y-m-d')}})</td>
-                                                    <td>{{number_format($hargaTPS->tarif_dasar_massa,2)}} * {{number_format($hargaTPS->massa3)}}%</td>
+                                                    <td>{{number_format($hargaTPS->tarif_dasar_massa,0)}} * {{number_format($hargaTPS->massa3)}}%</td>
                                                     <td>{{$jumlahContMassa}}</td>
                                                     <td>{{$massa3TPS}}</td>
                                                     @php
                                                         $totalPenumpukanMassa3 = (($hargaTPS->tarif_dasar_massa * $hargaTPS->massa3)/100)*$jumlahContMassa*$massa3TPS;
                                                         $totalTPS += $totalPenumpukanMassa3;
                                                     @endphp
-                                                    <td>{{number_format($totalPenumpukanMassa3, 2)}}</td>
+                                                    <td>{{number_format($totalPenumpukanMassa3, 0)}}</td>
                                                 </tr>
                                             @endforeach
                                             <tr>
                                                 <td>Lift On</td>
-                                                <td>{{number_format($hargaTPS->lift_on,2)}}</td>
+                                                <td>{{number_format($hargaTPS->lift_on,0)}}</td>
                                                 <td>{{$jumlahCont}}</td>
                                                 <td>0</td>
                                                 @php
                                                     $totalLiftOnTPS = $hargaTPS->lift_on * $jumlahCont;
                                                     $totalTPS += $totalLiftOnTPS;
                                                 @endphp
-                                                <td>{{number_format($totalLiftOnTPS, 2)}}</td>
+                                                <td>{{number_format($totalLiftOnTPS, 0)}}</td>
                                             </tr>
                                             <tr>
                                                 <td>Gate Pass</td>
-                                                <td>{{number_format($hargaTPS->gate_pass,2)}}</td>
+                                                <td>{{number_format($hargaTPS->gate_pass,0)}}</td>
                                                 <td>{{$jumlahCont}}</td>
                                                 <td>0</td>
                                                 @php
                                                     $totalGatePassTPS = $hargaTPS->gate_pass * $jumlahCont;
                                                     $totalTPS += $totalGatePassTPS;
                                                 @endphp
-                                                <td>{{number_format($totalGatePassTPS, 2)}}</td>
+                                                <td>{{number_format($totalGatePassTPS, 0)}}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -302,8 +302,8 @@
                                 $adminTPS = $tarifTPS->first()->pluck('admin')->first();
                                 $totalTPSAdmin = $adminTPS + $totalTPS;
                             @endphp
-                            <h4 class="lead ">{{ number_format($adminTPS, 2) }}</h4>
-                            <h4 class="lead ">{{ number_format($totalTPSAdmin, 2) }}</h4>
+                            <h4 class="lead ">{{ number_format($adminTPS, 0) }}</h4>
+                            <h4 class="lead ">{{ number_format($totalTPSAdmin, 0) }}</h4>
                         </div>
                     </div>
                 </div>
@@ -355,67 +355,67 @@
                                         <tbody>
                                             <tr>
                                                 <td>Penumpukkan (Masuk pd {{$masuk->format('Y-m-d')}})</td>
-                                                <td>{{number_format($tarif->tarif_dasar_massa,2)}} * {{number_format($tarif->massa)}}%</td>
+                                                <td>{{number_format($tarif->tarif_dasar_massa,0)}} * {{number_format($tarif->massa)}}%</td>
                                                 <td>{{$jumlahContMassaWMS}}</td>
                                                 <td>{{$jumlahHariWMSNew}}</td>
                                                 @php
                                                     $totalPenumpukan = (($tarif->tarif_dasar_massa * $tarif->massa)/100)*$jumlahContMassaWMS*$jumlahHariWMSNew;
                                                     $totalWMS += $totalPenumpukan;
                                                 @endphp
-                                                <td>{{number_format($totalPenumpukan, 2)}}</td>
+                                                <td>{{number_format($totalPenumpukan, 0)}}</td>
                                             </tr>
                                         </tbody>
                                         @endforeach
                                         <tbody>
                                             <tr>
                                                 <td>Paket PLP</td>
-                                                <td>{{ number_format($tarif->paket_plp, 2) }}</td>
+                                                <td>{{ number_format($tarif->paket_plp, 0) }}</td>
                                                 <td>{{ $jumlahCont }}</td>
                                                 <td>0</td>
                                                 @php
                                                     $total = $tarif->paket_plp * $jumlahCont;
                                                     $totalWMS += $total;
                                                 @endphp
-                                                <td>{{ number_format($total, 2) }}</td>
+                                                <td>{{ number_format($total, 0) }}</td>
                                             </tr>
                                         </tbody>
                                         <tbody>
                                             <tr>
                                                 <td>Lift On</td>
-                                                <td>{{number_format($tarif->lift_on,2)}}</td>
+                                                <td>{{number_format($tarif->lift_on,0)}}</td>
                                                 <td>{{$jumlahCont}}</td>
                                                 <td>0</td>
                                                 @php
                                                     $totalLiftOn = $tarif->lift_on * $jumlahCont;
                                                     $totalWMS += $totalLiftOn;
                                                 @endphp
-                                                <td>{{number_format($totalLiftOn, 2)}}</td>
+                                                <td>{{number_format($totalLiftOn, 0)}}</td>
                                             </tr>
                                         </tbody>
                                         <tbody>
                                             <tr>
                                                 <td>Lift Off</td>
-                                                <td>{{number_format($tarif->lift_off,2)}}</td>
+                                                <td>{{number_format($tarif->lift_off,0)}}</td>
                                                 <td>{{$jumlahCont}}</td>
                                                 <td>0</td>
                                                 @php
                                                     $totalLiftOff = $tarif->lift_off * $jumlahCont;
                                                     $totalWMS += $totalLiftOff;
                                                 @endphp
-                                                <td>{{number_format($totalLiftOff, 2)}}</td>
+                                                <td>{{number_format($totalLiftOff, 0)}}</td>
                                             </tr>
                                         </tbody>
                                         <tbody>
                                             <tr>
                                                 <td>Surcharge</td>
-                                                <td>{{number_format($tarif->surcharge,2)}}% dari (PLP, Penumpukan, Lift ON/OFF)</td>
+                                                <td>{{number_format($tarif->surcharge,0)}}% dari (PLP, Penumpukan, Lift ON/OFF)</td>
                                                 <td>{{$jumlahCont}}</td>
                                                 <td>0</td>
                                                 @php
                                                     $totalSurcharge = (($total + $totalPenumpukan + $totalLiftOn + $totalLiftOff)*$tarif->surcharge)/100;
                                                     $totalWMS += $totalSurcharge;
                                                 @endphp
-                                                <td>{{number_format($totalSurcharge, 2)}}</td>
+                                                <td>{{number_format($totalSurcharge, 0)}}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -433,8 +433,8 @@
                                 $adminWMS = $tarifWMS->pluck('admin')->first();
                                 $totalWMSAdmin = $totalWMS + $adminWMS
                             @endphp
-                            <h4 class="lead ">{{ number_format($adminWMS, 2) }}</h4>
-                            <h4 class="lead ">{{ number_format($totalWMSAdmin, 2) }}</h4>
+                            <h4 class="lead ">{{ number_format($adminWMS, 0) }}</h4>
+                            <h4 class="lead ">{{ number_format($totalWMSAdmin, 0) }}</h4>
                         </div>
                     </div>
                 </div>
@@ -453,9 +453,9 @@
                             <h4 class="lead ">Grand Total</h4>
                         </div>
                         <div class="col-6" style="text-align:right;">
-                            <h4 class="lead "><span>{{ number_format($total, '2', ',', '.') ?? ''}}</span></h4>
-                            <h4 class="lead "><span>{{ number_format($ppn, '2', ',', '.') ?? ''}}</span></h4>
-                            <h4 class="lead "><span><strong>{{ number_format($grandTotal, '2', ',', '.') ?? ''}}</strong></span></h4>
+                            <h4 class="lead "><span>{{ number_format($total, '0', ',', '.') ?? ''}}</span></h4>
+                            <h4 class="lead "><span>{{ number_format($ppn, '0', ',', '.') ?? ''}}</span></h4>
+                            <h4 class="lead "><span><strong>{{ number_format($grandTotal, '0', ',', '.') ?? ''}}</strong></span></h4>
                             <input type="hidden" name="form_id" value="{{$form->id}}">
                             <input type="hidden" name="job_id" value="{{$singleCont->cont->job->id}}">
                             <input type="hidden" name="total_tps" value="{{$totalTPS}}">

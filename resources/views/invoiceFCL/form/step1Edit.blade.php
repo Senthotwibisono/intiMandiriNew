@@ -122,7 +122,12 @@
         Swal.showLoading();
         $.ajax({
             type: 'GET',
-            url: '/invoiceFCL/form/getBLData/' + bl,
+            data: 
+            {
+                _token: '{{ csrf_token() }}',
+                bl:bl
+             },
+            url: '/invoiceFCL/form/getBLData',
             cache: false,
             data: {
               bl:bl
@@ -132,28 +137,37 @@
                 swal.close();
                 console.log(response);
 
-                $('#tgl_bl_awb').val(response.data);
-                $('#cust_id').val(response.customer.id).trigger('change');
+                if (response.success) {
+                    
+                    $('#tgl_bl_awb').val(response.data);
+                    $('#cust_id').val(response.customer ? response.customer.id : '').trigger('change');
+    
+                    let selectContainer = $('#container_available');
+                    selectContainer.empty();
+    
+                    let selectedValues = []; // Array untuk menyimpan semua ID
+    
+                    // Tambahkan data ke dalam Select2 dan kumpulkan semua ID
+                    $.each(response.containers, function(index, item) {
+                        let option = new Option(item.nocontainer, item.id, false, false);
+                        selectContainer.append(option);
+                        selectedValues.push(item.id); // Tambahkan ID ke array
+                    });
+    
+                    // Pilih semua item setelah data ditambahkan
+                    if (selectedValues.length > 0) {
+                        selectContainer.val(selectedValues).trigger('change');
+                    }
+    
+                    // Refresh Select2 agar data baru muncul
+                    selectContainer.trigger('change');
+                } else {
+                    Swal.fire('Error', response.message, 'error')
+                    .then(() => {
+                        location.reload();
+                    });
 
-                let selectContainer = $('#container_available');
-                selectContainer.empty();
-
-                let selectedValues = []; // Array untuk menyimpan semua ID
-
-                // Tambahkan data ke dalam Select2 dan kumpulkan semua ID
-                $.each(response.containers, function(index, item) {
-                    let option = new Option(item.nocontainer, item.id, false, false);
-                    selectContainer.append(option);
-                    selectedValues.push(item.id); // Tambahkan ID ke array
-                });
-
-                // Pilih semua item setelah data ditambahkan
-                if (selectedValues.length > 0) {
-                    selectContainer.val(selectedValues).trigger('change');
                 }
-
-                // Refresh Select2 agar data baru muncul
-                selectContainer.trigger('change');
 
             },
             error: function(response){

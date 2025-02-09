@@ -237,15 +237,15 @@ body {
                         @foreach($detilTPS as $tps)
                         <tr>
                             <td class="text-left">{{$tps->keterangan}}</td>
-                            <td>{{ number_format($tps->tarif_dasar, 2)}}</td>
+                            <td>{{ number_format($tps->tarif_dasar, 0)}}</td>
                             <td>{{$tps->jumlah}}</td>
                             <td>{{$tps->jumlah_hari}}</td>
-                            <td>{{ number_format($tps->total, 2)}}</td>
+                            <td>{{ number_format($tps->total, 0)}}</td>
                         </tr>   
                         @endforeach
                         <tr>
                             <td>Total</td>
-                            <td colspan="4">Rp. {{ number_format($header->total_tps, 2)}}</td>
+                            <td colspan="4">Rp. {{ number_format($header->total_tps, 0)}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -271,25 +271,25 @@ body {
                         @foreach($detilWMS as $wms)
                         <tr>
                             <td class="text-left">{{$wms->keterangan}}</td>
-                            <td>{{ number_format($wms->tarif_dasar, 2)}}</td>
+                            <td>{{ number_format($wms->tarif_dasar, 0)}}</td>
                             <td>{{$wms->jumlah}}</td>
                             <td>{{$wms->jumlah_hari}}</td>
-                            <td>{{ number_format($wms->total, 2)}}</td>
+                            <td>{{ number_format($wms->total, 0)}}</td>
                         </tr>   
                         @endforeach
                         <tr>
                             <td>Total</td>
-                            <td colspan="4">Rp. {{ number_format($header->total_wms, 2)}}</td>
+                            <td colspan="4">Rp. {{ number_format($header->total_wms, 0)}}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
             <div class="row text-right p-2">
                 <div class="col-12 text-right">
-                    <p class=""><strong>Admin</strong> : {{ number_format($header->admin, 2) }}</p>
-                    <p class=""><strong>Total</strong> : {{ number_format($header->total, 2) }}</p>
+                    <p class=""><strong>Admin</strong> : {{ number_format($header->admin, 0) }}</p>
+                    <p class=""><strong>Total</strong> : {{ number_format($header->total, 0) }}</p>
                     <hr>
-                    <p class=""><strong>PPN (11%)</strong> : {{ number_format($header->ppn, 2) }}</p>
+                    <p class=""><strong>PPN (11%)</strong> : {{ number_format($header->ppn, 0) }}</p>
                     @if($header->grand_total >= 5000000)
                     <p class=""><strong>Materai</strong> : 10.000</p>
                     @endif
@@ -299,7 +299,7 @@ body {
                             <p class=""><strong>Terbilang</strong> : {{ $terbilang }}</p>
                         </div>
                         <div class="col-4 text-right">
-                            <p class=""><strong>Grand Total</strong> : {{ number_format($header->grand_total, 2) }}</p>
+                            <p class=""><strong>Grand Total</strong> : {{ number_format($header->grand_total, 0) }}</p>
                         </div>
                     </div>
                 </div>

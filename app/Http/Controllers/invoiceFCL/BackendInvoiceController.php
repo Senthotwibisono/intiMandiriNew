@@ -22,7 +22,7 @@ class BackendInvoiceController extends Controller
 {
     public function dataTable(Request $request)
     {
-        $header = Header::get();
+        $header = Header::orderBy('created_at', 'desc')->orderBy('proforma_no', 'desc')->orderBy('invoice_no', 'desc');
 
         return DataTables::of($header)
         ->addColumn('invoiceNo', function($header){
