@@ -213,7 +213,7 @@
 
             <div class="container">
                 <div class="row">
-                    @foreach (['gate_in' => 'Photo Gate In', 'stripping' => 'Photo Stripping', 'placement' => 'Photo Placement', 'gate_out' => 'Photo Baung MT'] as $action => $title)
+                    @foreach (['gate-in' => 'Photo Gate In', 'stripping' => 'Photo Stripping', 'placement' => 'Photo Placement', 'gate-out' => 'Photo Gate Out', 'buang-mty'=> 'Photo Buang MTY'] as $action => $title)
                     <div class="col-sm-6">
                         <div class="card">
                             <div class="card-header">
