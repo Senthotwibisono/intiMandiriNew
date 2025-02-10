@@ -227,7 +227,8 @@
                                                 @if($photo->action == $action)
                                                     <tr>
                                                         <td class="text-center">
-                                                            <img src="{{ asset('storage/imagesInt/' . $photo->photo) }}" alt="Photo" class="img-fluid" style="width: 400px; height: 400px; object-fit: cover;">
+                                                            <img src="{{ asset('storage/imagesInt/' . $photo->photo) }}" alt="Photo" class="img-fluid" style="width: 400px; height: 400px; object-fit: cover;"><br>
+                                                            <span>{{$photo->detil ?? ''}} : {{$photo->created_at ?? '-'}}</span>
                                                         </td>
                                                         <td>
                                                             <form action="{{ route('lcl.gateIn.delete.detail') }}" method="POST">
