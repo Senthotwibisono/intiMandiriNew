@@ -22,7 +22,34 @@ class ReportFCLController extends Controller
 
     public function dataCont(Request $request)
     {
-        $cont = Cont::orderBy('joborder_id', 'desc')->get();
+        $cont = Cont::orderBy('joborder_id', 'desc');
+        if ($request->has('filter') && $request->filter) {
+            if ($request->filter == 'Tgl PLP') {
+                $cont = Cont::whereHas('job', function ($query) use ($request) {
+                    $query->whereBetween('ttgl_plp', [$request->start_date, $request->end_date])->orderBy('ttgl_plp', 'asc');
+                });
+            } elseif ($request->filter == 'Tgl Gate In') {
+                $cont = Cont::whereBetween('tglmasuk', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc');
+            } elseif ($request->filter == 'Tgl Gate Out') {
+                $cont = Cont::whereBetween('tglkeluar', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc');
+            } elseif ($request->filter == 'Tgl BC 1.1') {
+                $cont = Cont::whereHas('job', function ($query) use ($request) {
+                    $query->whereBetween('ttgl_bc11', [$request->start_date, $request->end_date])->orderBy('ttgl_bc11', 'asc');
+                });
+            }
+        }
+
+        if ($request->has('noplp') && $request->noplp) {
+            $cont = Cont::whereHas('job', function ($query) use ($request) {
+                $query->where('noplp', 'LIKE', "%{$request->noplp}%");
+            });
+        }
+    
+        if ($request->has('nobc_11') && $request->nobc_11) {
+            $cont = Cont::whereHas('job', function ($query) use ($request) {
+                $query->where('tno_bc11', 'LIKE', "%{$request->nobc_11}%");
+            });
+        }
         
         return DataTables::of($cont)
         ->addColumn('detil', function($cont){
@@ -37,6 +64,16 @@ class ReportFCLController extends Controller
         })
         ->addColumn('nocontainer', function($cont){
             return $cont->nocontainer ?? '-';
+        })
+        ->addColumn('ctrType', function($cont){
+            $color = $cont->ctr_type == 'BB' ? 'background-color:rgb(167, 40, 40); color: white;' : '';
+
+            return '<span style="'.$color.'; padding: 5px; border-radius: 5px;">'.$cont->ctr_type.'</span>';
+        })
+        ->addColumn('classType', function($cont){
+            $color = $cont->ctr_type == 'BB' ? 'background-color:rgb(167, 40, 40); color: white;' : '';
+
+            return '<span style="'.$color.'; padding: 5px; border-radius: 5px;">'.$cont->type_class.'</span>';
         })
         ->addColumn('size', function($cont){
             return $cont->size ?? '-';
@@ -57,10 +94,10 @@ class ReportFCLController extends Controller
             return $cont->job->ttgl_plp ?? '-';
         })
         ->addColumn('no_bc11', function($cont){
-            return $cont->job->PLP->no_bc11 ?? '-';
+            return $cont->job->tno_bc11 ?? '-';
         })
         ->addColumn('tgl_bc11', function($cont){
-            return $cont->job->PLP->tgl_bc11 ?? '';
+            return $cont->job->ttgl_bc11 ?? '';
         })
         ->addColumn('nobl', function($cont){
             return $cont->nobl ?? '-';
@@ -104,7 +141,33 @@ class ReportFCLController extends Controller
         ->addColumn('tglDok', function($cont){
             return $cont->tgl_dok ?? '-';
         })
-        ->rawColumns(['detil'])
+        ->addColumn('lamaHari', function($cont){
+            if (!$cont->tglmasuk) {
+                $lamaHari = 'Belum Masuk';
+                $longStay = 'N';
+            } else {
+                $lamaHari = Carbon::parse($cont->tglmasuk)->diffInDays($cont->tglkeluar ?? now()) . ' hari';
+    
+                if (Carbon::parse($cont->tglmasuk)->diffInDays($cont->tglkeluar ?? now()) >= 25 ) {
+                    $longStay = 'Y';
+                }else {
+                    $longStay = 'N';
+                }
+            }
+            return $lamaHari;
+        })
+        ->addColumn('longStay', function($cont){
+            if (!$cont->tglmasuk) {
+                $longStay = 'N';
+            } else {
+                $longStay = Carbon::parse($cont->tglmasuk)->diffInDays($cont->tglkeluar ?? now()) >= 25 ? 'Y' : 'N';
+            }
+        
+            $color = $longStay == 'Y' ? 'background-color: #28a745; color: white;' : '';
+        
+            return '<span style="'.$color.'; padding: 5px; border-radius: 5px;">'.$longStay.'</span>';
+        })
+        ->rawColumns(['detil', 'longStay', 'ctrType', 'classType'])
         ->make(true);
     }
 
