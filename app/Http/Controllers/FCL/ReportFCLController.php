@@ -9,6 +9,7 @@ use Auth;
 use Maatwebsite\Excel\Facades\Excel;
 
 use App\Exports\fcl\plpCont;
+use App\Exports\fcl\ReportBulanan;
 
 use DataTables;
 use App\Models\ContainerFCL as Cont;
@@ -217,6 +218,76 @@ class ReportFCLController extends Controller
 
         $fileName = 'ReportContainer-FULL.xlsx' ;
         return Excel::download(new plpCont($conts), $fileName);
+    }
+
+    public function formatBeacukai(Request $request)
+    {
+        $conts = Cont::orderBy('joborder_id', 'desc')->get();
+        if ($request->has('filter') && $request->filter) {
+            if ($request->filter == 'Tgl PLP') {
+                $conts = Cont::whereHas('job', function ($query) use ($request) {
+                    $query->whereBetween('ttgl_plp', [$request->start_date, $request->end_date])->orderBy('ttgl_plp', 'asc')->get();
+                });
+            } elseif ($request->filter == 'Tgl Gate In') {
+                $conts = Cont::whereBetween('tglmasuk', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc')->get();
+            } elseif ($request->filter == 'Tgl Gate Out') {
+                $conts = Cont::whereBetween('tglkeluar', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc')->get();
+            } elseif ($request->filter == 'Tgl BC 1.1') {
+                $conts = Cont::whereHas('job', function ($query) use ($request) {
+                    $query->whereBetween('ttgl_bc11', [$request->start_date, $request->end_date])->orderBy('ttgl_bc11', 'asc')->get();
+                });
+            }
+        }
+
+        if ($request->has('noplp') && $request->noplp) {
+            $conts->whereHas('job', function ($query) use ($request) {
+                $query->where('noplp', 'LIKE', "%{$request->noplp}%");
+            });
+        }
+    
+        if ($request->has('nobc_11') && $request->nobc_11) {
+            $conts->whereHas('job', function ($query) use ($request) {
+                $query->where('tno_bc11', 'LIKE', "%{$request->nobc_11}%");
+            });
+        }
+
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+        $tanggalJudul =  $this->formatDateRange($start_date, $end_date);
+
+        // dd($tanggalJudul);
+
+        $judul = 'Laporan Bulanan '. $tanggalJudul;
+
+        $fileName = 'ReportContainer-beacukai'.$start_date.'-'.$end_date.'.xlsx' ;
+        return Excel::download(new ReportBulanan($conts, $judul), $fileName);
+    }
+
+    private function formatDateRange($start_date, $end_date)
+    {
+        if (!$start_date && !$end_date) {
+            return null; // Jika keduanya kosong, abaikan
+        }
+
+        // Jika salah satu kosong, gunakan yang tersedia
+        if (!$start_date) {
+            return Carbon::parse($end_date)->translatedFormat('j F Y');
+        }
+        if (!$end_date) {
+            return Carbon::parse($start_date)->translatedFormat('j F Y');
+        }
+
+        $start = Carbon::parse($start_date);
+        $end = Carbon::parse($end_date);
+
+        if ($start->year === $end->year) {
+            if ($start->month === $end->month) {
+                return $start->format('j') . ' - ' . $end->translatedFormat('j F Y');
+            }
+            return $start->translatedFormat('j F') . ' - ' . $end->translatedFormat('j F Y');
+        }
+
+        return $start->translatedFormat('j F Y') . ' - ' . $end->translatedFormat('j F Y');
     }
 
 }

@@ -1450,7 +1450,7 @@ class DokumenController extends Controller
                                  'alasan_hold' => $alasanSize,
                                  'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
                                  'nobl' => $sppb->no_bl_awb,
-                                 'tgl_bl_awb' => $sppb->tgl_bl_awb ? Carbon::createFromFormat('m/d/Y', $sppb->tgl_bl_awb)->format('Y-m-d') : null,
+                                 'tgl_bl_awb' => $sppb->tgl_bl_awb ? Carbon::createFromFormat('m/d/Y', $sppb->tgl_bl_awb)->format('Y-m-d H:i:s') : null,
                              ]);
                         }
                     }
@@ -2366,7 +2366,7 @@ class DokumenController extends Controller
                                 'alasan_hold' => $alasanFinal,
                                 'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
                                 'nobl' => $pabean->no_bl_awb,
-                                'tgl_bl_awb' => $pabean->tgl_bl_awb ? Carbon::createFromFormat('m/d/Y', $pabean->tgl_bl_awb)->format('Y-m-d') : null,
+                                'tgl_bl_awb' => $pabean->tgl_bl_awb ? Carbon::createFromFormat('m/d/Y', $pabean->tgl_bl_awb)->format('Y-m-d H:i:s') : null,
                             ]);
                         }
                     }
@@ -2507,7 +2507,7 @@ class DokumenController extends Controller
                                 'alasan_hold' => $alasanFinal,
                                 'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
                                 'nobl' => $pabean->no_bl_awb,
-                                'tgl_bl_awb' => $pabean->tgl_bl_awb ? Carbon::createFromFormat('m/d/Y', $pabean->tgl_bl_awb)->format('Y-m-d') : null,
+                                'tgl_bl_awb' => $pabean->tgl_bl_awb ? Carbon::createFromFormat('m/d/Y', $pabean->tgl_bl_awb)->format('Y-m-d H:i:s') : null,
                             ]);
                         }
                     }
