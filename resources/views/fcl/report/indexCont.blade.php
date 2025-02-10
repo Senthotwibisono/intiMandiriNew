@@ -124,6 +124,16 @@
                 </table>
             </div>
         </div>
+        <div class="card-footer">
+            <div class="button-container">
+                <div class="col-auto">
+                    <button class="btn btn-success formatBeacukai"><i class="fa fa-download"></i> Format Beacukai</button>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-success formatStandar"><i class="fa fa-download"></i> Format Standar</button>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -149,7 +159,7 @@
                 let endDate = $('#end_date').val();
                 let noPlp = $('#noplp').val();
                 let noBc11 = $('#nobc_11').val();
-                
+
                 // Reload DataTables dengan parameter filter
                 $('#dataReportCont').DataTable().ajax.url('/fcl/report/dataCont?filter=' + filterBy + '&start_date=' + startDate + '&end_date=' + endDate + '&noplp=' + noPlp + '&nobc_11=' + noBc11).load();
                 
@@ -157,6 +167,34 @@
             }
         });
     })
+</script>
+
+<script>
+    $(document).on('click', '.formatStandar', function(){
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Apakah anda yakin menerapkan filter ini?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, update it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.showLoading();
+                let filterBy = $('#filter').val();
+                let startDate = $('#start_date').val();
+                let endDate = $('#end_date').val();
+                let noPlp = $('#noplp').val();
+                let noBc11 = $('#nobc_11').val();
+
+                // Redirect user to download link
+                let url = `/fcl/report/formatStandar?filter=${filterBy}&start_date=${startDate}&end_date=${endDate}&noplp=${noPlp}&nobc_11=${noBc11}`;
+                window.location.href = url;
+                Swal.close();
+            }
+        });
+    });
 </script>
 
 <script>

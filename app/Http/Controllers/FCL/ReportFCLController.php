@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Auth;
+use Maatwebsite\Excel\Facades\Excel;
+
+use App\Exports\fcl\plpCont;
 
 use DataTables;
 use App\Models\ContainerFCL as Cont;
@@ -179,6 +182,41 @@ class ReportFCLController extends Controller
         $data['photos'] = Photo::where('master_id', $id)->where('type', '=', 'fcl')->get();
         // dd($data['photos']);
         return view('lcl.report.photoCont', $data);
+    }
+
+    public function formatStandar(Request $request)
+    {
+        $conts = Cont::orderBy('joborder_id', 'desc')->get();
+        if ($request->has('filter') && $request->filter) {
+            if ($request->filter == 'Tgl PLP') {
+                $conts = Cont::whereHas('job', function ($query) use ($request) {
+                    $query->whereBetween('ttgl_plp', [$request->start_date, $request->end_date])->orderBy('ttgl_plp', 'asc');
+                });
+            } elseif ($request->filter == 'Tgl Gate In') {
+                $conts = Cont::whereBetween('tglmasuk', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc');
+            } elseif ($request->filter == 'Tgl Gate Out') {
+                $conts = Cont::whereBetween('tglkeluar', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc');
+            } elseif ($request->filter == 'Tgl BC 1.1') {
+                $conts = Cont::whereHas('job', function ($query) use ($request) {
+                    $query->whereBetween('ttgl_bc11', [$request->start_date, $request->end_date])->orderBy('ttgl_bc11', 'asc');
+                });
+            }
+        }
+
+        if ($request->has('noplp') && $request->noplp) {
+            $conts = Cont::whereHas('job', function ($query) use ($request) {
+                $query->where('noplp', 'LIKE', "%{$request->noplp}%");
+            });
+        }
+    
+        if ($request->has('nobc_11') && $request->nobc_11) {
+            $conts = Cont::whereHas('job', function ($query) use ($request) {
+                $query->where('tno_bc11', 'LIKE', "%{$request->nobc_11}%");
+            });
+        }
+
+        $fileName = 'ReportContainer-FULL.xlsx' ;
+        return Excel::download(new plpCont($conts), $fileName);
     }
 
 }
