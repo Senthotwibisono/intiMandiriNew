@@ -7,13 +7,15 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Auth;
 
+use DataTables;
 use App\Models\ContainerFCL as Cont;
+use App\Models\Photo;
 
 class ReportFCLController extends Controller
 {
     public function index()
     {
-        $data['title'] = "Report Container LCL";
+        $data['title'] = "Report Container FCL";
 
         return view('fcl.report.indexCont', $data);
     }
@@ -24,7 +26,7 @@ class ReportFCLController extends Controller
         
         return DataTables::of($cont)
         ->addColumn('detil', function($cont){
-            $herf = '/lcl/report/contPhoto';
+            $herf = '/fcl/report/photoCont';
             return '<a href="javascript:void(0)" onclick="openWindow(\''.$herf.$cont->id.'\')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>';
         })
         ->addColumn('jobordr', function($cont){
@@ -105,4 +107,15 @@ class ReportFCLController extends Controller
         ->rawColumns(['detil'])
         ->make(true);
     }
+
+    public function photoCont($id)
+    {
+        $cont = Cont::where('id', $id)->first();
+        $data['title'] = "Photo Container - " . $cont->nocontainer;
+        $data['item'] = $cont;
+        $data['photos'] = Photo::where('master_id', $id)->where('type', '=', 'fcl')->get();
+        // dd($data['photos']);
+        return view('lcl.report.photoCont', $data);
+    }
+
 }

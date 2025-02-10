@@ -52,6 +52,7 @@ use App\Http\Controllers\pengiriman\CoariCodecoController;
  use App\Http\Controllers\FCL\Realisasi\GateInFCLCotroller;
  use App\Http\Controllers\FCL\Delivery\DeliveryFCLController;
  use App\Http\Controllers\FCL\ContainerDokController;
+ use App\Http\Controllers\FCL\ReportFCLController;
  
  //  Invoice Fcl
  use App\Http\Controllers\invoiceFCL\InvoiceFCLMainController;
@@ -729,6 +730,12 @@ Route::controller(AndroidGateController::class)->group(function(){
             Route::get('/dataTable', 'dataTable');
             Route::post('/dataDok', 'dataDok');
             Route::post('/updateCont', 'updateCont')->name('fcl.containerList.update');
+        });
+
+        Route::prefix('/report')->controller(ReportFCLController::class)->group(function(){
+            Route::get('/index', 'index');
+            Route::get('/dataCont', 'dataCont');
+            Route::get('/photoCont{id?}', 'photoCont');
         });
     });
 

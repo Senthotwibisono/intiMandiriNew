@@ -169,8 +169,8 @@
                     <span>Report</span>
                 </a>
                 <ul class="submenu @if(Request::is('fcl/report/*')) active @endif">
-                    <li class="submenu-item @if(Request::is('fcl/report/cont')) active @endif">
-                        <a href="{{ url('/fcl/report/cont')}}">Container</a>
+                    <li class="submenu-item @if(Request::is('fcl/report/index')) active @endif">
+                        <a href="{{ url('/fcl/report/index')}}">Container</a>
                     </li>
                     <li class="submenu-item @if(Request::is('fcl/report/daily/*')) active @endif">
                         <a href="{{ route('report.lcl.daily')}}">Daily</a>
