@@ -190,27 +190,27 @@ class ReportFCLController extends Controller
         if ($request->has('filter') && $request->filter) {
             if ($request->filter == 'Tgl PLP') {
                 $conts = Cont::whereHas('job', function ($query) use ($request) {
-                    $query->whereBetween('ttgl_plp', [$request->start_date, $request->end_date])->orderBy('ttgl_plp', 'asc');
+                    $query->whereBetween('ttgl_plp', [$request->start_date, $request->end_date])->orderBy('ttgl_plp', 'asc')->get();
                 });
             } elseif ($request->filter == 'Tgl Gate In') {
-                $conts = Cont::whereBetween('tglmasuk', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc');
+                $conts = Cont::whereBetween('tglmasuk', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc')->get();
             } elseif ($request->filter == 'Tgl Gate Out') {
-                $conts = Cont::whereBetween('tglkeluar', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc');
+                $conts = Cont::whereBetween('tglkeluar', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc')->get();
             } elseif ($request->filter == 'Tgl BC 1.1') {
                 $conts = Cont::whereHas('job', function ($query) use ($request) {
-                    $query->whereBetween('ttgl_bc11', [$request->start_date, $request->end_date])->orderBy('ttgl_bc11', 'asc');
+                    $query->whereBetween('ttgl_bc11', [$request->start_date, $request->end_date])->orderBy('ttgl_bc11', 'asc')->get();
                 });
             }
         }
 
         if ($request->has('noplp') && $request->noplp) {
-            $conts = Cont::whereHas('job', function ($query) use ($request) {
+            $conts->whereHas('job', function ($query) use ($request) {
                 $query->where('noplp', 'LIKE', "%{$request->noplp}%");
             });
         }
     
         if ($request->has('nobc_11') && $request->nobc_11) {
-            $conts = Cont::whereHas('job', function ($query) use ($request) {
+            $conts->whereHas('job', function ($query) use ($request) {
                 $query->where('tno_bc11', 'LIKE', "%{$request->nobc_11}%");
             });
         }
