@@ -77,7 +77,7 @@ class CoariCodecoController extends Controller
     {
         $conts = Cont::whereNotNull('tglmasuk')->where('coari_flag', '=', 'N')->get();
         if (!empty($conts)) {
-            \SoapWrapper::add(function ($service) {
+            \SoapWrapper::override(function ($service) {
                 $service
                     ->name('CoarriCodeco_Container')
                     ->wsdl($this->wsdl)
@@ -108,26 +108,30 @@ class CoariCodecoController extends Controller
                     'flag_revisi' => 0,
                     'tgl_revisi' => null,
                     'kd_dok' => '5',
-                    'kd_tps' => $cont->job->PLP->kd_tps ?? null,
+                    'kd_tps' => 'INTI',
                     'nm_angkut' => $cont->job->PLP->nm_angkut ?? $cont->job->Kapal->name ?? null,
                     'no_voy_flight' => $cont->job->PLP->no_voy_flight ?? $cont->job->voy ?? null,
                     'call_sign' => $cont->job->PLP->call_sign ?? $cont->job_callsign ?? null,
                     'tgl_tiba' => $cont->job->PLP->tgl_tiba ?? null,
-                    'kd_gudang' => 'ARN',
+                    'kd_gudang' => '1MUT',
                     'kd_dok_inout' => 3,
                     'no_dok_inout' => $cont->job->PLP->no_plp,
                     'tanggal_dok_inout' => $cont->job->PLP->tgl_plp,
                     'wk_inout' => $wk_in,
                     'no_pol' => $cont->nopol,
                     'bruto' => $cont->weight,
-                    'no_master_bl_awb' => $cont->nobl ?? '',
-                    'tgl_master_bl_awb' => $cont->tgl_bl_awb 
+                    'no_master_bl_awb' => $cont->job->nombl ?? '',
+                    'tgl_master_bl_awb' => $cont->job->tgl_master_bl 
+                       ? Carbon::createFromFormat('Y-m-d', $cont->job->tgl_master_bl)->format('Ymd') 
+                       : null,
+                    'no_bl_awb' => $cont->nobl ?? '',
+                    'tgl_bl_awb' => $cont->tgl_bl_awb 
                        ? Carbon::createFromFormat('Y-m-d', $cont->job->tgl_master_bl)->format('Ymd') 
                        : null,
                     'no_cont' => $cont->nocontainer,
                     'uk_cont' => $cont->size,
                     'no_segel' => $cont->seal->code ?? ' ',
-                    'jns_cont' => $cont->type,
+                    'jns_cont' => 'F',
                     'no_bc11' => $cont->job->tno_bc11 ?? '',
                     'tgl_bc11' => $cont->job->ttgl_bc11 
                         ? Carbon::createFromFormat('Y-m-d', $cont->job->ttgl_bc11)->format('Ymd') 
@@ -156,8 +160,8 @@ class CoariCodecoController extends Controller
                 $contXml->addChild('UK_CONT', !empty($header['uk_cont']) ? $header['uk_cont'] : '');
                 $contXml->addChild('NO_SEGEL', !empty($header['no_segel']) ? $header['no_segel'] : '');
                 $contXml->addChild('JNS_CONT', !empty($header['jns_cont']) ? $header['jns_cont'] : '');
-                $contXml->addChild('NO_BL_AWB', ($cont->nombl != '') ? $cont->nombl : '');
-                $contXml->addChild('TGL_BL_AWB', ($cont->tgl_master_bl != '') ? $cont->tgl_master_bl : '');
+                $contXml->addChild('NO_BL_AWB', !empty($header['no_bl_awb']) ? $header['no_bl_awb'] : '');
+                $contXml->addChild('TGL_BL_AWB', !empty($header['tgl_bl_awb']) ? $header['tgl_bl_awb'] : '');
                 $contXml->addChild('NO_MASTER_BL_AWB', !empty($header['no_master_bl_awb']) ? $header['no_master_bl_awb'] : '');
                 $contXml->addChild('TGL_MASTER_BL_AWB', !empty($header['tgl_master_bl_awb']) ? $header['tgl_master_bl_awb'] : '');
                 $contXml->addChild('ID_CONSIGNEE', ($cont->id_consignee != 000000000000000) ? $cont->id_consignee : '');
@@ -235,6 +239,8 @@ class CoariCodecoController extends Controller
                     'jns_cont' => $header['jns_cont'],
                     'no_master_bl_awb' => $header['no_master_bl_awb'],
                     'tgl_master_bl_awb' => $header['tgl_master_bl_awb'],
+                    'no_bl_awb' => $header['no_bl_awb'],
+                    'tgl_bl_awb' => $header['tgl_bl_awb'],
                     'bruto' => $cont->weight,
                     'no_bc11' => $cont->job->tno_bc11,
                     'tgl_bc11' => $header['tgl_bc11'],
@@ -256,8 +262,13 @@ class CoariCodecoController extends Controller
                     'jam_entry' => $coariCont->jam_entry,
                 ]);
 
+                if (strpos($response, 'Gagal Insert') !== false) {
+                    $flag = 'N';
+                }else {
+                    $flag = 'Y';
+                }
                 $cont->update([
-                    'coari_flag' => 'Y',
+                    'coari_flag' => $flag,
                 ]);
             }
         }
@@ -267,7 +278,7 @@ class CoariCodecoController extends Controller
     {
         $conts = ContF::whereNotNull('tglmasuk')->where('coari_flag', '=', 'N')->get();
         if (!empty($conts)) {
-            \SoapWrapper::add(function ($service) {
+            \SoapWrapper::override(function ($service) {
                 $service
                     ->name('CoarriCodeco_Container')
                     ->wsdl($this->wsdl)
@@ -298,26 +309,30 @@ class CoariCodecoController extends Controller
                     'flag_revisi' => 0,
                     'tgl_revisi' => null,
                     'kd_dok' => '5',
-                    'kd_tps' => $cont->job->PLP->kd_tps ?? null,
+                    'kd_tps' => 'INTI',
                     'nm_angkut' => $cont->job->PLP->nm_angkut ?? $cont->job->Kapal->name ?? null,
                     'no_voy_flight' => $cont->job->PLP->no_voy_flight ?? $cont->job->voy ?? null,
                     'call_sign' => $cont->job->PLP->call_sign ?? $cont->job_callsign ?? null,
                     'tgl_tiba' => $cont->job->PLP->tgl_tiba ?? null,
-                    'kd_gudang' => 'ARN',
+                    'kd_gudang' => '1MUT',
                     'kd_dok_inout' => 3,
                     'no_dok_inout' => $cont->job->PLP->no_plp,
                     'tanggal_dok_inout' => $cont->job->PLP->tgl_plp,
                     'wk_inout' => $wk_in,
                     'no_pol' => $cont->nopol,
                     'bruto' => $cont->weight,
-                    'no_master_bl_awb' => $cont->nobl,
-                    'tgl_master_bl_awb' => $cont->tgl_bl_awb 
-                       ? Carbon::createFromFormat('Y-m-d H:i:s', $cont->job->tgl_master_bl)->format('Ymd') 
+                    'no_master_bl_awb' => $cont->job->nombl ?? '',
+                    'tgl_master_bl_awb' => $cont->job->tgl_master_bl 
+                       ? Carbon::createFromFormat('Y-m-d', $cont->job->tgl_master_bl)->format('Ymd') 
+                       : null,
+                    'no_bl_awb' => $cont->nobl ?? '',
+                    'tgl_bl_awb' => $cont->tgl_bl_awb 
+                       ? Carbon::createFromFormat('Y-m-d', $cont->job->tgl_master_bl)->format('Ymd') 
                        : null,
                     'no_cont' => $cont->nocontainer,
                     'uk_cont' => $cont->size,
                     'no_segel' => $cont->seal->code ?? ' ',
-                    'jns_cont' => $cont->type,
+                    'jns_cont' => 'F',
                     'no_bc11' => $cont->job->tno_bc11 ?? '',
                     'tgl_bc11' => $cont->job->ttgl_bc11 
                         ? Carbon::createFromFormat('Y-m-d', $cont->job->ttgl_bc11)->format('Ymd') 
@@ -346,8 +361,8 @@ class CoariCodecoController extends Controller
                 $contXml->addChild('UK_CONT', !empty($header['uk_cont']) ? $header['uk_cont'] : '');
                 $contXml->addChild('NO_SEGEL', !empty($header['no_segel']) ? $header['no_segel'] : '');
                 $contXml->addChild('JNS_CONT', !empty($header['jns_cont']) ? $header['jns_cont'] : '');
-                $contXml->addChild('NO_BL_AWB', ($cont->nombl != '') ? $cont->nombl : '');
-                $contXml->addChild('TGL_BL_AWB', ($cont->tgl_master_bl != '') ? $cont->tgl_master_bl : '');
+                $contXml->addChild('NO_BL_AWB', !empty($header['no_bl_awb']) ? $header['no_bl_awb'] : '');
+                $contXml->addChild('TGL_BL_AWB', !empty($header['tgl_bl_awb']) ? $header['tgl_bl_awb'] : '');
                 $contXml->addChild('NO_MASTER_BL_AWB', !empty($header['no_master_bl_awb']) ? $header['no_master_bl_awb'] : '');
                 $contXml->addChild('TGL_MASTER_BL_AWB', !empty($header['tgl_master_bl_awb']) ? $header['tgl_master_bl_awb'] : '');
                 $contXml->addChild('ID_CONSIGNEE', ($cont->id_consignee != 000000000000000) ? $cont->id_consignee : '');
@@ -425,6 +440,8 @@ class CoariCodecoController extends Controller
                     'jns_cont' => $header['jns_cont'],
                     'no_master_bl_awb' => $header['no_master_bl_awb'],
                     'tgl_master_bl_awb' => $header['tgl_master_bl_awb'],
+                    'no_bl_awb' => $header['no_bl_awb'],
+                    'tgl_bl_awb' => $header['tgl_bl_awb'],
                     'bruto' => $cont->weight,
                     'no_bc11' => $cont->job->tno_bc11,
                     'tgl_bc11' => $header['tgl_bc11'],
@@ -446,8 +463,13 @@ class CoariCodecoController extends Controller
                     'jam_entry' => $coariCont->jam_entry,
                 ]);
 
+                if (strpos($response, 'Gagal Insert') !== false) {
+                    $flag = 'N';
+                }else {
+                    $flag = 'Y';
+                }
                 $cont->update([
-                    'coari_flag' => 'Y',
+                    'coari_flag' => $flag,
                 ]);
             }
         }
@@ -465,7 +487,7 @@ class CoariCodecoController extends Controller
         $contIds = $mansifestMaster->unique('container_id')->pluck('container_id');
 
         if ($contIds->isEmpty()) {
-            \SoapWrapper::add(function ($service) {
+            \SoapWrapper::override(function ($service) {
                 $service
                     ->name('CoarriCodeco_Kemasan')
                     ->wsdl($this->wsdl)
@@ -498,12 +520,12 @@ class CoariCodecoController extends Controller
                 'flag_revisi' => 0,
                 'tgl_revisi' => null,
                 'kd_dok' => '5',
-                'kd_tps' => $cont->job->PLP->kd_tps ?? null,
+                'kd_tps' => 'INTI',
                 'nm_angkut' => $cont->job->PLP->nm_angkut ?? $cont->job->Kapal->name ?? null,
                 'no_voy_flight' => $cont->job->PLP->no_voy_flight ?? $cont->job->voy ?? null,
                 'call_sign' => $cont->job->PLP->call_sign ?? $cont->job_callsign ?? null,
                 'tgl_tiba' => $cont->job->PLP->tgl_tiba ?? null,
-                'kd_gudang' => 'ARN',
+                'kd_gudang' => '1MUT',
                 'kd_dok_inout' => 3,
                 'no_dok_inout' => $cont->job->PLP->no_plp,
                 'tanggal_dok_inout' => $cont->job->PLP->tgl_plp,
@@ -517,7 +539,7 @@ class CoariCodecoController extends Controller
                 'no_cont' => $cont->nocontainer,
                 'uk_cont' => $cont->size,
                 'no_segel' => $cont->seal->code ?? ' ',
-                'jns_cont' => $cont->type,
+                'jns_cont' => 'F',
                 'no_bc11' => $cont->job->tno_bc11 ?? '',
                 'tgl_bc11' => $cont->job->ttgl_bc11 
                     ? Carbon::createFromFormat('Y-m-d', $cont->job->ttgl_bc11)->format('Ymd') 
@@ -664,9 +686,9 @@ class CoariCodecoController extends Controller
 
     public function CodecoCont()
     {
-        $conts = Cont::whereNotNull('tglkeluar')->where('coari_flag', '=', 'Y')-where('codeco_flag', '=', 'N')->get();
+        $conts = Cont::whereNotNull('tglkeluar')->where('coari_flag', '=', 'Y')->where('codeco_flag', '=', 'N')->get();
         if (!empty($conts)) {
-            \SoapWrapper::add(function ($service) {
+            \SoapWrapper::override(function ($service) {
                 $service
                     ->name('CoarriCodeco_Container')
                     ->wsdl($this->wsdl)
@@ -698,26 +720,30 @@ class CoariCodecoController extends Controller
                     'flag_revisi' => 0,
                     'tgl_revisi' => null,
                     'kd_dok' => '6',
-                    'kd_tps' => $cont->job->PLP->kd_tps ?? null,
+                    'kd_tps' => 'INTI',
                     'nm_angkut' => $cont->job->PLP->nm_angkut ?? $cont->job->Kapal->name ?? null,
                     'no_voy_flight' => $cont->job->PLP->no_voy_flight ?? $cont->job->voy ?? null,
                     'call_sign' => $cont->job->PLP->call_sign ?? $cont->job_callsign ?? null,
                     'tgl_tiba' => $cont->job->PLP->tgl_tiba ?? null,
-                    'kd_gudang' => 'ARN',
+                    'kd_gudang' => '1MUT',
                     'kd_dok_inout' => 3,
                     'no_dok_inout' => $cont->job->PLP->no_plp,
                     'tanggal_dok_inout' => $cont->job->PLP->tgl_plp,
                     'wk_inout' => $wk_in,
                     'no_pol' => $cont->nopol,
                     'bruto' => $cont->weight,
-                    'no_master_bl_awb' => $cont->nobl,
-                    'tgl_master_bl_awb' => $cont->tgl_bl_awb 
+                    'no_master_bl_awb' => $cont->job->nombl ?? '',
+                    'tgl_master_bl_awb' => $cont->job->tgl_master_bl 
+                       ? Carbon::createFromFormat('Y-m-d', $cont->job->tgl_master_bl)->format('Ymd') 
+                       : null,
+                    'no_bl_awb' => $cont->nobl ?? '',
+                    'tgl_bl_awb' => $cont->tgl_bl_awb 
                        ? Carbon::createFromFormat('Y-m-d', $cont->job->tgl_master_bl)->format('Ymd') 
                        : null,
                     'no_cont' => $cont->nocontainer,
                     'uk_cont' => $cont->size,
                     'no_segel' => $cont->seal->code ?? ' ',
-                    'jns_cont' => $cont->type,
+                    'jns_cont' => 'F',
                     'no_bc11' => $cont->job->tno_bc11 ?? '',
                     'tgl_bc11' => $cont->job->ttgl_bc11 
                         ? Carbon::createFromFormat('Y-m-d', $cont->job->ttgl_bc11)->format('Ymd') 
@@ -746,8 +772,8 @@ class CoariCodecoController extends Controller
                 $contXml->addChild('UK_CONT', !empty($header['uk_cont']) ? $header['uk_cont'] : '');
                 $contXml->addChild('NO_SEGEL', !empty($header['no_segel']) ? $header['no_segel'] : '');
                 $contXml->addChild('JNS_CONT', !empty($header['jns_cont']) ? $header['jns_cont'] : '');
-                $contXml->addChild('NO_BL_AWB', ($cont->nombl != '') ? $cont->nombl : '');
-                $contXml->addChild('TGL_BL_AWB', ($cont->tgl_master_bl != '') ? $cont->tgl_master_bl : '');
+                $contXml->addChild('NO_BL_AWB', !empty($header['no_bl_awb']) ? $header['no_bl_awb'] : '');
+                $contXml->addChild('TGL_BL_AWB', !empty($header['tgl_bl_awb']) ? $header['tgl_bl_awb'] : '');
                 $contXml->addChild('NO_MASTER_BL_AWB', !empty($header['no_master_bl_awb']) ? $header['no_master_bl_awb'] : '');
                 $contXml->addChild('TGL_MASTER_BL_AWB', !empty($header['tgl_master_bl_awb']) ? $header['tgl_master_bl_awb'] : '');
                 $contXml->addChild('ID_CONSIGNEE', ($cont->id_consignee != 000000000000000) ? $cont->id_consignee : '');
@@ -825,8 +851,10 @@ class CoariCodecoController extends Controller
                     'uk_cont' => $header['uk_cont'],
                     'no_segel' =>$header['no_segel'],
                     'jns_cont' => $header['jns_cont'],
-                    'no_master_bl_awb' => $header['no_master_bl_awb'],
-                    'tgl_master_bl_awb' => $header['tgl_master_bl_awb'],
+                     'no_bl_awb' => $header['no_bl_awb'],
+                    'tgl_bl_awb' => $header['tgl_bl_awb'],
+                    'no_bl_awb' => $header['no_bl_awb'],
+                    'tgl_bl_awb' => $header['tgl_bl_awb'],
                     'bruto' => $cont->weight,
                     'no_bc11' => $cont->job->tno_bc11,
                     'tgl_bc11' => $header['tgl_bc11'],
@@ -848,8 +876,13 @@ class CoariCodecoController extends Controller
                     'jam_entry' => $codecoCont->jam_entry,
                 ]);
 
+                if (strpos($response, 'Gagal Insert') !== false) {
+                    $flag = 'N';
+                }else {
+                    $flag = 'Y';
+                }
                 $cont->update([
-                    'codeco_flag' => 'Y',
+                    'coari_flag' => $flag,
                 ]);
             }
         }
@@ -857,9 +890,9 @@ class CoariCodecoController extends Controller
 
     public function CodecoContFCL()
     {
-        $conts = ContF::whereNotNull('tglkeluar')->where('coari_flag', '=', 'Y')-where('codeco_flag', '=', 'N')->get();
+        $conts = ContF::whereNotNull('tglkeluar')->where('coari_flag', '=', 'Y')->where('codeco_flag', '=', 'N')->get();
         if (!empty($conts)) {
-            \SoapWrapper::add(function ($service) {
+            \SoapWrapper::override(function ($service) {
                 $service
                     ->name('CoarriCodeco_Container')
                     ->wsdl($this->wsdl)
@@ -891,26 +924,30 @@ class CoariCodecoController extends Controller
                     'flag_revisi' => 0,
                     'tgl_revisi' => null,
                     'kd_dok' => '6',
-                    'kd_tps' => $cont->job->PLP->kd_tps ?? null,
+                    'kd_tps' => 'INTI',
                     'nm_angkut' => $cont->job->PLP->nm_angkut ?? $cont->job->Kapal->name ?? null,
                     'no_voy_flight' => $cont->job->PLP->no_voy_flight ?? $cont->job->voy ?? null,
                     'call_sign' => $cont->job->PLP->call_sign ?? $cont->job_callsign ?? null,
                     'tgl_tiba' => $cont->job->PLP->tgl_tiba ?? null,
-                    'kd_gudang' => 'ARN',
+                    'kd_gudang' => '1MUT',
                     'kd_dok_inout' => 3,
                     'no_dok_inout' => $cont->job->PLP->no_plp,
                     'tanggal_dok_inout' => $cont->job->PLP->tgl_plp,
                     'wk_inout' => $wk_in,
                     'no_pol' => $cont->nopol,
                     'bruto' => $cont->weight,
-                    'no_master_bl_awb' => $cont->nobl,
-                    'tgl_master_bl_awb' => $cont->tgl_bl_awb 
+                    'no_master_bl_awb' => $cont->job->nombl ?? '',
+                    'tgl_master_bl_awb' => $cont->job->tgl_master_bl 
+                       ? Carbon::createFromFormat('Y-m-d', $cont->job->tgl_master_bl)->format('Ymd') 
+                       : null,
+                    'no_bl_awb' => $cont->nobl ?? '',
+                    'tgl_bl_awb' => $cont->tgl_bl_awb 
                        ? Carbon::createFromFormat('Y-m-d', $cont->job->tgl_master_bl)->format('Ymd') 
                        : null,
                     'no_cont' => $cont->nocontainer,
                     'uk_cont' => $cont->size,
                     'no_segel' => $cont->seal->code ?? ' ',
-                    'jns_cont' => $cont->type,
+                    'jns_cont' => 'F',
                     'no_bc11' => $cont->job->tno_bc11 ?? '',
                     'tgl_bc11' => $cont->job->ttgl_bc11 
                         ? Carbon::createFromFormat('Y-m-d', $cont->job->ttgl_bc11)->format('Ymd') 
@@ -939,8 +976,8 @@ class CoariCodecoController extends Controller
                 $contXml->addChild('UK_CONT', !empty($header['uk_cont']) ? $header['uk_cont'] : '');
                 $contXml->addChild('NO_SEGEL', !empty($header['no_segel']) ? $header['no_segel'] : '');
                 $contXml->addChild('JNS_CONT', !empty($header['jns_cont']) ? $header['jns_cont'] : '');
-                $contXml->addChild('NO_BL_AWB', ($cont->nombl != '') ? $cont->nombl : '');
-                $contXml->addChild('TGL_BL_AWB', ($cont->tgl_master_bl != '') ? $cont->tgl_master_bl : '');
+                $contXml->addChild('NO_BL_AWB', !empty($header['no_bl_awb']) ? $header['no_bl_awb'] : '');
+                $contXml->addChild('TGL_BL_AWB', !empty($header['tgl_bl_awb']) ? $header['tgl_bl_awb'] : '');
                 $contXml->addChild('NO_MASTER_BL_AWB', !empty($header['no_master_bl_awb']) ? $header['no_master_bl_awb'] : '');
                 $contXml->addChild('TGL_MASTER_BL_AWB', !empty($header['tgl_master_bl_awb']) ? $header['tgl_master_bl_awb'] : '');
                 $contXml->addChild('ID_CONSIGNEE', ($cont->id_consignee != 000000000000000) ? $cont->id_consignee : '');
@@ -1018,8 +1055,10 @@ class CoariCodecoController extends Controller
                     'uk_cont' => $header['uk_cont'],
                     'no_segel' =>$header['no_segel'],
                     'jns_cont' => $header['jns_cont'],
-                    'no_master_bl_awb' => $header['no_master_bl_awb'],
-                    'tgl_master_bl_awb' => $header['tgl_master_bl_awb'],
+                     'no_bl_awb' => $header['no_bl_awb'],
+                    'tgl_bl_awb' => $header['tgl_bl_awb'],
+                    'no_bl_awb' => $header['no_bl_awb'],
+                    'tgl_bl_awb' => $header['tgl_bl_awb'],
                     'bruto' => $cont->weight,
                     'no_bc11' => $cont->job->tno_bc11,
                     'tgl_bc11' => $header['tgl_bc11'],
@@ -1041,8 +1080,13 @@ class CoariCodecoController extends Controller
                     'jam_entry' => $codecoCont->jam_entry,
                 ]);
 
+                if (strpos($response, 'Gagal Insert') !== false) {
+                    $flag = 'N';
+                }else {
+                    $flag = 'Y';
+                }
                 $cont->update([
-                    'codeco_flag' => 'Y',
+                    'coari_flag' => $flag,
                 ]);
             }
         }
@@ -1060,7 +1104,7 @@ class CoariCodecoController extends Controller
         $contIds = $mansifestMaster->unique('container_id')->pluck('container_id');
 
         if ($contIds->isEmpty()) {
-            \SoapWrapper::add(function ($service) {
+            \SoapWrapper::override(function ($service) {
                 $service
                     ->name('CoarriCodeco_Kemasan')
                     ->wsdl($this->wsdl)
@@ -1092,12 +1136,12 @@ class CoariCodecoController extends Controller
                 'flag_revisi' => 0,
                 'tgl_revisi' => null,
                 'kd_dok' => '6',
-                'kd_tps' => $cont->job->PLP->kd_tps ?? null,
+                'kd_tps' => 'INTI',
                 'nm_angkut' => $cont->job->PLP->nm_angkut ?? $cont->job->Kapal->name ?? null,
                 'no_voy_flight' => $cont->job->PLP->no_voy_flight ?? $cont->job->voy ?? null,
                 'call_sign' => $cont->job->PLP->call_sign ?? $cont->job_callsign ?? null,
                 'tgl_tiba' => $cont->job->PLP->tgl_tiba ?? null,
-                'kd_gudang' => 'ARN',
+                'kd_gudang' => '1MUT',
                 'no_master_bl_awb' => $cont->job->nombl,
                 'tgl_master_bl_awb' => $cont->job->tgl_master_bl 
                    ? Carbon::createFromFormat('Y-m-d', $cont->job->tgl_master_bl)->format('Ymd') 
@@ -1105,7 +1149,7 @@ class CoariCodecoController extends Controller
                 'no_cont' => $cont->nocontainer,
                 'uk_cont' => $cont->size,
                 'no_segel' => $cont->seal->code ?? ' ',
-                'jns_cont' => $cont->type,
+                'jns_cont' => 'F',
                 'no_bc11' => $cont->job->tno_bc11 ?? '',
                 'tgl_bc11' => $cont->job->ttgl_bc11 
                     ? Carbon::createFromFormat('Y-m-d', $cont->job->ttgl_bc11)->format('Ymd') 
