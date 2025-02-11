@@ -234,6 +234,8 @@ class GateInFCLCotroller extends Controller
             ]
         ];
         
+        var_dump(json_encode($data));
+
     
         try {
             // Mengirim permintaan ke API eksternal menggunakan Guzzle
@@ -244,6 +246,8 @@ class GateInFCLCotroller extends Controller
                 ],
                 'json' => $data, // Mengirim data dalam format JSON
             ]);
+
+            var_dump($response);
         
             if ($response->getStatusCode() == 200) {
                 $responseData = json_decode($response->getBody(), true);

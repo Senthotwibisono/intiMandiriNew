@@ -2348,7 +2348,7 @@ class DokumenController extends Controller
                                 $alasanSize = null;
                             }
     
-                            $alasanFinal = 'Bukan Dokumen SPPB. ' . $alasanFinal;
+                            $alasanFinal = 'Bukan Dokumen SPPB. ' . $alasanSize;
                             $cust = Customer::where('name', $pabean->nm_imp)->first();
                             $newCust = null;
                             if (!$cust && $pabean->nama_imp != null) {
@@ -2366,7 +2366,7 @@ class DokumenController extends Controller
                                 'alasan_hold' => $alasanFinal,
                                 'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
                                 'nobl' => $pabean->no_bl_awb,
-                                'tgl_bl_awb' => $pabean->tgl_bl_awb ? Carbon::createFromFormat('m/d/Y', $pabean->tgl_bl_awb)->format('Y-m-d H:i:s') : null,
+                                
                             ]);
                         }
                     }
@@ -2489,7 +2489,7 @@ class DokumenController extends Controller
                                 $alasanSize = null;
                             }
     
-                            $alasanFinal = 'Bukan Dokumen SPPB. ' . $alasanFinal;
+                            $alasanFinal = 'Bukan Dokumen SPPB. ' . $alasanSize;
                             $cust = Customer::where('name', $pabean->nm_imp)->first();
                             $newCust = null;
                             if (!$cust && $pabean->nama_imp != null) {
