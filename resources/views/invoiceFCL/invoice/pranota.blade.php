@@ -321,19 +321,44 @@ body {
                         5. Untuk permintaan faktur pajak dapat email ke tps@intimandiri.com
                     </div>
                     <div class="col-6 text-right">
-                        <div class="text-center">
-                            Jakarta, {{Carbon\Carbon::parse($header->created_at)->format('Y-m-d')}} 
-                            <br>
-                            <br>
-                            <br>
-                            <br>
-                            <br>
-                            <br>
-                            <br>
-                            <span style="text-decoration: underline;">{{ $header->userCreate->name }}</span>
-                            <br>
-                            Kasir
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="text-center">
+                                    Jakarta, {{Carbon\Carbon::parse($header->created_at)->format('Y-m-d')}} 
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <span style="text-decoration: underline;">{{ $header->userCreate->name }}</span>
+                                    <br>
+                                    Kasir
+                                </div>
+                            </div>
+                            @if($header->grand_total >= 5000000)
+                            <div class="col-6">
+                                <div class="text-center">
+                                        -
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <span style="text-decoration: underline;">Materai</span>
+                                    <br>
+                                </div>
+                            </div>
+                            @endif
                         </div>
+                    </div>
+                </div>
+                <div class="divider divider-left">
+                    <div class="divider-text">
+                        JL bugis no.15 kebon bawang, jakarta utara T.J Priok
                     </div>
                 </div>
             </div>
