@@ -42,6 +42,7 @@ class InvoiceHeader extends Model
         'lunas_at',
         'created_at',
         'kapal_voy',
+        'type',
     ];
 
     public function Cust()

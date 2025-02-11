@@ -776,8 +776,27 @@ Route::controller(AndroidGateController::class)->group(function(){
 
                 // Cancel Form
                 Route::post('/cancelForm/{id?}', 'cancelForm');
+
+                // Perpanjangan
+                Route::prefix('/extend')->group(function(){
+                    Route::get('/index', 'indexPerpanjangan');
+                    Route::get('/dataTable', 'dataTablePerpanjangan');
+                    Route::get('/createIndex/Step1', 'indexStep1Perpanjangan');
+                    Route::get('/createEdit/Step1/{id?}', 'editStep1Perpanjangan');
+                    Route::get('/getBLAWB', 'getBLAWBPerpanjangan');
+                    Route::get('/getBLData', 'getBLDataPerpanjangan');
+                    Route::post('/step1Post', 'postStep1Perpanjangan');
+                    Route::post('/step1Update', 'updateStep1Perpanjangan');
+                    // Step 2
+                    Route::get('/indexStep2/{id?}', 'indexStep2Perpanjangan');
+                    Route::post('/postStep2', 'postStep2Perpanjangan')->name('invoice.lcl.postStep2');
+                    
+                    // Cancel Form
+                    Route::post('/cancelForm/{id?}', 'cancelForm');
+                });
             });
         });
+
         Route::prefix('/invoice')->group(function(){
             Route::get('/index', [InvoiceFCLMainController::class, 'invoiceIndex']);
             Route::controller(BackendInvoiceController::class)->group(function(){

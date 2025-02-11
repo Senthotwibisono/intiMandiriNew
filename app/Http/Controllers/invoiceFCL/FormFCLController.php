@@ -643,6 +643,308 @@ class FormFCLController extends Controller
         
     }
 
+
+    public function indexPerpanjangan()
+    {
+        $data['title'] = 'Form Invoice - FCL (Perpanjangan)';
+
+        return view('invoiceFCL.formPerpanjangan.index', $data);
+    }
+
+    public function dataTablePerpanjangan(Request $request)
+    {
+        $form = Form::where('type', 'EXTEND')->whereNot('status', 'Y')->get();
+        return DataTables::of($form)
+        ->addColumn('action', function($form){
+            return '<a href="/invoiceFCL/form/extend/createEdit/Step1/'.$form->id.'" class="btn btn-warning"><i class="fa fa-pencil"></i></a>';
+        })
+        ->rawColumns(['action'])
+        ->make(true);
+    }
+
+    public function indexStep1Perpanjangan()
+    {
+        $data['title'] = 'Create Invoice FCL (Perpanjangan) - Step 1';
+        $data['customers'] = Customer::get();
+
+        return view('invoiceFCL.formPerpanjangan.step1', $data);
+    }
+
+    public function editStep1Perpanjangan($id)
+    {
+        $data['title'] = 'Create Invoice FCL (Perpanjangan)- Step 1';
+        $data['customers'] = Customer::get();
+
+        $data['form'] = Form::find($id);
+        $data['containerInvoice'] = FormC::where('form_id', $id)->get();
+
+        // dd($data);
+
+        return view('invoiceFCL.formPerpanjangan.step1Edit', $data);
+    }
+
+    public function getBLAWBPerpanjangan(Request $request)
+    {
+        $search = $request->search;
+        $page = $request->page;
+        $perPage = 10; // Jumlah item per halaman
+
+        $query = Header::where('status', 'Y');
+
+        if ($search) {
+            $query->where('nobl', 'like', "%{$search}%");
+        }
+
+        $cont = $query->paginate(10);
+
+        return response()->json([
+            'data' => $cont->items(),
+            'more' => $cont->hasMorePages(),
+        ]);
+    }
+
+    public function getBLDataPerpanjangan(Request $request)
+    {
+        try {
+            $header = Header::find($request->id);
+            $contInvoice = FormC::where('form_id', $header->form_id)->pluck('container_id')->toArray();
+            // var_dump($contInvoice);
+            $cont = ContF::whereIn('id', $contInvoice)->whereNull('tglkeluar')->get();
+            if ($cont->isEmpty()) {
+                return response()->json([
+                    'success'=> false,
+                    'message'=> 'Tidak ada container yang dapat dipilih !!',
+                ]);
+            }
+            $dateBL = $header->nobl;
+           
+            $customer = Customer::find($header->cust_id);
+
+            // var_dump($customer);
+            // die();
+            
+            return response()->json([
+                'success' => true,
+                'data' => $dateBL,
+                'containers' => $cont, // Kirim daftar container ke frontend
+                'customer' => $customer,
+                'dataHeader' => $header,
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success'=> false,
+                'message'=> $th->getMessage(),
+            ]);
+        }
+    }
+
+    public function postStep1Perpanjangan(Request $request)
+    {
+        try {
+
+            if ($request->etd <= $request->eta) {
+                return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Tanggal Rencana Keluar Harus Lebih Besar Dibanding Tanggar Expired Sebelmnya']);
+            }
+            
+            $cont = ContF::whereIn('id', $request->container_id)->get();
+            if ($cont->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Container belum bisa di pilih',
+                ]);
+            }
+
+            $singleCont = ContF::where('id', $request->container_id)->first();
+            // dd($singleCont);
+           
+            $oldHeader = Header::find($request->inv_id);
+            $form = Form::create([
+                'lokasi_sandar_id' => $singleCont->lokasisandar_id,
+                'nobl' =>$singleCont->nobl,
+                'tgl_bl_awb' =>$singleCont->tgl_bl_awb,
+                'cust_id' => $request->cust_id,
+                'eta' => $request->eta,
+                'etd' => $request->etd,
+                'status' => 'N',
+                'uid' => Auth::user()->id,
+                'created_at' => Carbon::now(),
+                'inv_id' => $oldHeader->id,
+                'form_id' => $oldHeader->form_id,
+                'type' => 'EXTEND',
+            ]);
+            
+            foreach ($cont as $ct) {
+
+                if ($ct->tglbehandle != null) {
+                    $statusBehandle = 'Y';
+                }else {
+                    $statusBehandle = 'N';
+                }
+                $containerForm = FormC::create([
+                    'form_id' => $form->id,
+                    'container_id' => $ct->id,
+                    'size' => $ct->size,
+                    'ctr_type' => $ct->ctr_type,
+                    'behandle_yn' => $statusBehandle,
+                    'uid' => Auth::user()->id,
+                    'created_at' => Carbon::now(),
+                    'tglmasuk' => $ct->tglmasuk
+                ]);
+            }
+
+            return redirect('/invoiceFCL/form/extend/indexStep2/'.$form->id)->with('status', ['type'=>'success', 'message' => 'Data Berhasil Disimpan']);
+
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('status', ['type'=>'error', 'message' => 'Something Wrong: '. $th->getMessage()]);
+        }
+    }
+
+    public function indexStep2Perpanjangan($id)
+    {
+        $data['title'] = "Pre-Invoice FCL (Perpanjangan)";
+
+        $data['form'] = Form::find($id);
+
+        $data['containerInvoice'] = FormC::where('form_id', $id)->get();
+        $oldHeader = Header::find($data['form']->inv_id);
+        $oldForm = Form::find($data['form']->form_id);
+
+        // Checking Master Tarif WMS
+        $tarifWMS = TWMS::select('size', 'type')->get()->toArray();
+        $invalidContainers = $data['containerInvoice']->filter(function ($container) use ($tarifWMS) {
+            return !in_array(['size' => $container->size, 'type' => $container->ctr_type], $tarifWMS);
+        });
+
+        if ($invalidContainers->isNotEmpty()) {
+            $invalidContainerNumbers = $invalidContainers->pluck('cont.nocontainer')->implode(', ');
+            return redirect('/invoiceFCL/form/extend/createEdit/Step1/'. $id)->with('status', ['type'=> 'error', 'message' => 'Tidak ada tarif WMS yang cocok untuk container :' . $invalidContainerNumbers]);
+        }
+
+        // Check Tarif TPS
+
+        $container = FormC::where('form_id', $id)->get();
+        $containerSize = $container->pluck('size')->unique()->toArray();
+        $containerType = $container->pluck('ctr_type')->unique()->toArray();
+        $tglMasuk = $container->pluck('tglmasuk')->unique()->toArray();
+       
+        $data['tglMasuk'] = $tglMasuk;
+        $data['tglMasukView'] = $data['form']->eta;
+
+        $wmsPay = TWMS::whereIn('size', $containerSize)->whereIn('type', $containerType)->get();
+        $data['tarifWMS'] = $wmsPay;
+
+        $singleCont = $container->first();
+        $data['singleCont'] = $singleCont;
+
+        $data['jenisContainer'] = $container->pluck('size')->unique()->implode(', ');
+        $data['typeContainer'] = $container->pluck('ctr_type')->unique()->implode(', ');
+
+        $data['size'] = $container->pluck('size')->unique();
+        $data['type'] = $container->pluck('ctr_type')->unique();
+        $data['nocontainer'] = $container->pluck('cont.nocontainer')->implode(', ');
+
+        $data['jumlahHariWMS'] = Carbon::parse($data['form']->eta)->diffInDays(Carbon::parse($data['form']->etd));
+
+        return view('invoiceFCL.formPerpanjangan.step2', $data);
+    }
+
+    public function postStep2Perpanjangan(Request $request)
+    {
+        
+        try {
+            $job = JobF::find($request->job_id);
+            $form = Form::find($request->form_id);
+            $formC = FormC::where('form_id', $request->form_id)->get();
+            $cust = Customer::find($form->cust_id);
+    
+            $grandTotal = $request->grand_total;
+            if ($grandTotal >= 5000000) {
+                $sumGrandTotal = $grandTotal + 10000;
+            }else {
+                $sumGrandTotal = $grandTotal;
+            }
+            $form->update([
+                'status' => 'Y'
+            ]);
+
+            foreach ($formC as $cont) {
+                $tcWMS = TWMS::where('size', $cont->size)->where('type', $cont->ctr_type)->first();
+                if ($tcWMS) {
+                    $cont->update([
+                        'tarif_wms_id' => $tcWMS->id
+                    ]);
+                }
+            }
+
+            $header = Header::create([
+                'proforma_no' => $this->getNextOrderNo(),
+                'kd_tps_asal' => $request->kd_tps_asal,
+                'form_id' => $form->id,
+                'job_id' => $job->id,
+                'nobl' => $form->nobl,
+                'tgl_bl_awb' => $form->tgl_bl_awb,
+                'cust_id' => $cust->id,
+                'cust_name' => $cust->name,
+                'cust_alamat' => $cust->alamat,
+                'cust_npwp'  => $cust->npwp,
+                'eta' => $form->eta,
+                'tglmasuk' => $request->tglmasuk,
+                'etd'=> $form->etd,
+                'total_tps' => $request->total_tps,
+                'total_wms' => $request->total_wms,
+                'total' => $request->total,
+                'admin' => $request->admin,
+                'ppn' => $request->ppn,
+                'grand_total' => $sumGrandTotal,
+                'status' => 'N',
+                'uidCreate' => Auth::user()->id,
+                'created_at' => Carbon::now(),
+                'kapal_voy' => $request->kapal_voy,
+                'type' => 'EXTEND',
+            ]);
+    
+            $contFilter = $formC->groupBy(['size', 'ctr_type']);
+            $tglMasuks = $formC->pluck('tglmasuk')->unique()->toArray();
+    
+            foreach ($contFilter as $size => $types) {
+                foreach ($types as $ctr_type => $containers) {
+                    $jumlah = $containers->count();
+                        
+                    // Tarif WMS
+                    $tarifWMS = TWMS::where('size', $size)->where('type', $ctr_type)->first();
+                    // Paket PLP
+
+                        $etd = Carbon::parse($form->etd);
+                        $masuk = Carbon::parse($form->eta);
+                        $jumlahHariWMS = $masuk->diffInDays($etd);
+
+                        $tarifDasarMassa = ($tarifWMS->tarif_dasar_massa * $tarifWMS->massa)/100;
+                        $totalMassaWMS = $tarifDasarMassa*$jumlah * $jumlahHariWMS;
+                            # code...
+                            Detil::create([
+                                'form_id' => $form->id,
+                                'invoice_id' => $header->id,
+                                'tps' => 'Depo',
+                                'keterangan' => 'Penumpukan (' . $size . ' / ' .$ctr_type.' ) Masuk pd ' . $masuk->format('Y-m-d'),
+                                'size' => $size,
+                                'type' => $ctr_type,
+                                'tarif_dasar' => $tarifWMS->tarif_dasar_massa,
+                                'satuan' => '0',
+                                'jumlah' => $jumlah,
+                                'jumlah_hari' => $jumlahHariWMS,
+                                'total' => $totalMassaWMS,
+                            ]);
+                }
+            }
+            
+            return redirect('/invoiceFCL/invoice/index')->with('status', ['type'=> 'success', 'message' => 'Data Berhasil di Simpan']);
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('status', ['type'=> 'error', 'message' => 'Something gone wrong : ' . $th->getMessage()]);
+            //throw $th;
+        }
+        
+    }
+
     private function getNextOrderNo()
     {
         $latestOrder = Header::orderBy('proforma_no', 'desc')->first();

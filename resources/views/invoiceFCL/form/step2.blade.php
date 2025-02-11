@@ -344,7 +344,7 @@
                                         </thead>
                                         @foreach($tglMasuk as $masuk)
                                         @php
-                                        $jumlahContMassaWMS = $containerInvoice->where('tglmasuk', $masuk)->count();
+                                        $jumlahContMassaWMS = $containerInvoice->where('size', $sz)->where('ctr_type', $tp)->where('tglmasuk', $masuk)->count();
     
                                         $masuk = \Carbon\Carbon::parse($masuk);
                                         $keluar = \Carbon\Carbon::parse($form->etd);

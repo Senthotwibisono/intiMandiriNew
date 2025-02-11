@@ -113,7 +113,11 @@ class BackendInvoiceController extends Controller
         $data['terbilang'] = $this->terbilang($data['header']->grand_total);
         // dd($data['terbilang']);
 
-        return view('invoiceFCL.invoice.pranota', $data);
+        if ($data['header']->type == 'EXTEND') {
+            return view('invoiceFCL.invoice.pranotaExtend', $data);
+        }else {
+            return view('invoiceFCL.invoice.pranota', $data);
+        }
     }
 
     public function Invoice($id)
@@ -149,33 +153,46 @@ class BackendInvoiceController extends Controller
 
         $data['terbilang'] = $this->terbilang($data['header']->grand_total);
         // dd($data['terbilang']);
-
-        return view('invoiceFCL.invoice.invoice', $data);
+        if ($data['header']->type == 'EXTEND') {
+            return view('invoiceFCL.invoice.invoiceExtend', $data);
+        }else {
+            return view('invoiceFCL.invoice.invoice', $data);
+        }
+        
     }
 
     public function paidInvoice(Request $request)
     {
-        $year = Carbon::now()->format('y'); // '24' for 2024
-        // Get the last inserted sequential number from the Header table
-        $lastInvoice = Header::whereYear('created_at', Carbon::now()->year)->whereNotNull('invoice_no')
+        $year = Carbon::now()->format('y'); // Misalnya '24' untuk tahun 2024
+
+        // Cari invoice terakhir di tahun yang sama
+        $lastInvoice = Header::whereYear('created_at', Carbon::now()->year)
+                             ->whereNotNull('invoice_no')
                              ->orderBy('invoice_no', 'desc')
                              ->first();
-                             if ($lastInvoice) {
-                                // Remove '-P' if it exists at the end of the invoice number
-                                $invoiceNumber = rtrim($lastInvoice->invoice_no, ' -P');
-                                
-                                // Extract the numeric part from the invoice number
-                                if (preg_match('/(\d+)$/', $invoiceNumber, $matches)) {
-                                    $lastSequence = (int)$matches[0]; // Extract the numeric part
-                                } else {
-                                    $lastSequence = 0; // If no valid sequence is found, start from 0
-                                }
-                            } else {
-                                $lastSequence = 0; // If no previous invoice, start from 0
-                            }
-    
-        // dd($lastInvoice,$lastSequence);
-        // Increment the sequence and format as a 6-digit number
+        
+        if ($lastInvoice) {
+            // Hapus "-P" di akhir invoice_no jika ada
+            $invoiceNumber = preg_replace('/-P$/', '', $lastInvoice->invoice_no);
+        
+            // Ambil angka terakhir dari invoice_number
+            if (preg_match('/(\d+)$/', $invoiceNumber, $matches)) {
+                $lastSequence = (int) $matches[0];
+            } else {
+                $lastSequence = 0; // Jika tidak ditemukan angka, mulai dari 0
+            }
+        
+            // Cek apakah tahun pada invoice berbeda dengan tahun sekarang
+            $invoiceYear = substr($lastInvoice->invoice_no, 0, 2); // Ambil dua digit pertama (misal '24')
+        
+            if ($invoiceYear != $year) {
+                $lastSequence = 0; // Reset jika tahun berbeda
+            }
+        } else {
+            $lastSequence = 0; // Jika tidak ada invoice sebelumnya, mulai dari 0
+        }
+        
+        // Tambahkan 1 dan format menjadi 6 digit
         $newSequence = str_pad($lastSequence + 1, 6, '0', STR_PAD_LEFT);
     
         // Construct the new invoice number

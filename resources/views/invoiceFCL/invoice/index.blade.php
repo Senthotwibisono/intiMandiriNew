@@ -15,6 +15,7 @@
                         <tr>
                             <th>Proforma No</th>
                             <th>Invoice No</th>
+                            <th>Tipe Invoice</th>
                             <th>Customer Name</th>
                             <th>Customer NPWP</th>
                             <th>No BL AWB</th>
@@ -171,6 +172,7 @@
             columns:[
                 {data:'proforma_no', name:'proforma_no'},
                 {data:'invoiceNo', name:'invoiceNo'},
+                {data:'type', name:'type'},
                 {data:'cust_name', name:'cust_name'},
                 {data:'cust_npwp', name:'cust_npwp'},
                 {data:'nobl', name:'nobl'},

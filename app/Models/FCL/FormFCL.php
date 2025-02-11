@@ -26,6 +26,9 @@ class FormFCL extends Model
         'status',
         'uid',
         'created_at',
+        'type',
+        'inv_id',
+        'form_id',
     ];
 
     public function LokasiSandar()
@@ -41,5 +44,19 @@ class FormFCL extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'uid', 'id');
+    }
+
+    public function oldInvoice()
+    {
+        if ($this->type == 'EXTEND') {
+            return $this->belongsTo(InvoiceHeader::class, 'inv_id', 'id');
+        }
+    }
+
+    public function oldForm()
+    {
+        if ($this->type == 'EXTEND') {
+            return $this->belongsTo(FormFCL::class, 'form_id', 'id');
+        }
     }
 }

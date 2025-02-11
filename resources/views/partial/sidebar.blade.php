@@ -371,6 +371,9 @@
                     <li class="submenu-item @if(Request::is('invoiceFCL/form/index')) active @endif">
                         <a href="{{ url('/invoiceFCL/form/index')}}">Form Index</a>
                     </li>
+                    <li class="submenu-item @if(Request::is('invoiceFCL/form/extend/index')) active @endif">
+                        <a href="{{ url('/invoiceFCL/form/extend/index')}}">Form Perpanjangan</a>
+                    </li>
                 </ul>
             </li>
             <li class="sidebar-item @if(Request::is('invoiceFCL/invoice/index') || Request::is('/invoiceFCL/invoice/index')) active @endif">
