@@ -183,7 +183,7 @@ class BackendInvoiceController extends Controller
             }
         
             // Cek apakah tahun pada invoice berbeda dengan tahun sekarang
-            $invoiceYear = substr($lastInvoice->invoice_no, 0, 2); // Ambil dua digit pertama (misal '24')
+            $invoiceYear = substr($lastInvoice->invoice_no, 8, 2); // Ambil dua digit pertama (misal '24')
         
             if ($invoiceYear != $year) {
                 $lastSequence = 0; // Reset jika tahun berbeda

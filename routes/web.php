@@ -789,7 +789,7 @@ Route::controller(AndroidGateController::class)->group(function(){
                     Route::post('/step1Update', 'updateStep1Perpanjangan');
                     // Step 2
                     Route::get('/indexStep2/{id?}', 'indexStep2Perpanjangan');
-                    Route::post('/postStep2', 'postStep2Perpanjangan')->name('invoice.lcl.postStep2');
+                    Route::post('/postStep2', 'postStep2Perpanjangan');
                     
                     // Cancel Form
                     Route::post('/cancelForm/{id?}', 'cancelForm');
