@@ -217,6 +217,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
+                                            @if($form->type == 'BCF' || $form->type == 'STANDART')
                                             <tr>
                                                 <td>Penumpukkan Massa 1</td>
                                                 <td>0</td>
@@ -264,6 +265,8 @@
                                                     <td>{{number_format($totalPenumpukanMassa3, 0)}}</td>
                                                 </tr>
                                             @endforeach
+                                            @endif
+                                            @if($form->type == 'STANDART' || $form->type == 'TPP')
                                             <tr>
                                                 <td>Lift On</td>
                                                 <td>{{number_format($hargaTPS->lift_on,0)}}</td>
@@ -286,6 +289,7 @@
                                                 @endphp
                                                 <td>{{number_format($totalGatePassTPS, 0)}}</td>
                                             </tr>
+                                            @endif
                                         </tbody>
                                     </table>
                                 </div>
@@ -342,82 +346,88 @@
                                                 <th>Total</th>
                                             </tr>
                                         </thead>
-                                        @foreach($tglMasuk as $masuk)
-                                        @php
-                                        $jumlahContMassaWMS = $containerInvoice->where('size', $sz)->where('ctr_type', $tp)->where('tglmasuk', $masuk)->count();
-    
-                                        $masuk = \Carbon\Carbon::parse($masuk);
-                                        $keluar = \Carbon\Carbon::parse($form->etd);
-    
-                                        $jumlahHariWMSNew = $masuk->diffInDays($keluar) + 1;
-    
-                                        @endphp
-                                        <tbody>
-                                            <tr>
-                                                <td>Penumpukkan (Masuk pd {{$masuk->format('Y-m-d')}})</td>
-                                                <td>{{number_format($tarif->tarif_dasar_massa,0)}} * {{number_format($tarif->massa)}}%</td>
-                                                <td>{{$jumlahContMassaWMS}}</td>
-                                                <td>{{$jumlahHariWMSNew}}</td>
+                                        @if($form->type == 'STANDART' || $form->type == 'BCF')
+                                            @foreach($tglMasuk as $masuk)
                                                 @php
-                                                    $totalPenumpukan = (($tarif->tarif_dasar_massa * $tarif->massa)/100)*$jumlahContMassaWMS*$jumlahHariWMSNew;
-                                                    $totalWMS += $totalPenumpukan;
+                                                $jumlahContMassaWMS = $containerInvoice->where('size', $sz)->where('ctr_type', $tp)->where('tglmasuk', $masuk)->count();
+
+                                                $masuk = \Carbon\Carbon::parse($masuk);
+                                                $keluar = \Carbon\Carbon::parse($form->etd);
+
+                                                $jumlahHariWMSNew = $masuk->diffInDays($keluar) + 1;
+
                                                 @endphp
-                                                <td>{{number_format($totalPenumpukan, 0)}}</td>
-                                            </tr>
-                                        </tbody>
-                                        @endforeach
-                                        <tbody>
-                                            <tr>
-                                                <td>Paket PLP</td>
-                                                <td>{{ number_format($tarif->paket_plp, 0) }}</td>
-                                                <td>{{ $jumlahCont }}</td>
-                                                <td>0</td>
-                                                @php
-                                                    $total = $tarif->paket_plp * $jumlahCont;
-                                                    $totalWMS += $total;
-                                                @endphp
-                                                <td>{{ number_format($total, 0) }}</td>
-                                            </tr>
-                                        </tbody>
-                                        <tbody>
-                                            <tr>
-                                                <td>Lift On</td>
-                                                <td>{{number_format($tarif->lift_on,0)}}</td>
-                                                <td>{{$jumlahCont}}</td>
-                                                <td>0</td>
-                                                @php
-                                                    $totalLiftOn = $tarif->lift_on * $jumlahCont;
-                                                    $totalWMS += $totalLiftOn;
-                                                @endphp
-                                                <td>{{number_format($totalLiftOn, 0)}}</td>
-                                            </tr>
-                                        </tbody>
-                                        <tbody>
-                                            <tr>
-                                                <td>Lift Off</td>
-                                                <td>{{number_format($tarif->lift_off,0)}}</td>
-                                                <td>{{$jumlahCont}}</td>
-                                                <td>0</td>
-                                                @php
-                                                    $totalLiftOff = $tarif->lift_off * $jumlahCont;
-                                                    $totalWMS += $totalLiftOff;
-                                                @endphp
-                                                <td>{{number_format($totalLiftOff, 0)}}</td>
-                                            </tr>
-                                        </tbody>
-                                        <tbody>
-                                            <tr>
-                                                <td>Surcharge</td>
-                                                <td>{{number_format($tarif->surcharge,0)}}% dari (PLP, Penumpukan, Lift ON/OFF)</td>
-                                                <td>{{$jumlahCont}}</td>
-                                                <td>0</td>
-                                                @php
-                                                    $totalSurcharge = (($total + $totalPenumpukan + $totalLiftOn + $totalLiftOff)*$tarif->surcharge)/100;
-                                                    $totalWMS += $totalSurcharge;
-                                                @endphp
-                                                <td>{{number_format($totalSurcharge, 0)}}</td>
-                                            </tr>
-                                        </tbody>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Penumpukkan (Masuk pd {{$masuk->format('Y-m-d')}})</td>
+                                                        <td>{{number_format($tarif->tarif_dasar_massa,0)}} * {{number_format($tarif->massa)}}%</td>
+                                                        <td>{{$jumlahContMassaWMS}}</td>
+                                                        <td>{{$jumlahHariWMSNew}}</td>
+                                                        @php
+                                                            $totalPenumpukan = (($tarif->tarif_dasar_massa * $tarif->massa)/100)*$jumlahContMassaWMS*$jumlahHariWMSNew;
+                                                            $totalWMS += $totalPenumpukan;
+                                                        @endphp
+                                                        <td>{{number_format($totalPenumpukan, 0)}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            @endforeach
+                                        @endif
+                                        @if($form->type == 'STANDART' || $form->type == 'TPP')
+                                            <tbody>
+                                                <tr>
+                                                    <td>Paket PLP</td>
+                                                    <td>{{ number_format($tarif->paket_plp, 0) }}</td>
+                                                    <td>{{ $jumlahCont }}</td>
+                                                    <td>0</td>
+                                                    @php
+                                                        $total = $tarif->paket_plp * $jumlahCont;
+                                                        $totalWMS += $total;
+                                                    @endphp
+                                                    <td>{{ number_format($total, 0) }}</td>
+                                                </tr>
+                                            </tbody>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Lift On</td>
+                                                    <td>{{number_format($tarif->lift_on,0)}}</td>
+                                                    <td>{{$jumlahCont}}</td>
+                                                    <td>0</td>
+                                                    @php
+                                                        $totalLiftOn = $tarif->lift_on * $jumlahCont;
+                                                        $totalWMS += $totalLiftOn;
+                                                    @endphp
+                                                    <td>{{number_format($totalLiftOn, 0)}}</td>
+                                                </tr>
+                                            </tbody>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Lift Off</td>
+                                                    <td>{{number_format($tarif->lift_off,0)}}</td>
+                                                    <td>{{$jumlahCont}}</td>
+                                                    <td>0</td>
+                                                    @php
+                                                        $totalLiftOff = $tarif->lift_off * $jumlahCont;
+                                                        $totalWMS += $totalLiftOff;
+                                                    @endphp
+                                                    <td>{{number_format($totalLiftOff, 0)}}</td>
+                                                </tr>
+                                            </tbody>
+                                            @endif
+                                            @if($form->type == 'STANDART')
+                                            <tbody>
+                                                <tr>
+                                                    <td>Surcharge</td>
+                                                    <td>{{number_format($tarif->surcharge,0)}}% dari (PLP, Penumpukan, Lift ON/OFF)</td>
+                                                    <td>{{$jumlahCont}}</td>
+                                                    <td>0</td>
+                                                    @php
+                                                        $totalSurcharge = (($total + $totalPenumpukan + $totalLiftOn + $totalLiftOff)*$tarif->surcharge)/100;
+                                                        $totalWMS += $totalSurcharge;
+                                                    @endphp
+                                                    <td>{{number_format($totalSurcharge, 0)}}</td>
+                                                </tr>
+                                            </tbody>
+                                            @endif
                                     </table>
                                 </div>
                             @endforeach

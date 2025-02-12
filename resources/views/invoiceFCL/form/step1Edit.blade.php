@@ -60,7 +60,7 @@
                             Customer & Tanggal Keluar
                         </div>
                     </div>
-                    <div class="col-6">
+                    <div class="col-3">
                         <div class="form-group">
                             <label for="">Customer</label>
                             <select name="cust_id" id="cust_id" class="js-example-basic-single select2 form-control">
@@ -68,6 +68,17 @@
                                     @foreach($customers as $cust)
                                         <option value="{{$cust->id}}" {{$form->cust_id == $cust->id ? 'selected' : ''}}>{{$cust->name}} -- {{$cust->npwp ?? '-'}}</option>
                                     @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-group">
+                            <label for="">Invoice Type</label>
+                            <select name="type" id="" class="js-example-basic-single select2 form-select" style="width: 100%;">
+                                <option disabled selected value>Wajib Pilih Satu</option>
+                                <option value="STANDART" {{$form->type == 'STANDART' ? 'selected' : ''}}>STANDART</option>
+                                <option value="TPP" {{$form->type == 'TPP' ? 'selected' : ''}}>TPP</option>
+                                <option value="BCF" {{$form->type == 'BCF' ? 'selected' : ''}}>BCF</option>
                             </select>
                         </div>
                     </div>
