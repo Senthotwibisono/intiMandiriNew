@@ -502,6 +502,19 @@
             </li>
         </ul>
     </li>
+    <li class="sidebar-item has-sub @if(Request::is('fcl/report/*')) active @endif">
+        <a href="#" class='sidebar-link'>
+            <span>Report FCL</span>
+        </a>
+        <ul class="submenu @if(Request::is('fcl/report/*')) active @endif">
+            <li class="submenu-item @if(Request::is('fcl/report/index')) active @endif">
+                <a href="{{ url('/fcl/report/index')}}">Container</a>
+            </li>
+            <li class="submenu-item @if(Request::is('fcl/report/daily/*')) active @endif">
+                <a href="{{ route('report.lcl.daily')}}">Daily</a>
+            </li>
+        </ul>
+    </li>
     @else
     <li class="sidebar-item @if(Request::is('bc/dashboard') || Request::is('/home')) active @endif">
         <a href="/bc/dashboard" class='sidebar-link'>
@@ -547,7 +560,7 @@
             </li>
             <li class="sidebar-item has-sub @if(Request::is('lcl/report/*')) active @endif">
                 <a href="#" class='sidebar-link'>
-                    <span>Report</span>
+                    <span>Report LCL</span>
                 </a>
                 <ul class="submenu @if(Request::is('lcl/report/*')) active @endif">
                     <li class="submenu-item @if(Request::is('lcl/report/cont')) active @endif">
@@ -599,8 +612,8 @@
                     <span>Report</span>
                 </a>
                 <ul class="submenu @if(Request::is('fcl/report/*')) active @endif">
-                    <li class="submenu-item @if(Request::is('fcl/report/cont')) active @endif">
-                        <a href="{{ url('/fcl/report/cont')}}">Container</a>
+                    <li class="submenu-item @if(Request::is('fcl/report/index')) active @endif">
+                        <a href="{{ url('/fcl/report/index')}}">Container</a>
                     </li>
                     <li class="submenu-item @if(Request::is('fcl/report/daily/*')) active @endif">
                         <a href="{{ route('report.lcl.daily')}}">Daily</a>

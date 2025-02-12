@@ -38,7 +38,7 @@
                     <!-- FCL -->
                      <div class="divider divider-left">
                         <div class="divider-text">
-                            Log Manifest
+                            Log FCL
                         </div>
                      </div>
                     <div class="table">
