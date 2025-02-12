@@ -681,7 +681,7 @@ Route::controller(AndroidGateController::class)->group(function(){
         Route::prefix('/register')->controller(RegisterFCLController::class)->group(function(){
             Route::get('/index', 'index')->name('fcl.register.index');
             Route::get('/data', 'indexData');
-            Route::get('/detail-{id}', 'detail');
+            Route::get('/detail-{id}', 'detail')->name('fcl.register.detail');
             Route::get('/detailDataContainer-{id}', 'detilData');
             Route::get('/containerEdit{id}', 'editContainer');
             Route::post('/create', 'create')->name('fcl.register.create');

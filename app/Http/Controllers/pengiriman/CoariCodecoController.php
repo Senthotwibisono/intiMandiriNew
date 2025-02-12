@@ -262,7 +262,7 @@ class CoariCodecoController extends Controller
                     'jam_entry' => $coariCont->jam_entry,
                 ]);
 
-                if (strpos($response, 'Gagal Insert') !== false) {
+                if (strpos($response, ' Gagal Insert') !== false) {
                     $flag = 'N';
                 }else {
                     $flag = 'Y';
@@ -463,7 +463,7 @@ class CoariCodecoController extends Controller
                     'jam_entry' => $coariCont->jam_entry,
                 ]);
 
-                if (strpos($response, 'Gagal Insert') !== false) {
+                if (strpos($response, ' Gagal Insert') !== false) {
                     $flag = 'N';
                 }else {
                     $flag = 'Y';
@@ -876,13 +876,13 @@ class CoariCodecoController extends Controller
                     'jam_entry' => $codecoCont->jam_entry,
                 ]);
 
-                if (strpos($response, 'Gagal Insert') !== false) {
+                if (strpos($response, ' Gagal Insert') !== false) {
                     $flag = 'N';
                 }else {
                     $flag = 'Y';
                 }
                 $cont->update([
-                    'coari_flag' => $flag,
+                    'codeco_flag' => $flag,
                 ]);
             }
         }
@@ -1080,13 +1080,13 @@ class CoariCodecoController extends Controller
                     'jam_entry' => $codecoCont->jam_entry,
                 ]);
 
-                if (strpos($response, 'Gagal Insert') !== false) {
+                if (strpos($response, ' Gagal Insert') !== false) {
                     $flag = 'N';
                 }else {
                     $flag = 'Y';
                 }
                 $cont->update([
-                    'coari_flag' => $flag,
+                    'codeco_flag' => $flag,
                 ]);
             }
         }
