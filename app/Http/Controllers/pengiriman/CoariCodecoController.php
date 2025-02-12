@@ -41,9 +41,9 @@ class CoariCodecoController extends Controller
     public function __construct() {
 
         $this->wsdl = 'https://tpsonline.beacukai.go.id/tps/service.asmx?WSDL';
-        $this->user = 'AIRN';
-        $this->password = 'AIRN';
-        $this->kode = 'AIRN';
+        $this->user = 'INTIMANDIRI';
+        $this->password = 'INTIMANDIRI1';
+        $this->kode = '1MUT';
     }
 
     private function RefNumber()
