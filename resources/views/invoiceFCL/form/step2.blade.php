@@ -227,7 +227,7 @@
                                             </tr>
                                             @foreach($tglMasuk as $masuk)
                                                 @php
-                                                    $jumlahContMassa = $containerInvoice->where('tglmasuk', $masuk)->count();
+                                                    $jumlahContMassa = $containerInvoice->where('size', $sz)->where('ctr_type', $tp)->where('tglmasuk', $masuk)->count();
                                                     $eta = \Carbon\Carbon::parse($form->eta);
                                                     $masuk = \Carbon\Carbon::parse($masuk);
     
