@@ -173,7 +173,7 @@
                         <a href="{{ url('/fcl/report/index')}}">Container</a>
                     </li>
                     <li class="submenu-item @if(Request::is('fcl/report/daily/*')) active @endif">
-                        <a href="{{ route('report.lcl.daily')}}">Daily</a>
+                        <a href="{{ route('report.fcl.daily')}}">Daily</a>
                     </li>
                 </ul>
             </li>

@@ -738,6 +738,11 @@ Route::controller(AndroidGateController::class)->group(function(){
             Route::get('/photoCont{id?}', 'photoCont');
             Route::get('/formatStandar', 'formatStandar');
             Route::get('/formatBeacukai', 'formatBeacukai');
+            
+            // Daily Report
+            
+            Route::get('/indexDaily', 'indexDaily')->name('report.fcl.daily');
+            Route::get('/dataContDaily', 'dataContDaily');
         });
     });
 

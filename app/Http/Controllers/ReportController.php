@@ -333,7 +333,7 @@ class ReportController extends Controller
 
     public function indexDaily(Request $request)
     {
-        $data['title'] = "Report Manifest";
+        $data['title'] = "Report Daily";
 
         // Use dates from the request or default to the current date
         $start = $request->input('start_date') ?? Carbon::now()->toDateString();
