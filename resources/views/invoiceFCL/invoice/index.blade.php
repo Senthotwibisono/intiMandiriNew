@@ -56,6 +56,10 @@
                                     <input type="text" name="grand_total" id="grand_total_edit" class="form-control" readonly>
                                 </div>
                                 <div class="form-group">
+                                    <label for="">Jumlah Bayar</label>
+                                    <input type="text" name="jumlah_bayar" class="form-control">
+                                </div>
+                                <div class="form-group">
                                     <label for="">No HP</label>
                                     <input type="text" name="no_hp" id="no_hp_edit" class="form-control" required>
                                 </div>

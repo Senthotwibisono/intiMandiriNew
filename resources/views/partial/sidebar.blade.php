@@ -383,8 +383,8 @@
                 </a>
             </li>
             
-            <li class="submenu-item @if(Request::is('invoice/report')) active @endif">
-                <a href="{{ url('/invoice/report')}}">Rport Invoice</a>
+            <li class="submenu-item @if(Request::is('invoiceFCL/invoice/report/index')) active @endif">
+                <a href="{{ url('/invoiceFCL/invoice/report/index')}}">Rport Invoice</a>
             </li>
         </ul>
     </li>

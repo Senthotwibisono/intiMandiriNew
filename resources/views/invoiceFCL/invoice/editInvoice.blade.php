@@ -84,19 +84,39 @@
                      <div class="col-4">
                         <div class="form-group">
                             <label for="">Admin</label>
-                            <input type="text" class="form-control" value="{{ number_format($header->admin, 2) }}" readonly>
+                            <input type="text" class="form-control" value="{{ number_format($header->admin, 0) }}" readonly>
                         </div>
                      </div>
                      <div class="col-4">
                         <div class="form-group">
                             <label for="">PPN</label>
-                            <input type="text" class="form-control" value="{{ number_format($header->ppn, 2) }}" readonly>
+                            <input type="text" class="form-control" value="{{ number_format($header->ppn, 0) }}" readonly>
                         </div>
                      </div>
                      <div class="col-4">
                         <div class="form-group">
                             <label for="">Grand Total</label>
-                            <input type="text" class="form-control" value="{{ number_format($header->grand_total, 2) }}" readonly>
+                            <input type="text" class="form-control" value="{{ number_format($header->grand_total, 0) }}" readonly>
+                        </div>
+                     </div>
+                     <div class="col-6">
+                        <div class="form-group">
+                            <label for="">Jumlah Bayar</label>
+                            <input type="text" name="jumlah_bayar" value="{{number_format($header->jumlah_bayar, 0 ?? '0')}}" class="form-control">
+                        </div>
+                     </div>
+                     <div class="col-6">
+                        <div class="form-group">
+                            <label for="">Keterangan</label>
+                            @if($header->grand_total == $header->jumlah_bayar)
+                                <textarea readonly class="form-control" id="" cols="30" rows="10">Pembayaran Sudah Sesuai</textarea>
+                            @else
+                                @if($header->grand_total > $header->jumlah_bayar)
+                                    <textarea readonly class="form-control" id="" cols="30" rows="10">Pembayaran kurang sebesar : {{number_format(abs($header->sisa_bayar), 0 ?? '0')}}</textarea>
+                                @else
+                                    <textarea readonly class="form-control" id="" cols="30" rows="10">Pembayaran lebih sebesar : {{number_format(abs($header->sisa_bayar), 0 ?? '0')}}</textarea>
+                                @endif
+                            @endif
                         </div>
                      </div>
                      <div class="divider divider-left">

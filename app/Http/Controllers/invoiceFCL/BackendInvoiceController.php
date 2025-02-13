@@ -8,6 +8,12 @@ use Auth;
 use Carbon\Carbon;
 use DataTables;
 use Illuminate\Support\Facades\Storage;
+use App\Exports\fcl\invoice\ReportInvoiceFCL;
+use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
+use PDF;
+
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 use App\Models\Customer;
 use App\Models\ContainerFCL as ContF;
@@ -242,6 +248,7 @@ class BackendInvoiceController extends Controller
                 'status' => 'Y',
                 'no_hp' => $request->no_hp,
                 'ktp' => $fileName,
+                'jumlah_bayar' => $request->jumlah_bayar,
             ]);
             if ($cancel) {
                 $cancel->delete();
@@ -396,6 +403,8 @@ class BackendInvoiceController extends Controller
                 'cust_npwp' => $request->cust_npwp,
                 'cust_fax' => $request->cust_fax,
                 'cust_alamat' => $request->cust_alamat,
+                'jumlah_bayar' => $request->jumlah_bayar,
+                'no_hp' => $request->no_hp,
             ]);
 
             return redirect()->back()->with('status', ['type'=>'success', 'message'=>'Data berhasil di update']);
@@ -470,4 +479,109 @@ class BackendInvoiceController extends Controller
         return response()->json(['error' => 'Tidak ada gambar yang dikirim'], 400);
     }
 
+    public function indexReport()
+    {
+        $data['title'] = 'Report Invoice FCL';
+
+        return view('invoiceFCL.report.index', $data);
+    }
+
+    public function excelReport(Request $request)
+    {
+        try {
+            // Pastikan nilai $request->tanggal ada dan valid
+            $column = in_array($request->tanggal, ['created_at', 'lunas_at']) ? $request->tanggal : 'created_at';
+    
+            // Query berdasarkan filter, type, dan tanggal yang dipilih
+            $headers = Header::whereIn('status', $request->filter)
+                ->whereIn('type', $request->type)
+                ->whereBetween($column, [$request->start_date, $request->end_date])
+                ->orderBy('invoice_no', 'asc')
+                ->get();
+    
+            // Menampilkan hasil query (untuk testing)
+            $start_date = $request->start_date;
+            $end_date = $request->end_date;
+            $tanggalJudul =  $this->formatDateRange($start_date, $end_date);
+            if (!$tanggalJudul) {
+                return redirect()->back()->with('status', ['type' => 'error', 'message' => 'Something Wrong : Sepertinya anda belum memasukkan tanggal']);
+            }
+    
+
+            // dd($tanggalJudul);
+    
+            $judul = 'Laporan Invoice '. $tanggalJudul;
+            // dd($judul);
+    
+            $fileName = 'Report-Invoice-FCL-'.$start_date.'-'.$end_date.'.xlsx' ;
+            return Excel::download(new ReportInvoiceFCL($headers, $judul), $fileName);
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Gagal di Simpan '. $th->getMessage()]);
+        }
+    }
+    
+    public function pdfReport(Request $request)
+    {
+        try {
+            // Pastikan nilai $request->tanggal ada dan valid
+            $column = in_array($request->tanggal, ['created_at', 'lunas_at']) ? $request->tanggal : 'created_at';
+    
+            // Query berdasarkan filter, type, dan tanggal yang dipilih
+            $headers = Header::whereIn('status', $request->filter)
+                ->whereIn('type', $request->type)
+                ->whereBetween($column, [$request->start_date, $request->end_date])
+                ->orderBy('invoice_no', 'asc')
+                ->get();
+    
+            // Menampilkan hasil query (untuk testing)
+            $start_date = $request->start_date;
+            $end_date = $request->end_date;
+            $tanggalJudul =  $this->formatDateRange($start_date, $end_date);
+            if (!$tanggalJudul) {
+                return redirect()->back()->with('status', ['type' => 'error', 'message' => 'Something Wrong : Sepertinya anda belum memasukkan tanggal']);
+            }
+    
+
+            // dd($tanggalJudul);
+
+            $idHeader = $headers->pluck('id')->unique()->toArray();
+            // dd($idHeader);
+    
+            $judul = 'Laporan Invoice '. $tanggalJudul;
+            $detils = Detil::whereIn('invoice_id', $idHeader)->get();
+            // dd($judul);
+            return view('invoiceFCL.report.pdf', compact('headers', 'judul', 'detils'));
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Gagal di Simpan '. $th->getMessage()]);
+        }
+    }
+
+    private function formatDateRange($start_date, $end_date)
+    {
+        if (!$start_date && !$end_date) {
+            return null; // Jika keduanya kosong, abaikan
+        }
+
+        // Jika salah satu kosong, gunakan yang tersedia
+        if (!$start_date) {
+            return Carbon::parse($end_date)->translatedFormat('j F Y');
+        }
+        if (!$end_date) {
+            return Carbon::parse($start_date)->translatedFormat('j F Y');
+        }
+
+        $start = Carbon::parse($start_date);
+        $end = Carbon::parse($end_date);
+
+        if ($start->year === $end->year) {
+            if ($start->month === $end->month) {
+                return $start->format('j') . ' - ' . $end->translatedFormat('j F Y');
+            }
+            return $start->translatedFormat('j F') . ' - ' . $end->translatedFormat('j F Y');
+        }
+
+        return $start->translatedFormat('j F Y') . ' - ' . $end->translatedFormat('j F Y');
+    }
+
+    
 }

@@ -3,7 +3,7 @@
         'name' => 'laravel/laravel',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'f8c61e80e32e48272485db85f7b8ec22fa6e6500',
+        'reference' => 'd6e33a936805e32878135fc466183636f00fda24',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -463,7 +463,7 @@
         'laravel/laravel' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'f8c61e80e32e48272485db85f7b8ec22fa6e6500',
+            'reference' => 'd6e33a936805e32878135fc466183636f00fda24',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -619,6 +619,15 @@
             'reference' => 'f5ac2c0b0a2eefca70b2ce32a5809992227e75a6',
             'type' => 'library',
             'install_path' => __DIR__ . '/../masterminds/html5',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'milon/barcode' => array(
+            'pretty_version' => 'v11.0.1',
+            'version' => '11.0.1.0',
+            'reference' => '3eb073d2d63c27b2e900d543ad7683be34ca14f7',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../milon/barcode',
             'aliases' => array(),
             'dev_requirement' => false,
         ),
@@ -901,8 +910,8 @@
         'psr/log-implementation' => array(
             'dev_requirement' => false,
             'provided' => array(
-                0 => '3.0.0',
-                1 => '1.0|2.0|3.0',
+                0 => '1.0|2.0|3.0',
+                1 => '3.0.0',
             ),
         ),
         'psr/simple-cache' => array(

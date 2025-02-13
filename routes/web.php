@@ -814,7 +814,9 @@ Route::controller(AndroidGateController::class)->group(function(){
                 Route::post('/uploadKTP', 'uploadKtp');
 
                 Route::prefix('/report')->group(function(){
-                    // Route::get('/index', )
+                    Route::get('/index', 'indexReport');
+                    Route::get('/excel', 'excelReport');
+                    Route::get('/pdf', 'pdfReport');
                 });
             });
         });
