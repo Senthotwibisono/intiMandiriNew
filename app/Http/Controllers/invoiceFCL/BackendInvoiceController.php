@@ -18,6 +18,7 @@ use App\Models\FCL\MTarifTPS as TTPS;
 use App\Models\FCL\MTarifWMS as TWMS;
 use App\Models\FCL\InvoiceHeader as Header;
 use App\Models\FCL\InvoiceDetil as Detil;
+use App\Models\FCL\CanceledInvoice as InvCancel;
 
 class BackendInvoiceController extends Controller
 {
@@ -165,40 +166,46 @@ class BackendInvoiceController extends Controller
     public function paidInvoice(Request $request)
     {
         // dd($request->all());
-        $year = Carbon::now()->format('y'); // Misalnya '24' untuk tahun 2024
-
-        // Cari invoice terakhir di tahun yang sama
-        $lastInvoice = Header::whereYear('created_at', Carbon::now()->year)
-                             ->whereNotNull('invoice_no')
-                             ->orderBy('invoice_no', 'desc')
-                             ->first();
-        
-        if ($lastInvoice) {
-            // Hapus "-P" di akhir invoice_no jika ada
-            $invoiceNumber = preg_replace('/-P$/', '', $lastInvoice->invoice_no);
-        
-            // Ambil angka terakhir dari invoice_number
-            if (preg_match('/(\d+)$/', $invoiceNumber, $matches)) {
-                $lastSequence = (int) $matches[0];
-            } else {
-                $lastSequence = 0; // Jika tidak ditemukan angka, mulai dari 0
-            }
-        
-            // Cek apakah tahun pada invoice berbeda dengan tahun sekarang
-            $invoiceYear = substr($lastInvoice->invoice_no, 8, 2); // Ambil dua digit pertama (misal '24')
-        
-            if ($invoiceYear != $year) {
-                $lastSequence = 0; // Reset jika tahun berbeda
-            }
-        } else {
-            $lastSequence = 0; // Jika tidak ada invoice sebelumnya, mulai dari 0
-        }
-        
-        // Tambahkan 1 dan format menjadi 6 digit
-        $newSequence = str_pad($lastSequence + 1, 6, '0', STR_PAD_LEFT);
+        $cancel = invCancel::orderBy('invoice_no', 'asc')->first();
+        if ($cancel) {
+            $noInvoice = $cancel->invoice_no;
+        }else {
+            # code...
+            $year = Carbon::now()->format('y'); // Misalnya '24' untuk tahun 2024
     
-        // Construct the new invoice number
-        $noInvoice = 'ITM-' . 'FCL' . '/' . $year . '/' . $newSequence;
+            // Cari invoice terakhir di tahun yang sama
+            $lastInvoice = Header::whereYear('created_at', Carbon::now()->year)
+                                 ->whereNotNull('invoice_no')
+                                 ->orderBy('invoice_no', 'desc')
+                                 ->first();
+            
+            if ($lastInvoice) {
+                // Hapus "-P" di akhir invoice_no jika ada
+                $invoiceNumber = preg_replace('/-P$/', '', $lastInvoice->invoice_no);
+            
+                // Ambil angka terakhir dari invoice_number
+                if (preg_match('/(\d+)$/', $invoiceNumber, $matches)) {
+                    $lastSequence = (int) $matches[0];
+                } else {
+                    $lastSequence = 0; // Jika tidak ditemukan angka, mulai dari 0
+                }
+            
+                // Cek apakah tahun pada invoice berbeda dengan tahun sekarang
+                $invoiceYear = substr($lastInvoice->invoice_no, 8, 2); // Ambil dua digit pertama (misal '24')
+            
+                if ($invoiceYear != $year) {
+                    $lastSequence = 0; // Reset jika tahun berbeda
+                }
+            } else {
+                $lastSequence = 0; // Jika tidak ada invoice sebelumnya, mulai dari 0
+            }
+            
+            // Tambahkan 1 dan format menjadi 6 digit
+            $newSequence = str_pad($lastSequence + 1, 6, '0', STR_PAD_LEFT);
+        
+            // Construct the new invoice number
+            $noInvoice = 'ITM-' . 'FCL' . '/' . $year . '/' . $newSequence;
+        }
 
         try {
             //code...
@@ -236,6 +243,9 @@ class BackendInvoiceController extends Controller
                 'no_hp' => $request->no_hp,
                 'ktp' => $fileName,
             ]);
+            if ($cancel) {
+                $cancel->delete();
+            }
     
             $form = Form::find($header->form_id);
            
@@ -270,6 +280,10 @@ class BackendInvoiceController extends Controller
 
             $header->update([
                 'status' => 'C'
+            ]);
+
+            $noInvoice = invCancel::create([
+                'invoice_no' => $header->invoice_no,
             ]);
 
             return response()->json([
@@ -409,50 +423,50 @@ class BackendInvoiceController extends Controller
     public function uploadKtp(Request $request)
     {
         $header = Header::find($request->id); // Ganti sesuai kebutuhan
-    
+
         if ($request->has('image')) {
             $base64Image = $request->input('image');
-        
+
             // Cek format base64 dengan regex
             if (preg_match('/^data:image\/(\w+);base64,/', $base64Image, $matches)) {
                 $imageType = strtolower($matches[1]); // Ambil format file (png, jpg, jpeg)
-            
+
                 // Hanya izinkan PNG, JPG, JPEG
                 if (!in_array($imageType, ['png', 'jpg', 'jpeg'])) {
                     return response()->json(['error' => 'Format gambar tidak didukung'], 400);
                 }
-            
+
                 // Hapus prefix base64
                 $image = substr($base64Image, strpos($base64Image, ',') + 1);
                 $image = str_replace(' ', '+', $image); // Hindari karakter tidak valid
-            
+
                 // Decode base64 ke binary
                 $imageData = base64_decode($image);
-            
+
                 // Pastikan hasil decode valid
                 if ($imageData === false) {
                     return response()->json(['error' => 'Gagal mendekode gambar'], 400);
                 }
-            
+
                 // Buat nama file unik
                 $fileName = 'ktp_' . time() . '_' . uniqid() . '.' . $imageType;
-            
+
                 // Path penyimpanan di storage Laravel
                 $path = storage_path('app/public/ktpFCL/' . $fileName);
-            
+
                 // Simpan file ke storage
                 file_put_contents($path, $imageData);
-            
+
                 // Update database dengan nama file baru
                 $header->ktp = $fileName;
                 $header->save();
-            
+
                 return response()->json(['success' => 'Foto KTP berhasil diunggah', 'file' => $fileName]);
             } else {
                 return response()->json(['error' => 'Format base64 tidak valid'], 400);
             }
         }
-    
+
         return response()->json(['error' => 'Tidak ada gambar yang dikirim'], 400);
     }
 
