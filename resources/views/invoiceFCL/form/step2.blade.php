@@ -222,7 +222,7 @@
                                                 <td>Penumpukkan Massa 1</td>
                                                 <td>0</td>
                                                 <td>{{$jumlahCont}}</td>
-                                                <td>{{$form->eta}}</td>
+                                                <td>1</td>
                                                 <td>0</td>
                                             </tr>
                                             @foreach($tglMasuk as $masuk)
@@ -244,11 +244,11 @@
                                                 @endphp
                                                 <tr>
                                                     <td>Penumpukkan Massa 2 (Masuk pd {{$masuk->format('Y-m-d')}})</td>
-                                                    <td>{{number_format($hargaTPS->tarif_dasar_massa,0)}} * {{number_format($hargaTPS->massa0)}}%</td>
+                                                    <td>{{number_format($hargaTPS->tarif_dasar_massa,0)}} * {{number_format($hargaTPS->massa2)}}%</td>
                                                     <td>{{$jumlahContMassa}}</td>
                                                     <td>{{$massa2TPS}}</td>
                                                     @php
-                                                        $totalPenumpukanMassa2 = (($hargaTPS->tarif_dasar_massa * $hargaTPS->massa0)/100)*$jumlahContMassa*$massa2TPS;
+                                                        $totalPenumpukanMassa2 = (($hargaTPS->tarif_dasar_massa * $hargaTPS->massa2)/100)*$jumlahContMassa*$massa2TPS;
                                                         $totalTPS += $totalPenumpukanMassa2;
                                                     @endphp
                                                     <td>{{number_format($totalPenumpukanMassa2, 0)}}</td>
