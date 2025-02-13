@@ -37,25 +37,25 @@
                      <div class="col-3">
                         <div class="form-group">
                             <label for="">Customer Name</label>
-                            <input type="text" class="form-control" value="{{$header->cust_name ?? '-'}}" readonly>
+                            <input type="text" class="form-control" value="{{$header->cust_name ?? '-'}}" name="cust_name">
                         </div>
                      </div>
                      <div class="col-3">
                         <div class="form-group">
                             <label for="">Customer NPWP</label>
-                            <input type="text" class="form-control" value="{{$header->cust_npwp ?? '-'}}" readonly>
+                            <input type="text" class="form-control" value="{{$header->cust_npwp ?? '-'}}" name="cust_npwp">
                         </div>
                      </div>
                      <div class="col-3">
                         <div class="form-group">
                             <label for="">Customer Fax</label>
-                            <input type="text" class="form-control" value="{{$header->cust_fax ?? '-'}}" readonly>
+                            <input type="text" class="form-control" value="{{$header->cust_fax ?? '-'}}" name="cust_fax">
                         </div>
                      </div>
                      <div class="col-3">
                         <div class="form-group">
                             <label for="">Customer Alamat</label>
-                            <textarea name="" class="form-control" id="" readonly>{{$header->cust_alamat ?? '-'}}</textarea>
+                            <textarea name="" class="form-control" id="" name="cust_alamat">{{$header->cust_alamat ?? '-'}}</textarea>
                         </div>
                      </div>
                      <div class="divider divider-left">
@@ -115,6 +115,42 @@
                         <div class="form-group">
                             <label for="">Lunas At</label>
                             <input type="datetime-local" class="form-control" value="{{$header->lunas_at}}" name="lunas_at">
+                        </div>
+                     </div>
+                     <div class="divider divider-left">
+                        <div class="divider-text">
+                            EMKL Information
+                        </div>
+                     </div>
+                     <div class="col-3">
+                        <div class="form-group">
+                            <label for="">Nomor Hand Phone</label>
+                            <input type="text" name="no_hp" value="{{$header->no_hp}}" placeholder="Belum Di Isi" class="form-control">
+                        </div>
+                     </div>
+                     <div class="col-9 text-center">
+                        <div class="form-group">
+                            <label for="">Photo KTP</label>
+                            <br>
+                            @if($header->ktp != null)
+                            <img src="{{ asset('storage/ktpFCL/' . $header->ktp) }}" alt="Photo" class="img-fluid" style="width: 400px; height: 400px; object-fit: cover;">
+                            <br>
+                            <br>
+                            <button class="btn btn-danger deletePhoto" type="button" data-id="{{$header->id}}">Hapus Photo KTP</button>
+                            @else
+                            <div id="cameraSection">
+                                <video id="video" width="400" height="400" autoplay style="border: 1px solid black;"></video>
+                                <canvas id="canvas" style="display: none;"></canvas>
+                                <br>
+                                <button class="btn btn-primary" type="button" id="capture">Capture</button>
+                                <button class="btn btn-success" type="button" id="uploadFromGallery">Pilih dari Galeri</button>
+                                <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                                <form id="uploadForm" method="POST" enctype="multipart/form-data">
+                                    @csrf
+                                    <input type="hidden" name="image" id="capturedImage">
+                                </form>
+                            </div>
+                            @endif
                         </div>
                      </div>
                 </div>
@@ -180,6 +216,102 @@
 @endsection
 
 @section('custom_js')
+<script>
+    $(document).ready(function() {
+        let video = document.getElementById('video');
+        let canvas = document.getElementById('canvas');
+        let context = canvas.getContext('2d');
+        let capturedImageInput = document.getElementById('capturedImage');
+        let id = {{$header->id}};
+
+        // Aktifkan Kamera
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+                video.srcObject = stream;
+                video.play();
+            }).catch(function(error) {
+                console.error("Kamera tidak dapat diakses", error);
+            });
+        }
+
+        // Capture Foto dari Kamera
+        $("#capture").click(function() {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            let imageData = canvas.toDataURL("image/png"); // Konversi ke base64
+            capturedImageInput.value = imageData;
+            uploadImage(imageData);
+        });
+
+        // Upload dari Galeri
+        $("#uploadFromGallery").click(function() {
+            $("#fileInput").click();
+        });
+
+        $("#fileInput").change(function(event) {
+            let file = event.target.files[0];
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                uploadImage(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Fungsi Upload Foto
+        function uploadImage(imageData) {
+            $.ajax({
+                url: "/invoiceFCL/invoice/uploadKTP",
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    image: imageData,
+                    id : id
+                },
+                success: function(response) {
+                    Swal.fire("Berhasil!", "Foto KTP berhasil diunggah!", "success");
+                    location.reload();
+                },
+                error: function(error) {
+                    Swal.fire("Error!", "Gagal mengunggah foto KTP.", "error");
+                }
+            });
+        }
+    });
+</script>
+<script>
+    $(document).on('click', '.deletePhoto', function(){
+        let id = $(this).data('id');
+
+        Swal.fire({
+            title: "Apakah Anda yakin?",
+            text: "Foto KTP akan dihapus secara permanen!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Ya, Hapus!",
+            cancelButtonText: "Batal"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "/invoiceFCL/invoice/deleteKPT/" + id, 
+                    type: "POST",
+                    data: {
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        Swal.fire("Terhapus!", "Foto KTP berhasil dihapus.", "success");
+                        location.reload(); 
+                    },
+                    error: function() {
+                        Swal.fire("Error!", "Gagal menghapus foto KTP.", "error");
+                    }
+                });
+            }
+        });
+    });
+</script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Attach event listener to the update button

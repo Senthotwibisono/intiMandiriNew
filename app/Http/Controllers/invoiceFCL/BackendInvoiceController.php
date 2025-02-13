@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Auth;
 use Carbon\Carbon;
 use DataTables;
+use Illuminate\Support\Facades\Storage;
 
 use App\Models\Customer;
 use App\Models\ContainerFCL as ContF;
@@ -163,6 +164,7 @@ class BackendInvoiceController extends Controller
 
     public function paidInvoice(Request $request)
     {
+        // dd($request->all());
         $year = Carbon::now()->format('y'); // Misalnya '24' untuk tahun 2024
 
         // Cari invoice terakhir di tahun yang sama
@@ -198,33 +200,67 @@ class BackendInvoiceController extends Controller
         // Construct the new invoice number
         $noInvoice = 'ITM-' . 'FCL' . '/' . $year . '/' . $newSequence;
 
-        $header = Header::find($request->id);
-        $header->update([
-            'invoice_no' => $noInvoice,
-            'lunas_at' => Carbon::now(),
-            'uidLunas' => Auth::user()->id,
-            'status' => 'Y',
-        ]);
-
-        $form = Form::find($header->form_id);
-       
-
-        $formCont = FormC::where('form_id', $form->id)->get();
-        // var_dump($formCont);
-
-        foreach ($formCont as $fc) {
-            $cont = ContF::find($fc->container_id);
-
-            $cont->update([
-                'active_to' => $form->etd,
+        try {
+            //code...
+            if ($request->has('ktp')) {
+                // Get the array of base64 strings from the request
+                $base64Image = $request->input('ktp');
+    
+                // Loop through each base64 string
+               
+                    // Remove the "data:image/png;base64," part (if necessary)
+                    $image = str_replace('data:image/png;base64,', '', $base64Image);
+                    $image = str_replace(' ', '+', $image); // Ensure there are no spaces
+    
+                    // Decode the base64 image
+                    $imageData = base64_decode($image);
+    
+                    // Generate a filename
+                    $fileName = 'ktp_' . time() . '_' . uniqid() . '.png'; // Unique filename
+    
+                    // Specify the path to save the image in storage/app/public/ktp
+                    $path = storage_path('app/public/ktpFCL/' . $fileName);
+    
+                    // Store the image in the storage directory
+                    file_put_contents($path, $imageData);
+            } else {
+                $fileName = null; // Handle the case where no file was uploaded
+            }
+    
+            $header = Header::find($request->id);
+            $header->update([
+                'invoice_no' => $noInvoice,
+                'lunas_at' => Carbon::now(),
+                'uidLunas' => Auth::user()->id,
+                'status' => 'Y',
+                'no_hp' => $request->no_hp,
+                'ktp' => $fileName,
             ]);
+    
+            $form = Form::find($header->form_id);
+           
+    
+            $formCont = FormC::where('form_id', $form->id)->get();
+            // var_dump($formCont);
+    
+            foreach ($formCont as $fc) {
+                $cont = ContF::find($fc->container_id);
+    
+                $cont->update([
+                    'active_to' => $form->etd,
+                ]);
+            }
+    
+    
+            return redirect()->back()->with('status', ['type'=>'success', 'message'=>'Invoice Has Been Paid']);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Something Wrong: ' . $th->getMessage()]);
         }
-
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Invoice Has Been Paid',
-        ]);
+        // return response()->json([
+        //     'success' => true,
+        //     'message' => 'Invoice Has Been Paid',
+        // ]);
     }
 
     public function cancelInvoice(Request $request)
@@ -303,6 +339,26 @@ class BackendInvoiceController extends Controller
         return $result;
     }
 
+    public function getDataInvoice($id)
+    {
+        try {
+            $header = Header::find($id);
+
+            if ($header) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Data Ditemukan',
+                    'data' => $header,
+                ]);
+            }
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Something Wrong: ' . $th->getMessage(),
+            ]);
+        }
+    }
+
     public function editInvoice($id)
     {
         $header = Header::find($id);
@@ -322,6 +378,10 @@ class BackendInvoiceController extends Controller
             $header->update([
                 'created_at' => $request->created_at,
                 'lunas_at' => $request->lunas_at,
+                'cust_name' => $request->cust_name,
+                'cust_npwp' => $request->cust_npwp,
+                'cust_fax' => $request->cust_fax,
+                'cust_alamat' => $request->cust_alamat,
             ]);
 
             return redirect()->back()->with('status', ['type'=>'success', 'message'=>'Data berhasil di update']);
@@ -330,4 +390,70 @@ class BackendInvoiceController extends Controller
             //throw $th;
         }
     }
+
+    public function hapusPhotoKTP($id, Request $request)
+    {
+        $header = Header::findOrFail($id);
+
+        if ($header->ktp) {
+            Storage::delete('public/ktpFCL/' . $header->ktp);
+            $header->ktp = null;
+            $header->save();
+    
+            return response()->json(['success' => 'Foto KTP berhasil dihapus']);
+        }
+    
+        return response()->json(['error' => 'Foto KTP tidak ditemukan'], 404);
+    }
+
+    public function uploadKtp(Request $request)
+    {
+        $header = Header::find($request->id); // Ganti sesuai kebutuhan
+    
+        if ($request->has('image')) {
+            $base64Image = $request->input('image');
+        
+            // Cek format base64 dengan regex
+            if (preg_match('/^data:image\/(\w+);base64,/', $base64Image, $matches)) {
+                $imageType = strtolower($matches[1]); // Ambil format file (png, jpg, jpeg)
+            
+                // Hanya izinkan PNG, JPG, JPEG
+                if (!in_array($imageType, ['png', 'jpg', 'jpeg'])) {
+                    return response()->json(['error' => 'Format gambar tidak didukung'], 400);
+                }
+            
+                // Hapus prefix base64
+                $image = substr($base64Image, strpos($base64Image, ',') + 1);
+                $image = str_replace(' ', '+', $image); // Hindari karakter tidak valid
+            
+                // Decode base64 ke binary
+                $imageData = base64_decode($image);
+            
+                // Pastikan hasil decode valid
+                if ($imageData === false) {
+                    return response()->json(['error' => 'Gagal mendekode gambar'], 400);
+                }
+            
+                // Buat nama file unik
+                $fileName = 'ktp_' . time() . '_' . uniqid() . '.' . $imageType;
+            
+                // Path penyimpanan di storage Laravel
+                $path = storage_path('app/public/ktpFCL/' . $fileName);
+            
+                // Simpan file ke storage
+                file_put_contents($path, $imageData);
+            
+                // Update database dengan nama file baru
+                $header->ktp = $fileName;
+                $header->save();
+            
+                return response()->json(['success' => 'Foto KTP berhasil diunggah', 'file' => $fileName]);
+            } else {
+                return response()->json(['error' => 'Format base64 tidak valid'], 400);
+            }
+        }
+    
+        return response()->json(['error' => 'Tidak ada gambar yang dikirim'], 400);
+    }
+
 }

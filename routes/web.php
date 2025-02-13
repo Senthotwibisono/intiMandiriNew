@@ -803,11 +803,19 @@ Route::controller(AndroidGateController::class)->group(function(){
                 Route::get('/dataTable', 'dataTable');
                 Route::get('/pranota-{id?}', 'pranota');
                 Route::get('/invoice-{id?}', 'Invoice');
+                Route::get('/getDataInvoice-{id?}', 'getDataInvoice');
                 Route::post('/paidInvoice', 'paidInvoice');
                 Route::post('/cancelInvoice', 'cancelInvoice');
                 Route::post('/deleteInvoice', 'deleteInvoice');
                 Route::get('/edit/{id?}', 'editInvoice');
                 Route::post('/updateInvoice', 'updateInvoice');
+
+                Route::post('/deleteKPT/{id?}', 'hapusPhotoKTP');
+                Route::post('/uploadKTP', 'uploadKtp');
+
+                Route::prefix('/report')->group(function(){
+                    // Route::get('/index', )
+                });
             });
         });
     });

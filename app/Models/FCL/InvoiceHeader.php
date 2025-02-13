@@ -43,6 +43,8 @@ class InvoiceHeader extends Model
         'created_at',
         'kapal_voy',
         'type',
+        'ktp',
+        'no_hp'
     ];
 
     public function Cust()
