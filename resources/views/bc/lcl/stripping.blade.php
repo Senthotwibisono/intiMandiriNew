@@ -39,6 +39,8 @@
                             <th class="text-center">No Surat</th>
                             <th class="text-center">No BC 11</th>
                             <th class="text-center">Tgl BC 11</th>
+                            <th class="text-center">Tgl Masuk</th>
+                            <th class="text-center">Jam Masuk</th>
                             <th>UID</th>
                         </tr>
                     </thead>
@@ -83,6 +85,8 @@
                 {data:'no_surat', name:'no_surat', className:'text-center' },
                 {data:'no_bc11', name:'no_bc11', className:'text-center' },
                 {data:'tgl_bc11', name:'tgl_bc11', className:'text-center' },
+                {data:'tglmasuk', name:'tglmasuk', className:'text-center' },
+                {data:'jammasuk', name:'jammasuk', className:'text-center' },
                 {data:'user.name', name:'user.name', className:'text-center'},
             ]
         })

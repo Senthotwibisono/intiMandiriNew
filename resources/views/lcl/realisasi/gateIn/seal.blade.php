@@ -189,8 +189,7 @@ $(document).ready(function() {
 });
 </script>
 <script>
-    $(document).ready(function () {
-        $('.sendEasyGo').on('click', function () {
+    $(document).on('click', '.sendEasyGo', function () {
             var contId = $(this).data('id');
 
             // SweetAlert confirmation dialog
@@ -249,7 +248,6 @@ $(document).ready(function() {
                     });
                 }
             });
-        });
     });
 </script>
 <script>
@@ -277,7 +275,7 @@ $(document).ready(function() {
         $("#nopol").val(response.data.nopol);
         $("#no_seal").val(response.data.no_seal).trigger('change');
         $("#uidmasuk").val(response.data.uid.id ?? response.userId);
-        $("#nameUid").val(response.uid.name ?? response.user);
+        $("#nameUid").val(response.data.uid.name ?? response.user);
       },
       error: function(data) {
         console.log('error:', data)

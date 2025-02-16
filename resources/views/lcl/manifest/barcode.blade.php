@@ -13,7 +13,7 @@
   <style>
     /* Set ukuran kertas A5 landscape */
     @page {
-      width: 137mm;
+      width: 148mm;
       height: 100mm;
       margin: 0cm; /* Tambahkan margin jika diperlukan */
     }
@@ -27,7 +27,7 @@
     }
 
     .card {
-      width: 137mm;
+      width: 148mm;
       height: auto;
       border: 1px solid black;
     }
@@ -97,9 +97,9 @@
                                     <div class="col-8">
                                         <div class="text-center">
                                             <br>
-                                            <span>PT. Inti Mandiri Utama Trans</span>
+                                            <span><strong>PT. Inti Mandiri Utama Trans</strong></span>
                                             <hr>
-                                            <p>Consolidation Warehoude & Logistic</p>
+                                            <p><strong>Consolidation Warehoude & Logistic</strong></p>
                                         </div>
                                     </div>
                                 </div>
@@ -112,14 +112,14 @@
                         </div>
                         <div class="row" style="border-top: 1px solid black;">
                             <div class="col-12 text-center" style="line-height: 1.5;">
-                                <span>{{$item->manifest->customer->name ?? ''}}</span>
+                                <span><strong>{{$item->manifest->customer->name ?? ''}}</strong></span>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="row mt-0 mb-0" style="border-top: 1px solid black;">
                     <div class="col-12 text-center" style="line-height: 1.5;">
-                        <span>ADDRESS</span>
+                        <span>Container</span>
                     </div>
                 </div>
             </div>
@@ -133,7 +133,7 @@
             <div class="col-8" style="border-right: 1px solid black;">
                 <div class="row">
                     <div class="col-12" style="margin-left: 5px;">
-                        <p style="font-size: 10px;">{{$item->manifest->customer->alamat ?? ''}}</p>
+                        <p style="font-size: 10px;"><strong>{{$item->manifest->cont->nocontainer ?? ''}} || {{$item->manifest->cont->size ?? ''}} || {{$item->manifest->cont->nobl ?? ''}}</strong></p>
                     </div>
                 </div>
                 <div class="col-12">
@@ -143,7 +143,7 @@
                         </div>
                         <div class="col-45 text-center" style="border-right: 1px solid black;">
                             <p>
-                                {{$item->manifest->packing->code ?? ''}}
+                                <strong>{{$item->manifest->packing->code ?? ''}}</strong>
                             </p>
                         </div>
                         <div class="col-45" style="border-right: 1px solid black;">
@@ -153,7 +153,7 @@
                         </div>
                         <div class="col-45 text-center">
                             <p>
-                                {{$item->manifest->quantity}}
+                                <strong>{{$item->manifest->quantity}}</strong>
                             </p>
                         </div>
                     </div>
@@ -168,7 +168,7 @@
                 <hr>
                 <div class="row">
                     <div class="col-12 text-center">
-                        <span>{{$item->manifest->cont->job->eta}}</span>
+                        <span><strong>{{$item->manifest->cont->job->eta}}</strong></span>
                     </div>
                 </div>
             </div>
@@ -200,15 +200,15 @@
                     <div class="col-8" style="border-right: 1px solid black;">
                         <div class="row">
                             <div class="col-6 text-center" style="border-right: 1px solid black;">
-                                <p>{{$item->manifest->cont->job->Kapal->name ?? ''}}</p>
+                                <p><strong>{{$item->manifest->cont->job->Kapal->name ?? ''}}</strong></p>
                             </div>
                             <div class="col-6 text-center">
-                                <p>{{$item->manifest->nohbl ?? ''}} - {{$item->nomor}}</p>
+                                <p><strong>{{$item->manifest->nohbl ?? ''}} - {{$item->nomor}}</strong></p>
                             </div>
                         </div>
                     </div>
                     <div class="col-4 text-center">
-                        <p>{{$item->manifest->cont->job->Forwarding->name ?? ''}}</p>
+                        <p><strong>{{$item->manifest->cont->job->Forwarding->name ?? ''}}</strong></p>
                     </div>
                 </div>
             </div>

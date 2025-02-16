@@ -424,7 +424,7 @@ class GateInController extends Controller
             ],
             "tujuan" => [
                 [
-                    "geo_code"=> $cont->job->PLP->gudang_tujuan,
+                    "geo_code"=> 'TPS INTI MANDIRI',
                     "no_sj"=> "",
                     "description"=> "",
                     "cust_alert_telegram"=> [],

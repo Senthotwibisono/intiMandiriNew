@@ -286,7 +286,7 @@ body {
                         2. Terhadapt nota yang diajukan koreksi harus dilunasi terlebih dahulu. <br>
                         3. Tidak dibenarkan memberi imbalan kepada petugas. <br>
                         4. Nota ini berlaku sebagai bukti pembayaran. <br>
-                        5. Untuk permintaan faktur pajak dapat email ke intimandiri.tax2025@gmail.com
+                        5. Untuk permintaan faktur pajak dapat email ke intimandiri tax@inti-mandiri.com
                     </div>
                     <div class="col-6 text-right">
                         <div class="row">

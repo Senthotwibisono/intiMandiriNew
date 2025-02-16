@@ -561,7 +561,7 @@ class FormFCLController extends Controller
                     // Tarif WMS
                     $tarifWMS = TWMS::where('size', $size)->where('type', $ctr_type)->first();
                     
-                    if ($form->type == 'STANDRT' || $form->type == 'BCF') {
+                    if ($form->type == 'STANDART' || $form->type == 'BCF') {
                         foreach ($tglMasuks as $tglmasuk) {
                             $etd = Carbon::parse($form->etd);
                             $masuk = Carbon::parse($tglmasuk);

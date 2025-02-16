@@ -8,8 +8,8 @@
 
   <title> {{$title}} | Icon Sarana</title>
   <link rel="stylesheet" href="{{asset('dist/assets/css/main/app.css')}}">
-  <link rel="shortcut icon" href="{{asset('logo/IntiMandiri.PNG')}}" type="image/x-icon">
-  <link rel="shortcut icon" href="{{asset('logo/IntiMandiri.PNG')}}" type="image/png">
+  <link rel="shortcut icon" href="{{asset('logo/IntiMandiri.png')}}" type="image/x-icon">
+  <link rel="shortcut icon" href="{{asset('logo/IntiMandiri.png')}}" type="image/png">
 </head>
 
 
@@ -162,7 +162,7 @@
         <div class="col-12">
             <div class="text-center">
                <div class="logo">
-                    <img src="/logo/IntiMandiri.PNG" class="img" alt="">
+                    <img src="/logo/IntiMandiri.png" class="img" alt="">
                </div>
             </div>
        </div>
