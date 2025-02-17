@@ -876,7 +876,7 @@ class DokumenController extends Controller
                                 $alasanKemas = "Jenis Kemas Berbeda";
                             }
     
-                            if ($manifest->quantity != $bcKMS) {
+                            if ($manifest->quantity != $bcKMS->jml_kms) {
                                 $alasanJml = "Quantity Berbeda";
                             }
     
@@ -1111,7 +1111,7 @@ class DokumenController extends Controller
                                 $alasanKemas = "Jenis Kemas Berbeda";
                             }
     
-                            if ($manifest->quantity != $bcKMS) {
+                            if ($manifest->quantity != $bcKMS->jml_kms) {
                                 $alasanJml = "Quantity Berbeda";
                             }
     
@@ -1370,6 +1370,7 @@ class DokumenController extends Controller
                     if ($sppb->jml_cont == 0) {
                         $manifest = Manifest::where('nohbl', $sppb->no_bl_awb)->where('tglbuangmty', null)->first();
                         if ($manifest) {
+                            $alasanBasic = null;
                             $alasanCust = null;
                             $alasanKemas = null;
                             $alasanJml = null;
@@ -1385,7 +1386,7 @@ class DokumenController extends Controller
                                 $statusBC = "HOLD";
                             }
     
-                            if ($manifest->quantity != $sppbKMS) {
+                            if ($manifest->quantity != $sppbKMS->jml_kms) {
                                 $alasanJml = "Quantity Berbeda";
                                 $statusBC = "HOLD";
                             }
@@ -1621,7 +1622,7 @@ class DokumenController extends Controller
                                 $statusBC = "HOLD";
                             }
     
-                            if ($manifest->quantity != $sppbKMS) {
+                            if ($manifest->quantity != $sppbKMS->jml_kms) {
                                 $alasanJml = "Quantity Berbeda";
                                 $statusBC = "HOLD";
                             }
@@ -2161,7 +2162,7 @@ class DokumenController extends Controller
                                 $statusBC = "HOLD";
                             }
     
-                            if ($manifest->quantity != $manualKMS) {
+                            if ($manifest->quantity != $manualKMS->jml_kms) {
                                 $alasanJml = "Quantity Berbeda";
                                 $statusBC = "HOLD";
                             }
@@ -2363,7 +2364,7 @@ class DokumenController extends Controller
                                 $statusBC = "HOLD";
                             }
     
-                            if ($manifest->quantity != $manualKMS) {
+                            if ($manifest->quantity != $manualKMS->jml_kms) {
                                 $alasanJml = "Quantity Berbeda";
                                 $statusBC = "HOLD";
                             }
@@ -2598,7 +2599,7 @@ class DokumenController extends Controller
                                 $statusBC = "HOLD";
                             }
     
-                            if ($manifest->quantity != $pabeanKMS) {
+                            if ($manifest->quantity != $pabeanKMS->jml_kms) {
                                 $alasanJml = "Quantity Berbeda";
                                 $statusBC = "HOLD";
                             }
@@ -2840,7 +2841,7 @@ class DokumenController extends Controller
                                 $statusBC = "HOLD";
                             }
     
-                            if ($manifest->quantity != $pabeanKMS) {
+                            if ($manifest->quantity != $pabeanKMS->jml_kms) {
                                 $alasanJml = "Quantity Berbeda";
                                 $statusBC = "HOLD";
                             }

@@ -618,22 +618,22 @@ class DeliveryController extends Controller
                 'message' => 'Dokumen belum ada, isi dokumen terlebih dahulu!',
             ]);
         }
-        $header = Header::where('manifest_id', $request->id)->orderBy('expired_date', 'desc')->first();
+        // $header = Header::where('manifest_id', $request->id)->orderBy('expired_date', 'desc')->first();
         // var_dump($header);
         // die;
-        if (empty($header)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invoice belum terbit',
-            ]);
-        }
+        // if (empty($header)) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Invoice belum terbit',
+        //     ]);
+        // }
 
-        if ($header->status== 'N') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invoice belum dibayar',
-            ]);
-        }
+        // if ($header->status== 'N') {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Invoice belum dibayar',
+        //     ]);
+        // }
         if ($manifest->status_bc == 'release') {
             $action = 'active';
         }else {
@@ -642,7 +642,8 @@ class DeliveryController extends Controller
         $barcode = Barcode::where('ref_id', $manifest->id)->where('ref_type', '=', 'Manifest')->where('ref_action', 'gate-out')->first();
         if ($barcode) {
             $barcode->update([
-                'expired'=> $header->expired_date,
+                // 'expired'=> $header->expired_date,
+                'expired'=> Carbon::now()->addDay(3),
             ]);
             return response()->json([
                 'success' => true,
@@ -660,7 +661,8 @@ class DeliveryController extends Controller
                 'ref_number'=>$manifest->notally,
                 'barcode'=> $uniqueBarcode,
                 'status'=> $action,
-                'expired'=> $header->expired_date,
+                // 'expired'=> $header->expired_date,
+                'expired'=> Carbon::now()->addDay(3),
                 'uid'=> Auth::user()->id,
                 'created_at'=> Carbon::now(),
             ]);

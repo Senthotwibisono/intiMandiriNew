@@ -14,6 +14,11 @@
 
 
 <style>
+    @page {
+      width: 100mm;
+      height: auto;
+      margin: 0cm; /* Tambahkan margin jika diperlukan */
+    }
  .section {
       padding-top: 5%;
     }
@@ -85,8 +90,8 @@
         width:15%;   
     }
     .logo img{
-        width:45px;
-        height:45px;
+        width:50px;
+        height:auto;
         padding-top:30px;
     }
     .logo span{

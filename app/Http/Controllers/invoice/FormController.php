@@ -56,7 +56,7 @@ class FormController extends Controller
             'quantity' => $manifest->quantity,
             'weight'   => $manifest->weight,
             'meas'     => $manifest->meas,
-            'tglmasuk'     => $manifest->tglmasuk,
+            'tglmasuk'     => $manifest->cont->job->eta,
             'cbm'      => $cbm,
             'forwarding'      => $forwarding,
             'cust' => $manifest->customer_id,

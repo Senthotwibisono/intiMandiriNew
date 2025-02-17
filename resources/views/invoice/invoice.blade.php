@@ -205,6 +205,64 @@
         <hr>
         <h4 style="text-align:left;">Terbilang: {{$terbilang}}</h4>
       </div>
+      <div class="card-footer item-align-right">
+            <div class="divider divider-left">
+                <div class="divider-text">
+                    Ketentuan
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="row">
+                    <div class="col-6 text-left">
+                        1. Dalam waktu 8 hari kerja setelah nota ini diterima, tidak ada pengajuan keberatan saudara dianggap setuju. <br>
+                        2. Terhadapt nota yang diajukan koreksi harus dilunasi terlebih dahulu. <br>
+                        3. Tidak dibenarkan memberi imbalan kepada petugas. <br>
+                        4. Nota ini berlaku sebagai bukti pembayaran. <br>
+                        5. Untuk permintaan faktur pajak dapat email ke intimandiri tax@inti-mandiri.com
+                    </div>
+                    <div class="col-6 text-right">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="text-center">
+                                    Jakarta, {{Carbon\Carbon::parse($header->created_at)->format('Y-m-d')}} 
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <span style="text-decoration: underline;">{{ $header->kasirL->name }}</span>
+                                    <br>
+                                    Kasir
+                                </div>
+                            </div>
+                            @if($header->grand_total >= 5000000)
+                            <div class="col-6">
+                                <div class="text-center">
+                                        -
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <span style="text-decoration: underline;">Materai</span>
+                                    <br>
+                                </div>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                <div class="divider divider-left">
+                    <div class="divider-text">
+                        JL bugis no.15 kebon bawang, jakarta utara T.J Priok
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
   </div>
 </body>

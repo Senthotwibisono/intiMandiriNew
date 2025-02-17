@@ -256,12 +256,16 @@ class DeliveryFCLController extends Controller
                 'message' => 'Harap melunasi invoice terlebih dahulu',
             ]);
         }
-        if ($cont->active_to < Carbon::now()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invoice Container telah expired sejak :' . Carbon::parse($cont->active_to)->format('d/m/Y') . '. Harap melakukan perpanjangan terlebih dahulu',
-            ]);
-        }
+        // $expiredCheck = Carbon::now()->addDay();
+        // // var_dump($expiredCheck);
+        // // die;
+        // if ($cont->active_to < Carbon::today()) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Invoice Container telah expired sejak: ' . Carbon::parse($cont->active_to)->format('d/m/Y') . '. Harap melakukan perpanjangan terlebih dahulu',
+        //     ]);
+        // }
+        
         $barcode = Barcode::where('ref_id', $cont->id)->where('ref_type', '=', 'FCL')->where('ref_action', 'release')->first();
         if ($barcode) {
                 $now = Carbon::now();
