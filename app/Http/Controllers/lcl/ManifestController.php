@@ -143,6 +143,9 @@ class ManifestController extends Controller
         ->addColumn('final_qty', function($manifest){
             return $manifest->final_qty ?? '-';
         })
+        ->addColumn('palet', function($manifest){
+            return $manifest->palet ?? '-';
+        })
         ->addColumn('packingName', function($manifest){
             return $manifest->packing->name ?? '-';
         })
@@ -264,15 +267,17 @@ class ManifestController extends Controller
     {
         $manifest = Manifest::where('id', $request->id)->first();
         if ($manifest) {
-            if ($manifest->quantity != $request->quantity) {
+            if ($manifest->palet != $request->palet || $manifest->quantity != $request->quantity) {
                 $items = Item::where('manifest_id', $request->id)->get();
                 foreach ($items as $item) {
                     $item->delete();
                 }
-                for ($i = 1; $i < $request->quantity+1; $i++) {
+                for ($i = 1; $i < $request->palet+1; $i++) {
+                    $unit = ceil($request->quantity/$request->palet);
                     $newItem= Item::create([
                                 'manifest_id'=>$manifest->id,
                                 'barcode'=>$manifest->barcode . $i,
+                                'jumlah_barang' => $unit,
                                 'nomor'=>$i,
                                 'stripping' => 'N',
                                 'uid'=> Auth::user()->id,
@@ -290,6 +295,7 @@ class ManifestController extends Controller
                 'marking'=>$request->marking,
                 'descofgoods'=>$request->descofgoods,
                 'quantity'=>$request->quantity,
+                'palet'=>$request->palet,
                 'packing_id'=>$request->packing_id,
                 'weight'=>$request->weight,
                 'meas'=>$request->meas,
@@ -320,6 +326,7 @@ class ManifestController extends Controller
             
             if ($item) {
                 $item->name = $itemData['name'];
+                $item->jumlah_barang = $itemData['jumlah_barang'];
                 $item->save();
             }
         }
@@ -467,6 +474,13 @@ class ManifestController extends Controller
                     do {
                         $uniqueBarcode = Str::random(19);
                         } while (Manifest::where('barcode', $uniqueBarcode)->exists());
+                        
+                    if ($detil->quantity >= 10) {
+                        $palet = 5;
+                    }else {
+                        $palet = $detil->quantity;
+                    }
+                    // dd( $palet);
                     $newManifest = Manifest::create([
                         'notally'=>$noTally,
                         'validasi' => 'N',
@@ -486,9 +500,11 @@ class ManifestController extends Controller
                         'meas'=>$detil->meas,
                         'packing_tally'=>$detil->packing_id,
                         'uid'=>Auth::user()->id,
+                        'palet' => $palet,
                     ]);
-                    for ($i = 1; $i < $newManifest->quantity+1; $i++) {
+                    for ($i = 1; $i < $newManifest->palet+1; $i++) {
                         $itemName = isset($newManifest->customer) ? $newManifest->customer->name . '-' . $i : null;
+                        $unit = ceil($newManifest->quantity/$newManifest->palet);
                         $item= Item::create([
                                     'manifest_id'=>$newManifest->id,
                                     'barcode'=>$newManifest->barcode . $i,
@@ -496,8 +512,9 @@ class ManifestController extends Controller
                                     'name' => $itemName,
                                     'stripping' => 'N',
                                     'uid'=> Auth::user()->id,
+                                    'jumlah_barang' => $unit,
                                 ]);
-                     }
+                    }
                 }
             }
             TempCont::truncate();
@@ -586,6 +603,11 @@ class ManifestController extends Controller
                     do {
                         $uniqueBarcode = Str::random(19);
                         } while (Manifest::where('barcode', $uniqueBarcode)->exists());
+                        if ($detil->quantity >= 10) {
+                            $palet = 5;
+                        }else {
+                            $palet = $detil->quantity;
+                        }
                     $newManifest = Manifest::create([
                         'notally'=>$noTally,
                         'validasi' => 'N',
@@ -605,9 +627,11 @@ class ManifestController extends Controller
                         'meas'=>$detil->meas,
                         'packing_tally'=>$detil->packing_id,
                         'uid'=>Auth::user()->id,
+                        'palet' => $palet,
                     ]);
-                    for ($i = 1; $i < $newManifest->quantity+1; $i++) {
+                    for ($i = 1; $i < $newManifest->palet+1; $i++) {
                         $itemName = isset($newManifest->customer) ? $newManifest->customer->name . '-' . $i : null;
+                        $unit = ceil($newManifest->quantity/$newManifest->palet);
                         $item= Item::create([
                                     'manifest_id'=>$newManifest->id,
                                     'barcode'=>$newManifest->barcode . $i,
@@ -615,6 +639,7 @@ class ManifestController extends Controller
                                     'name' => $itemName,
                                     'stripping' => 'N',
                                     'uid'=> Auth::user()->id,
+                                    'jumlah_barang' => $unit,
                                 ]);
                      }
                 }

@@ -246,8 +246,10 @@ class StrippingController extends Controller
                 if ($manifest->ijin_stripping == 'Y') {
                     if ($request->final_qty == $manifest->quantity) {
                         $statusBc = null;
+                        $alasanHold = null;
                     }else {
                         $statusBc = 'HOLD';
+                        $alasanHold = 'Quantity Berbeda';
                     }
                     // dd($statusBc);
                     $manifest->update([
@@ -258,6 +260,8 @@ class StrippingController extends Controller
                         'validasi' => 'Y',
                         'status_bc' => $statusBc,
                         'final_qty' => $request->final_qty,
+                        'dg_label' => $request->dg_label,
+                        'alasan_hold' => $alasanHold,
                     ]);
                 }
 

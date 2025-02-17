@@ -180,10 +180,10 @@
                 {data:'eta', name:'eta', className:'text-center'},
             ],
             createdRow: function(row, data, dataIndex) {
-                if (data.status_bc === 'HOLD') {
-                    $(row).addClass('highlight-yellow');
-                } else if (data.status_bc === 'HOLDP2') {
+                if (data.flag_segel_merah === 'Y') {
                     $(row).addClass('highlight-red text-white');
+                } else if (data.status_bc === 'HOLD') {
+                    $(row).addClass('highlight-yellow');
                 } else if (data.status_bc === 'release'){
                     $(row).addClass('highlight-blue');
                 }

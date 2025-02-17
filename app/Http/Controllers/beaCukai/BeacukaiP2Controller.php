@@ -165,9 +165,11 @@ class BeacukaiP2Controller extends Controller
             }
 
             $manifest->update([
-                'alasan_segel' => $request->alasan_segel,
+               'alasan_segel' => $request->alasan_segel,
                 'nosegel' => $request->no_segel,
-                'status_bc'=>'HOLDP2',
+                'flag_segel_merah'=>'Y',
+                'uid_segel' => Auth::user()->id,
+                'tanggal_segel_merah' => Carbon::now(),
             ]);
             
             return redirect()->back()->with('status', ['type'=>'success', 'message'=>'Data berhasil di buat']);
@@ -256,7 +258,9 @@ class BeacukaiP2Controller extends Controller
 
             $manifest->update([
                 'alasan_lepas_segel' => $request->alasan_lepas_segel,
-                'status_bc'=>'HOLD',
+                'flag_segel_merah' => 'N',
+                'tanggal_lepas_segel'=> Carbon::now(),
+                'uid_lepas_segel'=> Auth::user()->id,
             ]);
             
             return redirect()->back()->with('status', ['type'=>'success', 'message'=>'Data berhasil di buat']);
@@ -536,7 +540,6 @@ class BeacukaiP2Controller extends Controller
 
             $cont->update([
                 'alasan_lepas_segel' => $request->alasan_lepas_segel,
-                'status_bc'=>'HOLD',
                 'flag_segel_merah' => 'N',
                 'tanggal_lepas_segel'=> Carbon::now(),
                 'uid_lepas_segel'=> Auth::user()->id,

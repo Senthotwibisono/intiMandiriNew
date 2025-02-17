@@ -182,6 +182,13 @@ class DokumenController extends Controller
         if(!$xml  || !$xml->children()){
            return back()->with('status', ['type' => 'error', 'message' => 'Error importing data: ' .  $this->response]);
         }
+
+        // $groups = [];
+        // foreach($xml->children() as $child) {
+        //     $groups[] = $child;
+        // }
+
+        // dd($groups);
        
         
         foreach($xml->children() as $child) {
@@ -196,10 +203,10 @@ class DokumenController extends Controller
             }
             // dd($xml);
             // Old Checking
-            // $oldPLP = PLP::where('no_plp', $header->NO_PLP)->where('tgl_plp', $header->TGL_PLP)->first();
-            // if ($oldPLP) {
-            //     return back()->with('status', ['type' => 'error', 'message' => 'Error importing data: Data Sudah Ada!!']);
-            // }
+            $oldPLP = PLP::where('no_plp', $header->NO_PLP)->where('tgl_plp', $header->TGL_PLP)->first();
+            if ($oldPLP) {
+                return back()->with('status', ['type' => 'error', 'message' => 'Error importing data: Data Sudah Ada!!']);
+            }
     
             // Inserrt Data Header
             $consolidator = Consolidator::first();
@@ -316,6 +323,8 @@ class DokumenController extends Controller
             $groups[] = $child;
         }
 
+        // dd($groups[]);
+
         foreach ($groups as $group) {
             $header = $group->header ?? $group->HEADER;
             $oldPLP = PLP::where('no_plp', $header->NO_PLP)->where('tgl_plp', $header->TGL_PLP)->first();
@@ -346,7 +355,7 @@ class DokumenController extends Controller
                     'gudang_asal'=>$header->GUDANG_ASAL,
                     'ref_number'=>$header->REF_NUMBER,
                 ]);
-                $detil = $group->DETIL ?? $group->detil;
+                $detil[] = $group->DETIL ?? $group->detil;
                 foreach ($detil as $detail) {
                     $cont = PLPdetail::create([
                         'plp_id' =>$plp->id,
@@ -849,6 +858,39 @@ class DokumenController extends Controller
                         'merk_kms'=>$detail->MERK_KMS,
                         'jml_kms'=>$detail->JML_KMS,
                     ]);
+
+                    if ($bc23->jml_cont == 0) {
+                        $manifest = Manifest::where('nohbl', $bc23->no_bl_awb)->where('tglbuangmty', null)->first();
+                        if ($manifest) {
+                            $alasanBasic = "Bukan Dokumen SPPB 2.0";
+                            $alasanCust = null;
+                            $alasanKemas = null;
+                            $alasanJml = null;
+                            // alasanCust 
+                            if ($manifest->customer->name != $bc23->nama_imp || $manifest->customer->npwp != $bc23->npwp_imp) {
+                                $alasanCust = "Data Importir Berbeda";
+                            }
+    
+                            // Alasan Kemas
+                            if ($manifest->packing->code != $bcKMS->jns_kms) {
+                                $alasanKemas = "Jenis Kemas Berbeda";
+                            }
+    
+                            if ($manifest->quantity != $bcKMS) {
+                                $alasanJml = "Quantity Berbeda";
+                            }
+    
+                            $alasanFinal = $alasanBasic . ', ' . $alasanCust . ', ' . $alasanKemas . ', ' . $alasanJml;
+    
+                            $manifest->update([
+                                'kd_dok_inout' => 2,
+                                'no_dok' => $bc23->no_sppb,
+                                'tgl_dok' => Carbon::createFromFormat('d/m/Y', $bc23->tgl_sppb)->format('Y-m-d'),
+                                'status_bc' => 'HOLD',
+                                'alasan_hold' => $alasanFinal,
+                            ]);
+                        }
+                    }
                 }
             }
 
@@ -1050,7 +1092,40 @@ class DokumenController extends Controller
                         'jns_kms'=>$detailKMS->JNS_KMS,
                         'merk_kms'=>$detailKMS->MERK_KMS,
                         'jml_kms'=>$detailKMS->JML_KMS,
-                    ]);        
+                    ]);      
+                    
+                    if ($bc23->jml_cont == 0) {
+                        $manifest = Manifest::where('nohbl', $bc23->no_bl_awb)->where('tglbuangmty', null)->first();
+                        if ($manifest) {
+                            $alasanBasic = "Bukan Dokumen SPPB 2.0";
+                            $alasanCust = null;
+                            $alasanKemas = null;
+                            $alasanJml = null;
+                            // alasanCust 
+                            if ($manifest->customer->name != $bc23->nama_imp || $manifest->customer->npwp != $bc23->npwp_imp) {
+                                $alasanCust = "Data Importir Berbeda";
+                            }
+    
+                            // Alasan Kemas
+                            if ($manifest->packing->code != $bcKMS->jns_kms) {
+                                $alasanKemas = "Jenis Kemas Berbeda";
+                            }
+    
+                            if ($manifest->quantity != $bcKMS) {
+                                $alasanJml = "Quantity Berbeda";
+                            }
+    
+                            $alasanFinal = $alasanBasic . ', ' . $alasanCust . ', ' . $alasanKemas . ', ' . $alasanJml;
+    
+                            $manifest->update([
+                                'kd_dok_inout' => 2,
+                                'no_dok' => $bc23->no_sppb,
+                                'tgl_dok' => Carbon::createFromFormat('d/m/Y', $bc23->tgl_sppb)->format('Y-m-d'),
+                                'status_bc' => 'HOLD',
+                                'alasan_hold' => $alasanFinal,
+                            ]);
+                        }
+                    }
                 }
             }
         }
@@ -1292,6 +1367,40 @@ class DokumenController extends Controller
                         'merk_kms'=>$detail->MERK_KMS,
                         'jml_kms'=>$detail->JML_KMS,
                     ]);
+                    if ($sppb->jml_cont == 0) {
+                        $manifest = Manifest::where('nohbl', $sppb->no_bl_awb)->where('tglbuangmty', null)->first();
+                        if ($manifest) {
+                            $alasanCust = null;
+                            $alasanKemas = null;
+                            $alasanJml = null;
+                            $statusBC = "release";
+                            if ($manifest->customer->name != $sppb->nama_imp || $manifest->customer->npwp != $sppb->npwp_imp) {
+                                $alasanCust = "Data Importir Berbeda";
+                                $statusBC = "HOLD";
+                            }
+    
+                            // Alasan Kemas
+                            if ($manifest->packing->code != $sppbKMS->jns_kms) {
+                                $alasanKemas = "Jenis Kemas Berbeda";
+                                $statusBC = "HOLD";
+                            }
+    
+                            if ($manifest->quantity != $sppbKMS) {
+                                $alasanJml = "Quantity Berbeda";
+                                $statusBC = "HOLD";
+                            }
+    
+                            $alasanFinal = $alasanBasic . ', ' . $alasanCust . ', ' . $alasanKemas . ', ' . $alasanJml;
+    
+                            $manifest->update([
+                                'kd_dok_inout' => 1,
+                                'no_dok' => $sppb->no_sppb,
+                                'tgl_dok' => Carbon::createFromFormat('d/m/Y', $sppb->tgl_sppb)->format('Y-m-d'),
+                                'status_bc' => $statusBC,
+                                'alasan_hold' => $alasanFinal,
+                            ]);
+                        }
+                    }
                 }
             }
 
@@ -1472,7 +1581,7 @@ class DokumenController extends Controller
                                 ]);
                             }
                             $contF->update([
-                                'kd_dok_inout' => 1,
+                                 'kd_dok_inout' => 1,
                                  'no_dok' => $sppb->no_sppb,
                                  'tgl_dok' => Carbon::createFromFormat('d/m/Y', $sppb->tgl_sppb)->format('Y-m-d'),
                                  'status_bc' => $statusBC,
@@ -1492,7 +1601,42 @@ class DokumenController extends Controller
                         'jns_kms'=>$detailKMS->JNS_KMS,
                         'merk_kms'=>$detailKMS->MERK_KMS,
                         'jml_kms'=>$detailKMS->JML_KMS,
-                    ]);            
+                    ]);     
+                    
+                    if ($sppb->jml_cont == 0) {
+                        $manifest = Manifest::where('nohbl', $sppb->no_bl_awb)->where('tglbuangmty', null)->first();
+                        if ($manifest) {
+                            $alasanCust = null;
+                            $alasanKemas = null;
+                            $alasanJml = null;
+                            $statusBC = "release";
+                            if ($manifest->customer->name != $sppb->nama_imp || $manifest->customer->npwp != $sppb->npwp_imp) {
+                                $alasanCust = "Data Importir Berbeda";
+                                $statusBC = "HOLD";
+                            }
+    
+                            // Alasan Kemas
+                            if ($manifest->packing->code != $sppbKMS->jns_kms) {
+                                $alasanKemas = "Jenis Kemas Berbeda";
+                                $statusBC = "HOLD";
+                            }
+    
+                            if ($manifest->quantity != $sppbKMS) {
+                                $alasanJml = "Quantity Berbeda";
+                                $statusBC = "HOLD";
+                            }
+    
+                            $alasanFinal = $alasanBasic . ', ' . $alasanCust . ', ' . $alasanKemas . ', ' . $alasanJml;
+    
+                            $manifest->update([
+                                'kd_dok_inout' => 1,
+                                'no_dok' => $sppb->no_sppb,
+                                'tgl_dok' => Carbon::createFromFormat('d/m/Y', $sppb->tgl_sppb)->format('Y-m-d'),
+                                'status_bc' => $statusBC,
+                                'alasan_hold' => $alasanFinal,
+                            ]);
+                        }
+                    }
                 }
             }
         }
@@ -1998,6 +2142,41 @@ class DokumenController extends Controller
                         'merk_kms' => $detail->MERK_KMS,
                         'jml_kms' => $detail->JML_KMS,
                     ]);
+
+                    if ($manual->jml_cont == 0) {
+                        $manifest = Manifest::where('nohbl', $manual->no_bl_awb)->where('tglbuangmty', null)->first();
+                        if ($manifest) {
+                            $alasanCust = null;
+                            $alasanKemas = null;
+                            $alasanJml = null;
+                            $statusBC = "release";
+                            if ($manifest->customer->name != $manual->consignee) {
+                                $alasanCust = "Data Importir Berbeda";
+                                $statusBC = "HOLD";
+                            }
+    
+                            // Alasan Kemas
+                            if ($manifest->packing->code != $manualKMS->jns_kms) {
+                                $alasanKemas = "Jenis Kemas Berbeda";
+                                $statusBC = "HOLD";
+                            }
+    
+                            if ($manifest->quantity != $manualKMS) {
+                                $alasanJml = "Quantity Berbeda";
+                                $statusBC = "HOLD";
+                            }
+    
+                            $alasanFinal = $alasanBasic . ', ' . $alasanCust . ', ' . $alasanKemas . ', ' . $alasanJml;
+    
+                            $manifest->update([
+                                'kd_dok_inout' => $manual->kd_dok_inout,
+                                'no_dok' => $manual->no_dok_inout,
+                                'tgl_dok' => Carbon::createFromFormat('d/m/Y', $manual->tgl_dok_inout)->format('Y-m-d'),
+                                'status_bc' => $statusBC,
+                                'alasan_hold' => $alasanFinal,
+                            ]);
+                        }
+                    }
                 }
             }
             if ($cont) {
@@ -2155,7 +2334,52 @@ class DokumenController extends Controller
                               ]);
                          }
                      }
-                 }    
+                }    
+                foreach ($group->DETIL->KMS as $detail) {
+                    // dd($kms, $detail);
+                    $manualKms = ManualKms::create([
+                        'manual_id' => $manual->idm,
+                        'id' => $detail->ID,
+                        'jns_kms' => $detail->JNS_KMS,
+                        'merk_kms' => $detail->MERK_KMS,
+                        'jml_kms' => $detail->JML_KMS,
+                    ]);
+
+                    if ($manual->jml_cont == 0) {
+                        $manifest = Manifest::where('nohbl', $manual->no_bl_awb)->where('tglbuangmty', null)->first();
+                        if ($manifest) {
+                            $alasanCust = null;
+                            $alasanKemas = null;
+                            $alasanJml = null;
+                            $statusBC = "release";
+                            if ($manifest->customer->name != $manual->consignee) {
+                                $alasanCust = "Data Importir Berbeda";
+                                $statusBC = "HOLD";
+                            }
+    
+                            // Alasan Kemas
+                            if ($manifest->packing->code != $manualKMS->jns_kms) {
+                                $alasanKemas = "Jenis Kemas Berbeda";
+                                $statusBC = "HOLD";
+                            }
+    
+                            if ($manifest->quantity != $manualKMS) {
+                                $alasanJml = "Quantity Berbeda";
+                                $statusBC = "HOLD";
+                            }
+    
+                            $alasanFinal = $alasanBasic . ', ' . $alasanCust . ', ' . $alasanKemas . ', ' . $alasanJml;
+    
+                            $manifest->update([
+                                'kd_dok_inout' => $manual->kd_dok_inout,
+                                'no_dok' => $manual->no_dok_inout,
+                                'tgl_dok' => Carbon::createFromFormat('d/m/Y', $manual->tgl_dok_inout)->format('Y-m-d'),
+                                'status_bc' => $statusBC,
+                                'alasan_hold' => $alasanFinal,
+                            ]);
+                        }
+                    }
+                }
              }
          }
          
@@ -2355,6 +2579,41 @@ class DokumenController extends Controller
                         'jns_kms' => $detail->JNS_KMS,
                         'jml_kms' => $detail->JML_KMS,
                     ]);
+
+                    if ($pabean->jml_cont == 0) {
+                        $manifest = Manifest::where('nohbl', $pabean->no_bl_awb)->where('tglbuangmty', null)->first();
+                        if ($manifest) {
+                            $alasanCust = null;
+                            $alasanKemas = null;
+                            $alasanJml = null;
+                            $statusBC = "release";
+                            if ($manifest->customer->name != $pabean->nm_imp || $manifest->customer->npwp != $pabean->npwp_imp) {
+                                $alasanCust = "Data Importir Berbeda";
+                                $statusBC = "HOLD";
+                            }
+    
+                            // Alasan Kemas
+                            if ($manifest->packing->code != $pabeanKMS->jns_kms) {
+                                $alasanKemas = "Jenis Kemas Berbeda";
+                                $statusBC = "HOLD";
+                            }
+    
+                            if ($manifest->quantity != $pabeanKMS) {
+                                $alasanJml = "Quantity Berbeda";
+                                $statusBC = "HOLD";
+                            }
+    
+                            $alasanFinal = $alasanBasic . ', ' . $alasanCust . ', ' . $alasanKemas . ', ' . $alasanJml;
+    
+                            $manifest->update([
+                                'kd_dok_inout' => $pabean->kd_dok_inout,
+                                'no_dok' => $pabean->no_dok_inout,
+                                'tgl_dok' => Carbon::createFromFormat('d/m/Y', $pabean->tgl_dok_inout)->format('Y-m-d'),
+                                'status_bc' => $statusBC,
+                                'alasan_hold' => $alasanFinal,
+                            ]);
+                        }
+                    }
                 }
             }
 
@@ -2562,6 +2821,41 @@ class DokumenController extends Controller
                         'jns_kms' => $detailKMS->JNS_KMS,
                         'jml_kms' => $detailKMS->JML_KMS,
                     ]);          
+
+                    if ($pabean->jml_cont == 0) {
+                        $manifest = Manifest::where('nohbl', $pabean->no_bl_awb)->where('tglbuangmty', null)->first();
+                        if ($manifest) {
+                            $alasanCust = null;
+                            $alasanKemas = null;
+                            $alasanJml = null;
+                            $statusBC = "release";
+                            if ($manifest->customer->name != $pabean->nm_imp || $manifest->customer->npwp != $pabean->npwp_imp) {
+                                $alasanCust = "Data Importir Berbeda";
+                                $statusBC = "HOLD";
+                            }
+    
+                            // Alasan Kemas
+                            if ($manifest->packing->code != $pabeanKMS->jns_kms) {
+                                $alasanKemas = "Jenis Kemas Berbeda";
+                                $statusBC = "HOLD";
+                            }
+    
+                            if ($manifest->quantity != $pabeanKMS) {
+                                $alasanJml = "Quantity Berbeda";
+                                $statusBC = "HOLD";
+                            }
+    
+                            $alasanFinal = $alasanBasic . ', ' . $alasanCust . ', ' . $alasanKemas . ', ' . $alasanJml;
+    
+                            $manifest->update([
+                                'kd_dok_inout' => $pabean->kd_dok_inout,
+                                'no_dok' => $pabean->no_dok_inout,
+                                'tgl_dok' => Carbon::createFromFormat('d/m/Y', $pabean->tgl_dok_inout)->format('Y-m-d'),
+                                'status_bc' => $statusBC,
+                                'alasan_hold' => $alasanFinal,
+                            ]);
+                        }
+                    }
                 }
             }
         }

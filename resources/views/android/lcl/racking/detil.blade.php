@@ -54,152 +54,45 @@
 
 @endsection
 @section('content')
+
+
 <section>
     <div class="card">
-        <div class="card-header">
-            <div class="button-container">
-                <a href="javascript:void(0)" onclick="openWindow('/lcl/realisasi/racking/photoPlacement{{$manifest->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
-            </div>
-        </div>
-        <form action="{{ route('lcl.racking.updatePhoto')}}" method="post" enctype="multipart/form-data">
+        <form action="{{ route('photo.lcl.storeManifest')}}" method="post" enctype="multipart/form-data">
             @csrf
             <div class="card-body">
-                <div class="row mt-0">
+                <div class="col-sm-12">
                     <div class="form-group">
-                        <label for="">Photo Placement</label>
-                        <input type="hidden" name="id" value="{{$manifest->id}}">
-                        <input type="file" class="form-control" id="photos" name="photos[]" multiple accept="image/*">
+                        <label for="">No HBL</label>
+                        <input type="text" name="nohbl" value="{{$item->manifest->nohbl}}" id="nohbl_edit" class="form-control" readonly>
+                        <input type="hidden" name="id" value="{{$item->id}}" id="id_edit" class="form-control" readonly>
                     </div>
                     <div class="form-group">
-                        <label for="">Keterangan Photo</label>
-                        <select name="keteranganPhoto" class="js-example-basic-single form-select select2" style="width: 100%;">
-                            <option disabled selected value>Pilih Satu!</option>
-                            @foreach($kets as $ket)
-                                <option value="{{$ket->keterangan}}">{{$ket->keterangan}}</option>
-                            @endforeach
-                        </select>
+                        <label for="">Nomor Palet</label>
+                        <input type="text" name="quantity" value="{{$item->nomor}}" id="quantity_edit" class="form-control" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="">Jumlah Dalam Palet</label>
+                        <input type="text" name="quantity" value="{{$item->jumlah_barang}} / {{$item->manifest->quantity}}" id="quantity_edit" class="form-control" readonly>
                     </div>
                 </div>
+                <div class="card-body text-center">
+                    <div id="qr-reader-container">
+                        <video id="video" autoplay playsinline></video>
+                        <canvas id="canvas" hidden></canvas>
+                    </div>
+                </div>
+                
             </div>
             <div class="card-footer">
-                <button type="submit" class="btn btn-outline-success">Submit</button>
+                <div class="button-container">
+                    <button class="btn btn-success" type="submit">Submit</button>
+                </div>
             </div>
         </form>
     </div>
 </section>
-<section>
-    <div class="card">
-        <div class="card-body fixed-height-cardBody">
-            <table class="tabelCustom">
-                <thead>
-                    <tr>
-                        <th class="text-center">Action</th>
-                        <th class="text-center">Barcode Barang</th>
-                        <th class="text-center">Name Barang</th>
-                        <th class="text-center">Nomor Barang</th>
-                        <th class="text-center">Rack</th>
-                        <th class="text-center">Tier</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($placed as $plc)
-                        <tr>
-                            <td>
-                                <div class="button-container">
-                                    <button class="btn btn-outline-danger unPlace" data-id="{{$plc->id}}">Batal Placement</button>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <a href="javascript:void(0)" onclick="openWindow('/lcl/realisasi/racking/itemBarcode-{{$plc->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
-                            </td>
-                            <td class="text-center">{{$plc->name}}</td>
-                            <td class="text-center">{{$plc->nomor}}</td>
-                            <td class="text-center">{{$plc->Rack->name ?? ''}}</td>
-                            <td class="text-center">{{$plc->Rack->tier}}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    </div>
-</section>
 
-<section>
-    <div class="card">
-        <div class="card-body">
-            <form action="{{ route('lcl.racking.update') }}" method="POST">
-                @csrf
-                <div class="row mt-0">
-                    <div class="col-sm-6">
-                        <div class="rack-area" id="rack-area">
-                            <h3>Rack Area</h3>
-                            <div class="form-group">
-                                <label for="">Rack</label>
-                                <input type="hidden" name="manifest_id" value="{{$manifest->id}}">
-                                <select id="rack-select" name="lokasi_id" class="js-example-basic-single select2 form-select" style="width: 100%;">
-                                    <option disabled selected>Pilih Satu!</option>
-                                    @foreach($locs as $loc)
-                                        <option value="{{$loc->id}}">{{$loc->name}}</option>
-                                    @endforeach
-                                </select>
-                                <button id="scan-button" type="button" class="btn btn-primary mt-2">Scan Barcode</button>
-                                <div class="form-group">
-                                    <label for="">Tier</label>
-                                    <select name="tier" class="form-select" id="tier" required>
-                                        <option value="1">1</option>
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="rack-dropzone dropzone">
-                                <!-- Dropzone where items will be placed -->
-                            </div>
-                            <button id="submitButton" type="button" class="btn btn-primary mt-3">Update Placement</button>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="unplaced-items">
-                            <h3>Unplaced Items</h3>
-                            <div class="form-check mb-2">
-                                <input type="checkbox" class="form-check-input" id="select-all">
-                                <label class="form-check-label" for="select-all">Select All</label>
-                            </div>
-                            <ul id="item-list" class="dropzone">
-                                @foreach($item as $it)
-                                    <li class="draggable-item" draggable="true" data-item-id="{{ $it->id }}">
-                                        {{ $it->nomor }} -- {{ $it->barcode }}
-                                    </li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-</section>
-
-<!-- Modal -->
-<div class="modal fade" id="scanModal" tabindex="-1" role="dialog" aria-labelledby="scanModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="scanModalLabel">Scan Barcode</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div id="reader" style="width: 100%;"></div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 
 @endsection
@@ -435,7 +328,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 </script>
 
-<script>
+<!-- <script>
   document.addEventListener('DOMContentLoaded', (event) => {
     const scanButton = document.getElementById('scan-button');
     const rackSelect = document.getElementById('rack-select');
@@ -444,39 +337,32 @@ document.addEventListener('DOMContentLoaded', function () {
     scanButton.addEventListener('click', () => {
       scanModal.show();
 
-      // Initialize the QR code scanner
+
       const html5QrCode = new Html5Qrcode("reader");
 
       html5QrCode.start(
         { facingMode: "environment" }, 
         {
-          fps: 10,    // Optional, set the fps to 10
-          qrbox: 250  // Optional, set the size of the scanning box
+          fps: 10,    
+          qrbox: 250  
         },
         (decodedText, decodedResult) => {
-          // Assuming the barcode contains the ID directly
           const barcodeId = decodedText;
 
-          // Check if barcodeId is in the select options
           const optionExists = Array.from(rackSelect.options).some(option => option.value === barcodeId);
 
           if (optionExists) {
-            // Set the value of the select element
             rackSelect.value = barcodeId;
-            
-            // Trigger change event
+
             const event = new Event('change');
             rackSelect.dispatchEvent(event);
 
-            // Stop scanning
             html5QrCode.stop().then(() => {
-              // Close the modal
               scanModal.hide();
             }).catch((err) => {
               console.log("Failed to stop scanning.", err);
             });
           } else {
-            // Show error using SweetAlert
             Swal.fire({
               icon: 'error',
               title: 'Barcode Not Found',
@@ -485,15 +371,110 @@ document.addEventListener('DOMContentLoaded', function () {
           }
         },
         (errorMessage) => {
-          // Show detailed error using SweetAlert
           console.log("QR code scanning error:", errorMessage);
         }
       ).catch((err) => {
-        // Show error using SweetAlert
         console.log("Failed to stop scanning.", err);
       });
     });
   });
+</script> -->
+
+<script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
+<script>
+   const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const canvasContext = canvas.getContext('2d');
+
+// Fungsi untuk memulai kamera
+async function startCamera() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        video.srcObject = stream;
+        video.setAttribute('playsinline', true);
+        video.play();
+        scanQRCode();
+    } catch (err) {
+        console.error('Error accessing camera:', err);
+        Swal.fire('Error', 'Kamera tidak dapat diakses. Pastikan izin kamera telah diberikan.', 'error');
+    }
+}
+
+// Fungsi untuk memindai QR Code
+function scanQRCode() {
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const imageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
+        const qrCode = jsQR(imageData.data, canvas.width, canvas.height);
+
+        if (qrCode) {
+            Swal.fire({
+                title: 'Loading...',
+                text: 'Memproses data, harap tunggu...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            let formData = {
+                qr_code: qrCode.data,
+                id: document.querySelector('#id_edit').value
+            };
+
+            fetch('/android/lcl/rackingAndroid', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.message); });
+                }
+                return response.json();
+            })
+            .then(result => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: 'Data berhasil diproses!',
+                    showConfirmButton: true
+                }).then(() => {
+                    window.location.href = '/android/lcl/racking';
+                });
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: 'Terjadi kesalahan: ' + error.message
+                });
+                console.error('Error:', error);
+            });
+
+            stopCamera();
+        }
+    }
+    requestAnimationFrame(scanQRCode);
+}
+
+// Fungsi untuk menghentikan kamera
+function stopCamera() {
+    if (video.srcObject) {
+        video.srcObject.getTracks().forEach(track => track.stop());
+        video.srcObject = null;
+    }
+}
+
+// Mulai kamera saat halaman dimuat
+startCamera();
+
 </script>
 
 

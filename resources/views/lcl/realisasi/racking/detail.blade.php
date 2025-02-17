@@ -73,6 +73,7 @@
                             <th class="text-center">Barcode Barang</th>
                             <th class="text-center">Name Barang</th>
                             <th class="text-center">Nomor Barang</th>
+                            <th class="text-center">Jumlah Barang</th>
                             <th class="text-center">Rack</th>
                             <th class="text-center">Tier</th>
                         </tr>
@@ -157,6 +158,7 @@
                 { data: 'barcode', name: 'barcode', className: 'text-center' },
                 { data: 'name', name: 'name', className: 'text-center' },
                 { data: 'nomor', name: 'nomor', className: 'text-center' },
+                { data: 'jumlah_barang', name: 'jumlah_barang', className: 'text-center' },
                 { data: 'rack', name: 'rack', className: 'text-center' },
                 { data: 'tier', name: 'tier', className: 'text-center' },
             ]

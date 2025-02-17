@@ -256,6 +256,12 @@ class DeliveryFCLController extends Controller
                 'message' => 'Harap melunasi invoice terlebih dahulu',
             ]);
         }
+        if ($cont->active_to < Carbon::now()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invoice Container telah expired sejak :' . Carbon::parse($cont->active_to)->format('d/m/Y') . '. Harap melakukan perpanjangan terlebih dahulu',
+            ]);
+        }
         $barcode = Barcode::where('ref_id', $cont->id)->where('ref_type', '=', 'FCL')->where('ref_action', 'release')->first();
         if ($barcode) {
                 $now = Carbon::now();
@@ -266,7 +272,7 @@ class DeliveryFCLController extends Controller
                     $barcode->update([
                         'barcode'=> $uniqueBarcode,
                         'status'=>'active',
-                        'expired'=> Carbon::now()->addDays(3),
+                        'expired'=> $cont->active_to,
                     ]);
                     return response()->json([
                         'success' => true,

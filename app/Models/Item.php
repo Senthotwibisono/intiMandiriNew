@@ -23,6 +23,7 @@ class Item extends Model
         'uid',
         'lokasi_id',
         'tier',
+        'jumlah_barang',
     ];
 
     public function user()
@@ -37,5 +38,10 @@ class Item extends Model
     public function Rack()
     {
         return $this->belongsTo(PlacementManifest::class, 'lokasi_id', 'id');
+    }
+
+    public function Tier()
+    {
+        return $this->belongsTo(RackTier::class, 'tier', 'id');
     }
 }

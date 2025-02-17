@@ -194,6 +194,7 @@
                                 <tr>
                                     <th>Nomor Barang</th>
                                     <th>Name</th>
+                                    <th>Jumlah Barang</th>
                                     <th>UID</th>
                                     <th>Last Update</th>
                                 </tr>
@@ -205,6 +206,9 @@
                                         <td class="text-center">
                                             <input type="hidden" name="items[{{$item->id}}][id]" value="{{$item->id}}">
                                             <input type="text" name="items[{{$item->id}}][name]" value="{{$item->name ?? ' '}}" class="form-control">
+                                        </td>
+                                        <td>
+                                            <input type="text" name="items[{{$item->id}}][jumlah_barang]" value="{{$item->jumlah_barang ?? '0'}}" class="form-control">
                                         </td>
                                         <td class="text-center">{{$item->user->name}}</td>
                                         <td class="text-center">{{$item->updated_time}}</td>

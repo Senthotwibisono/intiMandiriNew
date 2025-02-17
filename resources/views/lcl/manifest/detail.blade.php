@@ -1,13 +1,6 @@
 @extends('partial.main')
 @section('custom_styles')
-<style>
-    .table-responsive td,
-    .table-responsive th {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-</style>
+
 @endsection
 @section('content')
 <section>
@@ -102,7 +95,7 @@
         </div>
         <div class="card-body">
             <div class="table">
-                <table class="table-hover table-stripped" id="tableDetil">
+                <table class="table-hover table-stripped" id="tableDetil" style="white-text: norwap;">
                     <thead>
                         <tr>
                             <th class="text-center">Delete</th>
@@ -116,6 +109,7 @@
                             <th class="text-center">Customer</th>
                             <th class="text-center">Qty</th>
                             <th class="text-center">Quantity Final</th>
+                            <th class="text-center">Palet</th>
                             <th class="text-center">Packing</th>
                             <th class="text-center">Kode Kemas</th>
                             <th class="text-center">Desc</th>
@@ -319,6 +313,10 @@
                                 <input type="number" name="quantity" id="quantity_edit" class="form-control">
                             </div>
                             <div class="form-group">
+                                <label for="">Palet</label>
+                                <input type="number" name="palet" id="palet_edit" class="form-control">
+                            </div>
+                            <div class="form-group">
                                 <label for="">Packing</label>
                                 <select name="packing_id" id="packing_id_edit"  style="width: 100%;" class="editSelect form-select select2">
                                     <option value disabled selected>Pilih Satu</option>
@@ -380,6 +378,7 @@
                 { data: 'customer', name: 'customer', className: 'text-center' }, // Define the column
                 { data: 'quantity', name: 'quantity', className: 'text-center' }, // Define the column
                 { data: 'final_qty', name: 'final_qty', className: 'text-center' }, // Define the column
+                { data: 'palet', name: 'palet', className: 'text-center' }, // Define the column
                 { data: 'packingName', name: 'packingName', className: 'text-center' }, // Define the column
                 { data: 'packingCode', name: 'packingCode', className: 'text-center' }, // Define the column
                 { data: 'desc', name: 'desc', className: 'text-center' }, // Define the column
@@ -417,6 +416,7 @@
         $("#editCust #marking_edit").val(response.data.marking);
         $("#editCust #descofgoods_edit").val(response.data.descofgoods);
         $("#editCust #quantity_edit").val(response.data.quantity);
+        $("#editCust #palet_edit").val(response.data.palet);
         $("#editCust #packing_id_edit").val(response.data.packing_id).trigger('change');
         $("#editCust #weight_edit").val(response.data.weight);
         $("#editCust #meas_edit").val(response.data.meas);

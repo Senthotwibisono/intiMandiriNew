@@ -582,7 +582,7 @@ class GateInController extends Controller
         $cont = Cont::find($id);
         $data['title'] = 'Surat Jalan Container ' . $cont->nocontainer;
 
-        $data['container'] = $cont;
+        $data['cont'] = $cont;
 
         return view('lcl.realisasi.gateIn.suratJalan', $data);
     }

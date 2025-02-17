@@ -46,8 +46,9 @@
                     </thead>
                 </table>
             </div>
-            <div class="container">
+            <div class="button-container">
                     <button class="btn btn-outline-info approve" id="approve" type="button">Approve</button>
+                    <button class="btn btn-outline-danger batalApv" id="batalApv" type="button">Batal Approve</button>
             </div>
         </div>
     </div>
@@ -191,6 +192,86 @@ $(document).ready(function() {
                         // Kirim data ke server
                         $.ajax({
                             url: '/bc/lcl/realisasi/stripping/approveCont',
+                            method: 'POST',
+                            data: { ids: selected },
+                            success: function (response) {
+                                console.log(response);
+                                if (response.success) {
+                                    Swal.fire('Saved!', '', 'success')
+                                        .then(() => {
+                                            // Memuat ulang halaman setelah berhasil menyimpan data
+                                            window.location.reload();
+                                        });
+                                } else {
+                                    Swal.fire('Error', response.message, 'error');
+                                }
+                            },
+                            error: function (error) {
+                                var errors = response.responseJSON.errors;
+                                if (errors) {
+                                    var errorMessage = '';
+                                    $.each(errors, function(key, value) {
+                                        errorMessage += value[0] + '<br>';
+                                    });
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Validation Error',
+                                        html: errorMessage,
+                                    });
+                                } else {
+                                    console.log('error:', response);
+                                }
+                            }
+                        });
+                    } else {
+                        Swal.fire('Error!', 'Nothing Selected', 'error')
+                        .then(() => {
+                        });
+                    }
+                } else if (result.isDenied) {
+                    Swal.fire('Changes are not saved', '', 'info')
+                }
+            });
+    });
+</script>
+
+<script>
+    $('#batalApv').on('click', function () {
+        var selected = [];
+        $('.select-cont:checked').each(function () {
+            selected.push($(this).val());
+        });
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        Swal.fire({
+                title: 'Are you sure?',
+                text: "",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, update it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                    title: 'Processing...',
+                    text: 'Please wait while we update the container',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                        willOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    if (selected.length > 0) {
+                        // Kirim data ke server
+                        $.ajax({
+                            url: '/bc/lcl/realisasi/stripping/BatalapproveCont',
                             method: 'POST',
                             data: { ids: selected },
                             success: function (response) {

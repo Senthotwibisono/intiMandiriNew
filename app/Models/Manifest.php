@@ -165,9 +165,10 @@ class Manifest extends Model
         'flag_bc',
         'no_flag_bc',
         'description_flag_bc',
-        'alasan_segel',
-        'alasan_lepas_segel',
+       
         'status_bc',
+        'alasan_hold',
+
         'release_bc',
         'release_bc_date',
         'release_bc_uid',
@@ -191,6 +192,7 @@ class Manifest extends Model
         'date_finish_behandle',
         'desc_check_behandle',
         'desc_finish_behandle',
+
         'location_id',
         'location_name',
         'final_qty',
@@ -207,6 +209,20 @@ class Manifest extends Model
 
         'coari_flag',
         'codeco_flag',
+
+        // BeaCukaiP2
+        'alasan_segel',
+        'alasan_lepas_segel',
+        'flag_segel_merah',
+        'tanggal_segel_merah',
+        'tanggal_lepas_segel_merah',
+        'uid_segel',
+        'uid_lepas_segel',
+
+        'active_to',
+        'type_class',
+        'dg_label',
+        'palet',
     ];
 
     public function user()
@@ -298,6 +314,16 @@ class Manifest extends Model
         $tglBuangMty = $this->tglbuangmty ? Carbon::parse($this->tglbuangmty) : Carbon::now();
 
         return $tglBuangMty->diffInDays($tglStripping);
+    }
+
+    public function uidSegel()
+    {
+        return $this->belongsTo(User::class, 'uid_segel', 'id');
+    }
+
+    public function uidLepasSegel()
+    {
+        return $this->belongsTo(User::class, 'uid_lepas_segel', 'id');
     }
 
 }

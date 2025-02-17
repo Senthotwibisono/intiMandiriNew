@@ -224,5 +224,78 @@
         </div>
     </div>
 </div>
+@if($barcode->ref_type == 'LCL' && $barcode->ref_action == 'RELEASE')
+<div class="page-break">
+    <div class="container">
+        <div class="row">
+            <div class="card">
+                <div class="card-header">
+                    <div class="col-12">
+                        <div class="d-flex align-items-center">
+                            <div class="logo img me-3">
+                                <img src="/logo/IntiMandiri.PNG" class="img-fluid" alt="" style="">
+                            </div>
+                            <div class="text-center flex-grow-1">
+                                BON MUAT
+                            </div>
+                        </div>
+                    </div>
+                    {{strtoupper($barcode->ref_type).' - '.strtoupper($barcode->ref_action)}}
+                    <small class="pull-right"><strong>Expired Date:</strong> {{ date('d F, Y', strtotime($barcode->expired)) }}</small>
+                </div>
+                <div class="card-body">
+                    <div class="text-center">
+                            <td><b>Code</b></td>
+                            <td>&nbsp;&nbsp;:&nbsp;&nbsp;</td>
+                            <td>{{ $barcode->barcode }}</td>
+                            <br>
+                        {!!QrCode::margin(0)->size(150)->generate($barcode->barcode)!!}
+                    </div>
+                    <br>
+                    <div class="text-center">
+                        <tr>
+                            <td>Container</td>
+                            <td> : </td>
+                            <td>{{$barcode->cont->nocontainer}}</td>
+                        </tr>
+                        <br>
+                        <tr>
+                            <td>Size</td>
+                            <td> : </td>
+                            <td>{{$barcode->cont->size}}</td>
+                        </tr>
+                        <br>
+                        <tr>
+                            <td>Ex. Kapal/Voy</td>
+                            <td> : </td>
+                            <td>{{$barcode->cont->job->kapal->name ?? ''}} / {{$barcode->cont->job->voy ?? '-'}}</td>
+                        </tr>
+                        <br>
+                        <tr>
+                            <td>Kode TPS Asal</td>
+                            <td> : </td>
+                            <td>{{$barcode->cont->job->sandar->kd_tps_asal ?? ''}}</td>
+                        </tr>
+                        <br>
+                        <tr>
+                            <td>Consignee/NPWP/FAX/EMAIL</td>
+                            <td> : </td>
+                            <br>
+                            <td>{{$barcode->cont->Customer->name ?? ''}} / {{$barcode->cont->Customer->npwp ?? ''}} / {{$barcode->cont->Customer->fax ?? ''}} / {{$barcode->cont->Customer->email ?? ''}}</td>
+                        </tr>
+                        <br>
+                        <tr>
+                            <td>Kd Dokumen/No Dok In Ou/Tgl Dok In Out</td>
+                            <td> : </td>
+                            <br>
+                            <td>{{$barcode->cont->dokumen->name ?? ''}} / {{$barcode->cont->no_dok ?? ''}} / {{$barcode->cont->tgl_dok ?? ''}}</td>
+                        </tr>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+@endif
 
 </html>

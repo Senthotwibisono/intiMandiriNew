@@ -221,11 +221,9 @@ class BeaCukaiController extends Controller
         
         return DataTables::of($cont)
         ->addColumn('check', function($cont){
-            if ($cont->status_ijin =='Y') {
-                return '<input type="checkbox" class="form-check-input form-check-glow select-cont" value="' . $cont->id . '" disabled>';
-            }else {
+         
                 return '<input type="checkbox" class="form-check-input form-check-glow select-cont" value="' . $cont->id . '">';
-            }
+            
         })
         ->addColumn('action', function($cont){
             return '<a href="/bc/lcl/realisasi/stripping/detil-' . $cont->id . '" class="btn btn-warning"><i class="fa fa-pen"></i></a>';
@@ -312,6 +310,32 @@ class BeaCukaiController extends Controller
            ]);
         }
     }
+
+    public function strippingBatalApproveCont(Request $request)
+    {
+        $ids = $request->input('ids');
+        // var_dump($ids);
+        // die;
+        try {
+            $conts = Cont::whereIn('id', $ids)->get();
+            foreach ($conts as $cont) {
+                if ($cont->status_ijin == 'Y') {
+                    $cont->update([
+                        'status_ijin' => 'N',
+                    ]);
+                }
+            }
+            return response()->json([
+                 'success' => true,
+                 'message' => 'Data success updated',
+            ]);
+        } catch (\Throwable $th) {
+           return response()->json([
+                'success' => false,
+                'message' => 'Something Wrong' . $th->getMessage(),
+           ]);
+        }
+    }
     
     public function strippingDetail($id)
     {
@@ -329,11 +353,9 @@ class BeaCukaiController extends Controller
 
         return DataTables::of($manifest)
         ->addColumn('check', function($manifest){
-            if ($manifest->ijin_stripping =='Y') {
-                return '<input type="checkbox" class="form-check-input form-check-glow select-cont" value="' . $manifest->id . '" disabled>';
-            }else {
+         
                 return '<input type="checkbox" class="form-check-input form-check-glow select-cont" value="' . $manifest->id . '">';
-            }
+            
         })
         ->addColumn('detil', function($manifest){
             if ($manifest->ijin_stripping == 'Y') {
@@ -398,6 +420,32 @@ class BeaCukaiController extends Controller
                         'ijin_stripping' => 'Y',
                         'ijin_stripping_at' => Carbon::now(),
                         'ijin_stripping_by' => Auth::user()->id,
+                    ]);
+                }
+            }
+            return response()->json([
+                 'success' => true,
+                 'message' => 'Data success updated',
+            ]);
+        } catch (\Throwable $th) {
+           return response()->json([
+                'success' => false,
+                'message' => 'Something Wrong' . $th->getMessage(),
+           ]);
+        }
+    }
+
+    public function BatalapproveStrippingManifest(Request $request)
+    {
+        $ids = $request->input('ids');
+        // var_dump($ids);
+        // die;
+        try {
+            $manifest = Manifest::whereIn('id', $ids)->get();
+            foreach ($manifest as $man) {
+                if ($man->ijin_stripping == 'Y') {
+                    $man->update([
+                        'ijin_stripping' => 'N',
                     ]);
                 }
             }

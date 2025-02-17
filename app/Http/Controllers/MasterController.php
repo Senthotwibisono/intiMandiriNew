@@ -1286,6 +1286,7 @@ class MasterController extends Controller
         // Query item berdasarkan selected grids
         $items = PM::whereIn('id', $selectedGrids)->get();
         $data['items'] = $items;
+        $data['tiers'] = RT::whereIn('rack_id', $selectedGrids)->orderBy('tier', 'desc')->get();
         // dd($selectedGrids);
 
         return view('master.placementManifest.barcode', $data);

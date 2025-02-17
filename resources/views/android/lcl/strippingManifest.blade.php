@@ -49,6 +49,15 @@
                             <input type="hidden" class="form-control"  id="quantity_edit">
                         </div>
                     </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="">Danger Label</label>
+                            <select class="form-select" name="dg_label" id="dg_label_edit">
+                                <option value="N">N</option>
+                                <option value="Y">Y</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="card-footer">
@@ -174,6 +183,7 @@ $(document).ready(function() {
                         $("#jamstripping_edit").val(response.data.jamstripping);
                         $("#startstripping_edit").val(response.data.startstripping);
                         $("#endstripping_edit").val(response.data.endstripping);
+                        $("#dg_label_edit").val(response.data.dg_label).trigger('change');
                     }
                 }else{
                     Swal.fire({

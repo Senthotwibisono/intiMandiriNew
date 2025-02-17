@@ -14,6 +14,11 @@
 
 
 <style>
+    @page {
+      width: 100mm;
+      height: auto;
+      margin: 0cm; /* Tambahkan margin jika diperlukan */
+    }
  .section {
       padding-top: 5%;
     }
@@ -85,8 +90,8 @@
         width:15%;   
     }
     .logo img{
-        width:45px;
-        height:45px;
+        width:50px;
+        height:auto;
         padding-top:30px;
     }
     .logo span{
@@ -157,32 +162,10 @@
     }
 </style>
 
-<div class="container">
-    <div class="row">
-        <div class="col-12">
-            <div class="text-center">
-                    <img src="/logo/IntiMandiri.PNG" class="img" alt="">
-               
-            </div>
-       </div>
-    </div>
-    <br>
-    <div class="text-center">
-        {{$title}}
-    </div>
-    <hr>
-    <!-- <div class="row">
-        <div class="col-3">
-            <a herf="" class="btn btn-danger">Cetak PDF</a>
-        </div>
-        <div class="col-3">
-            <a herf="" class="btn btn-success">Cetak Excel</a>
-        </div>
-    </div>
-    <br>
-    <hr> -->
-    <div class="row">
-        @foreach($items as $item)
+@foreach($items as $item)
+    @foreach($tiers as $tier)
+        @if($tier->rack_id == $item->id)
+        <div class="container">
             <div class="card">
                 <div class="card-body">
                     <div class="text-center">
@@ -190,14 +173,14 @@
                             <td>&nbsp;&nbsp;:&nbsp;&nbsp;</td>
                             <td>{{ $item->barcode }}</td>
                             <br>
-                        {!!QrCode::margin(0)->size(300)->generate($item->id)!!}
+                        {!!QrCode::margin(0)->size(500)->generate($tier->barcode)!!}
                     </div>
                     <br>
                     <div class="text-center">
                         <tr>
-                            <td>No Rack</td>
+                            <td>No Rack || Tier</td>
                             <td> : </td>
-                            <td>{{$item->name}}</td>
+                            <td>{{$item->name}} || {{$tier->tier}}</td>
                         </tr>
                         <br>
                         <tr>
@@ -220,8 +203,9 @@
                     </div>
                 </div>
             </div>
-        @endforeach
-    </div>
-</div>
+        </div>
+        @endif
+    @endforeach
+@endforeach
 
 </html>

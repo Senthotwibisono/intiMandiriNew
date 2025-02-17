@@ -16,6 +16,7 @@ use App\Models\YardDetil as RowTier;
 use App\Models\Item;
 use App\Models\PlacementManifest as PM;
 use App\Models\RackingDetil as Rack;
+use App\Models\RackTier as RT;
 use App\Models\KeteranganPhoto as KP;
 use App\Models\Photo;
 
@@ -85,17 +86,52 @@ class LclController extends Controller
         $scanItem = Item::with('manifest')->where('barcode', $qr)->first();
         $manifest = $scanItem->manifest;
         if ($manifest->tglstripping == null) {
-            return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Mnifest Belum Stripping']);
+            return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Manifest Belum Stripping']);
         }
         $item = Item::where('manifest_id', $manifest->id)->get();
+        $data['item'] = $scanItem;
         $data['title'] = "Racking Manifest || " . $manifest->notally . "Scan in Item Number: " . $scanItem->nomor;
-        $data['locs'] = PM::whereNot('use_for', 'B')->get();
-        $data['manifest'] = $manifest;
-        $data['placed'] = Item::where('manifest_id', $manifest->id)->whereNot('lokasi_id', null)->get();
-        $data['item'] = Item::where('manifest_id', $manifest->id)->where('lokasi_id', null)->get();
-        $data['kets'] = KP::where('kegiatan', '=', 'palcement')->get();
+        // $data['locs'] = PM::whereNot('use_for', 'B')->get();
+        // $data['manifest'] = $manifest;
+        // $data['placed'] = Item::where('manifest_id', $manifest->id)->whereNot('lokasi_id', null)->get();
+        // $data['item'] = Item::where('manifest_id', $manifest->id)->where('lokasi_id', null)->get();
+        // $data['kets'] = KP::where('kegiatan', '=', 'palcement')->get();
 
         return view('android.lcl.racking.detil', $data);
+    }
+
+    public function postRacking(Request $request)
+    {
+        // var_dump($request->all());
+        // die;
+
+        
+        try {
+            $item = Item::find($request->id);
+            $tier = RT::where('barcode' ,$request->qr_code)->first();
+            
+            // var_dump($request->qr_code, $tier, $item);
+            // die();
+            $rack = PM::find($tier->rack_id);
+            $item->update([
+                'lokasi_id' => $rack->id,
+                'tier' => $tier->id,
+            ]);
+
+            $tier->jumlah_barang = $tier->jumlah_barang + $item->jumlah_barang;
+            $tier->save();
+            $rack->increment('jumlah_barang', $item->jumlah_barang);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data Berhasil di update',
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => $th->getMessage(),
+            ]);
+        }
     }
 
     public function behandleIndex()

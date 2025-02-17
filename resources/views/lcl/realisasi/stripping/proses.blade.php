@@ -198,6 +198,13 @@
                             <label for="">End Stripping Date</label>
                             <input type="datetime-local" name="endstripping" id="endstripping_edit" class="form-control">
                         </div>
+                        <div class="form-group">
+                            <label for="">Danger Label</label>
+                            <select class="form-select" name="dg_label" id="dg_label_edit">
+                                <option value="N">N</option>
+                                <option value="Y">Y</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -289,6 +296,7 @@ $(document).ready(function() {
         $("#jamstripping_edit").val(response.data.jamstripping);
         $("#startstripping_edit").val(response.data.startstripping);
         $("#endstripping_edit").val(response.data.endstripping);
+        $("#dg_label_edit").val(response.data.dg_label).trigger('change');
       },
       error: function(data) {
         console.log('error:', data)

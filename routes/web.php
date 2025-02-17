@@ -447,10 +447,12 @@ Route::controller(BeaCukaiController::class)->group(function(){
     Route::get('/bc/lcl/realisasi/stripping', 'strippingIndex')->name('bc.stripping.index');
     Route::get('/bc/lcl/realisasi/stripping/data', 'strippingIndexData')->name('bc.stripping.indexData');
     Route::post('/bc/lcl/realisasi/stripping/approveCont', 'strippingApproveCont')->name('bc.stripping.aprroveCont');
+    Route::post('/bc/lcl/realisasi/stripping/BatalapproveCont', 'strippingBatalApproveCont')->name('bc.stripping.batalApprove');
     
     Route::get('/bc/lcl/realisasi/stripping/detil-{id?}', 'strippingDetail');
     Route::get('/bc/lcl/realisasi/stripping/detilData-{id?}', 'strippingDetailData');
     Route::post('/bc/lcl/realisasi/stripping/manifest/approve', 'approveStrippingManifest');
+    Route::post('/bc/lcl/realisasi/stripping/manifest/Batalapprove', 'BatalapproveStrippingManifest');
 
     Route::post('/bc/lcl/realisasi/stripping-approveAll', 'strippingApproveAll');
     
@@ -515,6 +517,7 @@ Route::controller(LclController::class)->group(function(){
     // Racking
     Route::get('/android/lcl/racking', 'rackingIndex');
     Route::get('/android/lcl/rackingDetail-{qr?}', 'rackingDetil');
+    Route::post('/android/lcl/rackingAndroid', 'postRacking');
    
     // Behandle
     Route::get('/android/lcl/behandle', 'behandleIndex');
