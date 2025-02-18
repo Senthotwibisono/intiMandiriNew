@@ -540,6 +540,9 @@ Route::controller(LclController::class)->group(function(){
 Route::controller(AndroidGateController::class)->group(function(){
     Route::get('/android/gate/index', 'index');
     Route::get('/android/gate/reciving/{qr?}', 'recivingBarcode');
+    Route::get('/android/gate/fcl/{qr?}', 'indexGateFCL');
+    Route::get('/android/gate/lcl/{qr?}', 'indexGateLCL');
+    Route::get('/android/gate/manifest/{qr?}', 'indexGateManifest');
 });
 
 // Invoice

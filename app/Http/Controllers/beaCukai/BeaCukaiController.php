@@ -177,7 +177,7 @@ class BeaCukaiController extends Controller
             ]);
         }
         if ($manifest) {
-            $barcode = Barcode::where('ref_id', $manifest->id)->where('ref_type', '=', 'Manifest')->where('ref_action', 'hold')->first();
+            $barcode = Barcode::where('ref_id', $manifest->id)->where('ref_type', '=', 'Manifest')->where('status', 'hold')->first();
             if ($barcode) {
                 $manifest->update([
                     'status_bc'=>'release',

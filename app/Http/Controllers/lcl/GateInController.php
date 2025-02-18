@@ -220,7 +220,7 @@ class GateInController extends Controller
         $data['conts'] = Cont::whereNotNull('endstripping')->whereNotNull('tglmasuk')->get();
         $data['user'] = Auth::user()->name;
         $data['seals'] = Eseal::get();
-        $data['kets'] = KP::where('kegiatan', '=', 'gate-out')->get();
+        $data['kets'] = KP::where('kegiatan', '=', 'buag-mty')->get();
 
         return view('lcl.realisasi.gateIn.mty', $data);
     }

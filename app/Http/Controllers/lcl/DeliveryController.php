@@ -572,8 +572,8 @@ class DeliveryController extends Controller
                 }
             }
             $manifest->update([
-                'tglbuangmty' => $request->tglbuangmty,
-                'jambuangmty' => $request->jambuangmty,
+                'tglrelease' => $request->tglbuangmty,
+                'jamrelease' => $request->jambuangmty,
                 'nopol_release' => $request->nopol_release,
             ]);
 
@@ -639,7 +639,7 @@ class DeliveryController extends Controller
         }else {
             $action = 'hold';
         }
-        $barcode = Barcode::where('ref_id', $manifest->id)->where('ref_type', '=', 'Manifest')->where('ref_action', 'gate-out')->first();
+        $barcode = Barcode::where('ref_id', $manifest->id)->where('ref_type', '=', 'Manifest')->where('ref_action', 'release')->first();
         if ($barcode) {
             $barcode->update([
                 // 'expired'=> $header->expired_date,
@@ -657,7 +657,7 @@ class DeliveryController extends Controller
             $newBarcode = Barcode::create([
                 'ref_id'=>$manifest->id,
                 'ref_type'=>'Manifest',
-                'ref_action'=> 'gate-out',
+                'ref_action'=> 'release',
                 'ref_number'=>$manifest->notally,
                 'barcode'=> $uniqueBarcode,
                 'status'=> $action,

@@ -862,10 +862,8 @@ class DokumenController extends Controller
                     if ($bc23->jml_cont == 0) {
                         $manifest = Manifest::where('nohbl', $bc23->no_bl_awb)->where('tglbuangmty', null)->first();
                         if ($manifest) {
-                            $alasanBasic = "Bukan Dokumen SPPB 2.0";
+                            
                             $alasanCust = null;
-                            $alasanKemas = null;
-                            $alasanJml = null;
                             // alasanCust 
                             $cust = Customer::where('name', $bc23->nama_imp)->first();
                             if ($cust) {
@@ -893,7 +891,7 @@ class DokumenController extends Controller
                                 $alasanJml = "Quantity Berbeda";
                             }
     
-                            $alasanFinal = $alasanBasic . ', ' . $alasanCust . ', ' . $alasanKemas . ', ' . $alasanJml;
+                            $alasanFinal = $alasanCust . ', ';
     
                             $manifest->update([
                                 'kd_dok_inout' => 2,
@@ -1111,10 +1109,8 @@ class DokumenController extends Controller
                     if ($bc23->jml_cont == 0) {
                         $manifest = Manifest::where('nohbl', $bc23->no_bl_awb)->where('tglbuangmty', null)->first();
                         if ($manifest) {
-                            $alasanBasic = "Bukan Dokumen SPPB 2.0";
+                          
                             $alasanCust = null;
-                            $alasanKemas = null;
-                            $alasanJml = null;
                             // alasanCust 
                             $cust = Customer::where('name', $bc23->nama_imp)->first();
                             if ($cust) {
@@ -1142,7 +1138,7 @@ class DokumenController extends Controller
                                 $alasanJml = "Quantity Berbeda";
                             }
     
-                            $alasanFinal = $alasanBasic . ', ' . $alasanCust . ', ' . $alasanKemas . ', ' . $alasanJml;
+                            $alasanFinal = 'Bukan Dokume SPPB, ' . $alasanCust . ', ';
     
                             $manifest->update([
                                 'kd_dok_inout' => 2,
@@ -1398,10 +1394,8 @@ class DokumenController extends Controller
                     if ($sppb->jml_cont == 0) {
                         $manifest = Manifest::where('nohbl', $sppb->no_bl_awb)->where('tglbuangmty', null)->first();
                         if ($manifest) {
-                            $alasanBasic = null;
+                           
                             $alasanCust = null;
-                            $alasanKemas = null;
-                            $alasanJml = null;
                             $statusBC = "release";
                             $cust = Customer::where('name', $sppb->nama_imp)->first();
                             if ($cust) {
@@ -1420,18 +1414,7 @@ class DokumenController extends Controller
                                 ]);
                             }
     
-                            // Alasan Kemas
-                            if ($manifest->packing->code != $sppbKMS->jns_kms) {
-                                $alasanKemas = "Jenis Kemas Berbeda";
-                                $statusBC = "HOLD";
-                            }
-    
-                            if ($manifest->quantity != $sppbKMS->jml_kms) {
-                                $alasanJml = "Quantity Berbeda";
-                                $statusBC = "HOLD";
-                            }
-    
-                            $alasanFinal = $alasanBasic . ', ' . $alasanCust . ', ' . $alasanKemas . ', ' . $alasanJml;
+                            $alasanFinal = 'Bukan Dokume SPPB, ' . $alasanCust . ', ';
     
                             $manifest->update([
                                 'kd_dok_inout' => 1,
@@ -1649,8 +1632,6 @@ class DokumenController extends Controller
                         $manifest = Manifest::where('nohbl', $sppb->no_bl_awb)->where('tglbuangmty', null)->first();
                         if ($manifest) {
                             $alasanCust = null;
-                            $alasanKemas = null;
-                            $alasanJml = null;
                             $statusBC = "release";
                             $cust = Customer::where('name', $sppb->nama_imp)->first();
                             if ($cust) {
@@ -1669,18 +1650,7 @@ class DokumenController extends Controller
                                 ]);
                             }
     
-                            // Alasan Kemas
-                            if ($manifest->packing->code != $sppbKMS->jns_kms) {
-                                $alasanKemas = "Jenis Kemas Berbeda";
-                                $statusBC = "HOLD";
-                            }
-    
-                            if ($manifest->quantity != $sppbKMS->jml_kms) {
-                                $alasanJml = "Quantity Berbeda";
-                                $statusBC = "HOLD";
-                            }
-    
-                            $alasanFinal = $alasanBasic . ', ' . $alasanCust . ', ' . $alasanKemas . ', ' . $alasanJml;
+                            $alasanFinal = 'Bukan Dokume SPPB, ' . $alasanCust . ', ';
     
                             $manifest->update([
                                 'kd_dok_inout' => 1,
@@ -2202,8 +2172,6 @@ class DokumenController extends Controller
                         $manifest = Manifest::where('nohbl', $manual->no_bl_awb)->where('tglbuangmty', null)->first();
                         if ($manifest) {
                             $alasanCust = null;
-                            $alasanKemas = null;
-                            $alasanJml = null;
                             $statusBC = "release";
                             $cust = Customer::where('name', $manual->consignee)->first();
                             $newCust = null;
@@ -2224,7 +2192,7 @@ class DokumenController extends Controller
                                 $statusBC = "HOLD";
                             }
     
-                            $alasanFinal = $alasanBasic . ', ' . $alasanCust . ', ' . $alasanKemas . ', ' . $alasanJml;
+                            $alasanFinal = 'Bukan Dokume SPPB, ' . $alasanCust . ', ';
     
                             $manifest->update([
                                 'kd_dok_inout' => $manual->kd_dok_inout,
@@ -2408,8 +2376,6 @@ class DokumenController extends Controller
                         $manifest = Manifest::where('nohbl', $manual->no_bl_awb)->where('tglbuangmty', null)->first();
                         if ($manifest) {
                             $alasanCust = null;
-                            $alasanKemas = null;
-                            $alasanJml = null;
                             $statusBC = "release";
                             $cust = Customer::where('name', $manual->consignee)->first();
                             $newCust = null;
@@ -2430,7 +2396,7 @@ class DokumenController extends Controller
                                 $statusBC = "HOLD";
                             }
     
-                            $alasanFinal = $alasanBasic . ', ' . $alasanCust . ', ' . $alasanKemas . ', ' . $alasanJml;
+                            $alasanFinal = 'Bukan Dokume SPPB, ' . $alasanCust . ', ';
     
                             $manifest->update([
                                 'kd_dok_inout' => $manual->kd_dok_inout,
@@ -2647,8 +2613,6 @@ class DokumenController extends Controller
                         $manifest = Manifest::where('nohbl', $pabean->no_bl_awb)->where('tglbuangmty', null)->first();
                         if ($manifest) {
                             $alasanCust = null;
-                            $alasanKemas = null;
-                            $alasanJml = null;
                             $statusBC = "release";
                             $cust = Customer::where('name', $manual->consignee)->first();
                             $newCust = null;
@@ -2659,17 +2623,8 @@ class DokumenController extends Controller
                             }
     
                             // Alasan Kemas
-                            if ($manifest->packing->code != $pabeanKMS->jns_kms) {
-                                $alasanKemas = "Jenis Kemas Berbeda";
-                                $statusBC = "HOLD";
-                            }
     
-                            if ($manifest->quantity != $pabeanKMS->jml_kms) {
-                                $alasanJml = "Quantity Berbeda";
-                                $statusBC = "HOLD";
-                            }
-    
-                            $alasanFinal = $alasanBasic . ', ' . $alasanCust . ', ' . $alasanKemas . ', ' . $alasanJml;
+                            $alasanFinal = 'Bukan Dokume SPPB, ' . $alasanCust . ', ';
     
                             $manifest->update([
                                 'kd_dok_inout' => $pabean->kd_dok_inout,
@@ -2893,8 +2848,6 @@ class DokumenController extends Controller
                         $manifest = Manifest::where('nohbl', $pabean->no_bl_awb)->where('tglbuangmty', null)->first();
                         if ($manifest) {
                             $alasanCust = null;
-                            $alasanKemas = null;
-                            $alasanJml = null;
                             $statusBC = "release";
                             $cust = Customer::where('name', $pabean->nm_imp)->first();
                             if ($cust) {
@@ -2914,17 +2867,8 @@ class DokumenController extends Controller
                             }
     
                             // Alasan Kemas
-                            if ($manifest->packing->code != $pabeanKMS->jns_kms) {
-                                $alasanKemas = "Jenis Kemas Berbeda";
-                                $statusBC = "HOLD";
-                            }
     
-                            if ($manifest->quantity != $pabeanKMS->jml_kms) {
-                                $alasanJml = "Quantity Berbeda";
-                                $statusBC = "HOLD";
-                            }
-    
-                            $alasanFinal = $alasanBasic . ', ' . $alasanCust . ', ' . $alasanKemas . ', ' . $alasanJml;
+                            $alasanFinal = 'Bukan Dokume SPPB, ' . $alasanCust . ', ';
     
                             $manifest->update([
                                 'kd_dok_inout' => $pabean->kd_dok_inout,

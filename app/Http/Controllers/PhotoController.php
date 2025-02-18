@@ -48,7 +48,13 @@ class PhotoController extends Controller
 
     public function storeManifest(Request $request)
     {
+       
         $manifest = Manifest::where('id', $request->id)->first();
+        $manifest->update([
+                'tglrelease' => $request->tglrelease,
+                'jamrelease' => $request->jamrelease,
+                'nopol_release' => $request->nopol_release,
+        ]);
         try {
             if ($request->hasFile('photos')) {
                 foreach ($request->file('photos') as $photo) {
@@ -73,6 +79,12 @@ class PhotoController extends Controller
     public function storeContainer(Request $request)
     {
         $cont = Cont::where('id', $request->id)->first();
+        $cont->update([
+            'nopol' => $request->nopol,
+            'nopol_mty' => $request->nopol_mty,
+            'tglkeluar' => $request->tglkeluar,
+            'jamkeluar' => $request->jamkeluar,
+        ]);
         try {
             if ($request->hasFile('photos')) {
                 foreach ($request->file('photos') as $photo) {
