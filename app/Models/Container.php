@@ -137,6 +137,10 @@ class Container extends Model
         'codeco_flag',
     ];
 
+    public function DepoMty()
+    {
+        return $this->belongsTo(DepoMty::class, 'tujuan_mty', 'id');
+    }
     public function user()
     {
         return $this->belongsTo(User::class, 'uid', 'id');

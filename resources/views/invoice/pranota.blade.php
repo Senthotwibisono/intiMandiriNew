@@ -100,7 +100,7 @@
     <div class="grid invoice">
       <div class="grid-body">
         <div class="img">
-            <img src="/logo/IntiMandiri.png" class="img" alt="">
+            <img src="/logo/lkbLogo.png" class="img" alt="">
         </div>
         <div class="text-center">
           <h2 style="margin: 5px 0;">Invoice {{$header->judul_invoice ?? ''}}</h2>

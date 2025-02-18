@@ -102,7 +102,10 @@
                 <span class="small">Invoice No. # {{$header->invoice_no}}</span><br>
             </div>
             <div class="col-xs-12 col-4 text-center">
-                <img src="/images/paid.png" class="img" style="width:50%;" alt="">
+            <div class="img">
+                <img src="/logo/lkbLogo.png" class="img" style="width:90%;" alt="">
+            </div>
+                <!-- <img src="/images/paid.png" class="img" style="width:50%;" alt=""> -->
             </div>
         </div>
         <hr>

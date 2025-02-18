@@ -54,7 +54,10 @@ class HomeController extends Controller
         $data['gudang'] = PM::orderBy('nomor', 'asc')->get();
 
         // Daily Recap
-        $daily = Manifest::whereNot('tglmasuk', null)->where('tglrelease', null)->get();
+        $daily = Manifest::whereHas('cont', function ($query) {
+            $query->whereNotNull('tglmasuk');
+        })->whereNull('tglrelease')->get();
+    
         $data['tonase'] = $daily->sum('weight');
         $data['volume'] = $daily->sum('meas');
         $data['masukCont'] = Container::whereDate('tglmasuk', Carbon::now())->count();

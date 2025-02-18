@@ -152,10 +152,13 @@ class ReportController extends Controller
 
         switch ($request->filter) {
             case 'masuk':
-                $mans = Manifest::whereBetween('tglmasuk', [$start, $end])->get();
+                $mans = Manifest::whereHas('cont', function ($query) use ($start, $end) {
+                    $query->whereBetween('tglmasuk', [$start, $end]);
+                })->get();
+            
                 break;
             case 'keluar':
-                $mans = Manifest::whereBetween('tglbuangmty', [$start, $end])->get();
+                $mans = Manifest::whereBetween('tglrelease', [$start, $end])->get();
                 break;
             
             default:
@@ -317,7 +320,7 @@ class ReportController extends Controller
                 break;
 
             case 'Tgl Release':
-                $manifests = Manifest::whereBetween('tglbuangmty', [$request->start_date, $request->end_date])->orderBy('tglbuangmty', 'asc')->get();
+                $manifests = Manifest::whereBetween('tglrelease', [$request->start_date, $request->end_date])->orderBy('tglrelease', 'asc')->get();
                 break;
 
             default:  
@@ -339,18 +342,24 @@ class ReportController extends Controller
         $start = $request->input('start_date') ?? Carbon::now()->toDateString();
         $end = $request->input('end_date') ?? Carbon::now()->toDateString();
 
-        $awal = Manifest::whereDate('tglmasuk', '<=', $start)
-        ->where(function ($query) use ($start) {
+        $awal = Manifest::whereHas('cont', function ($query) use ($start) {
+            $query->whereDate('tglmasuk', '<=', $start);
+        })->where(function ($query) use ($start) {
             $query->whereDate('tglrelease', '>=', $start)
                   ->orWhereNull('tglrelease');
         })->get();
+    
         $data['awal'] = $awal;
         $data['jumlahAwal'] = $awal->count();
         $data['quantityAwal'] = $awal->sum('quantity');
         $data['tonaseAwal'] = $awal->sum('weight');
         $data['volumeAwal'] = $awal->sum('meas');
 
-        $masuk = Manifest::whereBetween('tglmasuk', [$start, $end])->get();
+        $masuk = Manifest::whereHas('cont', function ($query) use ($start, $end) {
+            $query->whereBetween('tglmasuk', [$start, $end]);
+        })->get();
+        
+        // dd($masuk);
         $data['masuk'] = $masuk;
         $data['jumlahMasuk'] = $masuk->count();
         $data['quantityMasuk'] = $masuk->sum('quantity');
@@ -364,7 +373,10 @@ class ReportController extends Controller
         $data['tonaseKeluar'] = $keluar->sum('weight');
         $data['volumeKeluar'] = $keluar->sum('meas');
 
-        $akhir = Manifest::whereDate('tglmasuk', '<=', $end)->whereNull('tglrelease')->get();
+        $akhir = Manifest::whereHas('cont', function ($query) use ($end) {
+            $query->whereDate('tglmasuk', '<=', $end);
+        })->whereNull('tglrelease')->get();
+        
         // ->where(function ($query) use ($end) {
         //     $query->whereDate('tglrelease', '>=', $end)
         //           ->orWhereNull('tglrelease');

@@ -14,6 +14,7 @@ class DepoMty extends Model
 
     protected $fillable = [
         'name',
+        'alamat',
         'uid',
     ];
 

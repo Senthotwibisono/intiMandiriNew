@@ -9,7 +9,7 @@
                     <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#excelModal">Add File</button>
                 </div> -->
                 <div class="col-auto ms-2">
-                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addManual">Add Pelabuhan</button>
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addManual">Add Depo</button>
                 </div>
             </div>
             <br>
@@ -17,6 +17,7 @@
                 <thead>
                     <tr>
                         <th>Name</th>
+                        <th>Alamat</th>
                         <th>UID</th>
                         <th>Action</th>
                     </tr>
@@ -25,6 +26,7 @@
                     @foreach($depos as $depo)
                     <tr>
                         <td>{{$depo->name ?? ' '}}</td>
+                        <td>{{$depo->alamat ?? ''}}</td>
                         <td>{{$depo->user->name ?? ''}}</td>
                         <td>
                             <button class="btn btn-warning formEdit" data-id="{{ $depo->id }}" id="formEdit"><i class="fa fa-pen"></i></button>
@@ -78,6 +80,10 @@
                                 <label for="">Name</label>
                                 <input type="text" class="form-control" name="name" required>
                             </div>
+                            <div class="form-group">
+                                <label for="">Alamat</label>
+                                <input type="text" class="form-control" name="alamat" required>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -106,6 +112,10 @@
                                 <label for="">Name</label>
                                 <input type="text" class="form-control" id="name_edit" name="name" required>
                                 <input type="hidden" class="form-control" id="id_edit" name="id" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="">Alamat</label>
+                                <input type="text" class="form-control" id="alamat_edit" name="alamat" required>
                             </div>
                         </div>
                     </div>
@@ -213,6 +223,7 @@
         console.log(response);
         $('#editCust').modal('show');
         $("#editCust #name_edit").val(response.data.name);
+        $("#editCust #alamat_edit").val(response.data.alamat);
         $("#editCust #id_edit").val(response.data.id);
       },
       error: function(data) {

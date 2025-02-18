@@ -107,6 +107,15 @@
                             <input type="text" name="nopol_mty" id="nopol_mty" class="form-control">
                         </div>
                         <div class="form-group">
+                            <label for="">Tujuan MTY</label>
+                            <select name="tujuan_mty" id="tujuan_mty" class="js-example-basic-single form-select select2" style="width: 100%;">
+                                <option disabled selected value>Pilih Satu!</option>
+                                @foreach($deps as $dep)
+                                    <option value="{{$dep->id}}">{{$dep->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label for="">Petugas Lapangan</label>
                             <input type="text" id="nameUid"value="{{$user}}" class="form-control" readonly>
                             <input type="hidden" name="uidmty" id="uidmty" class="form-control">
@@ -227,6 +236,7 @@ $(document).ready(function() {
         $("#tglkeluar").val(response.data.tglkeluar);
         $("#jamkeluar").val(response.data.jamkeluar);
         $("#nopol_mty").val(response.data.nopol_mty);
+        $("#tujuan_mty").val(response.data.tujuan_mty).trigger('change');
         $("#uidmty").val(response.data.uid.id ?? response.userId);
         $("#nameUid").val(response.uid.name ?? response.user);
       },

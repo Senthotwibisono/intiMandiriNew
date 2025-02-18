@@ -15,6 +15,7 @@ use App\Models\JobOrder as Job;
 use App\Models\Manifest;
 use App\Models\Eseal;
 use App\Models\User;
+use App\Models\DepoMty;
 use App\Models\Photo;
 use App\Models\BarcodeGate as Barcode;
 use App\Models\YardDetil as RowTier;
@@ -221,6 +222,7 @@ class GateInController extends Controller
         $data['user'] = Auth::user()->name;
         $data['seals'] = Eseal::get();
         $data['kets'] = KP::where('kegiatan', '=', 'buag-mty')->get();
+        $data['deps'] = DepoMty::get();
 
         return view('lcl.realisasi.gateIn.mty', $data);
     }
@@ -291,14 +293,15 @@ class GateInController extends Controller
     {
         $cont = Cont::where('id', $request->id)->first();
         if ($cont) {
-            if ($cont->status_bc != 'release') {
-                return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Status belum release']);
-            }
+            // if ($cont->status_bc != 'release') {
+            //     return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Status belum release']);
+            // }
             $cont->update([
                 'tglkeluar'=>$request->tglkeluar,
                 'jamkeluar'=>$request->jamkeluar,
                 'uidmty'=>$request->uidmty,
                 'nopol_mty'=>$request->nopol_mty,
+                'tujuan_mty'=>$request->tujuan_mty,
                 'no_seal'=> $request->no_seal,
             ]);
 
@@ -583,6 +586,8 @@ class GateInController extends Controller
         $data['title'] = 'Surat Jalan Container ' . $cont->nocontainer;
 
         $data['cont'] = $cont;
+
+        $data['tonase'] = Manifest::where('container_id', $id)->sum('weight');
 
         return view('lcl.realisasi.gateIn.suratJalan', $data);
     }

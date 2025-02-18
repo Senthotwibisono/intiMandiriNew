@@ -835,6 +835,7 @@ class MasterController extends Controller
         if (!$nameCheck) {
             $depoMT =  DepoMty::create([
                 'name' => $request->name,
+                'alamat' => $request->alamat,
                 'uid' => Auth::user()->id,
             ]);
             return redirect()->back()->with('status', ['type' => 'success', 'message' => 'Data successfully stored.']);
@@ -859,6 +860,8 @@ class MasterController extends Controller
     {
         $depoMT = DepoMty::where('id', $request->id)->first();
 
+        // dd($request->all());
+
         if (!$depoMT) {
             return redirect()->back()->with('status', ['type' => 'error', 'message' => 'Gudang not found.']);
         }
@@ -871,6 +874,7 @@ class MasterController extends Controller
 
         $depoMT->update([
             'name' => $request->name,
+            'alamat' => $request->alamat,
             'uid' => Auth::user()->id,
         ]);
 
