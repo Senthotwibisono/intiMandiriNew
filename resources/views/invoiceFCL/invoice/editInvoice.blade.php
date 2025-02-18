@@ -66,37 +66,37 @@
                      <div class="col-4">
                         <div class="form-group">
                             <label for="">Total TPS ({{$header->kd_tps_asal}})</label>
-                            <input type="text" class="form-control" value="{{ number_format($header->total_tps, 2) }}" readonly>
+                            <input type="number" class="form-control" value="{{ number_format($header->total_tps, 2) }}" name="total_tps">
                         </div>
                      </div>
                      <div class="col-4">
                         <div class="form-group">
                             <label for="">Total WMS</label>
-                            <input type="text" class="form-control" value="{{ number_format($header->total_wms, 2) }}" readonly>
+                            <input type="number" class="form-control" value="{{ number_format($header->total_wms, 2) }}" name="total_wms">
                         </div>
                      </div>
                      <div class="col-4">
                         <div class="form-group">
                             <label for="">Total</label>
-                            <input type="text" class="form-control" value="{{ number_format($header->total, 2) }}" readonly>
+                            <input type="number" class="form-control" value="{{ number_format($header->total, 2) }}" name="total">
                         </div>
                      </div>
                      <div class="col-4">
                         <div class="form-group">
                             <label for="">Admin</label>
-                            <input type="text" class="form-control" value="{{ number_format($header->admin, 0) }}" readonly>
+                            <input type="number" class="form-control" value="{{ number_format($header->admin, 0) }}" name="admin">
                         </div>
                      </div>
                      <div class="col-4">
                         <div class="form-group">
                             <label for="">PPN</label>
-                            <input type="text" class="form-control" value="{{ number_format($header->ppn, 0) }}" readonly>
+                            <input type="number" class="form-control" value="{{ number_format($header->ppn, 0) }}" name="ppn">
                         </div>
                      </div>
                      <div class="col-4">
                         <div class="form-group">
                             <label for="">Grand Total</label>
-                            <input type="text" class="form-control" value="{{ number_format($header->grand_total, 0) }}" readonly>
+                            <input type="number" class="form-control" value="{{ number_format($header->grand_total, 0) }}" name="grand_total">
                         </div>
                      </div>
                      <div class="col-6">

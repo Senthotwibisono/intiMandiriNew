@@ -867,8 +867,21 @@ class DokumenController extends Controller
                             $alasanKemas = null;
                             $alasanJml = null;
                             // alasanCust 
-                            if ($manifest->customer->name != $bc23->nama_imp || $manifest->customer->npwp != $bc23->npwp_imp) {
-                                $alasanCust = "Data Importir Berbeda";
+                            $cust = Customer::where('name', $bc23->nama_imp)->first();
+                            if ($cust) {
+                                $cust->update([
+                                    'name' => $bc23->nama_imp,
+                                    'npwp' => $bc23->npwp_imp,
+                                    'alamat' => $bc23->alamat_imp,
+                                ]);
+                            }
+                            $newCust = null;
+                            if (!$cust && $bc23->nama_imp != null) {
+                                $newCust = Customer::create([
+                                    'name' => $bc23->nama_imp,
+                                    'npwp' => $bc23->npwp_imp,
+                                    'alamat' => $bc23->alamat_imp,
+                                ]);
                             }
     
                             // Alasan Kemas
@@ -887,6 +900,7 @@ class DokumenController extends Controller
                                 'no_dok' => $bc23->no_sppb,
                                 'tgl_dok' => Carbon::createFromFormat('d/m/Y', $bc23->tgl_sppb)->format('Y-m-d'),
                                 'status_bc' => 'HOLD',
+                                'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
                                 'alasan_hold' => $alasanFinal,
                             ]);
                         }
@@ -1102,8 +1116,21 @@ class DokumenController extends Controller
                             $alasanKemas = null;
                             $alasanJml = null;
                             // alasanCust 
-                            if ($manifest->customer->name != $bc23->nama_imp || $manifest->customer->npwp != $bc23->npwp_imp) {
-                                $alasanCust = "Data Importir Berbeda";
+                            $cust = Customer::where('name', $bc23->nama_imp)->first();
+                            if ($cust) {
+                                $cust->update([
+                                    'name' => $bc23->nama_imp,
+                                    'npwp' => $bc23->npwp_imp,
+                                    'alamat' => $bc23->alamat_imp,
+                                ]);
+                            }
+                            $newCust = null;
+                            if (!$cust && $bc23->nama_imp != null) {
+                                $newCust = Customer::create([
+                                    'name' => $bc23->nama_imp,
+                                    'npwp' => $bc23->npwp_imp,
+                                    'alamat' => $bc23->alamat_imp,
+                                ]);
                             }
     
                             // Alasan Kemas
@@ -1122,6 +1149,7 @@ class DokumenController extends Controller
                                 'no_dok' => $bc23->no_sppb,
                                 'tgl_dok' => Carbon::createFromFormat('d/m/Y', $bc23->tgl_sppb)->format('Y-m-d'),
                                 'status_bc' => 'HOLD',
+                                'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
                                 'alasan_hold' => $alasanFinal,
                             ]);
                         }
@@ -1375,9 +1403,21 @@ class DokumenController extends Controller
                             $alasanKemas = null;
                             $alasanJml = null;
                             $statusBC = "release";
-                            if ($manifest->customer->name != $sppb->nama_imp || $manifest->customer->npwp != $sppb->npwp_imp) {
-                                $alasanCust = "Data Importir Berbeda";
-                                $statusBC = "HOLD";
+                            $cust = Customer::where('name', $sppb->nama_imp)->first();
+                            if ($cust) {
+                                $cust->update([
+                                    'name' => $sppb->nama_imp,
+                                    'npwp' => $sppb->npwp_imp,
+                                    'alamat' => $sppb->alamat_imp,
+                                ]);
+                            }
+                            $newCont = null;
+                            if (!$cust && $sppb->nama_imp != null) {
+                                $newCust = Customer::create([
+                                    'name' => $sppb->nama_imp,
+                                    'npwp' => $sppb->npwp_imp,
+                                    'alamat' => $sppb->alamat_imp,
+                                ]);
                             }
     
                             // Alasan Kemas
@@ -1398,6 +1438,7 @@ class DokumenController extends Controller
                                 'no_dok' => $sppb->no_sppb,
                                 'tgl_dok' => Carbon::createFromFormat('d/m/Y', $sppb->tgl_sppb)->format('Y-m-d'),
                                 'status_bc' => $statusBC,
+                                'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
                                 'alasan_hold' => $alasanFinal,
                             ]);
                         }
@@ -1611,9 +1652,21 @@ class DokumenController extends Controller
                             $alasanKemas = null;
                             $alasanJml = null;
                             $statusBC = "release";
-                            if ($manifest->customer->name != $sppb->nama_imp || $manifest->customer->npwp != $sppb->npwp_imp) {
-                                $alasanCust = "Data Importir Berbeda";
-                                $statusBC = "HOLD";
+                            $cust = Customer::where('name', $sppb->nama_imp)->first();
+                            if ($cust) {
+                                $cust->update([
+                                    'name' => $sppb->nama_imp,
+                                    'npwp' => $sppb->npwp_imp,
+                                    'alamat' => $sppb->alamat_imp,
+                                ]);
+                            }
+                            $newCont = null;
+                            if (!$cust && $sppb->nama_imp != null) {
+                                $newCust = Customer::create([
+                                    'name' => $sppb->nama_imp,
+                                    'npwp' => $sppb->npwp_imp,
+                                    'alamat' => $sppb->alamat_imp,
+                                ]);
                             }
     
                             // Alasan Kemas
@@ -1634,6 +1687,7 @@ class DokumenController extends Controller
                                 'no_dok' => $sppb->no_sppb,
                                 'tgl_dok' => Carbon::createFromFormat('d/m/Y', $sppb->tgl_sppb)->format('Y-m-d'),
                                 'status_bc' => $statusBC,
+                                'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
                                 'alasan_hold' => $alasanFinal,
                             ]);
                         }
@@ -2151,9 +2205,12 @@ class DokumenController extends Controller
                             $alasanKemas = null;
                             $alasanJml = null;
                             $statusBC = "release";
-                            if ($manifest->customer->name != $manual->consignee) {
-                                $alasanCust = "Data Importir Berbeda";
-                                $statusBC = "HOLD";
+                            $cust = Customer::where('name', $manual->consignee)->first();
+                            $newCust = null;
+                            if (!$cust && $manual->consignee != null) {
+                                $newCust = Customer::create([
+                                    'name' => $manual->consignee,
+                                ]);
                             }
     
                             // Alasan Kemas
@@ -2175,6 +2232,7 @@ class DokumenController extends Controller
                                 'tgl_dok' => Carbon::createFromFormat('d/m/Y', $manual->tgl_dok_inout)->format('Y-m-d'),
                                 'status_bc' => $statusBC,
                                 'alasan_hold' => $alasanFinal,
+                                'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
                             ]);
                         }
                     }
@@ -2353,9 +2411,12 @@ class DokumenController extends Controller
                             $alasanKemas = null;
                             $alasanJml = null;
                             $statusBC = "release";
-                            if ($manifest->customer->name != $manual->consignee) {
-                                $alasanCust = "Data Importir Berbeda";
-                                $statusBC = "HOLD";
+                            $cust = Customer::where('name', $manual->consignee)->first();
+                            $newCust = null;
+                            if (!$cust && $manual->consignee != null) {
+                                $newCust = Customer::create([
+                                    'name' => $manual->consignee,
+                                ]);
                             }
     
                             // Alasan Kemas
@@ -2377,6 +2438,7 @@ class DokumenController extends Controller
                                 'tgl_dok' => Carbon::createFromFormat('d/m/Y', $manual->tgl_dok_inout)->format('Y-m-d'),
                                 'status_bc' => $statusBC,
                                 'alasan_hold' => $alasanFinal,
+                                'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
                             ]);
                         }
                     }
@@ -2588,9 +2650,12 @@ class DokumenController extends Controller
                             $alasanKemas = null;
                             $alasanJml = null;
                             $statusBC = "release";
-                            if ($manifest->customer->name != $pabean->nm_imp || $manifest->customer->npwp != $pabean->npwp_imp) {
-                                $alasanCust = "Data Importir Berbeda";
-                                $statusBC = "HOLD";
+                            $cust = Customer::where('name', $manual->consignee)->first();
+                            $newCust = null;
+                            if (!$cust && $manual->consignee != null) {
+                                $newCust = Customer::create([
+                                    'name' => $manual->consignee,
+                                ]);
                             }
     
                             // Alasan Kemas
@@ -2612,6 +2677,7 @@ class DokumenController extends Controller
                                 'tgl_dok' => Carbon::createFromFormat('d/m/Y', $pabean->tgl_dok_inout)->format('Y-m-d'),
                                 'status_bc' => $statusBC,
                                 'alasan_hold' => $alasanFinal,
+                                'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
                             ]);
                         }
                     }
@@ -2830,9 +2896,21 @@ class DokumenController extends Controller
                             $alasanKemas = null;
                             $alasanJml = null;
                             $statusBC = "release";
-                            if ($manifest->customer->name != $pabean->nm_imp || $manifest->customer->npwp != $pabean->npwp_imp) {
-                                $alasanCust = "Data Importir Berbeda";
-                                $statusBC = "HOLD";
+                            $cust = Customer::where('name', $pabean->nm_imp)->first();
+                            if ($cust) {
+                                $cust->update([
+                                   'name' => $pabean->nm_imp,
+                                    'npwp' => $pabean->npwp_imp,
+                                    'alamat' => $pabean->al_imp,
+                                ]);
+                            }
+                            $newCust = null;
+                            if (!$cust && $pabean->nama_imp != null) {
+                                $newCust = Customer::create([
+                                    'name' => $pabean->nm_imp,
+                                    'npwp' => $pabean->npwp_imp,
+                                    'alamat' => $pabean->al_imp,
+                                ]);
                             }
     
                             // Alasan Kemas
@@ -2854,6 +2932,7 @@ class DokumenController extends Controller
                                 'tgl_dok' => Carbon::createFromFormat('d/m/Y', $pabean->tgl_dok_inout)->format('Y-m-d'),
                                 'status_bc' => $statusBC,
                                 'alasan_hold' => $alasanFinal,
+                                'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
                             ]);
                         }
                     }

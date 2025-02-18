@@ -1,182 +1,114 @@
-@extends('partial.print')
+<!DOCTYPE html>
+<html lang="en">
 
-@section('title')
-    {{ 'Delivery Surat Jalan' }}
-@stop
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-@section('content')
-<style>
-    body {
-        font-size: 14px;
-        color: #000;
-        background: #FFF;
-    }
-    td {
-        vertical-align: top;
-    }
-    @media print {
-        body {
-            background: #FFF;
-            color: #000;
-        }
+    <title>{{$title}} | Inti Mandiri</title>
+    <link rel="stylesheet" href="{{asset('dist/assets/css/main/app.css')}}">
+    <link rel="shortcut icon" href="{{asset('logo/icon.png')}}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{asset('logo/icon.png')}}" type="image/png">
+
+    <style>
         @page {
-            size: auto;   /* auto is the initial value */
-/*            margin-top: 114px;
-            margin-bottom: 90px;
-            margin-left: 38px;
-            margin-right: 75px;*/
-            font-weight: bold;
-            background: #FFF;
-            color: #000;
+            size: A4 portrait; /* Ukuran A4 */
+            margin: 10mm; /* Margin untuk cetak */
         }
-        .print-btn {
-            display: none;
-        }
-    }
-</style>
-<a href="#" class="print-btn" type="button" onclick="window.print();">PRINT</a>
-<div id="details" class="clearfix" style="width: 605px;height: 794px;">
-        <?php 
-            $array_bulan = array("I","II","III", "IV", "V","VI","VII","VIII","IX","X", "XI","XII");
-            $romawi_bulan = $array_bulan[date('n')-1];
-        ?>
-        <div style="margin-left: 33%;">{{$romawi_bulan.''.date('Y')}}<br /><br /><br /></div>
-        <table border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 0;width:100%">
-            <tr>
-                <td width='56%'>
-                    <table border="0" cellspacing="0" cellpadding="0" style="font-size: 13px;margin-bottom: 0;">
-                        <tr>
-                            <td style="color: transparent; width: 130px;">Kepada Yth.</td>
-                            <td class="padding-10 text-center" style="color: transparent;">:</td>
-                            <!--<td>{{ $manifest->NAMACONSOLIDATOR }}</td>-->
-                            <td style="color: transparent;">PT. Inti Mandiri</td>
-                        </tr>
-                        <tr>
-                            <td style="color: transparent;">Ex. Kapal/Voy</td>
-                            <td class="padding-10 text-center" style="color: transparent;">:</td>
-                            <td style="padding-bottom: 10px;">{{ $manifest->cont->job->Kapal->name.' V.'.$manifest->cont->job->voy }}</td>
-                        </tr>
-                        <tr>
-                            <td style="color: transparent;">Tanggal Tiba </td>
-                            <td class="padding-10 text-center" style="color: transparent;">:</td>
-                            <td style="padding-bottom: 10px;">{{ date("d-m-Y", strtotime($manifest->cont->job->eta)) }}</td>
-                        </tr>
-                        
-                        <tr>
-                            <td style="color: transparent;">Truk No. Pol</td>
-                            <td class="padding-10 text-center" style="color: transparent;">:</td>
-                            <td style="padding-bottom: 10px;">{{ $manifest->nopol ?? ' ' }}</td>
-                        </tr>
-                        <tr>
-                            <td style="color: transparent;">No. Container</td>
-                            <td class="padding-10 text-center" style="color: transparent;">:</td>
-                            <td style="padding-bottom: 10px;">{{ $manifest->cont->nocontainer.' / '.$manifest->cont->size }}</td>
-                        </tr>
-<!--                        <tr>
-                            <td style="color: transparent;">No. DO</td>
-                            <td class="padding-10 text-center" style="color: transparent;">:</td>
-                            <td></td>
-                        </tr>-->
-                        <tr>
-                            <td style="color: transparent;">No. BL</td>
-                            <td class="padding-10 text-center" style="color: transparent;">:</td>
-                            <td style="padding-bottom: 10px;">{{ $manifest->nohbl }}</td>
-                        </tr>
-                        <tr>
-                            <td style="color: transparent;">Party</td>
-                            <td class="padding-10 text-center" style="color: transparent;">:</td>
-                            <td>{{ $manifest->quantity ?? ' ' }}/{{ $manifest->packing->name ?? ' ' }}</td>
-                        </tr>
 
-                    </table>
-                </td>
-                <td style="vertical-align: top;">
-                    <table border="0" cellspacing="0" cellpadding="0" style="font-size: 13px;margin-bottom: 0;">
-                        <tr>
-                            <td style="color: transparent;">No. Bea Cukai</td>
-                            <td class="padding-10 text-center" style="color: transparent;">:</td>
-                            <td style="color: transparent;">{{ $manifest->no_dok ?? ' ' }}</td>
-                        </tr>
-<!--                        <tr>
-                            <td colspan="3">&nbsp;</td>
-                        </tr>-->
-                        <tr>
-                            <td colspan="3">{{ $manifest->customer->name ?? ''}}</td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
-        
-        <br /><br /><br /><br />
-        <table border="0" cellspacing="0" cellpadding="0" style="font-size: 12px;">
-            <thead>
-                <tr>
-                    <th rowspan="3" style="color: transparent;">NO</th>
-                    <th rowspan="3" style="color: transparent;">MERK</th>
-                    <th rowspan="3" style="color: transparent;">JENIS BARANG</th>
-                    <th rowspan="3" style="color: transparent;">JUMLAH BARANG</th>
-                    <th rowspan="3" style="color: transparent;">KETERANGAN</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td width='20%' style="text-align: left;">{{ $manifest->marking }}</td>
-                    <td width='20%' style="text-align: left;">{{$manifest->descofgoods ?? ''}}</td>
-                    <td width='15%' style="text-align: center;">{{ $manifest->quantity }}/{{ $manifest->packing->name }}</td>
-                    <td width='15%' style="text-align: center;">{{ $manifest->weight.' KGS' }}<br />{{ $manifest->meas.' CBM' }}</td>
-                    <td width='30%'>&nbsp;</td>    
-                </tr>
-            </tbody>
-        </table>
-        
-        <!--<div style="position: absolute; bottom: 50px;right: 20px;">{{ date('d F Y') }}</div>-->
-        
-<!--        <table border="0" cellspacing="0" cellpadding="0">
-            <tr>
-                <td colspan="50"></td>
-            </tr>
-        </table>
-        
-        <table border="0" cellspacing="0" cellpadding="0">
-            <tr>
-                <td style="border: 1px solid;">&nbsp;&nbsp;</td>
-                <td>Barang dalam keadaan baik, lengkap dan sesuai DO.</td>
-            </tr>
-            <tr><td style="border-bottom: 1px solid;"></td><td></td></tr>
-            <tr>
-                <td style="border: 1px solid;">&nbsp;&nbsp;</td>
-                <td>Barang dalam keadaan rusak/cacat/tidak lengkap (Lampiran berita acara)</td>
-            </tr>
-        </table>
-        
--->        
-<!--        <table border="0" cellspacing="0" cellpadding="0">
-            <tr>
-                <td>Tanjung Priok, {{ date('d-m-Y H:i:s') }}</td>
-            </tr>
-        </table>-->
-        <!--<div style="page-break-after: always;"></div>-->
-<!--        <table border="0" cellspacing="0" cellpadding="0">
-            <tr>
-                <td>Penerima</td>
-                <td>Sopir Truck</td>
-                <td>Petugas APW</td>
-                <td class="text-center" style="border: 1px solid;">Custodian</td>
-            </tr>
-            <tr>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td height="70" style="font-size: 70px;line-height: 0;border: 1px solid;"></td>
-            </tr>
-            <tr>
-                <td>(..................)</td>
-                <td>(..................)</td>
-                <td>(..................)</td>
-                <td>&nbsp;</td>
-            </tr>
-        </table>-->
+        body {
+            font-family: 'Roboto Condensed', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .container {
+            width: 50%; /* Setengah dari lebar A4 */
+            height: 50%; /* Setengah dari tinggi A4 */
+            padding: 10px;
+            box-sizing: border-box;
+            page-break-inside: avoid; /* Hindari pemutusan halaman di tengah */
+        }
+
+        .card {
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 100%;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .logo {
+            flex: 0 0 50px;
+        }
+
+        .logo img {
+            width: 50px;
+            height: auto;
+        }
+
+        .card-title {
+            flex-grow: 1;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .col-6 {
+            width: 48%;
+        }
+
+        .imgeEir{
+            width: 230px;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body>
+    @for ($i = 0; $i < 4; $i++)
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <div class="logo">
+                    <img src="/logo/IntiMandiri.PNG" class="img-fluid" alt="">
+                </div>
+                <div class="card-title">
+                    Surat Jalan
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <span style="font-size: 9px;">No Host BL Awb : <strong>{{$manifest->nohbl ?? '-'}}</strong></span> <br>
+                    <span style="font-size: 9px;">Quantity : <strong>{{$manifest->quantity ?? '-'}}</strong></span> <br>
+                    <span style="font-size: 9px;">No Container : <strong>{{$manifest->cont->nocontainer}}</strong></span> <br>
+                    <span style="font-size: 9px;">Container Size : <strong>{{$manifest->cont->size}}</strong></span> <br>
+                    <span style="font-size: 9px;">Container Type : <strong>{{$manifest->cont->ctr_type}}</strong></span> <br>
+                </div>
+                <div class="col-6">
+                    <span style="font-size: 9px;">Active To : <strong>{{$manifest->active_to}}</strong></span> <br>
+                    <span style="font-size: 9px;">Dokumen : <strong>{{$manifest->dokumen->name ?? '-'}}</strong></span> <br>
+                    <span style="font-size: 9px;">No Dokumen / Tgl Dokumen : <strong>{{$manifest->no_dok ?? '-'}} / {{$manifest->tgl_dok ?? '-'}}</strong></span> <br>
+                </div>
+            </div>
+            <div class="text-center">
+                <img src="/images/EIR.png" alt="EIR" class="imgeEir">
+            </div>
+        </div>
     </div>
-        
-@stop
+    @endfor
+</body>
+
+</html>

@@ -164,10 +164,10 @@
                   @foreach ($tarifs as $tarif)
                   <tr>
                     <td class="text-right">{{ $tarif->Tarif->nama_tarif }}</td>
-                    <td class="text-right">{{ number_format($tarif->harga, '3', ',', '.') }}</td>
-                    <td class="text-right">{{ number_format($tarif->jumlah, '3', ',', '.') }}</td>
-                    <td class="text-right">{{ number_format($tarif->jumlah_hari, '3', ',', '.') }}</td>
-                    <td class="text-right">{{ number_format($tarif->total, '3', ',', '.') }}</td>
+                    <td class="text-right">{{ number_format($tarif->harga, '0', ',', '.') }}</td>
+                    <td class="text-right">{{ number_format($tarif->jumlah, '0', ',', '.') }}</td>
+                    <td class="text-right">{{ number_format($tarif->jumlah_hari, '0', ',', '.') }}</td>
+                    <td class="text-right">{{ number_format($tarif->total, '0', ',', '.') }}</td>
                   </tr>
                   @endforeach
                 </tbody>
@@ -186,19 +186,19 @@
           </div>
           <div class="col-6 text-right">
             @if($header->mekanik_y_n == 'N')
-            <h4 class="lead">{{ number_format($form->admin, '3', ',', '.') ?? '' }}</h4>
-            <h4 class="lead">{{ number_format($form->discount, '3', ',', '.') ?? '' }}</h4>
-            <h4 class="lead">{{ number_format($form->total, '3', ',', '.') ?? '' }}</h4>
+            <h4 class="lead">{{ number_format($form->admin, '0', ',', '.') ?? '' }}</h4>
+            <h4 class="lead">{{ number_format($form->discount, '0', ',', '.') ?? '' }}</h4>
+            <h4 class="lead">{{ number_format($form->total, '0', ',', '.') ?? '' }}</h4>
             <h4 class="lead">{{ $form->pajak ?? '' }} %</h4>
-            <h4 class="lead">{{ number_format($form->pajak_amount, '3', ',', '.') ?? '' }}</h4>
-            <h4 class="lead">{{ number_format($form->grand_total, '3', ',', '.') ?? '' }}</h4>
+            <h4 class="lead">{{ number_format($form->pajak_amount, '0', ',', '.') ?? '' }}</h4>
+            <h4 class="lead">{{ number_format($form->grand_total, '0', ',', '.') ?? '' }}</h4>
             @else
-            <h4 class="lead">{{ number_format($form->admin_m, '3', ',', '.') ?? '' }}</h4>
-            <h4 class="lead">{{ number_format($form->discount_m, '3', ',', '.') ?? '' }}</h4>
-            <h4 class="lead">{{ number_format($form->total_m, '3', ',', '.') ?? '' }}</h4>
+            <h4 class="lead">{{ number_format($form->admin_m, '0', ',', '.') ?? '' }}</h4>
+            <h4 class="lead">{{ number_format($form->discount_m, '0', ',', '.') ?? '' }}</h4>
+            <h4 class="lead">{{ number_format($form->total_m, '0', ',', '.') ?? '' }}</h4>
             <h4 class="lead">{{ $form->pajak_m ?? '' }} %</h4>
-            <h4 class="lead">{{ number_format($form->pajak_amount_m, '3', ',', '.') ?? '' }}</h4>
-            <h4 class="lead">{{ number_format($form->grand_total_m, '3', ',', '.') ?? '' }}</h4>
+            <h4 class="lead">{{ number_format($form->pajak_amount_m, '0', ',', '.') ?? '' }}</h4>
+            <h4 class="lead">{{ number_format($form->grand_total_m, '0', ',', '.') ?? '' }}</h4>
             @endif
           </div>
         </div>
@@ -218,7 +218,7 @@
                         2. Terhadapt nota yang diajukan koreksi harus dilunasi terlebih dahulu. <br>
                         3. Tidak dibenarkan memberi imbalan kepada petugas. <br>
                         4. Nota ini berlaku sebagai bukti pembayaran. <br>
-                        5. Untuk permintaan faktur pajak dapat email ke intimandiri tax@inti-mandiri.com
+                        5. Untuk permintaan faktur pajak dapat email ke lkb.tax22@gmail.com
                     </div>
                     <div class="col-6 text-right">
                         <div class="row">

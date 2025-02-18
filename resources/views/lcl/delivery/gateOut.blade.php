@@ -191,13 +191,14 @@
                 { data: 'tglDok', name: 'tglDok', className: 'text-center' },
             ],
             createdRow: function (row, data, dataIndex) {
-                if (data.highlight === 'highlight-yellow') {
-                    $(row).addClass('highlight-yellow');
-                } else if (data.highlight === 'highlight-red text-white') {
+                if (data.flag_segel_merah === 'Y') {
                     $(row).addClass('highlight-red text-white');
+                } else if (data.status_bc === 'HOLD') {
+                    $(row).addClass('highlight-yellow');
+                } else if (data.status_bc === 'release'){
+                    $(row).addClass('highlight-blue');
                 }
             }
-
         })
     })
 </script>

@@ -21,7 +21,7 @@
                                     <input type="number" class="form-control harga-satuan-mekanik" name="harga_satuan_mekanik[{{$index}}]" step="0.01" id="harga_satuan_{{$index}}_mekanik" value="{{$tarif->harga ?? 0}}" data-index="{{$index}}">
                                 </td>
                                 <td>
-                                    <input type="number" class="form-control jumlah-volume-mekanik" name="jumlah_volume_mekanik[{{$index}}]" value="{{$form->cbm}}" step="0.01" id="jumlah_volume_{{$index}}_mekanik" data-index="{{$index}}">
+                                    <input type="number" class="form-control jumlah-volume-mekanik" name="jumlah_volume_mekanik[{{$index}}]" value="{{$tarif->jumlah ?? $form->cbm ?? 0}}" step="0.01" id="jumlah_volume_{{$index}}_mekanik" data-index="{{$index}}">
                                 </td>
                                 <td>
                                     <input type="number" class="form-control jumlah-hari-mekanik" name="jumlah_hari_mekanik[{{$index}}]" value="0" step="0.01" id="jumlah_hari_{{$index}}_mekanik" data-index="{{$index}}" disabled>

@@ -364,11 +364,11 @@ class ReportController extends Controller
         $data['tonaseKeluar'] = $keluar->sum('weight');
         $data['volumeKeluar'] = $keluar->sum('meas');
 
-        $akhir = Manifest::whereDate('tglmasuk', '<=', $end)
-        ->where(function ($query) use ($end) {
-            $query->whereDate('tglrelease', '>=', $end)
-                  ->orWhereNull('tglrelease');
-        })->get();
+        $akhir = Manifest::whereDate('tglmasuk', '<=', $end)->whereNull('tglrelease')->get();
+        // ->where(function ($query) use ($end) {
+        //     $query->whereDate('tglrelease', '>=', $end)
+        //           ->orWhereNull('tglrelease');
+        // })->get();
         $data['akhir'] = $akhir;
         $data['jumlahAkhir'] = $akhir->count();
         $data['quantityAkhir'] = $akhir->sum('quantity');

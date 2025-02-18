@@ -82,7 +82,7 @@
     <div class="card">
         <!-- Bag Atas -->
         <div class="row" style="border-bottom: 1px solid black;">
-            <div class="col-8" style="border-right: 1px solid black;">
+            <div class="col-8" style="border-right: 1px solid black; height: 70%;">
                 <div class="row">
                     <div class="col-12">
                         <div class="row">
@@ -132,8 +132,8 @@
          <div class="row" style="border-bottom: 1px solid black;">
             <div class="col-8" style="border-right: 1px solid black;">
                 <div class="row">
-                    <div class="col-12" style="margin-left: 5px;">
-                        <p style="font-size: 10px;"><strong>{{$item->manifest->cont->nocontainer ?? ''}} || {{$item->manifest->cont->size ?? ''}} || {{$item->manifest->cont->nobl ?? ''}}</strong></p>
+                    <div class="col-12 text-center">
+                        <p style="font-size: 20px;"><strong>{{$item->manifest->cont->nocontainer ?? ''}} || {{$item->manifest->cont->size ?? ''}} || {{$item->manifest->cont->nobl ?? ''}}</strong></p>
                     </div>
                 </div>
                 <div class="col-12">
@@ -168,7 +168,7 @@
                 <hr>
                 <div class="row">
                     <div class="col-12 text-center">
-                        <span><strong>{{$item->manifest->cont->job->eta}}</strong></span>
+                        <span style="font-size: 20px;"><strong>{{$item->manifest->cont->job->eta}}</strong></span>
                     </div>
                 </div>
             </div>
@@ -200,10 +200,10 @@
                     <div class="col-8" style="border-right: 1px solid black;">
                         <div class="row">
                             <div class="col-6 text-center" style="border-right: 1px solid black;">
-                                <p><strong>{{$item->manifest->cont->job->Kapal->name ?? ''}}</strong></p>
+                                <p style="font-size: 20px;"><strong>{{$item->manifest->cont->job->Kapal->name ?? ''}}</strong></p>
                             </div>
                             <div class="col-6 text-center">
-                                <p><strong>{{$item->manifest->nohbl ?? ''}} - {{$item->nomor}}</strong></p>
+                                <p style="font-size: 20px;"><strong>{{$item->manifest->nohbl ?? ''}} - {{$item->nomor}}</strong></p>
                             </div>
                         </div>
                     </div>

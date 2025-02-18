@@ -21,7 +21,7 @@
                                         <input type="number" class="form-control harga-satuan" name="harga_satuan[{{$index}}]" step="0.01" id="harga_satuan_{{$index}}" value="{{$tarif->harga ?? 0}}" data-index="{{$index}}">
                                     </td>
                                     <td>
-                                        <input type="number" class="form-control jumlah-volume" name="jumlah_volume[{{$index}}]" value="{{$form->cbm}}" step="0.01" id="jumlah_volume_{{$index}}" data-index="{{$index}}">
+                                        <input type="number" class="form-control jumlah-volume" name="jumlah_volume[{{$index}}]" value="{{$tarif->jumlah ?? $form->cbm ?? 0}}" step="0.01" id="jumlah_volume_{{$index}}" data-index="{{$index}}">
                                     </td>
                                     <td>
                                         @if($tarif->Tarif->day == 'Y')

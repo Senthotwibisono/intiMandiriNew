@@ -405,6 +405,12 @@ class BackendInvoiceController extends Controller
                 'cust_alamat' => $request->cust_alamat,
                 'jumlah_bayar' => $request->jumlah_bayar,
                 'no_hp' => $request->no_hp,
+                'total_tps' => $request->total_tps,
+                'total_wms' => $request->total_wms,
+                'total' => $request->total,
+                'admin' => $request->admin,
+                'ppn' => $request->ppn,
+                'grand_total' => $request->grand_total,
             ]);
 
             return redirect()->back()->with('status', ['type'=>'success', 'message'=>'Data berhasil di update']);

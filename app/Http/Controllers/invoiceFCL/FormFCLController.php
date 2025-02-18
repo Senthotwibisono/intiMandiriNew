@@ -75,7 +75,7 @@ class FormFCLController extends Controller
     public function getBLData(Request $request)
     {
         try {
-            $cont = ContF::whereNotNull('tglmasuk')->whereNull('tglkeluar')->where('nobl', $request->bl)->get();
+            $cont = ContF::whereNotNull('tglmasuk')->where('nobl', $request->bl)->get();
             if ($cont->isEmpty()) {
                 return response()->json([
                     'success'=> false,

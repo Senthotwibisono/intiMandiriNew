@@ -183,10 +183,10 @@
                           @foreach ($tarifs as $tarif)
                           <tr>
                             <td class="text-right">{{ $tarif->Tarif->nama_tarif }}</td>
-                            <td class="text-right">{{ number_format($tarif->harga, '2', ',' ,'.') }}</td>
-                            <td class="text-right">{{ number_format($tarif->jumlah, '2', ',' ,'.') }}</td>
-                            <td class="text-right">{{ number_format($tarif->jumlah_hari, '2', ',' ,'.') }}</td>
-                            <td class="text-right">{{ number_format($tarif->total, '2', ',' ,'.') }}</td>
+                            <td class="text-right">{{ number_format($tarif->harga, '0', ',' ,'.') }}</td>
+                            <td class="text-right">{{ number_format($tarif->jumlah, '0', ',' ,'.') }}</td>
+                            <td class="text-right">{{ number_format($tarif->jumlah_hari, '0', ',' ,'.') }}</td>
+                            <td class="text-right">{{ number_format($tarif->total, '0', ',' ,'.') }}</td>
                           </tr>
                           @endforeach
                         </tbody>
@@ -199,19 +199,19 @@
                         <h4 class="lead ">Admin</h4>
                         <!-- <h4 class="lead ">Discount</h4> -->
                         <h4 class="lead ">Total</h4>
-                        <h4 class="lead ">PPN ({{ number_format($form->pajak, '2', ',', '.') ?? ''}}%)</h4>
+                        <h4 class="lead ">PPN ({{ number_format($form->pajak, '0', ',', '.') ?? ''}}%)</h4>
                         <!-- <h4 class="lead ">PPN (Amount)</h4> -->
                         <h4 class="lead ">Grand Total</h4>
                     </div>
                     <div class="col-6" style="text-align:right;">
-                        <h4 class="lead "><span id="grand_total_display">{{ number_format($form->admin, '2', ',', '.') ?? ''}}</span></h4>
-                        <!-- <h4 class="lead "><span id="grand_total_display">{{ number_format($form->discount, '2', ',', '.') ?? ''}}</span></h4> -->
-                        <h4 class="lead "><span id="grand_total_display">{{ number_format($form->total, '2', ',', '.') ?? ''}}</span></h4>
+                        <h4 class="lead "><span id="grand_total_display">{{ number_format($form->admin, '0', ',', '.') ?? ''}}</span></h4>
+                        <!-- <h4 class="lead "><span id="grand_total_display">{{ number_format($form->discount, '0', ',', '.') ?? ''}}</span></h4> -->
+                        <h4 class="lead "><span id="grand_total_display">{{ number_format($form->total, '0', ',', '.') ?? ''}}</span></h4>
                         <!-- <h4 class="lead ">
-                            {{ number_format($form->pajak, '2', ',', '.') ?? ''}} %
+                            {{ number_format($form->pajak, '0', ',', '.') ?? ''}} %
                         </h4> -->
-                        <h4 class="lead "><span id="ppn_amount_display">{{number_format($form->pajak_amount, '2', ',', '.') ?? ''}}</span></h4>
-                        <h4 class="lead "><span id="ppn_amount_display">{{number_format($form->grand_total, '2', ',', '.') ?? ''}}</span></h4>
+                        <h4 class="lead "><span id="ppn_amount_display">{{number_format($form->pajak_amount, '0', ',', '.') ?? ''}}</span></h4>
+                        <h4 class="lead "><span id="ppn_amount_display">{{number_format($form->grand_total, '0', ',', '.') ?? ''}}</span></h4>
                     </div>
                     <hr>
                     <h4 style="text-align:left;">Terbilang : {{$terbilang}}</h4>
