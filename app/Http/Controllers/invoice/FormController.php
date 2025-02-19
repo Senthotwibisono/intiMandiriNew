@@ -451,7 +451,6 @@ class FormController extends Controller
             'manifest_id' => $form->manifest_id,
             'customer_id' => $form->customer_id,
             'judul_invoice' => $isMekanik ? 'Mekanik ' . $request->judul_invoice : $request->judul_invoice,
-            'invoice_no' => $form->invoice_no,
             'order_no' => $oldHeader->order_no ?? $this->getNextOrderNo(),
             'time_in' => $form->time_in,
             'expired_date' => $form->expired_date,

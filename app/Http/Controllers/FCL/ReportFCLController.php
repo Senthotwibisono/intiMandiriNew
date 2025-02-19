@@ -191,8 +191,8 @@ class ReportFCLController extends Controller
         if ($request->has('filter') && $request->filter) {
             if ($request->filter == 'Tgl PLP') {
                 $conts = Cont::whereHas('job', function ($query) use ($request) {
-                    $query->whereBetween('ttgl_plp', [$request->start_date, $request->end_date])->orderBy('ttgl_plp', 'asc')->get();
-                });
+                    $query->whereBetween('ttgl_plp', [$request->start_date, $request->end_date])->orderBy('ttgl_plp', 'asc');
+                })->get();
             } elseif ($request->filter == 'Tgl Gate In') {
                 $conts = Cont::whereBetween('tglmasuk', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc')->get();
             } elseif ($request->filter == 'Tgl Gate Out') {
@@ -226,8 +226,8 @@ class ReportFCLController extends Controller
         if ($request->has('filter') && $request->filter) {
             if ($request->filter == 'Tgl PLP') {
                 $conts = Cont::whereHas('job', function ($query) use ($request) {
-                    $query->whereBetween('ttgl_plp', [$request->start_date, $request->end_date])->orderBy('ttgl_plp', 'asc')->get();
-                });
+                    $query->whereBetween('ttgl_plp', [$request->start_date, $request->end_date])->orderBy('ttgl_plp', 'asc');
+                })->get();
             } elseif ($request->filter == 'Tgl Gate In') {
                 $conts = Cont::whereBetween('tglmasuk', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc')->get();
             } elseif ($request->filter == 'Tgl Gate Out') {

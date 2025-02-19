@@ -115,7 +115,7 @@ class FormPerpanjanganController extends Controller
                 return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Tanggal Expired lebih kecil dari tanggal awal']);
             }
             $form = Form::find($request->id);
-            $interval = Carbon::parse($request->time_in)->diff(Carbon::parse($request->expired_date)->addDay(1)) ?? null;
+            $interval = Carbon::parse($request->time_in)->diff(Carbon::parse($request->expired_date)) ?? null;
             $jumlahHari = $interval->days;
 
             $lastPeriod = $header->Form->period;

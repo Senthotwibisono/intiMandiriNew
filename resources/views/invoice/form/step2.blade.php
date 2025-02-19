@@ -107,7 +107,7 @@
                     </div>
                     <div class="col-sm-5">
                         <div class="form-group">
-                            <label for="">Expired</label>
+                            <label for="">Rencana Keluar</label>
                             <input type="date" name="expired_date" id="" class="form-control" value="{{$form->expired_date ?? ''}}" disabled>
                         </div>
                     </div>

@@ -73,6 +73,7 @@
                                     <div class="button-container">
                                         <button type="button" id="pay" data-id="{{$form->id}}" class="btn btn-sm btn-success pay"><i class="fa fa-cogs"></i></button>
                                         <button type="button" id="dok" data-id="{{$form->manifest_id}}" class="btn btn-sm btn-primary dok"><i class="fa fa-plus"></i></button>
+                                        <button class="btn btn-primary revisiInvoice" data-id="{{$form->form_id}}">Revisi</button>
                                     </div>
                                 </td>
                             </tr>
@@ -169,6 +170,40 @@
 @endsection
 
 @section('custom_js')
+<script>
+    $(document).ready(function() {
+        // Attach click event to dynamically created buttons
+        $(document).on('click', '.revisiInvoice', function() {
+            let id = $(this).data('id'); // Get the form ID from data attribute
+            console.log("logId: " + id);
+            
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Apakah anda yakin untuk melakukan revisi pada invoice ini?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, update it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Processing...',
+                        text: 'Please wait',
+                        icon: 'info',
+                        allowOutsideClick: false,
+                        showConfirmButton: false,
+                        willOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    // Redirect to the specified URL with form ID
+                    window.location.href = '/invoice/form/formStep1/' + id;
+                }
+            });
+        });
+    });
+</script>
 <script>
     $(document).ready(function() {
         $(".dokSelect").select2({

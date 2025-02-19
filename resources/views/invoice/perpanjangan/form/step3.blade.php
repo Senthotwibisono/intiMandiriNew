@@ -151,7 +151,7 @@ $(document).ready(function() {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: '/invoice/form/delete-' + formId, // Ganti dengan endpoint penghapusan Anda
+                    url: '/invoice/form/perpanjangan/delete-' + formId, // Ganti dengan endpoint penghapusan Anda
                     type: 'DELETE',
                     data: {
                         _token: '{{ csrf_token() }}' // Sertakan token CSRF untuk keamanan
@@ -162,7 +162,7 @@ $(document).ready(function() {
                             'Data berhasil dihapus.',
                             'success'
                         ).then(() => {
-                            window.location.href = '/invoice/form/index'; // Arahkan ke halaman beranda setelah penghapusan sukses
+                            window.location.href = '/invoice/form/perpanjangan/index'; // Arahkan ke halaman beranda setelah penghapusan sukses
                         });
                     },
                     error: function(xhr) {

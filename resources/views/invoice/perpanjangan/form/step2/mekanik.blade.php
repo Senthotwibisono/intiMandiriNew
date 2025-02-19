@@ -26,11 +26,11 @@
                                 <td>
                                     @if($tarif->Tarif->day == 'Y')
                                         @if($tarif->Tarif->period == '1')
-                                            <input type="number" name="jumlah_hari_mekanik[{{$index}}]" class="form-control jumlah-hari-mekanik" value="{{$periode1}}" step="0.01" id="jumlah_hari_{{$index}}_mekanik" data-index="{{$index}}">
+                                            <input type="number" name="jumlah_hari_mekanik[{{$index}}]" class="form-control jumlah-hari-mekanik" value="{{$$form->jumlah_hari}}" step="0.01" id="jumlah_hari_{{$index}}_mekanik" data-index="{{$index}}">
                                         @elseif($tarif->Tarif->period == '2')
-                                            <input type="number" name="jumlah_hari_mekanik[{{$index}}]" class="form-control jumlah-hari-mekanik" value="{{$periode2}}" step="0.01" id="jumlah_hari_{{$index}}_mekanik" data-index="{{$index}}">
+                                            <input type="number" name="jumlah_hari_mekanik[{{$index}}]" class="form-control jumlah-hari-mekanik" value="{{$$form->jumlah_hari}}" step="0.01" id="jumlah_hari_{{$index}}_mekanik" data-index="{{$index}}">
                                         @elseif($tarif->Tarif->period == '3')
-                                            <input type="number" name="jumlah_hari_mekanik[{{$index}}]" class="form-control jumlah-hari-mekanik" value="{{$periode3}}" step="0.01" id="jumlah_hari_{{$index}}_mekanik" data-index="{{$index}}">
+                                            <input type="number" name="jumlah_hari_mekanik[{{$index}}]" class="form-control jumlah-hari-mekanik" value="{{$$form->jumlah_hari}}" step="0.01" id="jumlah_hari_{{$index}}_mekanik" data-index="{{$index}}">
                                         @endif
                                     @else
                                         <input type="number" class="form-control jumlah-hari-mekanik" name="jumlah_hari_mekanik[{{$index}}]" value="0" step="0.01" id="jumlah_hari_{{$index}}_mekanik" data-index="{{$index}}" disabled>
