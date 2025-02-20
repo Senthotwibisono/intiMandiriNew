@@ -114,10 +114,10 @@
                 { data:'tglmasuk', name:'tglmasuk', className:'text-center' },
                 { data:'jammasuk', name:'jammasuk', className:'text-center' },
                 { data:'nopol', name:'nopol', className:'text-center' },
-                { data:'tglkeluar', name:'tglkeluar', className:'text-center' },
-                { data:'jamkeluar', name:'jamkeluar', className:'text-center' },
                 { data:'tglstripping', name:'tglstripping', className:'text-center' },
                 { data:'jamstripping', name:'jamstripping', className:'text-center' },
+                { data:'tglkeluar', name:'tglkeluar', className:'text-center' },
+                { data:'jamkeluar', name:'jamkeluar', className:'text-center' },
             ]
         })
     })

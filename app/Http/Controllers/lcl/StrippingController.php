@@ -194,11 +194,13 @@ class StrippingController extends Controller
 
                $manifest = Manifest::where('container_id', $cont->id)->get();
                foreach ($manifest as $mans) {
+                $mans->update([
+                    'startstripping' => $cont->startstripping,
+                ]);
                     if ($mans->ijin_stripping == 'Y') {
                         $mans->update([
                             'tglstripping' => $cont->tglstripping,
                             'jamstripping' => $cont->jamstripping,
-                            'startstripping' => $cont->startstripping,
                             'endstripping' => $cont->endstripping,
                             'validasi' => 'Y',
                         ]);
@@ -245,11 +247,11 @@ class StrippingController extends Controller
             try {
                 if ($manifest->ijin_stripping == 'Y') {
                     if ($request->final_qty == $manifest->quantity) {
-                        $statusBc = null;
-                        $alasanHold = null;
+                        $statusBc = $manifest->status_bc;
+                        $alasanHold = $manifest->alasan_hold;
                     }else {
                         $statusBc = 'HOLD';
-                        $alasanHold = 'Quantity Berbeda';
+                        $alasanHold = trim(($manifest->alasan_hold ? $manifest->alasan_hold . ', ' : '') . 'Quantity Berbeda');
                     }
                     // dd($statusBc);
                     $manifest->update([
