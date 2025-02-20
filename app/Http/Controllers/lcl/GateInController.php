@@ -264,7 +264,7 @@ class GateInController extends Controller
             return $container->tglmasuk ?? 'Belum Masuk';
         })
         ->addColumn('jammasuk', function($container){
-            return $container->tglkeluar ?? 'Belum Masuk';
+            return $container->jammasuk ?? 'Belum Masuk';
         })
         ->addColumn('tglkeluar', function($container){
             return $container->tglkeluar ?? 'Belum Keluar';

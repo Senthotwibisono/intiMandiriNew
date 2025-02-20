@@ -915,7 +915,7 @@ class DokumenController extends Controller
                             $manifest->update([
                                 'kd_dok_inout' => 2,
                                 'no_dok' => $bc23->no_sppb,
-                                'tgl_dok' => Carbon::createFromFormat('d/m/Y', $bc23->tgl_sppb)->format('Y-m-d'),
+                                'tgl_dok' => Carbon::createFromFormat('m/d/Y', $bc23->tgl_sppb)->format('Y-m-d'),
                                 'status_bc' => 'HOLD',
                                 'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
                                 'alasan_hold' => $alasanFinal,
@@ -964,7 +964,7 @@ class DokumenController extends Controller
                             $contF->update([
                                 'kd_dok_inout' => 2,
                                 'no_dok' => $bc23->no_sppb,
-                                'tgl_dok' => Carbon::createFromFormat('d/m/Y', $bc23->tgl_sppb)->format('Y-m-d'),
+                                'tgl_dok' => Carbon::createFromFormat('m/d/Y', $bc23->tgl_sppb)->format('Y-m-d'),
                                 'status_bc' => 'HOLD',
                                 'alasan_hold' => $alasanFinal,
                                 'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
@@ -1106,7 +1106,7 @@ class DokumenController extends Controller
                             $contF->update([
                                'kd_dok_inout' => 2,
                                 'no_dok' => $bc23->no_sppb,
-                                'tgl_dok' => Carbon::createFromFormat('d/m/Y', $bc23->tgl_sppb)->format('Y-m-d'),
+                                'tgl_dok' => Carbon::createFromFormat('m/d/Y', $bc23->tgl_sppb)->format('Y-m-d'),
                                 'status_bc' => 'HOLD',
                                 'alasan_hold' => $alasanFinal,
                                 'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
@@ -1162,7 +1162,7 @@ class DokumenController extends Controller
                             $manifest->update([
                                 'kd_dok_inout' => 2,
                                 'no_dok' => $bc23->no_sppb,
-                                'tgl_dok' => Carbon::createFromFormat('d/m/Y', $bc23->tgl_sppb)->format('Y-m-d'),
+                                'tgl_dok' => Carbon::createFromFormat('m/d/Y', $bc23->tgl_sppb)->format('Y-m-d'),
                                 'status_bc' => 'HOLD',
                                 'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
                                 'alasan_hold' => $alasanFinal,
@@ -1438,7 +1438,7 @@ class DokumenController extends Controller
                             $manifest->update([
                                 'kd_dok_inout' => 1,
                                 'no_dok' => $sppb->no_sppb,
-                                'tgl_dok' => Carbon::createFromFormat('d/m/Y', $sppb->tgl_sppb)->format('Y-m-d'),
+                                'tgl_dok' => Carbon::createFromFormat('m/d/Y', $sppb->tgl_sppb)->format('Y-m-d'),
                                 'status_bc' => $statusBC,
                                 'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
                                 'alasan_hold' => $alasanFinal,
@@ -1487,7 +1487,7 @@ class DokumenController extends Controller
                             $contF->update([
                                 'kd_dok_inout' => 1,
                                  'no_dok' => $sppb->no_sppb,
-                                 'tgl_dok' => Carbon::createFromFormat('d/m/Y', $sppb->tgl_sppb)->format('Y-m-d'),
+                                 'tgl_dok' => Carbon::createFromFormat('m/d/Y', $sppb->tgl_sppb)->format('Y-m-d'),
                                  'status_bc' => $statusBC,
                                  'alasan_hold' => $alasanSize,
                                  'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
@@ -1627,7 +1627,7 @@ class DokumenController extends Controller
                             $contF->update([
                                  'kd_dok_inout' => 1,
                                  'no_dok' => $sppb->no_sppb,
-                                 'tgl_dok' => Carbon::createFromFormat('d/m/Y', $sppb->tgl_sppb)->format('Y-m-d'),
+                                 'tgl_dok' => Carbon::createFromFormat('m/d/Y', $sppb->tgl_sppb)->format('Y-m-d'),
                                  'status_bc' => $statusBC,
                                  'alasan_hold' => $alasanSize,
                                  'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
@@ -1674,7 +1674,7 @@ class DokumenController extends Controller
                             $manifest->update([
                                 'kd_dok_inout' => 1,
                                 'no_dok' => $sppb->no_sppb,
-                                'tgl_dok' => Carbon::createFromFormat('d/m/Y', $sppb->tgl_sppb)->format('Y-m-d'),
+                                'tgl_dok' => Carbon::createFromFormat('m/d/Y', $sppb->tgl_sppb)->format('Y-m-d'),
                                 'status_bc' => $statusBC,
                                 'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
                                 'alasan_hold' => $alasanFinal,
@@ -2216,7 +2216,7 @@ class DokumenController extends Controller
                             $manifest->update([
                                 'kd_dok_inout' => $manual->kd_dok_inout,
                                 'no_dok' => $manual->no_dok_inout,
-                                'tgl_dok' => Carbon::createFromFormat('d/m/Y', $manual->tgl_dok_inout)->format('Y-m-d'),
+                                'tgl_dok' => Carbon::createFromFormat('m/d/Y', $manual->tgl_dok_inout)->format('Y-m-d'),
                                 'status_bc' => $statusBC,
                                 'alasan_hold' => $alasanFinal,
                                 'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
@@ -2252,7 +2252,7 @@ class DokumenController extends Controller
                         $contF->update([
                            'kd_dok_inout' => $manual->kd_dok_inout,
                            'no_dok' => $manual->no_dok_inout,
-                           'tgl_dok' => Carbon::createFromFormat('d/m/Y', $manual->tgl_dok_inout)->format('Y-m-d'),
+                           'tgl_dok' => Carbon::createFromFormat('m/d/Y', $manual->tgl_dok_inout)->format('Y-m-d'),
                            'status_bc' => 'HOLD',
                            'alasan_hold' => $alasanFinal,
                            'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
@@ -2373,7 +2373,7 @@ class DokumenController extends Controller
                              $contF->update([
                                 'kd_dok_inout' => $manual->kd_dok_inout,
                                 'no_dok' => $manual->no_dok_inout,
-                                'tgl_dok' => Carbon::createFromFormat('d/m/Y', $manual->tgl_dok_inout)->format('Y-m-d'),
+                                'tgl_dok' => Carbon::createFromFormat('m/d/Y', $manual->tgl_dok_inout)->format('Y-m-d'),
                                 'status_bc' => 'HOLD',
                                 'alasan_hold' => $alasanFinal,
                                 'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
@@ -2420,7 +2420,7 @@ class DokumenController extends Controller
                             $manifest->update([
                                 'kd_dok_inout' => $manual->kd_dok_inout,
                                 'no_dok' => $manual->no_dok_inout,
-                                'tgl_dok' => Carbon::createFromFormat('d/m/Y', $manual->tgl_dok_inout)->format('Y-m-d'),
+                                'tgl_dok' => Carbon::createFromFormat('m/d/Y', $manual->tgl_dok_inout)->format('Y-m-d'),
                                 'status_bc' => $statusBC,
                                 'alasan_hold' => $alasanFinal,
                                 'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
@@ -2648,7 +2648,7 @@ class DokumenController extends Controller
                             $manifest->update([
                                 'kd_dok_inout' => $pabean->kd_dok_inout,
                                 'no_dok' => $pabean->no_dok_inout,
-                                'tgl_dok' => Carbon::createFromFormat('d/m/Y', $pabean->tgl_dok_inout)->format('Y-m-d'),
+                                'tgl_dok' => Carbon::createFromFormat('Ymd', $pabean->tgl_dok_inout)->format('Y-m-d'),
                                 'status_bc' => $statusBC,
                                 'alasan_hold' => $alasanFinal,
                                 'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
@@ -2892,7 +2892,7 @@ class DokumenController extends Controller
                             $manifest->update([
                                 'kd_dok_inout' => $pabean->kd_dok_inout,
                                 'no_dok' => $pabean->no_dok_inout,
-                                'tgl_dok' => Carbon::createFromFormat('d/m/Y', $pabean->tgl_dok_inout)->format('Y-m-d'),
+                                'tgl_dok' => Carbon::createFromFormat('Ymd', $pabean->tgl_dok_inout)->format('Y-m-d'),
                                 'status_bc' => $statusBC,
                                 'alasan_hold' => $alasanFinal,
                                 'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),

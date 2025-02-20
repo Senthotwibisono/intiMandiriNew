@@ -3,7 +3,7 @@
 @section('content')
 <section>
     <div class="card">
-        <form action="{{ route('photo.fcl.storeContainer')}}" method="post" enctype="multipart/form-data">
+        <form action="{{ route('photo.lcl.storeContainer')}}" method="post" enctype="multipart/form-data">
             @csrf
             <div class="card-body">
                 <div class="col-sm-12">
@@ -62,7 +62,7 @@
                                 <option selected value="gate-in">Gate In</option>
                                 @endif
                                 @if($barcode->ref_action == 'release')
-                                <option selected value="gate-out">Gate Out</option>
+                                <option selected value="buang-mty">Gate Out</option>
                                 @endif
                             </select>
                         </div>
@@ -87,7 +87,7 @@
             </div>
             <div class="card-footer">
                 <div class="button-container">
-                    <button class="btn btn-success" type="submit">Submit</button>
+                    <button class="btn btn-success submit" type="submit">Submit</button>
                     <!-- <a href="javascript:void(0)" class="btn btn-sm btn-info photo"><i class="fa fa-eye"></i></a> -->
                 </div>
             </div>
@@ -96,6 +96,21 @@
 </section>
 @endsection
 @section('custom_js')
+
+<script>
+    $(document).on('click', '.submit', function(){
+        swal.fire({
+            title: 'Processing...',
+            text: 'Please wait',
+            icon: 'info',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                }
+        });
+    })
+</script>
 <script>
 $(document).ready(function(){
     $('#kegiatan').on('change', function(){

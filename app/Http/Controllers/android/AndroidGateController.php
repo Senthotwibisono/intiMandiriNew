@@ -89,10 +89,12 @@ class AndroidGateController extends Controller
             $photoTake = Photo::where('type', 'LCL')->where('master_id', $cont->id)->where('action', 'gate-in')->get();
         }else {
             $data['kets'] = KP::where('tipe', 'container')->where('kegiatan', 'buang-mty')->get();
-            $photoTake = Photo::where('type', 'LCL')->where('master_id', $cont->id)->where('action', 'buang-mty')->get();
+            $photoTake = Photo::where('type', 'LCL')->where('master_id', $cont->id)->whereIn('action', ['buang-mty', 'gate-out'])->get();
         }
         $data['take'] = $photoTake->pluck('detil');
         $data['cont'] = $cont;
+
+        // dd($data['take']);
         
         $data['barcode'] = $barcode;
 
