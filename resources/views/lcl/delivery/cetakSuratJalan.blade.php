@@ -175,7 +175,7 @@
                         <thead>
                             <tr>
                                 <th rowspan="2">Host BL AWB</th>
-                                <th rowspan="2">Ukuran Container</th>
+                                <th rowspan="2">Quantity</th>
                                 <th colspan="2">Jumlah Barang</th>
                                 <th rowspan="2">Keterangan</th>
                             </tr>
@@ -188,8 +188,8 @@
                             <tr>
                                 <td class="text-center" style="font-size: 14px;">{{$manifest->nohbl}}</td>
                                 <td class="text-center" style="font-size: 14px;"> {{$manifest->final_qty}}</td>
-                                <td class="text-center" style="font-size: 14px;"> {{ number_format($manifest->weight, '2')}}</td>
                                 <td class="text-center" style="font-size: 14px;">{{ number_format($manifest->meas, '2')}}</td>
+                                <td class="text-center" style="font-size: 14px;"> {{ number_format($manifest->weight, '2')}}</td>
                                 <td class="text-center" style="font-size: 14px;">Ex. Warehouse</td>
                             </tr>
                         </tbody>
@@ -203,6 +203,7 @@
                     {{ Carbon\Carbon::now()->format('d-m-Y / H:i:s') }}
                 </span>
             </div>
+            <br>
             <div class="row">
                 <div class="col-4 text-center">
                     Penerima,
