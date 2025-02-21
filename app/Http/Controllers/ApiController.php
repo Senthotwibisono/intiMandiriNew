@@ -20,7 +20,7 @@ class ApiController extends Controller
     {
         $this->now = Carbon::now()->format('Ymd');
         
-        $this->token = $this->now . 'ENVLG';
+        $this->token = '$U2FsdGVkX18WeMoBpJoh/Fklqv+HfHHjmT1pMz3sbJX6SHIJJvoDdImZEr+GQwDLWmXxVXJB4cp9iQuiESKK6A==';
         $this->client = new Client(); // Inisialisasi Guzzle Client
     }
 
@@ -37,20 +37,20 @@ class ApiController extends Controller
             ]);
         }
 
-        $plp = $request->plpNumber;
-        $cont = $request->containerNumber;
-
-        $token = $this->token.$plp.$cont;
-
-        if ($header['authorization'][0] != $token) {
+        
+       
+        
+        if ($header['authorization'][0] != $this->token) {
             return response()->json([
                 'status' => 0,
                 'success' => false,
                 'message' => 'Invalid Token',
             ]);
         }
-
-        $cont = ContF::where('nocontainer', $cont)
+        
+        $plp = $request->plpNumber;
+        $contNumber = $request->containerNumber;
+        $cont = ContF::where('nocontainer', $contNumber)
             ->whereHas('job', function ($query) use ($plp) {
                 $query->where('noplp', $plp);
             })->first();
