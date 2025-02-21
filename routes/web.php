@@ -59,7 +59,7 @@ use App\Http\Controllers\pengiriman\CoariCodecoController;
  use App\Http\Controllers\invoiceFCL\MasterTarifFCLController;
  use App\Http\Controllers\invoiceFCL\FormFCLController;
  use App\Http\Controllers\invoiceFCL\BackendInvoiceController;
-
+ 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -74,6 +74,8 @@ use App\Http\Controllers\pengiriman\CoariCodecoController;
 Route::middleware(['auth', 'check.segel'])->group(function () {
     Route::put('/tcontainer_fcl/{tcontainer_fcl}', [TcontainerFclController::class, 'update']);
 });
+
+
 
 
 Route::get('/', function () {

@@ -211,11 +211,9 @@ $(document).ready(function() {
                                 text: response.success ? 'E-Seal berhasil dikirim!' : response.message,
                                 icon: response.success ? 'success' : 'error'
                             }).then(() => {
-                                if (response.success) {
-                                    // Bisa reload sebagian elemen jika perlu, misal:
-                                    // $("#container_" + contId).text("Terkirim");
+                        
                                     location.reload(); 
-                                }
+                               
                             });
                         },
                         error: function () {
@@ -223,6 +221,8 @@ $(document).ready(function() {
                                 title: 'Terjadi Kesalahan!',
                                 text: 'Gagal mengirim E-Seal. Silakan coba lagi.',
                                 icon: 'error'
+                            }).then(() => {
+                                location.reload(); 
                             });
                         }
                     });
@@ -305,7 +305,10 @@ $(document).ready(function() {
       },
       dataType: 'json',
 
+      
       success: function(response) {
+
+        swal.close();
 
         console.log(response);
         $('#editCust').modal('show');
