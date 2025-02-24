@@ -47,7 +47,7 @@ class ManifestController extends Controller
 
     public function indexData(Request $request)
     {
-        $cont = Cont::with(['job', 'user'])->where('type', '=', 'lcl')->where('tglkeluar', null )->get();
+        $cont = Cont::with(['job', 'user'])->where('type', '=', 'lcl')->get();
 
         return DataTables::of($cont)
         ->addColumn('kapal_cont', function($cont){
