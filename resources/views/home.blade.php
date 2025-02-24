@@ -279,7 +279,7 @@
                 <div class="card-header justify-content-center align-items-center mt-0">
                     <h4>Layout Gudang</h4>
                 </div>
-                <div class="card" style="width: 100%; height: 300px;">
+                <div class="card">
                     <div class="card-body grid-manifest justify-content-center align-items-center mt-0">
                         @foreach($gudang as $item)
                             @php
@@ -292,15 +292,22 @@
                                 };
                             @endphp
                             <div class="grid-item-manifest {{ $bgColorClass }}" onmouseenter="showDetails(this, '{{ $item->name }}')" onmouseleave="hideDetails(this)">
-                                <a href=""><h4>{{$item->name ?? ''}}</h4></a>
+                                <a href=""><h4 style="color: black;">{{$item->name ?? ''}}</h4></a>
                                 @if($item->name != null)
                                 <div class="grid-item-detail" style="display: none;">
                                     <div class="rowSide">
                                         @foreach($tiers as $tier)
                                             @if($tier->rack_id == $item->id)
-                                                <div class="item {{ $tier->jumlah_barang > 0 ? 'filled' : '' }}">
+                                            @php
+                                                $listBarangs = $barangs->where('tier', $tier->id);
+                                                $jumlahBarang = $barangs->where('tier', $tier->id)->sum('jumlah_barang');
+                                            @endphp
+                                                <div class="item {{ $jumlahBarang > 0 ? 'filled' : '' }}">
                                                     <p>tier: {{$tier->tier}}</p>
-                                                    <p>Jlm Brg : {{$tier->jumlah_barang}}</p>
+                                                    <p>Jlm Brg : {{$jumlahBarang}}</p>
+                                                    @foreach($listBarangs as $barang)
+                                                        <p> {{$barang->manifest->nohbl ?? '-'}}, </p>
+                                                    @endforeach
                                                 </div>
                                             @endif
                                         @endforeach

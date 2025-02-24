@@ -8,6 +8,7 @@ use Auth;
 use Carbon\Carbon;
 
 use App\Models\Manifest;
+use App\Models\Item;
 use App\Models\Container;
 use App\Models\YardDesign as YD;
 use App\Models\YardDetil as RowTier;
@@ -72,6 +73,10 @@ class HomeController extends Controller
         $data['persentaseTerisi'] = ($terisi / $data['kg']) * 100;
         $data['persentaseTidakTerisi'] = ($tidakTerisi / $data['kg']) * 100;
         $data['tiers'] = RT::orderBy('tier', 'desc')->get();
+
+        $data['manifests'] = Manifest::whereNull('tglrelease')->get();
+        $data['barangs'] = Item::whereIn('manifest_id', $data['manifests']->pluck('id'))->get();
+        // dd($data['barangs']);
 
         // dd($data['tonase'], $data['volume']);
 
