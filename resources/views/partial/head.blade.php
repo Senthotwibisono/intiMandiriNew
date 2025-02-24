@@ -99,6 +99,12 @@
     overflow: hidden; /* Ensures content stays visible */
 }
 
+.custom-textarea {
+    width: 100%;
+    min-height: 100px;
+    height: auto;
+    resize: vertical;
+}
 </style>
 @if(View::hasSection('custom_styles'))
 @yield('custom_styles')

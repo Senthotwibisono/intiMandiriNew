@@ -78,6 +78,20 @@
                 </div>
             </div>
         </div>
+        <div class="card-body">
+            <div class="divider divider-left">
+                <div class="divider-text">
+                    Data Permohonan Manifest
+                </div>
+            </div>
+            <div class="container-button">
+                <div class="col-auto">
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addPermohonanStripping"><i class="fas fa-plus"></i>|| Upload Permohonan Stripping</button>
+                    <a href="{{ asset('storage/permohonanStripping/masterBL/masterBL-' . $cont->id) }}" target="_blank" class="btn btn-primary">Master BL</a>
+                    <a href="{{ asset('storage/permohonanStripping/hostBL/hostBL-' . $cont->id) }}" target="_blank" class="btn btn-primary">Host BL</a>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -95,13 +109,13 @@
         </div>
         <div class="card-body">
             <div class="table">
-                <table class="table-hover table-stripped" id="tableDetil" style="white-text: norwap;">
+                <table class="table-hover table-stripped" id="tableDetil" style="white-space: nowrap;">
                     <thead>
                         <tr>
-                            <th class="text-center">Delete</th>
                             <th class="text-center">Edit</th>
                             <th class="text-center">Detil</th>
                             <th class="text-center">Barcode</th>
+                            <th class="text-center">Bon Muat</th>
                             <th class="text-center">No HBL</th>
                             <th class="text-center">Tgl HBL</th>
                             <th class="text-center">No Tally</th>
@@ -249,6 +263,36 @@
     </div>
 </div>
 
+<!-- Data Pengajuan -->
+<div class="modal fade" id="addPermohonanStripping" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-centered modal-dialog-scrollable modal-xl"role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">Add Data Permohonan Stripping</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"> <i data-feather="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <form action="/lcl/manifest/permohonanStripping" method="post" enctype="multipart/form-data" id="izinStrippingModal">
+                    @csrf
+                    <div class="modal-body">
+                        <p> Upload Master BL </p>
+                        <input type="file" name="master_bl" class="form-control" id="inputGroupFile01">
+                        <input type="hidden" name="container_id" value="{{$cont->id}}" class="form-control">
+                        <br>
+                        <!--  -->
+                        <p> Upload House BL </p>
+                        <input type="file" name="host_bl" class="form-control" id="inputGroupFile01">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal"> <i class="bx bx-x d-block d-sm-none"></i> <span class="d-none d-sm-block">Close</span> </button>
+                <button type="button" class="btn btn-primary ml-1 uploadIzin" id="uploadIzin"><span class="d-none d-sm-block">Submit</span> </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="editCust" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-centered modal-dialog-scrollable modal-lg"role="document">
         <div class="modal-content">
@@ -367,24 +411,25 @@
             scrollY: '50vh',
             ajax: '/lcl/manifest/detailManifestData-' + Id, // Fix concatenation
             columns: [
-                { data: 'delete', name: 'delete', className: 'text-center' }, // Define the column
+                // { data: 'delete', name: 'delete', className: 'text-center' }, // Define the column
                 { data: 'edit', name: 'edit', className: 'text-center' }, // Define the column
                 { data: 'detil', name: 'detil', className: 'text-center' }, // Define the column
                 { data: 'barcode', name: 'barcode', className: 'text-center' }, // Define the column
-                { data: 'nohbl', name: 'nohbl', className: 'text-center' }, // Define the column
-                { data: 'tgl_hbl', name: 'tgl_hbl', className: 'text-center' }, // Define the column
-                { data: 'notally', name: 'notally', className: 'text-center' }, // Define the column
-                { data: 'shipper', name: 'shipper', className: 'text-center' }, // Define the column
-                { data: 'customer', name: 'customer', className: 'text-center' }, // Define the column
-                { data: 'quantity', name: 'quantity', className: 'text-center' }, // Define the column
-                { data: 'final_qty', name: 'final_qty', className: 'text-center' }, // Define the column
-                { data: 'palet', name: 'palet', className: 'text-center' }, // Define the column
-                { data: 'packingName', name: 'packingName', className: 'text-center' }, // Define the column
-                { data: 'packingCode', name: 'packingCode', className: 'text-center' }, // Define the column
-                { data: 'desc', name: 'desc', className: 'text-center' }, // Define the column
-                { data: 'weight', name: 'weight', className: 'text-center' }, // Define the column
-                { data: 'meas', name: 'meas', className: 'text-center' }, // Define the column
-                { data: 'packingTally', name: 'packingTally', className: 'text-center' }, // Define the column
+                { data: 'bonMuat', name: 'bonMuat', className: 'text-center' }, // Define the column
+                { data: 'nohbl', name: 'nohbl', className: 'text-center', orderable: true }, // Define the column
+                { data: 'tgl_hbl', name: 'tgl_hbl', className: 'text-center', orderable: true }, // Define the column
+                { data: 'notally', name: 'notally', className: 'text-center', orderable: true }, // Define the column
+                { data: 'shipper', name: 'shipper', className: 'text-center', orderable: true }, // Define the column
+                { data: 'customer', name: 'customer', className: 'text-center', orderable: true }, // Define the column
+                { data: 'quantity', name: 'quantity', className: 'text-center', orderable: true }, // Define the column
+                { data: 'final_qty', name: 'final_qty', className: 'text-center', orderable: true }, // Define the column
+                { data: 'palet', name: 'palet', className: 'text-center', orderable: true }, // Define the column
+                { data: 'packingName', name: 'packingName', className: 'text-center', orderable: true }, // Define the column
+                { data: 'packingCode', name: 'packingCode', className: 'text-center', orderable: true }, // Define the column
+                { data: 'desc', name: 'desc', className: 'text-center', orderable: true }, // Define the column
+                { data: 'weight', name: 'weight', className: 'text-center', orderable: true }, // Define the column
+                { data: 'meas', name: 'meas', className: 'text-center', orderable: true }, // Define the column
+                { data: 'packingTally', name: 'packingTally', className: 'text-center', orderable: true }, // Define the column
              
             ]
         })
@@ -613,6 +658,31 @@ $(document).on('click', '.unapproveButton', function() {
                 if (result.isConfirmed) {
                     // Submit the form programmatically if confirmed
                     document.getElementById('updateForm').submit();
+                }
+            });
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Attach event listener to the update button
+        document.getElementById('uploadIzin').addEventListener('click', function (e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Show SweetAlert confirmation dialog
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Apakah dokumen yg anda masukan sudah benar?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, update it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Submit the form programmatically if confirmed
+                    document.getElementById('izinStrippingModal').submit();
                 }
             });
         });

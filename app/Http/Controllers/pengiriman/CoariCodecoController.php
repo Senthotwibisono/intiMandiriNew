@@ -43,7 +43,7 @@ class CoariCodecoController extends Controller
         $this->wsdl = 'https://tpsonline.beacukai.go.id/tps/service.asmx?WSDL';
         $this->user = 'INTIMANDIRI';
         $this->password = 'INTIMANDIRI1';
-        $this->kode = '1MUT';
+        $this->kode = 'INTI';
     }
 
     private function RefNumber()
@@ -262,13 +262,8 @@ class CoariCodecoController extends Controller
                     'jam_entry' => $coariCont->jam_entry,
                 ]);
 
-                if (strpos($response, ' Gagal Insert') !== false) {
-                    $flag = 'N';
-                }else {
-                    $flag = 'Y';
-                }
                 $cont->update([
-                    'coari_flag' => $flag,
+                    'coari_flag' => 'Y',
                 ]);
             }
         }
@@ -463,13 +458,8 @@ class CoariCodecoController extends Controller
                     'jam_entry' => $coariCont->jam_entry,
                 ]);
 
-                if (strpos($response, ' Gagal Insert') !== false) {
-                    $flag = 'N';
-                }else {
-                    $flag = 'Y';
-                }
                 $cont->update([
-                    'coari_flag' => $flag,
+                    'coari_flag' => 'Y',
                 ]);
             }
         }
@@ -876,13 +866,8 @@ class CoariCodecoController extends Controller
                     'jam_entry' => $codecoCont->jam_entry,
                 ]);
 
-                if (strpos($response, ' Gagal Insert') !== false) {
-                    $flag = 'N';
-                }else {
-                    $flag = 'Y';
-                }
                 $cont->update([
-                    'codeco_flag' => $flag,
+                    'codeco_flag' => 'Y',
                 ]);
             }
         }
@@ -1080,13 +1065,8 @@ class CoariCodecoController extends Controller
                     'jam_entry' => $codecoCont->jam_entry,
                 ]);
 
-                if (strpos($response, ' Gagal Insert') !== false) {
-                    $flag = 'N';
-                }else {
-                    $flag = 'Y';
-                }
                 $cont->update([
-                    'codeco_flag' => $flag,
+                    'codeco_flag' => 'Y',
                 ]);
             }
         }

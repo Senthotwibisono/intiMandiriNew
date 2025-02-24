@@ -102,30 +102,41 @@ class LclController extends Controller
 
     public function postRacking(Request $request)
     {
-        // var_dump($request->all());
-        // die;
-
-        
         try {
             $item = Item::find($request->id);
-            $tier = RT::where('barcode' ,$request->qr_code)->first();
-            
-            // var_dump($request->qr_code, $tier, $item);
-            // die();
-            $rack = PM::find($tier->rack_id);
-            $item->update([
-                'lokasi_id' => $rack->id,
-                'tier' => $tier->id,
-            ]);
+            if ($item) {
 
-            $tier->jumlah_barang = $tier->jumlah_barang + $item->jumlah_barang;
-            $tier->save();
-            $rack->increment('jumlah_barang', $item->jumlah_barang);
+                $oldLokasi = PM::find($item->lokasi_id);
+                if ($oldLokasi) {
+                    $oldLokasi->decrement('jumlah_barang', $item->jumlah_barang);
+                }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Data Berhasil di update',
-            ]);
+                $oldRack = RT::find($item->tier);
+                if ($oldRack) {
+                    $oldRack->decrement('jumlah_barang', $item->jumlah_barang);
+                }
+
+                $tier = RT::where('barcode' ,$request->qr_code)->first();
+                $rack = PM::find($tier->rack_id);
+                $item->update([
+                    'lokasi_id' => $rack->id,
+                    'tier' => $tier->id,
+                ]);
+    
+                $tier->increment('jumlah_barang', $item->jumlah_barang);
+                $tier->save();
+                $rack->increment('jumlah_barang', $item->jumlah_barang);
+    
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Data Berhasil di update',
+                ]);
+            }else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data Tidak Ditemukan',
+                ]);
+            }
         } catch (\Throwable $th) {
             return response()->json([
                 'success' => false,
@@ -187,5 +198,131 @@ class LclController extends Controller
          $data['detil'] = $photoTake;
 
         return view('android.photoManifestDetil', $data);
+    }
+
+    public function indexMuat()
+    {
+        $data['title'] = 'Muat Index';
+
+        return view('android.lcl.muat.index', $data);
+    }
+
+    public function detilMuat($barcode)
+    {
+        $manifest = Manifest::where('barcode', $barcode)->first();
+        if (!$manifest) {
+            return redirect()->back()->with('status', ['type' => 'success', 'message' =>'Data tidak ditemukan']);
+        }
+        
+        if ($manifest->tglstripping == null) {
+            return redirect()->back()->with('status', ['type' => 'success', 'message' =>'Manifest belum stripping']);
+        }
+
+        $data['title'] = 'Muat Manifest: ' . $manifest->nohbl;
+
+        $items = Item::where('manifest_id', $manifest->id)->get();
+        $data['manifest'] = $manifest;
+        $data['items'] = $items;
+
+        return view('android.lcl.muat.detil', $data)->with('status', ['type'=>'success', 'message'=>'Data Ditemukan']);
+    }
+
+    public function mulaiMuat(Request $request)
+    {
+        try {
+            $manifest = Manifest::find($request->id);
+
+            $manifest->update([
+                'mulai_muat' => Carbon::now(),
+                'uid_muat' => Auth::user()->id,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Waktu Muat Telah Dimulai',
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal!! : ' . $th->getMessage(),
+            ]);
+        }
+    }
+
+    public function selesaiMuat(Request $request)
+    {
+        try {
+            $manifest = Manifest::find($request->id);
+
+            $unItems = Item::where('manifest_id', $manifest->id)->whereNull('waktu_muat')->get();
+
+            if ($unItems->isNotEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Terdapat barang yang belum Muat',
+                ]);
+            }
+
+            $manifest->update([
+                'selesai_muat' => Carbon::now(),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Waktu Muat Telah Dimulai',
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal!! : ' . $th->getMessage(),
+            ]);
+        }
+    }
+
+    public function muatItem(Request $request)
+    {
+        // var_dump($request->all());
+        // die();
+
+        try {
+            $item = Item::find($request->id);
+            if ($item) {
+                if ($item->barcode !=  $request->qr_code) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Data Manifest berbeda, harap pilih manifest yang sesuai',
+                    ]);
+                }
+
+                $rack = PM::find($item->lokasi_id);
+                if ($rack) {
+                    $rack->decrement('jumlah_barang', $item->jumlah_barang);
+                }
+
+                $tier = RT::find($item->tier);
+                if ($tier) {
+                    $tier->decrement('jumlah_barang', $item->jumlah_barang);
+                }
+
+                $item->update([
+                    'waktu_muat' => Carbon::now(),
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Proses Muat Berhasil',
+                ]);
+            }else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data tidak ditemukan',
+                ]);
+            }
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Somethong Wrong: ' . $th->getMessage(),
+            ]);
+        }
     }
 }

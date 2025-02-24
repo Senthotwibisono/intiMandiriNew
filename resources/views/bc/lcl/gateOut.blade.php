@@ -39,6 +39,7 @@
                         <tr>
                             <th class="text-center">Action</th>
                             <th class="text-center">Status BC</th>
+                            <th class="text-center">Alasan Hold</th>
                             <th class="text-center">No HBL</th>
                             <th class="text-center">Tgl HBL</th>
                             <th class="text-center">No Tally</th>
@@ -67,6 +68,7 @@
                                 <td>
                                     {{$mans->status_bc}}
                                 </td>
+                                <td>{{$mans->alasan_hold ?? '-'}}</td>
                                 <td>{{$mans->nohbl}}</td>
                                 <td>{{$mans->tgl_hbl}}</td>
                                 <td>{{$mans->notally}}</td>

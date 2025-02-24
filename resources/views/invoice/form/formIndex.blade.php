@@ -34,7 +34,7 @@
             </div>
             <div class="card-body">
                 <div class="row mt-0">
-                    <div class="col-sm-4">
+                    <div class="col-sm-2">
                         <div class="form-group">
                             <label for="">Manifest</label>
                             <select name="manifest_id" id="manifest_id" style="width:100%;" class="js-example-basic-single select2 form-select">
@@ -43,6 +43,12 @@
                                     <option value="{{$mans->id}}" {{$form->manifest_id == $mans->id ? 'selected' : ''}}>{{$mans->nohbl}}</option>
                                 @endforeach
                             </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label for="">Label BB</label>
+                            <input type="text" class="form-control" name="dg_label" id="dg_label" value="{{$form->manifest->dg_label ?? ''}}" readonly>
                         </div>
                     </div>
                     <div class="col-sm-2">
@@ -254,6 +260,7 @@
                             confirmButton: 'Ok',
                         })
                         // Populate the form fields with the returned data
+                        $('#dg_label').val(data.dg_label);
                         $('#quantity').val(data.quantity);
                         $('#weight').val(data.weight);
                         $('#meas').val(data.meas);
@@ -265,6 +272,7 @@
                 });
             } else {
                 // Clear the fields if no manifest is selected
+                $('#dg_label').val('');
                 $('#quantity').val('');
                 $('#weight').val('');
                 $('#meas').val('');

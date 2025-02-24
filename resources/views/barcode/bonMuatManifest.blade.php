@@ -14,7 +14,7 @@
 
 
 <style>
-    @page {
+   @page {
       width: 100mm;
       height: auto;
       margin: 0cm; /* Tambahkan margin jika diperlukan */
@@ -162,71 +162,71 @@
     }
 </style>
 
-<div class="container">
-    <div class="row">
-        <div class="col-12">
-            <div class="text-center">
-                    <img src="/logo/IntiMandiri.PNG" class="img" alt="">
-               
-            </div>
-       </div>
-    </div>
-    <br>
-    <div class="text-center">
-        {{$title}}
-    </div>
-    <hr>
-    <!-- <div class="row">
-        <div class="col-3">
-            <a herf="" class="btn btn-danger">Cetak PDF</a>
-        </div>
-        <div class="col-3">
-            <a herf="" class="btn btn-success">Cetak Excel</a>
-        </div>
-    </div>
-    <br>
-    <hr> -->
-    <div class="row">
-        <div class="card">
-            <div class="card-header">
-                {{strtoupper($barcode->ref_type).' - '.strtoupper($barcode->ref_action)}}
-                <small class="pull-right"><strong>Expired Date:</strong> {{ date('d F, Y', strtotime($barcode->expired)) }}</small>
-            </div>
-            <div class="card-body">
-                <div class="text-center">
-                        <td><b>Code</b></td>
-                        <td>&nbsp;&nbsp;:&nbsp;&nbsp;</td>
-                        <td>{{ $barcode->barcode }}</td>
-                        <br>
-                    {!!QrCode::margin(0)->size(300)->generate($barcode->barcode)!!}
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="card">
+                <div class="card-header">
+                    <div class="col-12">
+                        <div class="d-flex align-items-center">
+                            <div class="logo img me-3">
+                                <img src="/logo/IntiMandiri.PNG" class="img-fluid" alt="" style="">
+                            </div>
+                            <div class="text-center flex-grow-1">
+                                {{$title}}
+                            </div>
+                        </div>
+                    </div>
+                    {{strtoupper($manifest->nohbl).' - Ex. Container : '.strtoupper($manifest->cont->nocontainer)}}
+                    <small class="pull-right"><strong>Stripping Date:</strong> {{ date('d F, Y', strtotime($manifest->tglstripping)) }}</small>
                 </div>
-                <br>
-                <div class="text-center">
-                    <tr>
-                        <td>No Tally</td>
-                        <td> : </td>
-                        <td>{{$barcode->manifest->notally}}</td>
-                    </tr>
+                <div class="card-body">
+                    <div class="text-center">
+                            <td><b>Code</b></td>
+                            <td>&nbsp;&nbsp;:&nbsp;&nbsp;</td>
+                            <td>{{ $manifest->barcode }}</td>
+                            <br>
+                        {!!QrCode::margin(0)->size(150)->generate($manifest->barcode)!!}
+                    </div>
                     <br>
-                    <tr>
-                        <td>Kode Dok</td>
-                        <td> : </td>
-                        <td>{{$barcode->manifest->dokumen->name}}</td>
-                    </tr>
-                    <br>
-                    <tr>
-                        <td>No Dokumen</td>
-                        <td> : </td>
-                        <td>{{$barcode->manifest->no_dok}}</td>
-                    </tr>
-                    <tr>
-                        <td>Tanggal Dokumen</td>
-                        <td> : </td>
-                        <td>{{$barcode->manifest->tgl_dok}}</td>
-                    </tr>
+                    <div class="text-center">
+                        <tr>
+                            <td>Dokumen/No Dokumen/Tgl Dok</td>
+                            <td> : </td>
+                            <td>{{$manifest->dokumen->name ?? '-'}}/{{$manifest->no_dok}}/{{$manifest->tgl_dok}}</td>
+                        </tr>
+                        <tr>
+                            <td>Consignee/NPWP/FAX/EMAIL</td>
+                            <td> : </td>
+                            <br>
+                            <td>{{$manifest->Customer->name ?? ''}} / {{$manifest->Customer->npwp ?? ''}} / {{$manifest->Customer->fax ?? ''}} / {{$manifest->Customer->email ?? ''}}</td>
+                        </tr>
+                        <hr>
+                        <p>Location</p>
+                        <table style="margin: auto;">
+                            <thead>
+                                <tr>
+                                    <th>Rack</th>
+                                    <th>Tier</th>
+                                    <th>Jumlah Brang</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($items as $item)
+                                <tr>
+                                    <td>{{$item->Rack->name ?? '-'}}</td>
+                                    <td>{{$item->Tier->tier ?? '-'}}</td>
+                                    <td>{{$item->jumlah_barang ?? '-'}}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+    </div>
+</body>
+
 </html>

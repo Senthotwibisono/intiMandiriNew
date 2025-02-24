@@ -20,6 +20,13 @@
                         <label for="">Quantity</label>
                         <input type="text" name="quantity" value="{{$manifest->quantity}}" id="quantity_edit" class="form-control" readonly>
                     </div>
+                    <div class="form-group">
+                        <label for="">Danger Label</label>
+                        <select class="form-select" name="dg_label" id="dg_label_edit">
+                            <option value="N" {{ $manifest->dg_label == 'N' ? 'selected' : '' }}>N</option>
+                            <option value="Y" {{ $manifest->dg_label == 'Y' ? 'selected' : '' }}>Y</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="row mt-0">
                     <div class="col-sm-6">

@@ -96,8 +96,8 @@
                                 <select class="customSelect form-control select2" name="type" style="width: 100%;" required>
                                     <option disabled selected value>Choose Jenis Container</option>
                                     <option value="DRY">DRY</option>
-                                     <option value="BB">BB</option>
-                                     <option value="OH">OH</option>
+                                    <option value="BB">BB</option>
+                                    <option value="OH">OH</option>
                                  </select>
                             </div>
                         </div>
@@ -421,41 +421,10 @@
                             <div class="form-group">
                                 <label>Jenis Container</label>
                                 <select class="customSelectWMS form-control select2" name="type" style="width: 100%;" required>
-                                    <option disabled selected value>Choose Jenis Container</option>
-                                    <option value="Class BB Standar 3">Class BB Standar 3</option>
-                                    <option value="Class BB Standar 8">Class BB Standar 8</option>
-                                    <option value="Class BB Standar 9">Class BB Standar 9</option>
-                                    <option value="Class BB Standar 4,1">Class BB Standar 4,1</option>
-                                    <option value="Class BB Standar 4,2">Class BB Standar 4,2</option>   
-				            		<option value="Class BB Standar 4,3">Class BB Standar 4,3</option>   
-                                    <option value="Class BB Standar 6">Class BB Standar 6</option>
-                                    <option value="Class BB Standar 2,2">Class BB Standar 2,2</option>
-                                    <option value="Class BB Standar 2,3">Class BB Standar 2,3</option>    
-                                    <option value="Class BB High Class 2,1">Class BB High Class 2,1</option>
-                                    <option value="Class BB High Class 5,1">Class BB High Class 5,1</option>
-                                    <option value="Class BB High Class 6,1">Class BB High Class 6,1</option>
-                                    <option value="Class BB High Class 5,2">Class BB High Class 5,2</option>
-                                    <option value="REEFER RF">REEFER RF</option>
-                                    <option value="REEFER RECOOLING">REEFER RECOOLING</option>
-				            		<option value="REEFER RECOOLING BB 3">REEFER RECOOLING BB 3</option>
-				            		<option value="REEFER RECOOLING BB 8">REEFER RECOOLING BB 8</option>                           
-				            		<option value="REEFER RECOOLING BB 6">REEFER RECOOLING BB 6</option>\		
-				            		<option value="REEFER RECOOLING BB 9">REEFER RECOOLING BB 9</option>
-				            		<option value="REEFER RECOOLING BB 2.1">REEFER RECOOLING BB 2.1</option>
-				            		<option value="REEFER RECOOLING BB 2.2">REEFER RECOOLING BB 2.2</option>
-				            		<option value="REEFER RECOOLING BB 2.3">REEFER RECOOLING BB 2.3</option>			
-				            		<option value="REEFER RECOOLING BB 4.1">REEFER RECOOLING BB 4.1</option>
-				            		<option value="REEFER RECOOLING BB 4.2">REEFER RECOOLING BB 4.2</option>
-                                    <option value="REEFER RECOOLING BB 5.1">REEFER RECOOLING BB 5.1</option>
-                                    <option value="REEFER RECOOLING BB 5.2">REEFER RECOOLING BB 5.2</option>
-                                    <option value="REEFER RECOOLING BB 6.1">REEFER RECOOLING BB 6.1</option>
-				            		<option value="FLAT TRACK RF">FLAT TRACK RF</option>
-                                    <option value="FLAT TRACK OH">FLAT TRACK OH</option>
-                                    <option value="FLAT TRACK OW">FLAT TRACK OW</option>
-                                    <option value="FLAT TRACK OL">FLAT TRACK OL</option>
+                                <option disabled selected value>Choose Jenis Container</option>
                                     <option value="DRY">DRY</option>
-                                    <option value="OPEN TOP">OPEN TOP</option>
-				            		<option value="OH">OH</option>
+                                    <option value="BB">BB</option>
+                                    <option value="OH">OH</option>
                                  </select>
                             </div>
                         </div>
@@ -600,40 +569,9 @@
                                 <label>Jenis Container</label>
                                 <select class="editelectWMS form-control select2" name="type" id="type_edit" style="width: 100%;" required>
                                     <option disabled selected value>Choose Jenis Container</option>
-                                    <option value="Class BB Standar 3">Class BB Standar 3</option>
-                                    <option value="Class BB Standar 8">Class BB Standar 8</option>
-                                    <option value="Class BB Standar 9">Class BB Standar 9</option>
-                                    <option value="Class BB Standar 4,1">Class BB Standar 4,1</option>
-                                    <option value="Class BB Standar 4,2">Class BB Standar 4,2</option>   
-				            		<option value="Class BB Standar 4,3">Class BB Standar 4,3</option>   
-                                    <option value="Class BB Standar 6">Class BB Standar 6</option>
-                                    <option value="Class BB Standar 2,2">Class BB Standar 2,2</option>
-                                    <option value="Class BB Standar 2,3">Class BB Standar 2,3</option>    
-                                    <option value="Class BB High Class 2,1">Class BB High Class 2,1</option>
-                                    <option value="Class BB High Class 5,1">Class BB High Class 5,1</option>
-                                    <option value="Class BB High Class 6,1">Class BB High Class 6,1</option>
-                                    <option value="Class BB High Class 5,2">Class BB High Class 5,2</option>
-                                    <option value="REEFER RF">REEFER RF</option>
-                                    <option value="REEFER RECOOLING">REEFER RECOOLING</option>
-				            		<option value="REEFER RECOOLING BB 3">REEFER RECOOLING BB 3</option>
-				            		<option value="REEFER RECOOLING BB 8">REEFER RECOOLING BB 8</option>                           
-				            		<option value="REEFER RECOOLING BB 6">REEFER RECOOLING BB 6</option>\		
-				            		<option value="REEFER RECOOLING BB 9">REEFER RECOOLING BB 9</option>
-				            		<option value="REEFER RECOOLING BB 2.1">REEFER RECOOLING BB 2.1</option>
-				            		<option value="REEFER RECOOLING BB 2.2">REEFER RECOOLING BB 2.2</option>
-				            		<option value="REEFER RECOOLING BB 2.3">REEFER RECOOLING BB 2.3</option>			
-				            		<option value="REEFER RECOOLING BB 4.1">REEFER RECOOLING BB 4.1</option>
-				            		<option value="REEFER RECOOLING BB 4.2">REEFER RECOOLING BB 4.2</option>
-                                    <option value="REEFER RECOOLING BB 5.1">REEFER RECOOLING BB 5.1</option>
-                                    <option value="REEFER RECOOLING BB 5.2">REEFER RECOOLING BB 5.2</option>
-                                    <option value="REEFER RECOOLING BB 6.1">REEFER RECOOLING BB 6.1</option>
-				            		<option value="FLAT TRACK RF">FLAT TRACK RF</option>
-                                    <option value="FLAT TRACK OH">FLAT TRACK OH</option>
-                                    <option value="FLAT TRACK OW">FLAT TRACK OW</option>
-                                    <option value="FLAT TRACK OL">FLAT TRACK OL</option>
                                     <option value="DRY">DRY</option>
-                                    <option value="OPEN TOP">OPEN TOP</option>
-				            		<option value="OH">OH</option>
+                                    <option value="BB">BB</option>
+                                    <option value="OH">OH</option>
                                  </select>
                             </div>
                         </div>

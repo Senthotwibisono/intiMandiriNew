@@ -319,10 +319,13 @@ Route::controller(DokumenController::class)->group(function (){
         Route::post('/lcl/manifest/update', 'update')->name('lcl.manifest.update');
         Route::post('/lcl/manifest/approve-{id?}', 'approve')->name('lcl.manifest.approve');
         Route::post('/lcl/manifest/unapprove-{id?}', 'unapprove')->name('lcl.manifest.unapprove');
+        Route::post('/lcl/manifest/permohonanStripping', 'permohonanStripping');
+
         // Item
         Route::get('/lcl/manifest/item-{id?}', 'itemIndex')->name('lcl.manifest.item.index');
         Route::post('/lcl/manifest/itemUpdate', 'itemUpdate')->name('lcl.manifest.item.update');
         Route::get('/lcl/manifest/barcode-{id?}', 'barcodeIndex')->name('lcl.manifest.barcode.index');
+        Route::get('/lcl/manifest/bonMuat/{id?}', 'bonMuatManifest');
     });
 
     // Stripping
@@ -531,6 +534,15 @@ Route::controller(LclController::class)->group(function(){
     // Photo Manifest
     Route::get('/android/photo/photoManifest', 'photoManifest');
     Route::get('/android/photo/photoManifest-{qr?}', 'photoManifestDetil');
+
+    // Muat
+    Route::prefix('/android/muat')->group(function(){
+        Route::get('/index', 'indexMuat');
+        Route::get('/detil/{barcode?}', 'detilMuat');
+        Route::post('/mulaiMuat', 'mulaiMuat');
+        Route::post('/selesaiMuat', 'selesaiMuat');
+        Route::post('/muatItem', 'muatItem');
+    });
 });
 
     Route::controller(FCLAndroidController::class)->group(function(){

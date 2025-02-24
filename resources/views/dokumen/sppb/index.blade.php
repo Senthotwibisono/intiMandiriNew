@@ -94,7 +94,7 @@
             <div class="modal-body">
                 <div class="table">
                     <table id="containerTable" class="table table-striped table-bordered">
-                        <thead>
+                        <thead style="white-space: nowrap;">
                             <tr>
                                 <th>No Kontainer</th>
                                 <th>Ukuran Dok</th>

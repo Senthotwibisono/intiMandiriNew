@@ -223,11 +223,18 @@ class Manifest extends Model
         'type_class',
         'dg_label',
         'palet',
+        'mulai_muat',
+        'selesai_muat',
+        'uid_muat',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class, 'uid', 'id');
+    }
+    public function uidMuat()
+    {
+        return $this->belongsTo(User::class, 'uid_muat', 'id');
     }
 
     public function strippingBy()

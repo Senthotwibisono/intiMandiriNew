@@ -23,13 +23,15 @@
     <div class="card">
         <div class="card-body">
             <div class="table">
-                <table class="table-hover table-stripped" id="tableGateOut">
+                <table class="table-hover table-stripped" id="tableGateOut" style="white-space: nowrap;">
                     <thead>
                         <tr>
                             <th class="text-center">Edit</th>
                             <th class="text-center">Detil</th>
                             <th class="text-center">Barcode</th>
+                            <th class="text-center">Bon Muat</th>
                             <th class="text-center">Status BC</th>
+                            <th class="text-center">Alasan Hold</th>
                             <th class="text-center">No HBL</th>
                             <th class="text-center">Tgl HBL</th>
                             <th class="text-center">No Tally</th>
@@ -172,7 +174,9 @@
                 { data: 'edit', name: 'edit', className: 'text-center' },
                 { data: 'detail', name: 'detail', className: 'text-center' },
                 { data: 'barcode', name: 'barcode', className: 'text-center' },
+                { data: 'bonMuat', name: 'barcode', className: 'text-center' },
                 { data: 'status_bc', name: 'status_bc', className: 'text-center' },
+                { data: 'alasan_hold', name: 'alasan_hold', className: 'text-center' },
                 { data: 'nohbl', name: 'nohbl', className: 'text-center' },
                 { data: 'tgl_hbl', name: 'tgl_hbl', className: 'text-center' },
                 { data: 'notally', name: 'notally', className: 'text-center' },

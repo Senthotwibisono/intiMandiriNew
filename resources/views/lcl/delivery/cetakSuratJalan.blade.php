@@ -127,7 +127,7 @@
                     <img src="/logo/IntiMandiri.png" class="img" style="width:20%;" alt="">
                 </div>
                 <div class="col-4">
-                    <span style="font-size: 20px;">{{$manifest->cont->job->nojoborder ?? ''}}</span>
+                    <span style="font-size: 20px;">{{$manifest->notally ?? ''}}</span>
                 </div>
             </div>
             <br>

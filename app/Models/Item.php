@@ -24,6 +24,7 @@ class Item extends Model
         'lokasi_id',
         'tier',
         'jumlah_barang',
+        'waktu_muat',
     ];
 
     public function user()

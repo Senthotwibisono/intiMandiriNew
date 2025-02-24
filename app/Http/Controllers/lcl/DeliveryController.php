@@ -355,14 +355,6 @@ class DeliveryController extends Controller
         $manifest = Manifest::whereNotNull('tglstripping')->get();
 
         return DataTables::of($manifest)
-        ->addColumn('highlight', function($manifest){
-            $statusClasses = [
-                'HOLD' => 'highlight-yellow',
-                'HOLDP2' => 'highlight-red text-white',
-            ];
-        
-            return $statusClasses[$manifest->status_bc] ?? '';
-        })
         ->addColumn('edit', function($manifest){
             return '<button class="btn btn-warning editButton" data-id="'.$manifest->id.'"><i class="fa fa-pencil"></i></button>';
         })
@@ -371,7 +363,18 @@ class DeliveryController extends Controller
             return '<a href="javascript:void(0)" onclick="openWindow(\''.$herf.$manifest->id.'\')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>';
         })
         ->addColumn('barcode', function($manifest){
-            return '<button class="btn btn-danger printBarcode" data-id="'.$manifest->id.'"><i class="fa fa-print"></i></button>';
+            if ($manifest->flag_segel_merarh == 'Y') {
+               return '<p>Tidak Dapat Mencetak Barcode Ketika Segel Merah</p>';
+            }else {
+                if ($manifest->status_bc != 'release') {
+                    return '<p>Tidak Dapat Mencetak Barcode Ketika Belum Release</p>';
+                }else {
+                    return '<button class="btn btn-danger printBarcode" data-id="'.$manifest->id.'"><i class="fa fa-print"></i></button>';
+                }
+            }
+        })
+        ->addColumn('bonMuat', function($manifest){
+            return '<button class="btn btn-danger printBonmuat" data-id="'.$manifest->id.'"><i class="fa fa-print"></i></button>';
         })
         ->addColumn('status_bc', function($manifest){
             return $manifest->status_bc ?? '-';
@@ -405,7 +408,7 @@ class DeliveryController extends Controller
         })
         ->addColumn('desc', function($manifest){
             $desc = $manifest->descofgoods ?? '-';
-            return '<textarea class="form-control" cols="3" readonly>'. $desc .'</textarea>';
+            return '<textarea class="form-control custom-textarea" cols="30" readonly>'. $desc .'</textarea>';
         })
         ->addColumn('weight', function($manifest){
             return $manifest->weight ?? '';
@@ -425,7 +428,7 @@ class DeliveryController extends Controller
         ->addColumn('tglDok', function($manifest){
             return $manifest->tgl_dok ?? '-';
         })
-        ->rawColumns(['edit', 'detail', 'barcode', 'desc'])
+        ->rawColumns(['edit', 'detail', 'barcode', 'desc', 'bonMuat'])
         ->make(true);
     }
 
@@ -675,6 +678,15 @@ class DeliveryController extends Controller
     }
 
     public function manifestBarcode($id)
+    {
+        $data['barcode'] = Barcode::where('id', $id)->first();
+        $barcode = $data['barcode'];
+        $data['title'] = "Gate Pass " . $barcode->manifest->notally; 
+
+        return view('barcode.indexManifest', $data);
+    }
+
+    public function manifestBonMuat($id)
     {
         $data['barcode'] = Barcode::where('id', $id)->first();
         $barcode = $data['barcode'];

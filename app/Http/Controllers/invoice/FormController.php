@@ -60,6 +60,7 @@ class FormController extends Controller
             'cbm'      => $cbm,
             'forwarding'      => $forwarding,
             'cust' => $manifest->customer_id,
+            'dg_label' => $manifest->dg_label,
         ]);
     }
 

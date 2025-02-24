@@ -112,7 +112,11 @@ class ManifestController extends Controller
             return '<button class="btn btn-danger deleteButton" data-id="'.$manifest->id.'"><i class="fa fa-trash"></i></button>';
         })
         ->addColumn('edit', function($manifest){
-            return '<button class="btn btn-warning editButton" data-id="'.$manifest->id.'"><i class="fa fa-pencil"></i></button>';
+            if ($manifest->flag_segel_merah == 'Y') {
+                return '<p>Tidak Dapat Edit Ketika Segel Merah</p>';
+            }else {
+                return '<button class="btn btn-warning editButton" data-id="'.$manifest->id.'"><i class="fa fa-pencil"></i></button>';
+            }
         })
         ->addColumn('detil', function($manifest){
             $herfDetil = '/lcl/manifest/item-';
@@ -120,6 +124,10 @@ class ManifestController extends Controller
         })
         ->addColumn('barcode', function($manifest){
             $herfBarcode = '/lcl/manifest/barcode-';
+            return '<a href="javascript:void(0)" onclick="openWindow(\''. $herfBarcode . $manifest->id .'\')" class="btn btn-sm btn-danger"><i class="fa fa-print"></i></a>';
+        })
+        ->addColumn('bonMuat', function($manifest){
+            $herfBarcode = '/lcl/manifest/bonMuat/';
             return '<a href="javascript:void(0)" onclick="openWindow(\''. $herfBarcode . $manifest->id .'\')" class="btn btn-sm btn-danger"><i class="fa fa-print"></i></a>';
         })
         ->addColumn('nohbl', function($manifest){
@@ -154,7 +162,7 @@ class ManifestController extends Controller
         })
         ->addColumn('desc', function($manifest){
             $desc = $manifest->descofgoods ?? '-';
-            return '<textarea class="form-control" cols="3" readonly>'. $desc .'</textarea>';
+            return '<textarea class="form-control" cols="30" readonly>'. $desc .'</textarea>';
         })
         ->addColumn('weight', function($manifest){
             return $manifest->weight ?? '';
@@ -165,7 +173,7 @@ class ManifestController extends Controller
         ->addColumn('packingTally', function($manifest){
             return $manifest->packingTally->name ?? '-';
         })
-        ->rawColumns(['delete', 'edit', 'detil', 'barcode', 'desc'])
+        ->rawColumns(['delete', 'edit', 'detil', 'barcode', 'desc', 'bonMuat'])
         ->make(true);
     }
 
@@ -660,6 +668,45 @@ class ManifestController extends Controller
         $sheetNames = $spreadsheet->getSheetNames();
 
         return $sheetNames;
+    }
+
+    public function permohonanStripping(Request $request)
+    {
+        // dd($request->all());
+
+        $cont = Cont::find($request->container_id);
+
+        try {
+            if ($request->file('master_bl')) {
+                $masterBL = $request->file('master_bl');
+                $fileName = 'masterBL-'.$cont->id;
+                $masterBL->storeAs('permohonanStripping/masterBL', $fileName, 'public'); 
+            }
+    
+            if ($request->file('host_bl')) {
+                $hostBL = $request->file('host_bl');
+                $fileName = 'hostBL-'.$cont->id;
+                $hostBL->storeAs('permohonanStripping/hostBL', $fileName, 'public'); 
+            }
+
+            return redirect()->back()->with('status', ['type'=>'success', 'message'=>'Data Behasil d Update']);
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Something Wrong: '. $th->getMessage()]);
+            //throw $th;
+        }
+    }
+
+    public function bonMuatManifest($id)
+    {
+        $manifest = Manifest::find($id);
+
+        $item = Item::where('manifest_id', $manifest->id)->get();
+
+        $data['title'] = 'Bon Muat Manifest : ' . $manifest->nohbl;
+        $data['manifest'] = $manifest;
+        $data['items'] = $item;
+
+        return view('barcode.bonMuatManifest', $data);
     }
 
 }

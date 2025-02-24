@@ -54,6 +54,7 @@ class PhotoController extends Controller
                 'tglrelease' => $request->tglrelease,
                 'jamrelease' => $request->jamrelease,
                 'nopol_release' => $request->nopol_release,
+                'dg_label' => $request->dg_label,
         ]);
         try {
             if ($request->hasFile('photos')) {
