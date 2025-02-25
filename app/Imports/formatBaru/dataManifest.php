@@ -82,7 +82,7 @@ class dataManifest implements ToCollection, WithHeadingRow
 
             $detil_id = trim($row['id_bl']);
             $nohbl = trim($row['nomor_host_bl']);
-            $tgl_hbl = Carbon::createFromFormat('Y-d-m', \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject(trim($row['tanggal_host_bl']))->format('Y-m-d'));
+            $tgl_hbl = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['tanggal_host_bl'])->format('Y-m-d');
             // dd($tgl_hbl);
             $npwp_consignee = trim($row['npwp_penerima']);
             $nama_consignee = trim($row['nama_penerima']);
