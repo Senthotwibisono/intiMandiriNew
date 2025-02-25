@@ -42,7 +42,7 @@ class dataMaster implements ToCollection,  WithHeadingRow
         if (!is_null($job->nombl) && $job->nombl !== '' && $job->nombl != $no_bl) {
             throw new \Exception('NO MBL Tidak Sesuai');
         }
-        $tanggal_bl = Carbon::createFromFormat('Y-d-m', \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($firstRow['tanggal_bl'])->format('Y-m-d'));
+        $tanggal_bl =  \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($firstRow['tanggal_bl'])->format('Y-m-d');
         $job->update([
         'nombl' =>  $no_bl,
         'tgl_master_bl'=> $tanggal_bl,
