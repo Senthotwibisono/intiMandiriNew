@@ -108,6 +108,7 @@
         scale: 0.75;
     }
     .grid-item-manifest {
+        position: relative;
         width: 90px;
         height: 45px;
         background-color: #f2f2f2;
@@ -119,14 +120,14 @@
     }
 
     .grid-item-detail {
-        position: flex;
+        position: absolute;
         top: 100%;
         left: 0;
         background: #f8f9fa;
         border: 1px solid #ddd;
         padding: 10px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        z-index: 100;
+        z-index: 999;
         display: none;
         width: 10px;
     }
@@ -160,7 +161,7 @@
     .rowSide {
         position: flex;
         display: flex; /* Mengaktifkan Flexbox */
-        flex-wrap: nowrap; /* Item tetap dalam satu baris (tidak turun ke baris baru) */
+        flex-direction: column; /* Item tetap dalam satu baris (tidak turun ke baris baru) */
         gap: 2px; /* Jarak antar item */
         width: 150px;
     }
@@ -276,7 +277,7 @@
         </div> -->
         <div class="col-sm-12">
             <div class="card">
-                <div class="card-header justify-content-center align-items-center mt-0">
+                <div class="card-header">
                     <h4>Layout Gudang</h4>
                 </div>
                 <div class="card">
@@ -289,9 +290,11 @@
                                     'B' => 'bg-white',
                                     'L' => 'bg-white',
                                     default => ''
+
                                 };
+                                $terisi = $barangs->where('lokasi_id', $item->id)->sum('jumlah_barang');
                             @endphp
-                            <div class="grid-item-manifest {{ $bgColorClass }}" onmouseenter="showDetails(this, '{{ $item->name }}')" onmouseleave="hideDetails(this)">
+                            <div class="grid-item-manifest {{ $terisi > 0 ? 'bg-red' : 'bg-white' }}" onmouseenter="showDetails(this, '{{ $item->name }}')" onmouseleave="hideDetails(this)" style="position: relative; top: -20px;">
                                 <a href=""><h4 style="color: black;">{{$item->name ?? ''}}</h4></a>
                                 @if($item->name != null)
                                 <div class="grid-item-detail" style="display: none;">
@@ -303,10 +306,10 @@
                                                 $jumlahBarang = $barangs->where('tier', $tier->id)->sum('jumlah_barang');
                                             @endphp
                                                 <div class="item {{ $jumlahBarang > 0 ? 'filled' : '' }}">
-                                                    <p>tier: {{$tier->tier}}</p>
-                                                    <p>Jlm Brg : {{$jumlahBarang}}</p>
+                                                    <p style="color: black;" >tier: {{$tier->tier}}</p>
+                                                    <p style="color: black;">Jlm Brg : {{$jumlahBarang}}</p>
                                                     @foreach($listBarangs as $barang)
-                                                        <p> {{$barang->manifest->nohbl ?? '-'}}, </p>
+                                                        <p style="color: black;"> {{$barang->manifest->nohbl ?? '-'}}, </p>
                                                     @endforeach
                                                 </div>
                                             @endif
