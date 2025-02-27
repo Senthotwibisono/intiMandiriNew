@@ -366,11 +366,7 @@ class DeliveryController extends Controller
             if ($manifest->flag_segel_merarh == 'Y') {
                return '<p>Tidak Dapat Mencetak Barcode Ketika Segel Merah</p>';
             }else {
-                if ($manifest->status_bc != 'release') {
-                    return '<p>Tidak Dapat Mencetak Barcode Ketika Belum Release</p>';
-                }else {
-                    return '<button class="btn btn-danger printBarcode" data-id="'.$manifest->id.'"><i class="fa fa-print"></i></button>';
-                }
+                return '<button class="btn btn-danger printBarcode" data-id="'.$manifest->id.'"><i class="fa fa-print"></i></button>';
             }
         })
         ->addColumn('bonMuat', function($manifest){

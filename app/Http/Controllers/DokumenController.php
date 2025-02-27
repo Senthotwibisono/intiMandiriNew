@@ -910,7 +910,7 @@ class DokumenController extends Controller
                                 $alasanJml = "Quantity Berbeda";
                             }
     
-                            $alasanFinal = $alasanCust . ', ';
+                            $alasanFinal = 'Bukan Dokumen SPPB, ' . $alasanCust . ', ';
     
                             $manifest->update([
                                 'kd_dok_inout' => 2,
@@ -944,7 +944,7 @@ class DokumenController extends Controller
                                 $alasanSize = null;
                             }
     
-                            $alasanFinal = 'Bukan Dokumen SPPB. ' . $alasanFinal;
+                            $alasanFinal = 'Bukan Dokumen SPPB. ' . $alasanSize;
                             $cust = Customer::where('name', $bc23->nama_imp)->first();
                             if ($cust) {
                                 $cust->update([
@@ -1433,7 +1433,7 @@ class DokumenController extends Controller
                                 ]);
                             }
     
-                            $alasanFinal = 'Bukan Dokume SPPB, ' . $alasanCust . ', ';
+                            $alasanFinal =  $alasanCust . ', ';
     
                             $manifest->update([
                                 'kd_dok_inout' => 1,
@@ -1669,7 +1669,7 @@ class DokumenController extends Controller
                                 ]);
                             }
     
-                            $alasanFinal = 'Bukan Dokume SPPB, ' . $alasanCust . ', ';
+                            $alasanFinal = $alasanCust . ', ';
     
                             $manifest->update([
                                 'kd_dok_inout' => 1,

@@ -36,7 +36,7 @@ class StrippingController extends Controller
 
     public function indexData(Request $request)
     {
-        $cont = Cont::with(['job', 'user'])->where('type', '=', 'lcl')->whereNot('tglmasuk', null)->where('tglkeluar', null )->orderBy('endstripping', 'asc')->get();
+        $cont = Cont::with(['job', 'user'])->where('type', '=', 'lcl')->whereNot('tglmasuk', null)->orderBy('endstripping', 'asc')->get();
         
         return DataTables::of($cont)
         ->addColumn('detil', function($cont){
