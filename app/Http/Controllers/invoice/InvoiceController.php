@@ -230,7 +230,7 @@ class InvoiceController extends Controller
                // Ambil invoice terakhir berdasarkan tahun order
                 $lastInvoice = Header::whereYear('order_at', Carbon::now()->year)
                 ->whereNotNull('invoice_no')
-                ->orderBy('invoice_no', 'desc')
+                ->orderByRaw("CAST(REGEXP_SUBSTR(invoice_no, '[0-9]+$') AS UNSIGNED) DESC")
                 ->first();
                             
                 if ($lastInvoice) {
