@@ -227,7 +227,7 @@
                         <div class="row">
                             <div class="col-6">
                                 <div class="text-center">
-                                    Jakarta, {{Carbon\Carbon::parse($header->created_at)->format('Y-m-d')}} 
+                                    Jakarta, {{Carbon\Carbon::parse($header->lunas_at)->format('Y-m-d')}} 
                                     <br>
                                     <br>
                                     <br>
