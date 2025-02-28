@@ -102,6 +102,7 @@ class FormPerpanjanganController extends Controller
         try {
             $tarifSelected = $request->tarif_id;
             $tarifMekanikSelected = $request->tarifM_id;
+            $masterTarifSelectedPeriod = MT::whereIn('id', $tarifSelected)->where('day', 'Y')->orderBy('period', 'desc')->first();
 
             // dd($tarifSelected);
             if (empty($tarifSelected)) {
@@ -237,11 +238,12 @@ class FormPerpanjanganController extends Controller
                 'time_in' => $request->time_in,
                 'expired_date' => $request->expired_date,
                 'jumlah_hari'=>$jumlahHari,
-                'period' => $period,
+                'period' => $masterTarifSelectedPeriod->period,
                 'hari_period' => $hariPeriod,
                 'massa1' => $massa1,
                 'massa2' => $massa2,
                 'massa3' => $massa3,
+                'forwarding_id' => $header->Form->forwarding_id,
             ]);
 
             $allTarifSelected = array_merge((array) $tarifSelected, (array) $tarifMekanikSelected);

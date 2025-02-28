@@ -230,12 +230,17 @@ class InvoiceController extends Controller
                // Ambil invoice terakhir berdasarkan tahun order
                 $lastInvoice = Header::whereYear('order_at', Carbon::now()->year)
                 ->whereNotNull('invoice_no')
-                ->orderByRaw("CAST(REGEXP_SUBSTR(invoice_no, '[0-9]+$') AS UNSIGNED) DESC")
+                ->orderByRaw("CAST(RIGHT(invoice_no, LOCATE('/', REVERSE(invoice_no)) - 1) AS UNSIGNED) DESC")
                 ->first();
+
+
+                // dd($lastInvoice);
                             
                 if ($lastInvoice) {
                 // Hapus '-P' jika ada
-                $invoiceNumber = str_replace('-P', '', $lastInvoice->invoice_no);
+                $invoiceNumber = str_replace(' -P', '', $lastInvoice->invoice_no);
+
+                // dd($invoiceNumber);
                 
                 // Ambil angka terakhir dari invoice
                 if (preg_match('/(\d+)$/', $invoiceNumber, $matches)) {
@@ -243,6 +248,7 @@ class InvoiceController extends Controller
                 } else {
                     $lastSequence = 0; // Jika tidak ditemukan angka, mulai dari 0
                 }
+                // dd($invoiceNumber,$lastSequence, preg_match('/(\d+)$/', $invoiceNumber, $matches));
                 } else {
                 $lastSequence = 0; // Jika belum ada invoice, mulai dari 0
                 }

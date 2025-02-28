@@ -78,7 +78,7 @@ class InvoicePerpanjanganController extends Controller
                 FormT::where('form_id', $form->id)->delete();
 
                 // Delete the header and form records
-                $allHeader = Header::where('form_id', $form->id)->delete();
+                $header->delete();
                 $form->delete();
 
                 return response()->json(['success' => 'Invoice deleted successfully']);
@@ -166,27 +166,49 @@ class InvoicePerpanjanganController extends Controller
                 if ($header->invoice_no != null) {
                     $noInvoice = $header->invoice_no;
                 }else {
-                    $consolidatorCode = $header->manifest->cont->job->consolidator->code;
+                    $forwardingCode = substr($header->Form->Forwarding->code, 0, 3);
+                    if (!$forwardingCode) {
+                        return redirect()->back()->with('status', ['type' => 'error', 'message' => 'Forwarding belum memiliki code, harap lengkapi terlebih dahulu']);
+                    }
 
                     // Get the last two digits of the current year
                     $year = Carbon::now()->format('y'); // '24' for 2024
 
                     // Get the last inserted sequential number from the Header table
-                    $lastInvoice = Header::whereYear('order_at', Carbon::now()->year)->whereNotNull('invoice_no')
-                                            ->orderByRaw("CAST(REGEXP_SUBSTR(invoice_no, '[0-9]+$') AS UNSIGNED) DESC")
-                                            ->first();
+                    // Ambil invoice terakhir berdasarkan tahun order
+                    $lastInvoice = Header::whereYear('order_at', Carbon::now()->year)
+                    ->whereNotNull('invoice_no')
+                    ->orderByRaw("CAST(RIGHT(invoice_no, LOCATE('/', REVERSE(invoice_no)) - 1) AS UNSIGNED) DESC")
+                    ->first();
 
-                    if ($lastInvoice && preg_match('/\d+$/', $lastInvoice->invoice_no, $matches)) {
-                        $lastSequence = (int)$matches[0]; // Extract the numeric part
+                    if ($lastInvoice) {
+                    // Hapus '-P' jika ada
+                    $invoiceNumber = str_replace(' -P', '', $lastInvoice->invoice_no);
+                    
+                    // Ambil angka terakhir dari invoice
+                    if (preg_match('/(\d+)$/', $invoiceNumber, $matches)) {
+                        $lastSequence = (int)$matches[0];
                     } else {
-                        $lastSequence = 0; // If no previous invoice, start from 0
+                        $lastSequence = 0; // Jika tidak ditemukan angka, mulai dari 0
                     }
-                
-                    // Increment the sequence and format as a 6-digit number
+                    } else {
+                    $lastSequence = 0; // Jika belum ada invoice, mulai dari 0
+                    }
+
+                    // Tambah 1 ke sequence terakhir dan format menjadi 6 digit angka
                     $newSequence = str_pad($lastSequence + 1, 6, '0', STR_PAD_LEFT);
-                
-                    // Construct the new invoice number
-                    $noInvoice = 'LKB-' . $consolidatorCode . '/' . $year . '/' . $newSequence;
+
+                    // Ambil kode forwarding (pastikan tidak null)
+                    $forwardingCode = substr($header->Form->Forwarding->code ?? 'XXX', 0, 3);
+                    if (!$forwardingCode) {
+                    return redirect()->back()->with('status', ['type' => 'error', 'message' => 'Forwarding belum memiliki kode!']);
+                    }
+
+                    // Ambil 2 digit terakhir dari tahun saat ini
+                    $year = Carbon::now()->format('y');
+
+                    // Buat nomor invoice baru
+                    $noInvoice = "LKB-$forwardingCode/IGM/$year/$newSequence";
                 }
             }
             // dd($noInvoice);

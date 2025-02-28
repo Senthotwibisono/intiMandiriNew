@@ -54,7 +54,7 @@ class DokumenController extends Controller
         $this->middleware('auth');
 
         $this->wsdl = 'https://tpsonline.beacukai.go.id/tps/service.asmx?WSDL';
-        $this->user = 'INTIMANDIRI';
+        $this->user = '1MUT';
         $this->password = 'INTIMANDIRI1';
         $this->kode = '1MUT';
         
@@ -325,10 +325,12 @@ class DokumenController extends Controller
             $groups[] = $child;
         }
 
+        var_dump($groups);
+        die;
         // Iterasi untuk memproses data
         foreach ($groups as $group) {
             // Cek apakah elemen ini adalah "header"
-            if (strtolower($group->getName()) == 'header') {
+            if ($group->HEADER || $group->header) {
                 $header = $group;
             } else {
                 foreach ($group->children() as $detail) {

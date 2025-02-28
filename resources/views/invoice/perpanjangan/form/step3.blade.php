@@ -75,7 +75,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 // Redirect to the back URL if confirmed
-                window.location.href = '/invoice/form/formStep2/' + formId;
+                window.location.href = '/invoice/form/perpanjangan/formStep2/' + formId;
             }
         });
     });

@@ -264,6 +264,7 @@ $(document).ready(function() {
     });
 });
 </script>
+
 <script>
     // Mendapatkan nilai dari server
     var hari1 = @json($hari1 ?? 5);
@@ -273,8 +274,11 @@ $(document).ready(function() {
     
     var formHari = {{ $form->jumlah_hari }};
     var formPeriod = {{ $form->period }};
+
+   
     
     console.log("formHari " + formHari);
+    console.log("formPeriod " + formPeriod);
     console.log("totalHari " + totalHari);
 
     if (formHari != totalHari) {
@@ -334,6 +338,25 @@ $(document).ready(function() {
         });
     });
 </script>
+
+<script>
+    $(document).ready(function () {
+    // Perulangan pada setiap elemen total
+    $('.total').each(function (index) {
+        var hargaSatuan = parseFloat($('#harga_satuan_' + index).val()) || 0; // Ambil harga satuan
+        var jumlahVolume = parseFloat($('#jumlah_volume_' + index).val()) || 0; // Ambil jumlah volume
+
+        // Cek apakah jumlah_hari dinonaktifkan, gunakan default 1 jika iya
+        var jumlahHari = $('#jumlah_hari_' + index).is(':disabled') ? 1 : parseFloat($('#jumlah_hari_' + index).val()) || 0;
+        // Hitung total
+        var total = hargaSatuan * jumlahVolume * jumlahHari;
+       
+        // Set nilai elemen total
+        $(this).val(total); 
+    });
+});
+</script>
+
 <script>
     $(document).ready(function() {
         // Function to update the total for each row
