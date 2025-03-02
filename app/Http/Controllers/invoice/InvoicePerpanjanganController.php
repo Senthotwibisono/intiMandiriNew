@@ -208,13 +208,13 @@ class InvoicePerpanjanganController extends Controller
                     $year = Carbon::now()->format('y');
 
                     // Buat nomor invoice baru
-                    $noInvoice = "LKB-$forwardingCode/IGM/$year/$newSequence";
+                    $noInvoice = "LKB-$forwardingCode/IGM/$year/$newSequence -P";
                 }
             }
             // dd($noInvoice);
 
             $header->update([
-                'invoice_no' => $noInvoice . ' -P',
+                'invoice_no' => $noInvoice,
                 'status' => $status,
                 'piutang_at' => $timeP,
                 'kasir_piutang_id' => $kasirP,

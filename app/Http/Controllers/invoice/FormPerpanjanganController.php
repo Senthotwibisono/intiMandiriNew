@@ -465,66 +465,73 @@ class FormPerpanjanganController extends Controller
     {
         try {
             $form = Form::find($request->id);
-
-            $latestOrder = Header::orderBy('id', 'desc')->first();
-        
-            // Calculate the next order number
-            $nextOrderNo = $latestOrder ? intval($latestOrder->order_no) + 1 : 1;
-            $formattedOrderNo = str_pad($nextOrderNo, 6, '0', STR_PAD_LEFT); // Ensure it's a 6-digit number
-
-            $header = Header::create([
-                'form_id' => $form->id,
-                'manifest_id' => $form->manifest_id,
-                'type' => 'P',
-                'customer_id' => $form->customer_id,
-                'judul_invoice' => 'Perpanjangan ' . $request->judul_invoice,
-                'order_no' => $formattedOrderNo . ' -P',
-                'time_in' => $form->time_in,
-                'expired_date' => $form->expired_date,
-                'total' => $form->total,
-                'admin' => $form->admin,
-                'discount' => $form->discount,
-                'pajak' => $form->pajak,
-                'pajak_amount' => $form->pajak_amount,
-                'grand_total' => $form->grand_total,
-                'status' => 'N',
-                'order_at' => Carbon::now(),
-                'kasir_id' => Auth::user()->id,
-                'mekanik_y_n' => 'N',
-            ]);
-
-            if ($form->mekanik_y_n == 'Y') {
-                $nextOrderNoMekanik = $latestOrder ? intval($latestOrder->order_no) + 2 : 1;
-                $formattedOrderNoMekanik = str_pad($nextOrderNoMekanik, 6, '0', STR_PAD_LEFT); // Ensure it's a 6-digit number
-                $headerMekanik = Header::create([
-                    'form_id' => $form->id,
-                    'manifest_id' => $form->manifest_id,
-                    'type' => 'P',
-                    'customer_id' => $form->customer_id,
-                    'judul_invoice' => 'Perpanjangan Mekanik ' . $request->judul_invoice,
-                    'order_no' => $formattedOrderNoMekanik . ' -P',
-                    'time_in' => $form->time_in,
-                    'expired_date' => $form->expired_date,
-                    'total' => $form->total_m,
-                    'admin' => $form->admin_m,
-                    'discount' => $form->discount_m,
-                    'pajak' => $form->pajak_m,
-                    'pajak_amount' => $form->pajak_amount_m,
-                    'grand_total' => $form->grand_total_m,
-                    'status' => 'N',
-                    'order_at' => Carbon::now(),
-                    'kasir_id' => Auth::user()->id,
-                    'mekanik_y_n' => 'Y',
-                ]);
+            if (!$form) {
+                return redirect()->back()->with('status', ['type' => 'error', 'message' => 'Form not found']);
             }
 
-            $form->update([
-                'status' => 'Y'
-            ]);
-            return redirect()->route('invoice.perpanjangan.unpaid')->with('status', ['type'=>'success', 'message'=>'Berhasil di Simpan']);
-        } catch (\Throwable $th) {
-            //throw $th;
+            // Update or create non-mekanik header
+            $this->updateOrCreateHeader($form, false, $request);
+
+            // Update or create mekanik header (if applicable)
+            if ($form->mekanik_y_n == 'Y') {
+                $this->updateOrCreateHeader($form, true, $request);
+            } else {
+                // Close existing mekanik headers if mekanik is not active
+                Header::where('form_id', $form->id)->where('mekanik_y_n', 'Y')->update(['status' => 'C']);
+            }
+
+            // Update form status
+            $form->update(['status' => 'Y']);
+
+            return redirect()->route('invoice.perpanjangan.unpaid')->with('status', ['type' => 'success', 'message' => 'Berhasil di Simpan']);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('status', ['type' => 'error', 'message' => $e->getMessage()]);
         }
+    }
+
+    private function updateOrCreateHeader($form, $isMekanik, $request)
+    {
+        $mekanik = $isMekanik ? 'Y' : 'N';
+        $oldHeader = Header::where('form_id', $form->id)->where('type', 'P')->where('mekanik_y_n', $mekanik)->first();
+
+        $data = [
+            'form_id' => $form->id,
+            'type' => 'P',
+            'manifest_id' => $form->manifest_id,
+            'customer_id' => $form->customer_id,
+            'judul_invoice' => $isMekanik ? 'Perpanjangan Mekanik ' . $request->judul_invoice : 'Perpanajangan ' . $request->judul_invoice,
+            'order_no' => $oldHeader->order_no ?? $this->getNextOrderNo(),
+            'time_in' => $form->time_in,
+            'expired_date' => $form->expired_date,
+            'total' => $isMekanik ? $form->total_m : $form->total,
+            'admin' => $isMekanik ? $form->admin_m : $form->admin,
+            'discount' => $isMekanik ? $form->discount_m : $form->discount,
+            'pajak' => $isMekanik ? $form->pajak_m : $form->pajak,
+            'pajak_amount' => $isMekanik ? $form->pajak_amount_m : $form->pajak_amount,
+            'grand_total' => $isMekanik ? $form->grand_total_m : $form->grand_total,
+            'status' => 'N',
+            'order_at' => Carbon::now(),
+            'kasir_id' => Auth::user()->id,
+            'mekanik_y_n' => $mekanik,
+        ];
+
+        if ($data['grand_total'] >= 5000000) {
+            $data['grand_total'] += 10000;
+        }
+        
+        if ($oldHeader) {
+            $oldHeader->update($data);
+        } else {
+            Header::create($data);
+        }
+    }
+
+
+    private function getNextOrderNo()
+    {
+        $latestOrder = Header::orderBy('order_no', 'desc')->first();
+        $nextOrderNo = $latestOrder ? intval($latestOrder->order_no) + 1 : 1;
+        return str_pad($nextOrderNo, 6, '0', STR_PAD_LEFT);
     }
 
     private function terbilang($number)

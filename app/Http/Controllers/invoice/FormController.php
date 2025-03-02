@@ -445,7 +445,7 @@ class FormController extends Controller
     private function updateOrCreateHeader($form, $isMekanik, $request)
     {
         $mekanik = $isMekanik ? 'Y' : 'N';
-        $oldHeader = Header::where('form_id', $form->id)->where('mekanik_y_n', $mekanik)->first();
+        $oldHeader = Header::where('form_id', $form->id)->whereNot('type', 'P')->where('mekanik_y_n', $mekanik)->first();
 
         $data = [
             'form_id' => $form->id,
@@ -467,6 +467,10 @@ class FormController extends Controller
             'mekanik_y_n' => $mekanik,
         ];
 
+        if ($data['grand_total'] >= 5000000) {
+            $data['grand_total'] += 10000;
+        }
+        
         if ($oldHeader) {
             $oldHeader->update($data);
         } else {
