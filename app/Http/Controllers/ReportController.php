@@ -292,8 +292,8 @@ class ReportController extends Controller
         }
       }
 
-      if ($request->has('container_id') && $request->contianer_id) {
-        $mans->where('container_id', $request->cotnainer_id);
+      if ($request->has('container_id') && $request->container_id) {
+        $mans->where('container_id', $request->container_id);
       }
 
         // var_dump($mans, $start, $end);
