@@ -50,7 +50,7 @@
                 <div class="col-12">
                     <div class="form-group">
                         <label for="">Container/No Job Order</label>
-                        <select name="container_id" id="contianer_id" style="width: 100%;" class="js-example-basic-single">
+                        <select name="container_id" id="container_id" style="width: 100%;" class="js-example-basic-single">
                             <option disabled selected value>Pilih Satu jika Diperlukan</option>
                             @foreach($conts as $cont)
                                 <option value="{{$cont->id}}">{{$cont->nocontainer}} - {{$cont->job->nojoborder}}</option>
@@ -140,14 +140,10 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 Swal.showLoading();
-                let filterBy = $('#filter').val();
-                let startDate = $('#start_date').val();
-                let endDate = $('#end_date').val();
-                let container_id = $('#container_id').val();
+                let table = $('#tableManifest').DataTable();
 
-                // Reload DataTables dengan parameter filter
-                $('#tableManifest').DataTable().ajax.url('/lcl/report/manifestDataTable?filter=' + filterBy + '&start_date=' + startDate + '&end_date=' + endDate + '&container_id=' + container_id).load();
-                
+                // Reload DataTables but pass parameters as 'data'
+                table.ajax.reload(null, false);                
                 Swal.close();
             }
         });
@@ -173,7 +169,7 @@
                 let container_id = $('#container_id').val();
 
                 // Redirect user to download link
-                let url = `/lcl/report/manifestDataTable?filter=${filterBy}&start_date=${startDate}&end_date=${endDate}&container_id=${container_id}`;
+                let url = `/lcl/report/manifestGenerate?filter=${filterBy}&start_date=${startDate}&end_date=${endDate}&container_id=${container_id}`;
                 window.location.href = url;
                 Swal.close();
             }

@@ -191,19 +191,19 @@ class ReportController extends Controller
 
     public function generateCont(Request $request)
     {
-        $conts = Cont::orderBy('joborder_id', 'desc')->get();
+        $conts = Cont::orderBy('joborder_id', 'desc');
         if ($request->has('filter') && $request->filter) {
             if ($request->filter == 'Tgl PLP') {
                 $conts = Cont::whereHas('job', function ($query) use ($request) {
                     $query->whereBetween('ttgl_plp', [$request->start_date, $request->end_date])->orderBy('ttgl_plp', 'asc');
-                })->get();
+                });
             } elseif ($request->filter == 'Tgl Gate In') {
-                $conts = Cont::whereBetween('tglmasuk', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc')->get();
+                $conts = Cont::whereBetween('tglmasuk', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc');
             } elseif ($request->filter == 'Tgl Gate Out') {
-                $conts = Cont::whereBetween('tglkeluar', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc')->get();
+                $conts = Cont::whereBetween('tglkeluar', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc');
             } elseif ($request->filter == 'Tgl BC 1.1') {
                 $conts = Cont::whereHas('job', function ($query) use ($request) {
-                    $query->whereBetween('ttgl_bc11', [$request->start_date, $request->end_date])->orderBy('ttgl_bc11', 'asc')->get();
+                    $query->whereBetween('ttgl_bc11', [$request->start_date, $request->end_date])->orderBy('ttgl_bc11', 'asc');
                 });
             }
         }
@@ -219,6 +219,8 @@ class ReportController extends Controller
                 $query->where('tno_bc11', 'LIKE', "%{$request->nobc_11}%");
             });
         }
+
+        $conts = $conts->get();
 
         $start_date = $request->start_date;
         $end_date = $request->end_date;
@@ -417,37 +419,46 @@ class ReportController extends Controller
 
     public function generateManifest(Request $request)
     {
+        // Mulai Query Builder tanpa langsung `get()`
         $manifests = Manifest::orderBy('joborder_id', 'asc')->get();
+    
 
-      if ($request->has('filter') && $request->filter) {
-        if ($request->filter == 'Tgl PLP') {
-            $manifests = Manifest::whereHas('job', function ($query) use ($request) {
-                $query->whereBetween('ttgl_plp', [$request->start_date, $request->end_date])->orderBy('ttgl_plp', 'asc');
-            })->get();
-        } elseif ($request->filter == 'Tgl Gate In') {
-            $manifests = Manifest::whereBetween('tglmasuk', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc')->get();
-        } elseif ($request->filter == 'Tgl Release') {
-            $manifests = Manifest::whereBetween('tglrelease', [$request->start_date, $request->end_date])->orderBy('tglrelease', 'asc')->get();
-        } elseif ($request->filter == 'Tgl BC 1.1') {
-            $manifests = Manifest::whereHas('job', function ($query) use ($request) {
-                $query->whereBetween('ttgl_bc11', [$request->start_date, $request->end_date])->orderBy('ttgl_bc11', 'asc');
-            })->get();
-        } elseif ($request->filter == 'ETA') {
-            $manifests = Manifest::whereHas('job', function ($query) use ($request) {
-                $query->whereBetween('eta', [$request->start_date, $request->end_date])->orderBy('eta', 'asc');
-            })->get();
+        if ($request->has('filter') && $request->filter) {
+            if ($request->filter == 'Tgl PLP') {
+                $manifests = Manifest::whereHas('job', function ($query) use ($request) {
+                    $query->whereBetween('ttgl_plp', [$request->start_date, $request->end_date]);
+                })->get();
+            } elseif ($request->filter == 'Tgl Gate In') {
+                $manifests = Manifest::whereBetween('tglmasuk', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc')->get();
+            } elseif ($request->filter == 'Tgl Release') {
+                $manifests = Manifest::whereBetween('tglrelease', [$request->start_date, $request->end_date])->orderBy('tglrelease', 'asc')->get();
+            } elseif ($request->filter == 'Tgl BC 1.1') {
+                $manifests = Manifest::whereHas('job', function ($query) use ($request) {
+                    $query->whereBetween('ttgl_bc11', [$request->start_date, $request->end_date]);
+                })->get();
+            } elseif ($request->filter == 'ETA') {
+                $manifests = Manifest::whereHas('job', function ($query) use ($request) {
+                    $query->whereBetween('eta', [$request->start_date, $request->end_date]);
+                })->get();
+            }
         }
-      }
 
-      if ($request->has('container_id') && $request->container_id) {
-        $manifests->where('container_id', $request->container_id);
-      }
+        if ($request->has('container_id')) {
+            $manifests = Manifest::where('container_id', $request->container_id)->get();
+        }
+
+        // Ambil data setelah semua filter diterapkan   
+      
+        // dd($manifests, $request->container_id);
+
+        // Cek hasil sebelum download (bisa dihapus jika sudah benar)
         
-        // dd($manifests);
+
         $fileName = 'ReportManifest-' . $request->start_date . '-' . $request->end_date . '.xlsx';
 
         return Excel::download(new ReportManifest($manifests), $fileName);
     }
+
 
     public function indexDaily(Request $request)
     {
