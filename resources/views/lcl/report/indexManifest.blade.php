@@ -173,7 +173,7 @@
                 let container_id = $('#container_id').val();
 
                 // Redirect user to download link
-                let url = `/lcl/report/manifestGenerate?filter=${filterBy}&start_date=${startDate}&end_date=${endDate}&container_id=${container_id}`;
+                let url = `/lcl/report/manifestDataTable?filter=${filterBy}&start_date=${startDate}&end_date=${endDate}&container_id=${container_id}`;
                 window.location.href = url;
                 Swal.close();
             }
