@@ -143,10 +143,10 @@
                 let filterBy = $('#filter').val();
                 let startDate = $('#start_date').val();
                 let endDate = $('#end_date').val();
-                let contianer_id = $('#contianer_id').val();
+                let container_id = $('#container_id').val();
 
                 // Reload DataTables dengan parameter filter
-                $('#tableManifest').DataTable().ajax.url('/lcl/report/manifestDataTable?filter=' + filterBy + '&start_date=' + startDate + '&end_date=' + endDate + '&contianer_id=' + contianer_id).load();
+                $('#tableManifest').DataTable().ajax.url('/lcl/report/manifestDataTable?filter=' + filterBy + '&start_date=' + startDate + '&end_date=' + endDate + '&container_id=' + container_id).load();
                 
                 Swal.close();
             }
