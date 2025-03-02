@@ -439,8 +439,8 @@ class ReportController extends Controller
         }
       }
 
-      if ($request->has('container_id') && $request->contianer_id) {
-        $manifests->where('container_id', $request->cotnainer_id);
+      if ($request->has('container_id') && $request->container_id) {
+        $manifests->where('container_id', $request->container_id);
       }
         
         // dd($manifests);
