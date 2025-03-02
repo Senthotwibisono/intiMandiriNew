@@ -254,7 +254,7 @@ class Manifest extends Model
 
     public function job()
     {
-        return $this->belongsTo(Job::class, 'joborder_id', 'id');
+        return $this->belongsTo(JobOrder::class, 'joborder_id', 'id');
     }
 
     public function consolidator()

@@ -18,39 +18,54 @@
         <div class="card-header">
             <header>Generate Report</header>
         </div>
-        <form action="{{ route('report.lcl.generateCont')}}" method="get">
-            @csrf
-            <div class="card-body">
-                <div class="row mt-0">
-                    <div class="col-sm-4">
-                        <div class="form-group">
-                            <label for="">Filter By</label>
-                            <select name="filter" style="width: 100%;" class="js-example-basic-single">
-                                <option disabled selected>Pilih Satu</option>
-                                <option value="Tgl PLP">Tgl PLP</option>
-                                <option value="Tgl Gate In">Tgl Gate In</option>
-                                <option value="Tgl BC 1.1">Tgl BC 1.1</option>
-                            </select>
-                        </div>
+        <div class="card-body">
+            <div class="row mt-0">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="">Filter By</label>
+                        <select name="filter" id="filter" style="width: 100%;" class="js-example-basic-single">
+                            <option disabled selected>Pilih Satu</option>
+                            <option value="Tgl PLP">Tgl PLP</option>
+                            <option value="Tgl Gate In">Tgl Gate In</option>
+                            <option value="Tgl Gate Out">Tgl Gate Out</option>
+                            <option value="Tgl BC 1.1">Tgl BC 1.1</option>
+                        </select>
                     </div>
-                    <div class="col-sm-4">
-                        <div class="form-group">
-                            <label for="">Start Date</label>
-                            <input type="date" name="start_date" class="form-control">
-                        </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="">Start Date</label>
+                        <input type="date" name="start_date" id="start_date" class="form-control">
                     </div>
-                    <div class="col-sm-4">
-                        <div class="form-group">
-                            <label for="">End Date</label>
-                            <input type="date" name="end_date" class="form-control">
-                        </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="">End Date</label>
+                        <input type="date" name="end_date" id="end_date" class="form-control">
+                    </div>
+                </div>
+                <div class="divider divider-center">
+                    <div class="divider-text">
+                        Masukan Nomor Dokumen jika diperlukan!
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="">No PLP</label>
+                        <input type="text" name="noplp" id="noplp" class="form-control">
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="">No POS BC 1.1</label>
+                        <input type="text" name="nobc_11" id="nobc_11" class="form-control">
                     </div>
                 </div>
             </div>
-            <div class="card-footer">
-                <button class="btn btn-success" type="submit">Generate</button>
-            </div>
-        </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-success generateFilter" type="button">Generate</button>
+        </div>
     </div>
 </section>
 
@@ -58,12 +73,14 @@
     <div class="card">
         <div class="card-body">
             <div class="table">
-                <table class="table-hover" id="dataReportCont">
+                <table class="table-hover" id="dataReportCont" style="white-space: nowrap;">
                     <thead>
                         <tr>
                             <th class="text-center">Action</th>
                             <th class="text-center">No Job Order</th>
                             <th class="text-center">Nama Angkut</th>
+                            <th class="text-center">Bill of Loading No</th>
+                            <th class="text-center">Bill of Loading Date</th>
                             <th class="text-center">No Container</th>
                             <th class="text-center">Size</th>
                             <th class="text-center">ETA</th>
@@ -80,9 +97,19 @@
                             <th class="text-center">Jam Stripping</th>
                             <th class="text-center">Tgl Keluar</th>
                             <th class="text-center">Jam Keluar</th>
+                            <th class="text-center">Nopol Keluar</th>
+                            <th class="text-center">Lama Hari</th>
+                            <th class="text-center">Long Stay</th>
                         </tr>
                     </thead>
                 </table>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="button-container">
+                <div class="col-auto">
+                    <button class="btn btn-success formatBeacukai"><i class="fa fa-download"></i> Excel</button>
+                </div>
             </div>
         </div>
     </div>
@@ -92,16 +119,111 @@
 
 @section('custom_js')
 <script>
+    $(document).on('click', '.generateFilter', function(){
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Apakah anda yakin menerapkan filter ini?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, update it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.showLoading();
+                let filterBy = $('#filter').val();
+                let startDate = $('#start_date').val();
+                let endDate = $('#end_date').val();
+                let noPlp = $('#noplp').val();
+                let noBc11 = $('#nobc_11').val();
+
+                // Reload DataTables dengan parameter filter
+                $('#dataReportCont').DataTable().ajax.url('/lcl/report/dataCont?filter=' + filterBy + '&start_date=' + startDate + '&end_date=' + endDate + '&noplp=' + noPlp + '&nobc_11=' + noBc11).load();
+                
+                Swal.close();
+            }
+        });
+    })
+</script>
+
+<script>
+    $(document).on('click', '.formatStandar', function(){
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Apakah anda yakin menerapkan filter ini?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, update it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.showLoading();
+                let filterBy = $('#filter').val();
+                let startDate = $('#start_date').val();
+                let endDate = $('#end_date').val();
+                let noPlp = $('#noplp').val();
+                let noBc11 = $('#nobc_11').val();
+
+                // Redirect user to download link
+                let url = `/fcl/report/formatStandar?filter=${filterBy}&start_date=${startDate}&end_date=${endDate}&noplp=${noPlp}&nobc_11=${noBc11}`;
+                window.location.href = url;
+                Swal.close();
+            }
+        });
+    });
+</script>
+
+<script>
+    $(document).on('click', '.formatBeacukai', function(){
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Apakah anda yakin menerapkan filter ini?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, update it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.showLoading();
+                let filterBy = $('#filter').val();
+                let startDate = $('#start_date').val();
+                let endDate = $('#end_date').val();
+                let noPlp = $('#noplp').val();
+                let noBc11 = $('#nobc_11').val();
+
+                // Redirect user to download link
+                let url = `/lcl/report/contGenerate?filter=${filterBy}&start_date=${startDate}&end_date=${endDate}&noplp=${noPlp}&nobc_11=${noBc11}`;
+                window.location.href = url;
+                Swal.close();
+            }
+        });
+    });
+</script>
+
+<script>
     $(document).ready(function(){
         $('#dataReportCont').DataTable({
             processing: true,
             serverSide: true,
             scrollX: true,
-            ajax: '/lcl/report/dataCont',
+            ajax: {
+                url: '/lcl/report/dataCont',
+                data: function(d) {
+                    d.filter = $('#filter').val();
+                    d.start_date = $('#start_date').val();
+                    d.end_date = $('#end_date').val();
+                    d.noplp = $('#noplp').val();
+                    d.nobc_11 = $('#nobc_11').val();
+                }
+            },
             columns:[
                 { data:'detil', name:'detil', className:'text-center' },
                 { data:'jobordr', name:'jobordr', className:'text-center' },
                 { data:'nm_angkut', name:'nm_angkut', className:'text-center' },
+                { data:'nobl', name:'nobl', className:'text-center' },
+                { data:'tgl_bl_awb', name:'tgl_bl_awb', className:'text-center' },
                 { data:'nocontainer', name:'nocontainer', className:'text-center' },
                 { data:'size', name:'size', className:'text-center' },
                 { data:'eta', name:'eta', className:'text-center' },
@@ -118,7 +240,10 @@
                 { data:'jamstripping', name:'jamstripping', className:'text-center' },
                 { data:'tglkeluar', name:'tglkeluar', className:'text-center' },
                 { data:'jamkeluar', name:'jamkeluar', className:'text-center' },
-            ]
+                { data:'nopol_mty', name:'nopol_mty', className:'text-center' },
+                { data:'lamaHari', name:'lamaHari', className:'text-center' },
+                { data:'longStay', name:'longStay', className:'text-center' },
+            ],
         })
     })
 </script>

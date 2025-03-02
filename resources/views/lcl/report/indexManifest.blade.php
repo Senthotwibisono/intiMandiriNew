@@ -18,41 +18,51 @@
         <div class="card-header">
             <header>Generate Report</header>
         </div>
-        <form action="{{ route('report.lcl.generateManifest')}}" method="get">
-            @csrf
-            <div class="card-body">
-                <div class="row mt-0">
-                    <div class="col-sm-4">
-                        <div class="form-group">
-                            <label for="">Filter By</label>
-                            <select name="filter" style="width: 100%;" class="js-example-basic-single">
-                                <option disabled selected>Pilih Satu</option>
-                                <option value="Tgl PLP">Tgl PLP</option>
-                                <option value="ETA">ETA</option>
-                                <option value="Tgl Gate In">Tgl Gate In</option>
-                                <option value="Tgl BC 1.1">Tgl BC 1.1</option>
-                                <option value="Tgl Release">Tgl Release</option>
-                            </select>
-                        </div>
+        <div class="card-body">
+            <div class="row mt-0">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="">Filter By</label>
+                        <select name="filter" id="filter" style="width: 100%;" class="js-example-basic-single">
+                            <option disabled selected>Pilih Satu</option>
+                            <option value="Tgl PLP">Tgl PLP</option>
+                            <option value="ETA">ETA</option>
+                            <option value="Tgl Gate In">Tgl Gate In</option>
+                            <option value="Tgl BC 1.1">Tgl BC 1.1</option>
+                            <option value="Tgl Release">Tgl Release</option>
+                        </select>
                     </div>
-                    <div class="col-sm-4">
-                        <div class="form-group">
-                            <label for="">Start Date</label>
-                            <input type="date" name="start_date" class="form-control">
-                        </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="">Start Date</label>
+                        <input type="date" name="start_date" id="start_date" class="form-control">
                     </div>
-                    <div class="col-sm-4">
-                        <div class="form-group">
-                            <label for="">End Date</label>
-                            <input type="date" name="end_date" class="form-control">
-                        </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="">End Date</label>
+                        <input type="date" name="end_date" id="end_date" class="form-control">
                     </div>
                 </div>
             </div>
-            <div class="card-footer">
-                <button class="btn btn-success" type="submit">Generate</button>
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-group">
+                        <label for="">Container/No Job Order</label>
+                        <select name="container_id" id="contianer_id" style="width: 100%;" class="js-example-basic-single">
+                            <option disabled selected value>Pilih Satu jika Diperlukan</option>
+                            @foreach($conts as $cont)
+                                <option value="{{$cont->id}}">{{$cont->nocontainer}} - {{$cont->job->nojoborder}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
             </div>
-        </form>
+        </div>
+        <div class="card-footer">
+        <button class="btn btn-success generateFilter" type="button">Generate</button>
+        </div>
     </div>
 </section>
 
@@ -60,7 +70,7 @@
     <div class="card">
         <div class="card-body">
             <div class="table">
-                <table class="table-hover" id="tableManifest">
+                <table class="table-hover" id="tableManifest" style="white-space: nowrap;">
                     <thead>
                         <tr>
                             <th class="text-center">Action</th>
@@ -93,6 +103,7 @@
                             <th class="text-center">Jam Stripping</th>
                             <th class="text-center">Tgl Release</th>
                             <th class="text-center">Jam Release</th>
+                            <th class="text-center">Nomor Polisi Release</th>
                             <th class="text-center">Kode Dokumen</th>
                             <th class="text-center">Nomor Dokumen</th>
                             <th class="text-center">Tgl Dokumen</th>
@@ -103,6 +114,13 @@
                 </table>
             </div>
         </div>
+        <div class="card-footer">
+            <div class="button-container">
+                <div class="col-auto">
+                    <button class="btn btn-success formatBeacukai"><i class="fa fa-download"></i> Excel</button>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -110,12 +128,74 @@
 
 @section('custom_js')
 <script>
+    $(document).on('click', '.generateFilter', function(){
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Apakah anda yakin menerapkan filter ini?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, update it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.showLoading();
+                let filterBy = $('#filter').val();
+                let startDate = $('#start_date').val();
+                let endDate = $('#end_date').val();
+                let contianer_id = $('#contianer_id').val();
+
+                // Reload DataTables dengan parameter filter
+                $('#tableManifest').DataTable().ajax.url('/lcl/report/manifestDataTable?filter=' + filterBy + '&start_date=' + startDate + '&end_date=' + endDate + '&contianer_id=' + contianer_id).load();
+                
+                Swal.close();
+            }
+        });
+    })
+</script>
+
+<script>
+    $(document).on('click', '.formatBeacukai', function(){
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Apakah anda yakin menerapkan filter ini?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, update it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.showLoading();
+                let filterBy = $('#filter').val();
+                let startDate = $('#start_date').val();
+                let endDate = $('#end_date').val();
+                let container_id = $('#container_id').val();
+
+                // Redirect user to download link
+                let url = `/lcl/report/manifestGenerate?filter=${filterBy}&start_date=${startDate}&end_date=${endDate}&container_id=${container_id}`;
+                window.location.href = url;
+                Swal.close();
+            }
+        });
+    });
+</script>
+
+<script>
     $(document).ready(function(){
         $('#tableManifest').DataTable({
             processing: true,
             serverSide: true,
             scrollX: true,
-            ajax: '/lcl/report/manifestDataTable',
+            ajax: {
+                url: '/lcl/report/manifestDataTable',
+                data: function(d) {
+                    d.filter = $('#filter').val();
+                    d.start_date = $('#start_date').val();
+                    d.end_date = $('#end_date').val();
+                    d.container_id = $('#container_id').val();
+                }
+            },
             columns : [
                 { data:'detil', name:'detil'},
                 { data:'joborder', name:'joborder'},
@@ -145,8 +225,9 @@
                 { data:'jammasuk', name:'jammasuk'},
                 { data:'startstripping', name:'startstripping'},
                 { data:'endstripping', name:'endstripping'},
-                { data:'tglbuangmty', name:'tglbuangmty'},
-                { data:'jambuangmty', name:'jambuangmty'},
+                { data:'tglrelease', name:'tglrelease'},
+                { data:'jamrelease', name:'jamrelease'},
+                { data:'nopol_release', name:'nopol_release'},
                 { data:'dokumen', name:'dokumen'},
                 { data:'no_dok', name:'no_dok'},
                 { data:'tglDok', name:'tglDok'},

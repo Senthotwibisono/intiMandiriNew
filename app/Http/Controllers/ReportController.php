@@ -33,7 +33,34 @@ class ReportController extends Controller
 
     public function dataCont(Request $request)
     {
-        $cont = Cont::orderBy('joborder_id', 'desc')->get();
+        $cont = Cont::orderBy('joborder_id', 'desc');
+        if ($request->has('filter') && $request->filter) {
+            if ($request->filter == 'Tgl PLP') {
+                $cont = Cont::whereHas('job', function ($query) use ($request) {
+                    $query->whereBetween('ttgl_plp', [$request->start_date, $request->end_date])->orderBy('ttgl_plp', 'asc');
+                });
+            } elseif ($request->filter == 'Tgl Gate In') {
+                $cont = Cont::whereBetween('tglmasuk', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc');
+            } elseif ($request->filter == 'Tgl Gate Out') {
+                $cont = Cont::whereBetween('tglbuangmty', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc');
+            } elseif ($request->filter == 'Tgl BC 1.1') {
+                $cont = Cont::whereHas('job', function ($query) use ($request) {
+                    $query->whereBetween('ttgl_bc11', [$request->start_date, $request->end_date])->orderBy('ttgl_bc11', 'asc');
+                });
+            }
+        }
+
+        if ($request->has('noplp') && $request->noplp) {
+            $cont = Cont::whereHas('job', function ($query) use ($request) {
+                $query->where('noplp', 'LIKE', "%{$request->noplp}%");
+            });
+        }
+    
+        if ($request->has('nobc_11') && $request->nobc_11) {
+            $cont = Cont::whereHas('job', function ($query) use ($request) {
+                $query->where('tno_bc11', 'LIKE', "%{$request->nobc_11}%");
+            });
+        }
         
         return DataTables::of($cont)
         ->addColumn('detil', function($cont){
@@ -48,6 +75,16 @@ class ReportController extends Controller
         })
         ->addColumn('nocontainer', function($cont){
             return $cont->nocontainer ?? '-';
+        })
+        ->addColumn('ctrType', function($cont){
+            $color = $cont->ctr_type == 'BB' ? 'background-color:rgb(167, 40, 40); color: white;' : '';
+
+            return '<span style="'.$color.'; padding: 5px; border-radius: 5px;">'.$cont->ctr_type.'</span>';
+        })
+        ->addColumn('classType', function($cont){
+            $color = $cont->ctr_type == 'BB' ? 'background-color:rgb(167, 40, 40); color: white;' : '';
+
+            return '<span style="'.$color.'; padding: 5px; border-radius: 5px;">'.$cont->type_class.'</span>';
         })
         ->addColumn('size', function($cont){
             return $cont->size ?? '-';
@@ -68,10 +105,28 @@ class ReportController extends Controller
             return $cont->job->ttgl_plp ?? '-';
         })
         ->addColumn('no_bc11', function($cont){
-            return $cont->job->PLP->no_bc11 ?? '-';
+            return $cont->job->tno_bc11 ?? '-';
         })
         ->addColumn('tgl_bc11', function($cont){
-            return $cont->job->PLP->tgl_bc11 ?? '';
+            return $cont->job->ttgl_bc11 ?? '';
+        })
+        ->addColumn('nobl', function($cont){
+            return $cont->nobl ?? '-';
+        })
+        ->addColumn('tglBL', function($cont){
+            return $cont->tgl_bl_awb ?? '-';
+        })
+        ->addColumn('customer', function($cont){
+            return $cont->Customer->name ?? '-';
+        })
+        ->addColumn('npwp', function($cont){
+            return $cont->Customer->npwp ?? '-';
+        })
+        ->addColumn('email', function($cont){
+            return $cont->Customer->email ?? '-';
+        })
+        ->addColumn('nopol', function($cont){
+            return $cont->nopol ?? '-';
         })
         ->addColumn('tglmasuk', function($cont){
             return $cont->tglmasuk ?? 'Belum Masuk';
@@ -79,19 +134,48 @@ class ReportController extends Controller
         ->addColumn('jammasuk', function($cont){
             return $cont->jammasuk ?? 'Belum Masuk';
         })
-        ->addColumn('tglkeluar', function($cont){
-            return $cont->tglkeluar ?? 'Belum Keluar';
-        })
-        ->addColumn('jamkeluar', function($cont){
-            return $cont->jamkeluar ?? 'Belum Keluar';
-        })
         ->addColumn('tglstripping', function($cont){
             return $cont->tglstripping ?? 'Belum Stripping';
         })
         ->addColumn('jamstripping', function($cont){
             return $cont->jamstripping ?? 'Belum Stripping';
         })
-        ->rawColumns(['detil'])
+        ->addColumn('nopol_mty', function($cont){
+            return $cont->nopol_mty ?? '-';
+        })
+        ->addColumn('tglkeluar', function($cont){
+            return $cont->tglbuangmty ?? 'Belum keluar';
+        })
+        ->addColumn('jamkeluar', function($cont){
+            return $cont->jambuangmty ?? 'Belum keluar';
+        })
+        ->addColumn('lamaHari', function($cont){
+            if (!$cont->tglmasuk) {
+                $lamaHari = 'Belum Masuk';
+                $longStay = 'N';
+            } else {
+                $lamaHari = Carbon::parse($cont->tglmasuk)->diffInDays($cont->tglbuangmty ?? now()) . ' hari';
+    
+                if (Carbon::parse($cont->tglmasuk)->diffInDays($cont->tglbuangmty ?? now()) >= 25 ) {
+                    $longStay = 'Y';
+                }else {
+                    $longStay = 'N';
+                }
+            }
+            return $lamaHari;
+        })
+        ->addColumn('longStay', function($cont){
+            if (!$cont->tglmasuk) {
+                $longStay = 'N';
+            } else {
+                $longStay = Carbon::parse($cont->tglmasuk)->diffInDays($cont->tglbuangmty ?? now()) >= 25 ? 'Y' : 'N';
+            }
+        
+            $color = $longStay == 'Y' ? 'background-color: #28a745; color: white;' : '';
+        
+            return '<span style="'.$color.'; padding: 5px; border-radius: 5px;">'.$longStay.'</span>';
+        })
+        ->rawColumns(['detil', 'longStay', 'ctrType', 'classType'])
         ->make(true);
     }
 
@@ -107,64 +191,110 @@ class ReportController extends Controller
 
     public function generateCont(Request $request)
     {
-        $filter = $request->filter;
-        switch ($filter) {
-            case 'Tgl PLP':
+        $conts = Cont::orderBy('joborder_id', 'desc')->get();
+        if ($request->has('filter') && $request->filter) {
+            if ($request->filter == 'Tgl PLP') {
                 $conts = Cont::whereHas('job', function ($query) use ($request) {
                     $query->whereBetween('ttgl_plp', [$request->start_date, $request->end_date])->orderBy('ttgl_plp', 'asc');
                 })->get();
-                break;
-            
-            case 'Tgl BC 1.1':
-                $conts = Cont::whereHas('job', function ($query) use ($request) {
-                    $query->whereBetween('ttgl_bc11', [$request->start_date, $request->end_date])->orderBy('ttgl_bc11', 'asc');
-                })->get();
-                break;
-            
-            case 'Tgl Gate In':
+            } elseif ($request->filter == 'Tgl Gate In') {
                 $conts = Cont::whereBetween('tglmasuk', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc')->get();
-                break;
-
-            default :  
-                $conts = Cont::all();
-                break;
+            } elseif ($request->filter == 'Tgl Gate Out') {
+                $conts = Cont::whereBetween('tglkeluar', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc')->get();
+            } elseif ($request->filter == 'Tgl BC 1.1') {
+                $conts = Cont::whereHas('job', function ($query) use ($request) {
+                    $query->whereBetween('ttgl_bc11', [$request->start_date, $request->end_date])->orderBy('ttgl_bc11', 'asc')->get();
+                });
+            }
         }
 
-        $fileName = 'ReportContainer-' . $filter . '-' . $request->start_date . '-' . $request->end_date . '.xlsx';
+        if ($request->has('noplp') && $request->noplp) {
+            $conts->whereHas('job', function ($query) use ($request) {
+                $query->where('noplp', 'LIKE', "%{$request->noplp}%");
+            });
+        }
+    
+        if ($request->has('nobc_11') && $request->nobc_11) {
+            $conts->whereHas('job', function ($query) use ($request) {
+                $query->where('tno_bc11', 'LIKE', "%{$request->nobc_11}%");
+            });
+        }
 
-      return Excel::download(new ReportCont($conts), $fileName);
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+        $tanggalJudul =  $this->formatDateRange($start_date, $end_date);
+
+        // dd($tanggalJudul);
+
+        $judul = 'Laporan Bulanan '. $tanggalJudul;
+
+        $fileName = 'ReportContainer-LCL'.$start_date.'-'.$end_date.'.xlsx' ;
+        return Excel::download(new ReportCont($conts, $judul), $fileName);
+    }
+
+    private function formatDateRange($start_date, $end_date)
+    {
+        if (!$start_date && !$end_date) {
+            return null; // Jika keduanya kosong, abaikan
+        }
+
+        // Jika salah satu kosong, gunakan yang tersedia
+        if (!$start_date) {
+            return Carbon::parse($end_date)->translatedFormat('j F Y');
+        }
+        if (!$end_date) {
+            return Carbon::parse($start_date)->translatedFormat('j F Y');
+        }
+
+        $start = Carbon::parse($start_date);
+        $end = Carbon::parse($end_date);
+
+        if ($start->year === $end->year) {
+            if ($start->month === $end->month) {
+                return $start->format('j') . ' - ' . $end->translatedFormat('j F Y');
+            }
+            return $start->translatedFormat('j F') . ' - ' . $end->translatedFormat('j F Y');
+        }
+
+        return $start->translatedFormat('j F Y') . ' - ' . $end->translatedFormat('j F Y');
     }
     
     public function indexManifest()
     {
         $data['title'] = "Report Manifest"; 
 
+        $data['conts'] = Cont::orderBy('joborder_id', 'asc')->get();
+
         return view('lcl.report.indexManifest', $data);
     }
 
     public function manifestDataTable(Request $request)
     {
-        $start = $request->input('start') ?? Carbon::now()->toDateString();
-        $end = $request->input('end') ?? Carbon::now()->toDateString();
+      $mans = Manifest::orderBy('joborder_id', 'asc');
 
-        // var_dump($start);
-        // die;
-
-        switch ($request->filter) {
-            case 'masuk':
-                $mans = Manifest::whereHas('cont', function ($query) use ($start, $end) {
-                    $query->whereBetween('tglmasuk', [$start, $end]);
-                })->get();
-            
-                break;
-            case 'keluar':
-                $mans = Manifest::whereBetween('tglrelease', [$start, $end])->get();
-                break;
-            
-            default:
-                $mans = Manifest::orderBy('notally', 'desc')->get(); 
-                break;
+      if ($request->has('filter') && $request->filter) {
+        if ($request->filter == 'Tgl PLP') {
+            $mans = Manifest::whereHas('job', function ($query) use ($request) {
+                $query->whereBetween('ttgl_plp', [$request->start_date, $request->end_date])->orderBy('ttgl_plp', 'asc');
+            });
+        } elseif ($request->filter == 'Tgl Gate In') {
+            $mans = Manifest::whereBetween('tglmasuk', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc');
+        } elseif ($request->filter == 'Tgl Release') {
+            $mans = Manifest::whereBetween('tglrelease', [$request->start_date, $request->end_date])->orderBy('tglrelease', 'asc');
+        } elseif ($request->filter == 'Tgl BC 1.1') {
+            $mans = Manifest::whereHas('job', function ($query) use ($request) {
+                $query->whereBetween('ttgl_bc11', [$request->start_date, $request->end_date])->orderBy('ttgl_bc11', 'asc');
+            });
+        } elseif ($request->filter == 'ETA') {
+            $mans = Manifest::whereHas('job', function ($query) use ($request) {
+                $query->whereBetween('eta', [$request->start_date, $request->end_date])->orderBy('eta', 'asc');
+            });
         }
+      }
+
+      if ($request->has('container_id') && $request->contianer_id) {
+        $mans->where('container_id', $request->cotnainer_id);
+      }
 
         // var_dump($mans, $start, $end);
        
@@ -287,49 +417,34 @@ class ReportController extends Controller
 
     public function generateManifest(Request $request)
     {
-        $filter = $request->filter;
-        switch ($filter) {
-            case 'Tgl PLP':
-                $manifests = Manifest::whereHas('cont', function ($query) use ($request) {
-                    $query->whereHas('job', function ($query) use ($request) {
-                        $query->whereBetween('ttgl_plp', [$request->start_date, $request->end_date])->orderBy('ttgl_plp', 'asc');
-                    });
-                })->get();
-                break;
-            
-            case 'Tgl BC 1.1':
-                $manifests = Manifest::whereHas('cont', function ($query) use ($request) {
-                    $query->whereHas('job', function ($query) use ($request) {
-                        $query->whereBetween('ttgl_bc11', [$request->start_date, $request->end_date])->orderBy('ttgl_bc11', 'asc');
-                    });
-                })->get();
-                break;
-            
-            case 'Tgl Gate In':
-                $manifests = Manifest::whereHas('cont', function ($query) use ($request) {
-                    $query->whereBetween('tglmasuk', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc');
-                })->get();
-                break;
-            
-            case 'ETA':
-                $manifests = Manifest::whereHas('cont', function ($query) use ($request) {
-                    $query->whereHas('job', function ($query) use ($request) {
-                        $query->whereBetween('eta', [$request->start_date, $request->end_date])->orderBy('eta', 'asc');
-                    });
-                })->get();
-                break;
+        $manifests = Manifest::orderBy('joborder_id', 'asc')->get();
 
-            case 'Tgl Release':
-                $manifests = Manifest::whereBetween('tglrelease', [$request->start_date, $request->end_date])->orderBy('tglrelease', 'asc')->get();
-                break;
-
-            default:  
-                $manifests = Manifest::all();
-                break;
+      if ($request->has('filter') && $request->filter) {
+        if ($request->filter == 'Tgl PLP') {
+            $manifests = Manifest::whereHas('job', function ($query) use ($request) {
+                $query->whereBetween('ttgl_plp', [$request->start_date, $request->end_date])->orderBy('ttgl_plp', 'asc');
+            })->get();
+        } elseif ($request->filter == 'Tgl Gate In') {
+            $manifests = Manifest::whereBetween('tglmasuk', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc')->get();
+        } elseif ($request->filter == 'Tgl Release') {
+            $manifests = Manifest::whereBetween('tglrelease', [$request->start_date, $request->end_date])->orderBy('tglrelease', 'asc')->get();
+        } elseif ($request->filter == 'Tgl BC 1.1') {
+            $manifests = Manifest::whereHas('job', function ($query) use ($request) {
+                $query->whereBetween('ttgl_bc11', [$request->start_date, $request->end_date])->orderBy('ttgl_bc11', 'asc');
+            })->get();
+        } elseif ($request->filter == 'ETA') {
+            $manifests = Manifest::whereHas('job', function ($query) use ($request) {
+                $query->whereBetween('eta', [$request->start_date, $request->end_date])->orderBy('eta', 'asc');
+            })->get();
         }
+      }
+
+      if ($request->has('container_id') && $request->contianer_id) {
+        $manifests->where('container_id', $request->cotnainer_id);
+      }
         
         // dd($manifests);
-        $fileName = 'ReportManifest-' . $filter . '-' . $request->start_date . '-' . $request->end_date . '.xlsx';
+        $fileName = 'ReportManifest-' . $request->start_date . '-' . $request->end_date . '.xlsx';
 
         return Excel::download(new ReportManifest($manifests), $fileName);
     }
