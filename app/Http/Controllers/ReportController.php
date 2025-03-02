@@ -443,13 +443,13 @@ class ReportController extends Controller
             }
         }
 
-        if ($request->has('container_id')) {
-            $manifests = Manifest::where('container_id', $request->container_id)->get();
+        $cont = Cont::find($request->container_id);
+        if ($cont) {
+            $manifests = $manifests->where('container_id', $cont->id);
         }
-
         // Ambil data setelah semua filter diterapkan   
       
-        // dd($manifests, $request->container_id);
+        // dd($manifests, $request->container_id, $request->all());
 
         // Cek hasil sebelum download (bisa dihapus jika sudah benar)
         
