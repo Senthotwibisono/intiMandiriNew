@@ -12,6 +12,7 @@ use App\Models\Container as Cont;
 use App\Models\Manifest;
 use App\Models\Photo;
 use App\Exports\lcl\ReportCont;
+use App\Exports\lcl\ReportContJICT;
 use App\Exports\lcl\ReportManifest;
 
 use DataTables;
@@ -232,6 +233,54 @@ class ReportController extends Controller
 
         $fileName = 'ReportContainer-LCL'.$start_date.'-'.$end_date.'.xlsx' ;
         return Excel::download(new ReportCont($conts, $judul), $fileName);
+    }
+
+
+    public function contGenerateJICT(Request $request)
+    {
+        $conts = Cont::orderBy('joborder_id', 'desc');
+        if ($request->has('filter') && $request->filter) {
+            if ($request->filter == 'Tgl PLP') {
+                $conts = Cont::whereHas('job', function ($query) use ($request) {
+                    $query->whereBetween('ttgl_plp', [$request->start_date, $request->end_date])->orderBy('ttgl_plp', 'asc');
+                });
+            } elseif ($request->filter == 'Tgl Gate In') {
+                $conts = Cont::whereBetween('tglmasuk', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc');
+            } elseif ($request->filter == 'Tgl Gate Out') {
+                $conts = Cont::whereBetween('tglkeluar', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc');
+            } elseif ($request->filter == 'Tgl BC 1.1') {
+                $conts = Cont::whereHas('job', function ($query) use ($request) {
+                    $query->whereBetween('ttgl_bc11', [$request->start_date, $request->end_date])->orderBy('ttgl_bc11', 'asc');
+                });
+            }
+        }
+
+        if ($request->has('noplp') && $request->noplp) {
+            $conts->whereHas('job', function ($query) use ($request) {
+                $query->where('noplp', 'LIKE', "%{$request->noplp}%");
+            });
+        }
+    
+        if ($request->has('nobc_11') && $request->nobc_11) {
+            $conts->whereHas('job', function ($query) use ($request) {
+                $query->where('tno_bc11', 'LIKE', "%{$request->nobc_11}%");
+            });
+        }
+
+        $conts = $conts->whereHas('job', function($query) use ($request){
+            $query->where('lokasisandar_id', 3);
+        })->get();
+
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+        $tanggalJudul =  $this->formatDateRange($start_date, $end_date);
+
+        // dd($tanggalJudul);
+
+        $judul = 'Laporan Bulanan '. $tanggalJudul;
+
+        $fileName = 'ReportContainer-LCL'.$start_date.'-'.$end_date.'.xlsx' ;
+        return Excel::download(new ReportContJICT($conts, $judul), $fileName);
     }
 
     private function formatDateRange($start_date, $end_date)

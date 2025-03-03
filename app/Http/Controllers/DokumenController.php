@@ -325,7 +325,7 @@ class DokumenController extends Controller
             $groups[] = $child;
         }
 
-        var_dump($groups);
+        var_dump(json_encode($groups));
         die;
         // Iterasi untuk memproses data
         foreach ($groups as $group) {
@@ -2634,7 +2634,7 @@ class DokumenController extends Controller
                         $manifest = Manifest::where('nohbl', $pabean->no_bl_awb)->where('tglbuangmty', null)->first();
                         if ($manifest) {
                             $alasanCust = null;
-                            $statusBC = "release";
+                            $statusBC = "HOLD";
                             $cust = Customer::where('name', $pabean->nm_imp)->first();
                             $newCust = null;
                             if (!$cust && $pabean->consignee != null) {
