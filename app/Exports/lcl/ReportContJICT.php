@@ -126,7 +126,9 @@ class ReportContJICT implements FromCollection, WithHeadings, WithStyles, WithMa
     public function map($cont): array
     {
         $tglPLP = $cont->job->ttgl_plp ?  Carbon::parse($cont->job->ttgl_plp)->format('Y-m-d') : '-';
-        $tglSurat = $cont->job->PLP->tgl_surat ?  Carbon::parse($cont->job->PLP->tgl_surat)->format('Y-m-d') : '-';
+        $tglSurat = optional(optional(optional($cont)->job)->PLP)->tgl_surat 
+        ? Carbon::parse($cont->job->PLP->tgl_surat)->format('Y-m-d') 
+        : '-';
         $tglBC11 = $cont->job->ttgl_bc11 ?  Carbon::parse($cont->job->ttgl_bc11)->format('Y-m-d') : '-';
         $tglmasuk = $cont->tglmasuk ? Carbon::parse($cont->tglmasuk)->format('Y-m-d') : 'Belum Masuk';
         $tglblAWB = $cont->tgl_bl_awb ? Carbon::parse($cont->tgl_bl_awb)->format('Y-m-d') : '-';
