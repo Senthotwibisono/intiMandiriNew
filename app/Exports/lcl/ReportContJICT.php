@@ -165,7 +165,7 @@ class ReportContJICT implements FromCollection, WithHeadings, WithStyles, WithMa
             $tglBC11,
             $cont->job->plp->no_surat ?? '-',
             $tglSurat,
-            $cont->tglkeluar,
+            $cont->tglkeluar ?? 'Belum Keluar',
             'TIDAK',
             'TIDAK',
             'TIDAK',
