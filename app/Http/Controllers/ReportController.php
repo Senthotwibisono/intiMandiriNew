@@ -145,10 +145,10 @@ class ReportController extends Controller
             return $cont->nopol_mty ?? '-';
         })
         ->addColumn('tglkeluar', function($cont){
-            return $cont->tglbuangmty ?? 'Belum keluar';
+            return $cont->tglkeluar ?? 'Belum keluar';
         })
         ->addColumn('jamkeluar', function($cont){
-            return $cont->jambuangmty ?? 'Belum keluar';
+            return $cont->jamkeluar ?? 'Belum keluar';
         })
         ->addColumn('lamaHari', function($cont){
             if (!$cont->tglmasuk) {
