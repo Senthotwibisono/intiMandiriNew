@@ -121,7 +121,6 @@
               <strong>Billed To:</strong><br>
               {{$form->customer->name ?? ''}}<br>
               NPWP: {{$form->customer->npwp ?? ''}}<br>
-              Alamat: {{$form->customer->alamat ?? ''}}
             </address>
           </div>
           <div class="col-sm-4 d-flex align-items-center justify-content-center">

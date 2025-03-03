@@ -445,7 +445,7 @@ class FormController extends Controller
     private function updateOrCreateHeader($form, $isMekanik, $request)
     {
         $mekanik = $isMekanik ? 'Y' : 'N';
-        $oldHeader = Header::where('form_id', $form->id)->whereNot('type', 'P')->where('mekanik_y_n', $mekanik)->first();
+        $oldHeader = Header::where('form_id', $form->id)->whereNull('type')->where('mekanik_y_n', $mekanik)->first();
 
         $data = [
             'form_id' => $form->id,
