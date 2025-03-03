@@ -2635,11 +2635,13 @@ class DokumenController extends Controller
                         if ($manifest) {
                             $alasanCust = null;
                             $statusBC = "release";
-                            $cust = Customer::where('name', $manual->consignee)->first();
+                            $cust = Customer::where('name', $pabean->nm_imp)->first();
                             $newCust = null;
-                            if (!$cust && $manual->consignee != null) {
+                            if (!$cust && $pabean->consignee != null) {
                                 $newCust = Customer::create([
-                                    'name' => $manual->consignee,
+                                    'name' => $pabean->nm_imp,
+                                    'npwp' => $pabean->npwp_imp,
+                                    'alamat' => $pabean->al_imp,
                                 ]);
                             }
     

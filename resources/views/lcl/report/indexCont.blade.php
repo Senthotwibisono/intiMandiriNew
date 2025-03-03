@@ -110,6 +110,9 @@
                 <div class="col-auto">
                     <button class="btn btn-success formatBeacukai"><i class="fa fa-download"></i> Excel</button>
                 </div>
+                <div class="col-auto">
+                    <button class="btn btn-success formatJICT"><i class="fa fa-download"></i> Format JICT</button>
+                </div>
             </div>
         </div>
     </div>
@@ -195,6 +198,34 @@
 
                 // Redirect user to download link
                 let url = `/lcl/report/contGenerate?filter=${filterBy}&start_date=${startDate}&end_date=${endDate}&noplp=${noPlp}&nobc_11=${noBc11}`;
+                window.location.href = url;
+                Swal.close();
+            }
+        });
+    });
+</script>
+
+<script>
+    $(document).on('click', '.formatJICT', function(){
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Apakah anda yakin menerapkan filter ini?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, update it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.showLoading();
+                let filterBy = $('#filter').val();
+                let startDate = $('#start_date').val();
+                let endDate = $('#end_date').val();
+                let noPlp = $('#noplp').val();
+                let noBc11 = $('#nobc_11').val();
+
+                // Redirect user to download link
+                let url = `/lcl/report/contGenerateJICT?filter=${filterBy}&start_date=${startDate}&end_date=${endDate}&noplp=${noPlp}&nobc_11=${noBc11}`;
                 window.location.href = url;
                 Swal.close();
             }

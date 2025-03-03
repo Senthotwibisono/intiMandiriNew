@@ -495,6 +495,7 @@ Route::controller(ReportController::class)->group(function(){
     Route::get('/lcl/report/dataCont', 'dataCont');
     Route::get('/lcl/report/contPhoto{id?}', 'photoCont')->name('report.lcl.photoCont');
     Route::get('/lcl/report/contGenerate', 'generateCont')->name('report.lcl.generateCont');
+    Route::get('/lcl/report/contGenerateJICT', 'contGenerateJICT')->name('report.lcl.contGenerateJICT');
 
     // Manifest
     Route::get('/lcl/report/manifest', 'indexManifest')->name('report.lcl.manifest');
