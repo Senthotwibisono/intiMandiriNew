@@ -325,8 +325,8 @@ class DokumenController extends Controller
             $groups[] = $child;
         }
 
-        var_dump(json_encode($groups));
-        die;
+        // var_dump(json_encode($groups));
+        // die;
         // Iterasi untuk memproses data
         foreach ($groups as $group) {
             // Cek apakah elemen ini adalah "header"

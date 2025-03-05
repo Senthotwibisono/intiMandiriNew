@@ -79,7 +79,7 @@ class FormController extends Controller
     {
         $data['title'] = 'Create Form || Step 1';
         $data['form'] = Form::find($id);
-        $data['manifest'] = Manifest::whereNull('tglrelease')->get();
+        $data['manifest'] = Manifest::get();
         $data['customer'] = Customer::all();
 
         $data['masterTarif'] = MT::all();
