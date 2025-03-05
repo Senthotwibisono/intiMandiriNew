@@ -147,7 +147,7 @@ body {
 
 <body>
     <div class="container">
-        <div class="card-header">
+        <!-- <div class="card-header">
             <div class="divider divider-center">
                 <div class="divider-text d-flex justify-content-center align-items-center">
                     <div class="logo img me-3 text-center">
@@ -159,9 +159,9 @@ body {
             </div>
             <div class="text-center">
             </div>
-           
-            <!-- Bagian Kiri & Kanan -->
-        </div>
+        </div> -->
+        <br>
+        <br>
         <div class="card-body">
             <div class="row">
                 <div class="col-12">
@@ -239,6 +239,140 @@ body {
                     </table>
                 </div>
         </div>
+
+        <div class="card-footer">
+            <div class="row">
+                <!-- Kolom Kiri -->
+                <div class="col-6">
+                    <div class="row mb-2">
+                        <div class="col-3">TPS Asal</div>
+                        <div class="col-1">:</div>
+                        <div class="col-8">{{$job->sandar->kd_tps_asal ?? '-'}}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">TPS Tujuan</div>
+                        <div class="col-1">:</div>
+                        <div class="col-8">Inti Mandiri Utama Trans</div>
+                    </div>
+                </div>
+                <!-- Kolom Kanan -->
+                <div class="col-6">
+                    <div class="row mb-2">
+                        <div class="col-3">Kode TPS</div>
+                        <div class="col-1">:</div>
+                        <div class="col-8">{{$job->sandar->kd_tps_asal ?? '-'}}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">Kode TPS</div>
+                        <div class="col-1">:</div>
+                        <div class="col-8">1MUT</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-1">Alasan</div>
+                <div class="col-1">:</div>
+                <div class="col-9">
+                    Berdasarkan pertimbangan Kepala Kantor Pabean dimungkinkan terjadi stagnasi setelah mendapatkan masukan dari pengusaha TPS Asal
+                </div>
+            </div>
+
+            <br>
+            <br>
+            <p style="font-size: 12px;">Keputusan Pejabat Bea dan Cukai</p>
+            <br>
+            <br>
+            <p>Nomor   : {{$job->noplp ?? '-'}}</p>
+            <p>Tanggal : {{$job->ttgl_plp ?? '-'}}</p>
+                <div class="row">
+                    <div class="col-6 text-left">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="text-center">
+                                    an. Kepala Kantor, <br> Kepala Seksi Administrasi Manifest
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <span style="display: inline-block; width: 100px; border-bottom: 2px solid black;"></span>
+                                    <br>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 text-right">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="text-center">
+                                    Pemohonan
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <span style="display: inline-block; width: 100px; border-bottom: 2px solid black;"></span>
+                                    <br>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <br>
+                    <br>
+                    <p>NIP :</p>
+                </div>
+                <div class="row">
+                    <div class="col-6 text-center"  style="border: 1px solid black;">
+                        <p>Pemgeluaran TPS Asal</p>
+                        <div class="row text-left">
+                            <div class="col-3">Tanggal</div>
+                            <div class="col-1">:</div>
+                        </div>
+                        <div class="row text-left">
+                            <div class="col-3">Pukul</div>
+                            <div class="col-1">:</div>
+                        </div>
+                        <br>
+                        <p>Pejabat Bea dan Cukai</p>
+                        <div class="row text-left">
+                            <div class="col-3">Nama</div>
+                            <div class="col-1">:</div>
+                        </div>
+                        <div class="row text-left">
+                            <div class="col-3">NIP</div>
+                            <div class="col-1">:</div>
+                        </div>
+                    </div>
+                    <div class="col-6 text-center"  style="border: 1px solid black;">
+                        <p>Pemasukan TPS Tujuan</p>
+                        <div class="row text-left">
+                            <div class="col-3">Tanggal</div>
+                            <div class="col-1">:</div>
+                        </div>
+                        <div class="row text-left">
+                            <div class="col-3">Pukul</div>
+                            <div class="col-1">:</div>
+                        </div>
+                        <br>
+                        <p>Pejabat Bea dan Cukai</p>
+                        <div class="row text-left">
+                            <div class="col-3">Nama</div>
+                            <div class="col-1">:</div>
+                        </div>
+                        <div class="row text-left">
+                            <div class="col-3">NIP</div>
+                            <div class="col-1">:</div>
+                        </div>
+                    </div>
+                </div>
+                <p>*) Coret yang tidak perlu/diisi oleh Pejabat Bea dan Cukai</p>
+        </div>
+
 
         <br>
         <br>
