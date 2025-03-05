@@ -188,7 +188,6 @@ class Role extends Model implements RoleContract
             throw GuardDoesNotMatch::create($permission->guard_name, $guardName ? collect([$guardName]) : $this->getGuardNames());
         }
 
-        return $this->loadMissing('permissions')->permissions
-            ->contains($permission->getKeyName(), $permission->getKey());
+        return $this->permissions->contains($permission->getKeyName(), $permission->getKey());
     }
 }

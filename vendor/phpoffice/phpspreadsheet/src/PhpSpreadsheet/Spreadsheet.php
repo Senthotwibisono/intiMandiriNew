@@ -599,7 +599,7 @@ class Spreadsheet implements JsonSerializable
     public function createSheet($sheetIndex = null)
     {
         $newSheet = new Worksheet($this);
-        $this->addSheet($newSheet, $sheetIndex, true);
+        $this->addSheet($newSheet, $sheetIndex);
 
         return $newSheet;
     }
@@ -621,24 +621,11 @@ class Spreadsheet implements JsonSerializable
      *
      * @param Worksheet $worksheet The worksheet to add
      * @param null|int $sheetIndex Index where sheet should go (0,1,..., or null for last)
-     * @param bool $retitleIfNeeded add suffix if title exists in spreadsheet
      *
      * @return Worksheet
      */
-    public function addSheet(Worksheet $worksheet, $sheetIndex = null, $retitleIfNeeded = false)
+    public function addSheet(Worksheet $worksheet, $sheetIndex = null)
     {
-        if ($retitleIfNeeded) {
-            $title = $worksheet->getTitle();
-            if ($this->sheetNameExists($title)) {
-                $i = 1;
-                $newTitle = "$title $i";
-                while ($this->sheetNameExists($newTitle)) {
-                    ++$i;
-                    $newTitle = "$title $i";
-                }
-                $worksheet->setTitle($newTitle);
-            }
-        }
         if ($this->sheetNameExists($worksheet->getTitle())) {
             throw new Exception(
                 "Workbook already contains a worksheet named '{$worksheet->getTitle()}'. Rename this worksheet first."
@@ -763,16 +750,12 @@ class Spreadsheet implements JsonSerializable
      *
      * @return int index
      */
-    public function getIndex(Worksheet $worksheet, bool $noThrow = false)
+    public function getIndex(Worksheet $worksheet)
     {
-        $wsHash = $worksheet->getHashInt();
         foreach ($this->workSheetCollection as $key => $value) {
-            if ($value->getHashInt() === $wsHash) {
+            if ($value->getHashCode() === $worksheet->getHashCode()) {
                 return $key;
             }
-        }
-        if ($noThrow) {
-            return -1;
         }
 
         throw new Exception('Sheet does not exist.');

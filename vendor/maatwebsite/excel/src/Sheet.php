@@ -465,18 +465,13 @@ class Sheet
      */
     public function fromQuery(FromQuery $sheetExport, Worksheet $worksheet)
     {
-        $query = $sheetExport->query();
-        if ($query instanceof \Laravel\Scout\Builder) {
+        if ($sheetExport->query() instanceof \Laravel\Scout\Builder) {
             $this->fromScout($sheetExport, $worksheet);
 
             return;
         }
 
-        //Operate on a clone to avoid altering the original
-        //and use the clone operator directly to support old versions of Laravel
-        //that don't have a clone method in eloquent
-        $clonedQuery = clone $query;
-        $clonedQuery->chunk($this->getChunkSize($sheetExport), function ($chunk) use ($sheetExport) {
+        $sheetExport->query()->chunk($this->getChunkSize($sheetExport), function ($chunk) use ($sheetExport) {
             $this->appendRows($chunk, $sheetExport);
         });
     }

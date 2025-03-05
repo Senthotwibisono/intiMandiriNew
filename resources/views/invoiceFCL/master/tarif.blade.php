@@ -30,7 +30,6 @@
                                     <th>Massa II</th>
                                     <th>Massa III</th>
                                     <th>Lift On</th>
-                                    <th>Hyro Scan</th>
                                     <th>Gate Pass</th>
                                     <th>Refeer (Power for Refeer)</th>
                                     <th>Refeer (Monitooring)</th>
@@ -169,12 +168,6 @@
                                 <div class="form-group">
                                     <label for="">Lift On</label>
                                     <input type="number" name="lift_on" class="form-control" step="0.001" min="0" max="9999999999.999">
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="form-group">
-                                    <label for="">Hyro Scan</label>
-                                    <input type="number" name="hyro_scan" class="form-control" step="0.001" min="0" max="9999999999.999">
                                 </div>
                             </div>
                             <div class="col-4">
@@ -322,12 +315,6 @@
                                 <div class="form-group">
                                     <label for="">Lift On</label>
                                     <input type="number" name="lift_on" id="lift_on_edit" class="form-control" step="0.001" min="0" max="9999999999.999">
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="form-group">
-                                    <label for="">Hyro Scan</label>
-                                    <input type="number" name="hyro_scan" id="hyro_scan_edit" class="form-control" step="0.001" min="0" max="9999999999.999">
                                 </div>
                             </div>
                             <div class="col-4">
@@ -815,7 +802,6 @@
                 {data:'massa2', name:'massa2', className:'nowrap', render: formatPersen},
                 {data:'massa3', name:'massa3', className:'nowrap', render: formatPersen},
                 {data:'lift_on', name:'lift_on', className:'nowrap', render: formatRupiah},
-                {data:'hyro_scan', name:'hyro_scan', className:'nowrap', render: formatRupiah},
                 {data:'gate_pass', name:'gate_pass', className:'nowrap', render: formatRupiah},
                 {data:'refeer', name:'refeer', className:'nowrap', render: formatRupiah},
                 {data:'monitoring', name:'monitoring', className:'nowrap', render: formatRupiah},
@@ -890,7 +876,6 @@
                 $('#refeer_edit').val(response.data.refeer);
                 $('#monitoring_edit').val(response.data.monitoring);
                 $('#lift_on_edit').val(response.data.lift_on);
-                $('#hyro_scan_edit').val(response.data.hyro_scan);
                 $('#gate_pass_edit').val(response.data.gate_pass);
                 $('#admin_edit').val(response.data.admin);
             },

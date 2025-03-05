@@ -10,7 +10,6 @@ use Illuminate\Contracts\Cache\Store;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Contracts\Permission;
-use Spatie\Permission\Contracts\PermissionsTeamResolver;
 use Spatie\Permission\Contracts\Role;
 
 class PermissionRegistrar
@@ -35,9 +34,9 @@ class PermissionRegistrar
 
     public bool $teams;
 
-    protected PermissionsTeamResolver $teamResolver;
-
     public string $teamsKey;
+
+    protected string|int|null $teamId = null;
 
     public string $cacheKey;
 
@@ -56,7 +55,6 @@ class PermissionRegistrar
     {
         $this->permissionClass = config('permission.models.permission');
         $this->roleClass = config('permission.models.role');
-        $this->teamResolver = new (config('permission.team_resolver', DefaultTeamResolver::class));
 
         $this->cacheManager = $cacheManager;
         $this->initializeCache();
@@ -103,7 +101,10 @@ class PermissionRegistrar
      */
     public function setPermissionsTeamId($id): void
     {
-        $this->teamResolver->setPermissionsTeamId($id);
+        if ($id instanceof \Illuminate\Database\Eloquent\Model) {
+            $id = $id->getKey();
+        }
+        $this->teamId = $id;
     }
 
     /**
@@ -111,7 +112,7 @@ class PermissionRegistrar
      */
     public function getPermissionsTeamId()
     {
-        return $this->teamResolver->getPermissionsTeamId();
+        return $this->teamId;
     }
 
     /**

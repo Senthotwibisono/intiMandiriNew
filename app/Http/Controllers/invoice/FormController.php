@@ -466,6 +466,10 @@ class FormController extends Controller
             'kasir_id' => Auth::user()->id,
             'mekanik_y_n' => $mekanik,
         ];
+
+        if ($data['grand_total'] >= 5000000) {
+            $data['grand_total'] += 10000;
+        }
         
         if ($oldHeader) {
             $oldHeader->update($data);
