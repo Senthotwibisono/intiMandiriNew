@@ -279,6 +279,17 @@
                                                 <td>{{number_format($totalLiftOnTPS, 0)}}</td>
                                             </tr>
                                             <tr>
+                                                <td>Hyro Scan</td>
+                                                <td>{{number_format($hargaTPS->hyro_scan,0)}}</td>
+                                                <td>{{$jumlahCont}}</td>
+                                                <td>0</td>
+                                                @php
+                                                    $totalHyroScan = $hargaTPS->hyro_scan * $jumlahCont;
+                                                    $totalTPS += $totalLiftOnTPS;
+                                                @endphp
+                                                <td>{{number_format($totalHyroScan,0)}}</td>
+                                            </tr>
+                                            <tr>
                                                 <td>Gate Pass</td>
                                                 <td>{{number_format($hargaTPS->gate_pass,0)}}</td>
                                                 <td>{{$jumlahCont}}</td>

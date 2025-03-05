@@ -541,6 +541,21 @@ class FormFCLController extends Controller
                             'jumlah_hari' => 0,
                             'total' => $totalLiftOn,
                         ]);
+                        // HyroScan
+                        $totalHyroScan = $tarifTPS->hyro_scan * $jumlah;
+                        Detil::create([
+                            'form_id' => $form->id,
+                            'invoice_id' => $header->id,
+                            'tps' => $request->kd_tps_asal,
+                            'keterangan' => 'Hyro Scan (' . $size . ' / ' .$ctr_type.' )',
+                            'size' => $size,
+                            'type' => $ctr_type,
+                            'tarif_dasar' => $tarifTPS->hyro_scan,
+                            'satuan' => '0',
+                            'jumlah' => $jumlah,
+                            'jumlah_hari' => 0,
+                            'total' => $totalHyroScan,
+                        ]);
                         // Gate Pass
                         $totalGatePass = $tarifTPS->gate_pass * $jumlah;
                         Detil::create([

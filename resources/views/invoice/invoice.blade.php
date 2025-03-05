@@ -239,22 +239,6 @@
                                     Kasir
                                 </div>
                             </div>
-                            @if($header->grand_total >= 5000000)
-                            <div class="col-6">
-                                <div class="text-center">
-                                        -
-                                    <br>
-                                    <br>
-                                    <br>
-                                    <br>
-                                    <br>
-                                    <br>
-                                    <br>
-                                    <span style="text-decoration: underline;">Materai</span>
-                                    <br>
-                                </div>
-                            </div>
-                            @endif
                         </div>
                     </div>
                 </div>
