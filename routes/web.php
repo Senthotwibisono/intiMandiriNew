@@ -715,6 +715,7 @@ Route::controller(AndroidGateController::class)->group(function(){
             Route::post('/barcodeGateAll', 'createBarcodeAll');
 
             Route::get('/generateExcelPLP/{id?}', 'generateExcel');
+            Route::get('/cetakPLP/{id?}', 'cetakPLP');
         });
 
         Route::prefix('/realisasi')->controller(GateInFCLCotroller::class)->group(function(){

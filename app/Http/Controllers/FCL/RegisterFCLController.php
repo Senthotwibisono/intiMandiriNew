@@ -526,4 +526,17 @@ class RegisterFCLController extends Controller
         $fileName = 'ReportContainer-jobNumber-plp'. $job->PLP->noplp .'.xlsx' ;
         return Excel::download(new plpCont($conts), $fileName);
     }
+
+    public function cetakPLP($id)
+    {
+        $job = Job::find($id);
+
+        $conts = Cont::where('joborder_id', $job->id)->get();
+
+        $data['title'] = 'Permohonan Pindah Lokasi Petikemas';
+        $data['conts'] = $conts;
+        $data['job'] = $job;
+
+        return view('fcl.register.a11', $data);
+    }
 }

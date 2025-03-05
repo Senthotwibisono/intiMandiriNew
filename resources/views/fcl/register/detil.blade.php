@@ -278,6 +278,9 @@
                 <div class="col-auto">
                     <a href="/fcl/register/generateExcelPLP/{{$job->id}}" class="btn btn-success"><i class="fas fa-file-excel"></i> || Export to Excel</a>
                 </div>
+                <div class="col-auto">
+                    <a href="/fcl/register/cetakPLP/{{$job->id}}" target="_blank" class="btn btn-info"><i class="fas fa-file-download"></i> || Cetak A11</a>
+                </div>
                 <!-- <div class="col-auto">
                     <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#excelModal"><i class="fas fa-file-excel"></i></button>
                 </div>
