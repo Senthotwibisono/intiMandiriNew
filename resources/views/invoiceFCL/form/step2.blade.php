@@ -278,7 +278,6 @@
                                                 @endphp
                                                 <td>{{number_format($totalLiftOnTPS, 0)}}</td>
                                             </tr>
-                                            @if($form->type == 'STANDART' || $form->type == 'TPP')
                                             <tr>
                                                 <td>Hyro Scan</td>
                                                 <td>{{number_format($hargaTPS->hyro_scan,0)}}</td>

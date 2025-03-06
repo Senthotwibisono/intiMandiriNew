@@ -890,6 +890,7 @@
                 $('#refeer_edit').val(response.data.refeer);
                 $('#monitoring_edit').val(response.data.monitoring);
                 $('#lift_on_edit').val(response.data.lift_on);
+                $('#hyro_scan_edit').val(response.data.hyro_scan);
                 $('#gate_pass_edit').val(response.data.gate_pass);
                 $('#admin_edit').val(response.data.admin);
             },
