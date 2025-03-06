@@ -4,7 +4,7 @@
 /public/hot
 /public/storage
 /storage/*.key
-vendor
+/vendor
 .env
 .env.example
 .env.local
@@ -19,7 +19,7 @@ yarn-error.log
 /.idea
 /.vscode
 node_modules
-storage
-storage/logs/laravel.log
+/storage
+/storage/logs/laravel.log
 /node_modules
 /node_modules
