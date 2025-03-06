@@ -89,6 +89,7 @@
                     <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addPermohonanStripping"><i class="fas fa-plus"></i>|| Upload Permohonan Stripping</button>
                     <a href="{{ asset('storage/permohonanStripping/masterBL/masterBL-' . $cont->id) }}" target="_blank" class="btn btn-primary">Master BL</a>
                     <a href="{{ asset('storage/permohonanStripping/hostBL/hostBL-' . $cont->id) }}" target="_blank" class="btn btn-primary">Host BL</a>
+                    <a href="/lcl/manifest/suratIzinStripping/{{$cont->id}}" target="_blank" class="btn btn-info">Izin Stripping</a>
                 </div>
             </div>
         </div>

@@ -320,6 +320,7 @@ Route::controller(DokumenController::class)->group(function (){
         Route::post('/lcl/manifest/approve-{id?}', 'approve')->name('lcl.manifest.approve');
         Route::post('/lcl/manifest/unapprove-{id?}', 'unapprove')->name('lcl.manifest.unapprove');
         Route::post('/lcl/manifest/permohonanStripping', 'permohonanStripping');
+        Route::get('/lcl/manifest/suratIzinStripping/{id?}', 'suratIzinStripping');
 
         // Item
         Route::get('/lcl/manifest/item-{id?}', 'itemIndex')->name('lcl.manifest.item.index');

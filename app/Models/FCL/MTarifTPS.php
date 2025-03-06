@@ -24,6 +24,7 @@ class MTarifTPS extends Model
         'massa3',
         'lift_on',
         'hyro_scan',
+        'perawatan_it',
         'gate_pass',
         'refeer',
         'monitoring',

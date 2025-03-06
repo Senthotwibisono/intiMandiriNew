@@ -290,6 +290,17 @@
                                                 <td>{{number_format($totalHyroScan, 0)}}</td>
                                             </tr>
                                             <tr>
+                                                <td>Nota & Perawatan IT</td>
+                                                <td>{{number_format($hargaTPS->perawatan_it,0)}}</td>
+                                                <td>{{$jumlahCont}}</td>
+                                                <td>0</td>
+                                                @php
+                                                    $totalPerawatanIT = $hargaTPS->perawatan_it * $jumlahCont;
+                                                    $totalTPS += $totalPerawatanIT;
+                                                @endphp
+                                                <td>{{number_format($totalHyroScan, 0)}}</td>
+                                            </tr>
+                                            <tr>
                                                 <td>Gate Pass</td>
                                                 <td>{{number_format($hargaTPS->gate_pass,0)}}</td>
                                                 <td>{{$jumlahCont}}</td>

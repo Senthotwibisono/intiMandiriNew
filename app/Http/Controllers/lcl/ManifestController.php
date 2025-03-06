@@ -709,4 +709,14 @@ class ManifestController extends Controller
         return view('barcode.bonMuatManifest', $data);
     }
 
+    public function suratIzinStripping($id)
+    {
+        $cont = Cont::find($id);
+
+        $data['title'] = "Surat Izin Permohanan Stripping Container : " .$cont->nocontainer;
+        $data['cont'] = $cont;
+        
+        return view('lcl.manifest.suratIzinStripping', $data);
+    }
+
 }
