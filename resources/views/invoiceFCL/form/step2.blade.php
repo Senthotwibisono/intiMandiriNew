@@ -298,7 +298,7 @@
                                                     $totalPerawatanIT = $hargaTPS->perawatan_it * $jumlahCont;
                                                     $totalTPS += $totalPerawatanIT;
                                                 @endphp
-                                                <td>{{number_format($totalHyroScan, 0)}}</td>
+                                                <td>{{number_format($totalPerawatanIT, 0)}}</td>
                                             </tr>
                                             <tr>
                                                 <td>Gate Pass</td>

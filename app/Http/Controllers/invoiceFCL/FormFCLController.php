@@ -547,7 +547,7 @@ class FormFCLController extends Controller
                             'form_id' => $form->id,
                             'invoice_id' => $header->id,
                             'tps' => $request->kd_tps_asal,
-                            'keterangan' => 'Hyro Scan (' . $size . ' / ' .$ctr_type.' )',
+                            'keterangan' => 'Hyco Scan (' . $size . ' / ' .$ctr_type.' )',
                             'size' => $size,
                             'type' => $ctr_type,
                             'tarif_dasar' => $tarifTPS->hyro_scan,
@@ -557,15 +557,15 @@ class FormFCLController extends Controller
                             'total' => $totalHyroScan,
                         ]);
                         // Perawatan IT
-                        $totalPerawatanIT = $tarifTPS->totalPerawatanIT * $jumlah;
+                        $totalPerawatanIT = $tarifTPS->perawatan_it * $jumlah;
                         Detil::create([
                             'form_id' => $form->id,
                             'invoice_id' => $header->id,
                             'tps' => $request->kd_tps_asal,
-                            'keterangan' => 'Hyro Scan (' . $size . ' / ' .$ctr_type.' )',
+                            'keterangan' => 'Nota & Perawatan IT (' . $size . ' / ' .$ctr_type.' )',
                             'size' => $size,
                             'type' => $ctr_type,
-                            'tarif_dasar' => $tarifTPS->totalPerawatanIT,
+                            'tarif_dasar' => $tarifTPS->perawatan_it,
                             'satuan' => '0',
                             'jumlah' => $jumlah,
                             'jumlah_hari' => 0,
@@ -577,7 +577,7 @@ class FormFCLController extends Controller
                             'form_id' => $form->id,
                             'invoice_id' => $header->id,
                             'tps' => $request->kd_tps_asal,
-                            'keterangan' => 'Gate Pass Admin & Pass Truck (' . $size . ' / ' .$ctr_type.' )',
+                            'keterangan' => 'Adm Kartu & PASS (' . $size . ' / ' .$ctr_type.' )',
                             'size' => $size,
                             'type' => $ctr_type,
                             'tarif_dasar' => $tarifTPS->gate_pass,
