@@ -262,7 +262,7 @@ body {
                                     <br>
                                     <br>
                                     <br>
-                                    (pbb bEA & Cukai)
+                                    (PBB Bea & Cukai)
                                 </div>
                             </div>
                         </div>
