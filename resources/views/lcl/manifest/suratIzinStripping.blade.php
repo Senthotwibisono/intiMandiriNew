@@ -185,7 +185,7 @@ body {
                 <br>
                 <br>
                 <div class="table table-resposnive">
-                    <table class="table-stripped table-hover">
+                    <table class="tabel-stripped mx-auto">
                         <thead>
                             <tr>
                                 <th>No</th>
@@ -194,36 +194,59 @@ body {
                                 <th>No. Segel</th>
                                 <th>Vessel/Voyage</th>
                                 <th>Eta</th>
-                                <th>Eta</th>
+                                <th>No PLP</th>
+                                <th>Tanggal PLP</th>
                             </tr>
                         </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>{{$cont->nocontainer ?? '-'}}</td>
+                                <td>{{$cont->size ?? '-'}}</td>
+                                <td> </td>
+                                <td>{{$cont->job->Kapal->name}} / {{$cont->job->voy}}</td>
+                                <td>{{$cont->job->eta}}</td>
+                                <td>{{$cont->job->noplp}}</td>
+                                <td>{{$cont->job->ttgl_plp}}</td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
+                <br>
+                <br>
+                <p style="font-size: 14px;">Demikian surat permohonan kami buat, atas perhatian dan kerjasamanya kami ucapkan terimakasih</p>
         </div>
         <div class="card-footer item-align-right">
             </div>
             <div class="col-12">
                 <div class="row">
-                    <div class="col-6 text-left">
+                    <div class="col-12 text-left">
                         <div class="row">
                             <div class="col-6">
                                 <div class="text-center">
+                                    Hormat Kami
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <span style="text-decoration: underline;"> (Kepala Gd. PT. INTI MANDIRI UTAMA TRANS)</span>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    (TKBM)
                                    
-                                    <br>
-                                    <br>
-                                    <br>
-                                    <br>
-                                    <br>
-                                    <br>
-                                    <br>
-                                    <span style="text-decoration: underline;"></span>
-                                    <br>
-                                    Kasir
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="text-center">
-                                        -
+                                        Mengetahui
                                     <br>
                                     <br>
                                     <br>
@@ -231,8 +254,15 @@ body {
                                     <br>
                                     <br>
                                     <br>
-                                    <span style="text-decoration: underline;"></span>
+                                    <span style="text-decoration: underline;"> (Hanggar Bea & Cukai)</span>
                                     <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    <br>
+                                    (pbb bEA & Cukai)
                                 </div>
                             </div>
                         </div>
@@ -240,7 +270,7 @@ body {
                 </div>
                 <div class="divider divider-left">
                     <div class="divider-text">
-                        JL bugis no.15 kebon bawang, jakarta utara T.J Priok
+                        <!-- JL bugis no.15 kebon bawang, jakarta utara T.J Priok -->
                     </div>
                 </div>
             </div>
