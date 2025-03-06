@@ -562,7 +562,7 @@ class FormFCLController extends Controller
                             'form_id' => $form->id,
                             'invoice_id' => $header->id,
                             'tps' => $request->kd_tps_asal,
-                            'keterangan' => 'Gate Pass (' . $size . ' / ' .$ctr_type.' )',
+                            'keterangan' => 'Gate Pass Admin & Pass Truck (' . $size . ' / ' .$ctr_type.' )',
                             'size' => $size,
                             'type' => $ctr_type,
                             'tarif_dasar' => $tarifTPS->gate_pass,
