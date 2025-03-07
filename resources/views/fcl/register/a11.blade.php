@@ -106,27 +106,28 @@ body {
 
     table.tabel-stripped {
         width: 90%;
-        border-collapse: collapse;
+        border-collapse: collapse; /* Menghindari garis ganda */
         text-align: center;
         font-size: 11px; /* Ukuran font lebih kecil agar muat di A4 */
+        border: 1px solid black; /* Garis luar tabel */
     }
 
     /* Header tabel */
-    table.tabel-stripped thead {
-        background-color: #007bff; /* Warna biru Bootstrap */
-        color: white;
+    table.tabel-stripped thead th {
         font-weight: bold;
+        padding: 5px;
+        border: 1px solid black; /* Garis hitam di setiap sel header */
+        background-color: #f2f2f2; /* Abu-abu muda untuk membedakan header */
+        text-align: center; /* Posisi teks tengah */
+        vertical-align: middle; /* Agar teks di tengah untuk rowspan */
     }
 
-    table.tabel-stripped thead th {
-        padding: 5px;
-        border: 1px solid #ddd;
-    }
 
     /* Isi tabel */
     table.tabel-stripped tbody tr {
         background-color: #fff;
         transition: background 0.3s ease;
+        border: 1px solid black;
     }
 
     table.tabel-stripped tbody tr:nth-child(even) {
@@ -135,13 +136,14 @@ body {
 
     table.tabel-stripped tbody td {
         padding: 6px;
-        border: 1px solid #ddd;
+        border: 1px solid black; /* Pastikan semua sel memiliki garis hitam */
     }
 
     /* Efek hover */
     table.tabel-stripped tbody tr:hover {
         background-color: #e9ecef;
     }
+
   </style>
 </head>
 
