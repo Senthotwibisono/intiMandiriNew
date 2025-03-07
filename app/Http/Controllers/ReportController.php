@@ -62,6 +62,8 @@ class ReportController extends Controller
                 $query->where('tno_bc11', 'LIKE', "%{$request->nobc_11}%");
             });
         }
+
+        $cont = $cont->get();
         
         return DataTables::of($cont)
         ->addColumn('detil', function($cont){
@@ -346,6 +348,8 @@ class ReportController extends Controller
       if ($request->has('container_id') && $request->container_id) {
         $mans->where('container_id', $request->container_id);
       }
+
+      $mans = $mans->get();
 
         // var_dump($mans, $start, $end);
        

@@ -321,147 +321,81 @@ class DokumenController extends Controller
         $groups = [];
 
         // Loop untuk menyimpan elemen XML ke dalam array
-        
+        foreach ($xml->children() as $child) {
+            $groups[] = $child;
+        }
 
         // var_dump(json_encode($groups));
         // die;
         // Iterasi untuk memproses data
-        // foreach ($groups as $group) {
-        //     // Cek apakah elemen ini adalah "header"
-        //     if ($group->HEADER || $group->header) {
-        //         $header = $group;
-        //     } else {
-        //         foreach ($group->children() as $detail) {
-        //             $detil[] = $detail;
-        //         }
-        //     }
-        
-        //     // Pastikan `$header` tidak kosong sebelum menyimpan
-        //     if ($header) {
-        //         $oldPLP = PLP::where('no_plp', $header->NO_PLP)->where('tgl_plp', $header->TGL_PLP)->first();
-            
-        //         if (!$oldPLP) {
-        //             $consolidator = Consolidator::first();
-        //             $plp = PLP::create([
-        //                 'tgl_upload' => Carbon::now()->format('Ymd'), 
-        //                 'upload_date' => Carbon::today()->format('Y-m-d'), 
-        //                 'upload_time' => Carbon::now()->format('H:i:s'),
-        //                 'kd_kantor' => (string) $header->KD_KANTOR,
-        //                 'kd_tps' => $this->kode,
-        //                 'kd_tps_asal' => (string) $header->KD_TPS_ASAL,
-        //                 'gudang_tujuan' => (string) $header->GUDANG_TUJUAN,
-        //                 'no_plp' => (string) $header->NO_PLP,
-        //                 'tgl_plp' => (string) $header->TGL_PLP,
-        //                 'call_sign' => (string) $header->CALL_SIGN,
-        //                 'nm_angkut' => (string) $header->NM_ANGKUT,
-        //                 'no_voy_flight' => (string) $header->NO_VOY_FLIGHT,
-        //                 'tgl_tiba' => (string) $header->TGL_TIBA,
-        //                 'no_surat' => (string) $header->NO_SURAT,
-        //                 'tgl_surat' => (string) $header->TGL_SURAT,
-        //                 'no_bc11' => (string) $header->NO_BC11,
-        //                 'tgl_bc11' => (string) $header->TGL_BC11,
-        //                 'uid' => Auth::user()->id,
-        //                 'consolidator_id' => $consolidator->id,
-        //                 'namaconsolidator' => $consolidator->namaconsolidator,
-        //                 'kd_tps_tujuan' => (string) $header->KD_TPS_TUJUAN,
-        //                 'gudang_asal' => (string) $header->GUDANG_ASAL,
-        //                 'ref_number' => (string) $header->REF_NUMBER,
-        //             ]);
-                
-        //             // Simpan Detail PLP
-        //             foreach ($detil as $detail) {
-        //                 PLPdetail::create([
-        //                     'plp_id' => $plp->id,
-        //                     'tgl_upload' => $plp->tgl_upload,
-        //                     'no_plp' => $plp->no_plp,
-        //                     'tgl_plp' => $plp->tgl_plp,
-        //                     'no_cont' => (string) $detail->NO_CONT,
-        //                     'uk_cont' => (string) $detail->UK_CONT,
-        //                     'jns_cont' => (string) $detail->JNS_CONT,
-        //                     'no_bc11' => $plp->no_bc11,
-        //                     'tgl_bc11' => $plp->tgl_bc11,
-        //                     'no_pos_bc11' => (string) $detail->NO_POS_BC11,
-        //                     'consignee' => (string) $detail->CONSIGNEE,
-        //                     'jns_kms' => isset($detail->jns_kms) ? (string) $detail->jns_kms : null,
-        //                     'jml_kms' => isset($detail->jml_kms) ? (string) $detail->jml_kms : null,
-        //                     'no_bl_awb' => isset($detail->NO_BL_AWB) ? (string) $detail->NO_BL_AWB : null,
-        //                     'tgl_bl_awb' => isset($detail->TGL_BL_AWB) ? (string) $detail->TGL_BL_AWB : null,
-        //                     'flag_spk' => $plp->flag_spk,
-        //                 ]);
-        //             }
-        //         }
-        //     }
-        
-        //     // Reset $detil setelah menyimpan data agar tidak tercampur dengan group berikutnya
-        //     $detil = [];
-        // }
-
-        foreach($xml->children() as $child) {
-            foreach($child as $key => $value) {
-                if($key == 'header' || $key == 'HEADER'){
-                    $header = $value;
-                }else{
-                    foreach ($value as $detail):
-                        $details[] = $detail;
-                    endforeach;
+        foreach ($groups as $group) {
+            // Cek apakah elemen ini adalah "header"
+            if ($group->HEADER || $group->header) {
+                $header = $group;
+            } else {
+                foreach ($group->children() as $detail) {
+                    $detil[] = $detail;
                 }
             }
-            // dd($xml);
-            // Old Checking
-            $oldPLP = PLP::where('no_plp', $header->NO_PLP)->where('tgl_plp', $header->TGL_PLP)->first();
-            if ($oldPLP) {
-                return back()->with('status', ['type' => 'error', 'message' => 'Error importing data: Data Sudah Ada!!']);
+        
+            // Pastikan `$header` tidak kosong sebelum menyimpan
+            if ($header) {
+                $oldPLP = PLP::where('no_plp', $header->NO_PLP)->where('tgl_plp', $header->TGL_PLP)->first();
+            
+                if (!$oldPLP) {
+                    $consolidator = Consolidator::first();
+                    $plp = PLP::create([
+                        'tgl_upload' => Carbon::now()->format('Ymd'), 
+                        'upload_date' => Carbon::today()->format('Y-m-d'), 
+                        'upload_time' => Carbon::now()->format('H:i:s'),
+                        'kd_kantor' =>  $header->KD_KANTOR,
+                        'kd_tps' => $this->kode,
+                        'kd_tps_asal' =>  $header->KD_TPS_ASAL,
+                        'gudang_tujuan' =>  $header->GUDANG_TUJUAN,
+                        'no_plp' =>  $header->NO_PLP,
+                        'tgl_plp' =>  $header->TGL_PLP,
+                        'call_sign' =>  $header->CALL_SIGN,
+                        'nm_angkut' =>  $header->NM_ANGKUT,
+                        'no_voy_flight' =>  $header->NO_VOY_FLIGHT,
+                        'tgl_tiba' =>  $header->TGL_TIBA,
+                        'no_surat' =>  $header->NO_SURAT,
+                        'tgl_surat' =>  $header->TGL_SURAT,
+                        'no_bc11' =>  $header->NO_BC11,
+                        'tgl_bc11' =>  $header->TGL_BC11,
+                        'uid' => Auth::user()->id,
+                        'consolidator_id' => $consolidator->id,
+                        'namaconsolidator' => $consolidator->namaconsolidator,
+                        'kd_tps_tujuan' =>  $header->KD_TPS_TUJUAN,
+                        'gudang_asal' =>  $header->GUDANG_ASAL,
+                        'ref_number' =>  $header->REF_NUMBER,
+                    ]);
+                
+                    // Simpan Detail PLP
+                    foreach ($detil as $detail) {
+                        PLPdetail::create([
+                            'plp_id' => $plp->id,
+                            'tgl_upload' => $plp->tgl_upload,
+                            'no_plp' => $plp->no_plp,
+                            'tgl_plp' => $plp->tgl_plp,
+                            'no_cont' =>  $detail->NO_CONT,
+                            'uk_cont' =>  $detail->UK_CONT,
+                            'jns_cont' =>  $detail->JNS_CONT,
+                            'no_bc11' => $plp->no_bc11,
+                            'tgl_bc11' => $plp->tgl_bc11,
+                            'no_pos_bc11' =>  $detail->NO_POS_BC11,
+                            'consignee' =>  $detail->CONSIGNEE,
+                            'jns_kms' => isset($detail->jns_kms) ?  $detail->jns_kms : null,
+                            'jml_kms' => isset($detail->jml_kms) ?  $detail->jml_kms : null,
+                            'no_bl_awb' => isset($detail->NO_BL_AWB) ?  $detail->NO_BL_AWB : null,
+                            'tgl_bl_awb' => isset($detail->TGL_BL_AWB) ?  $detail->TGL_BL_AWB : null,
+                            'flag_spk' => $plp->flag_spk,
+                        ]);
+                    }
+                }
             }
-    
-            // Inserrt Data Header
-            $consolidator = Consolidator::first();
-    
-            $plp = PLP::create([
-                'tgl_upload' => Carbon::now()->format('Ymd'), 
-                'upload_date' => Carbon::today()->format('Y-m-d'), 
-                'upload_time' => Carbon::now()->format('H:i:s'),
-                'kd_kantor'=>$header->KD_KANTOR,
-                'kd_tps'=> $this->kode,
-                'kd_tps_asal'=>$header->KD_TPS_ASAL,
-                'gudang_tujuan'=>$header->GUDANG_TUJUAN,
-                'no_plp'=>$header->NO_PLP,
-                'tgl_plp'=>$header->TGL_PLP,
-                'call_sign'=>$header->CALL_SIGN,
-                'nm_angkut'=>$header->NM_ANGKUT,
-                'no_voy_flight'=>$header->NO_VOY_FLIGHT,
-                'tgl_tiba'=>$header->TGL_TIBA,
-                'no_surat'=>$header->NO_SURAT,
-                'tgl_surat'=>$header->TGL_SURAT,
-                'no_bc11'=>$header->NO_BC11,
-                'tgl_bc11'=>$header->TGL_BC11,
-                'uid'=> Auth::user()->id,
-                'consolidator_id'=>$consolidator->id,
-                'namaconsolidator'=>$consolidator->namaconsolidator,
-                'kd_tps_tujuan'=>$header->KD_TPS_TUJUAN,
-                'gudang_asal'=>$header->GUDANG_ASAL,
-                'ref_number'=>$header->REF_NUMBER,
-            ]);
-    
-            foreach ($details as $detail) {
-               $cont = PLPdetail::create([
-                'plp_id' =>$plp->id,
-                'tgl_upload' =>$plp->tgl_upload,
-                'no_plp' =>$plp->no_plp,
-                'tgl_plp' =>$plp->tgl_plp,
-                'no_cont' =>$detail->NO_CONT,
-                'uk_cont' =>$detail->UK_CONT,
-                'jns_cont' =>$detail->JNS_CONT,
-                'no_bc11' =>$plp->no_bc11,
-                'tgl_bc11' =>$plp->tgl_bc11,
-                'no_pos_bc11' =>$detail->NO_POS_BC11,
-                'consignee' =>$detail->CONSIGNEE,
-                'jns_kms' =>$detail->jns_kms ?? NULL,
-                'jml_kms' =>$detail->jml_kms ?? NULL,
-                'no_bl_awb' =>$detail->NO_BL_AWB ?? NULL,
-                'tgl_bl_awb' =>$detail->TGL_BL_AWB ?? NULL,
-                'flag_spk' =>$plp->flag_spk,
-               ]);
-            }
+        
+            // Reset $detil setelah menyimpan data agar tidak tercampur dengan group berikutnya
+            $detil = [];
         }
 
         return response()->json([
