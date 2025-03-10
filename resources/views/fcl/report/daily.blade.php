@@ -1,5 +1,30 @@
 @extends('partial.main')
 @section('custom_styles')
+<style>
+    .table-responsive td,
+    .table-responsive th {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+<style>
+    .highlight-yellow {
+        background-color: yellow !important;;
+    }
+</style>
+
+<style>
+    .highlight-blue {
+        background-color: lightblue !important;;
+    }
+</style>
+
+<style>
+    .highlight-red {
+        background-color: red !important;;
+    }
+</style>
 
 @endsection
 @section('content')
@@ -16,13 +41,13 @@
                     <div class="col-sm-4">
                         <div class="form-group">
                             <label for="start_date">Start Date</label>
-                            <input type="date" name="start_date" class="form-control" value="{{ request('start_date') ?? $start }}">
+                            <input type="date" name="start_date" id="start_date" class="form-control" value="{{ request('start_date') ?? $start }}">
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-group">
                             <label for="end_date">End Date</label>
-                            <input type="date" name="end_date" class="form-control" value="{{ request('end_date') ?? $end }}">
+                            <input type="date" name="end_date" id="end_date" class="form-control" value="{{ request('end_date') ?? $end }}">
                         </div>
                     </div>
                     <div class="col-sm-4 d-flex align-items-end">
@@ -277,6 +302,63 @@
                 </table>
             </div>
         </div>
+        <hr>
+            <div class="col-sm-12">
+                <section>
+                    <div class="card h-100 justify-content-center mt-0">
+                        <div class="card-header text-center">
+                            <h4>Stock Lapangan</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table">
+                                <table class="table-hover" id="dataReportContAkhir" style="white-space: nowrap;">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">Action</th>
+                                            <th class="text-center">No Job Order</th>
+                                            <th class="text-center">Nama Angkut</th>
+                                            <th class="text-center">Status Beacukai</th>
+                                            <th class="text-center">Segel Merah</th>
+                                            <th class="text-center">Bill of Loading No</th>
+                                            <th class="text-center">Bill of Loading Date</th>
+                                            <th class="text-center">No Container</th>
+                                            <th class="text-center">Container Type</th>
+                                            <th class="text-center">Class Type</th>
+                                            <th class="text-center">Size</th>
+                                            <th class="text-center">ETA</th>
+                                            <th class="text-center">TPS Asal</th>
+                                            <th class="text-center">Consolidator</th>
+                                            <th class="text-center">No PLP</th>
+                                            <th class="text-center">Tgl PLP</th>
+                                            <th class="text-center">No BC 1.1</th>
+                                            <th class="text-center">Tgl BC 1.1</th>
+                                            <th class="text-center">Tgl Masuk</th>
+                                            <th class="text-center">Jam Masuk</th>
+                                            <th class="text-center">Nomor Polisi</th>
+                                            <th class="text-center">Tgl Keluar</th>
+                                            <th class="text-center">Jam Keluar</th>
+                                            <th class="text-center">Nopol Keluar</th>
+                                            <th class="text-center">Lama Hari</th>
+                                            <th class="text-center">Long Stay</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="button-container">
+                                <div class="col-auto">
+                                    <button class="btn btn-success formatBeacukai"><i class="fa fa-download"></i> Format Beacukai</button>
+                                </div>
+                                <div class="col-auto">
+                                    <button class="btn btn-success formatStandar"><i class="fa fa-download"></i> Format Standar</button>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                    </div>
+                </section>
+            </div>
     </div>
 </section>
 
@@ -354,7 +436,6 @@
             scrollX: true,
             scrollX: true,
             scrollCollapse: true,
-            scrollY: '30vh',
             ajax: {
                 url: '/fcl/report/dataContDaily',
                 type: 'GET',
@@ -405,8 +486,125 @@
 </script>
 
 <script>
+    $(document).ready(function(){
+        var start = "{{ $start }}";
+        var end = "{{ $end }}";
+        console.log('tgl ' + start + ' ' + end);
+        $('#dataReportContAkhir').DataTable({
+            processing: true,
+            serverSide: true,
+            scrollX: true,
+            scrollX: true,
+            scrollCollapse: true,
+            ajax: {
+                url: '/fcl/report/dataContDaily',
+                type: 'GET',
+                data : {filter:'total',
+                        start: start,
+                        end: end,
+                },
+            },
+            columns:[
+                { data:'detil', name:'detil', className:'text-center' },
+                { data:'jobordr', name:'jobordr', className:'text-center' },
+                { data:'nm_angkut', name:'nm_angkut', className:'text-center' },
+                { data:'status_bc', name:'status_bc', className:'text-center' },
+                { data:'flag_segel_merah', name:'flag_segel_merah', className:'text-center' },
+                { data:'nobl', name:'nobl', className:'text-center' },
+                { data:'tgl_bl_awb', name:'tgl_bl_awb', className:'text-center' },
+                { data:'nocontainer', name:'nocontainer', className:'text-center' },
+                { data:'ctrType', name:'ctrType', className:'text-center' },
+                { data:'classType', name:'classType', className:'text-center' },
+                { data:'size', name:'size', className:'text-center' },
+                { data:'eta', name:'eta', className:'text-center' },
+                { data:'kd_tps_asal', name:'kd_tps_asal', className:'text-center' },
+                { data:'namaconsolidator', name:'namaconsolidator', className:'text-center' },
+                { data:'noplp', name:'noplp', className:'text-center' },
+                { data:'tglPLP', name:'tglPLP', className:'text-center' },
+                { data:'no_bc11', name:'no_bc11', className:'text-center' },
+                { data:'tgl_bc11', name:'tgl_bc11', className:'text-center' },
+                { data:'tglmasuk', name:'tglmasuk', className:'text-center' },
+                { data:'jammasuk', name:'jammasuk', className:'text-center' },
+                { data:'nopol', name:'nopol', className:'text-center' },
+                { data:'tglkeluar', name:'tglkeluar', className:'text-center' },
+                { data:'jamkeluar', name:'jamkeluar', className:'text-center' },
+                { data:'nopol_mty', name:'nopol_mty', className:'text-center' },
+                { data:'lamaHari', name:'lamaHari', className:'text-center' },
+                { data:'longStay', name:'longStay', className:'text-center' },
+            ],
+            createdRow: function (row, data, dataIndex) {
+                if (data.flag_segel_merah === 'Y') {
+                    $(row).addClass('highlight-red text-white');
+                } else if (data.status_bc === 'HOLD') {
+                    $(row).addClass('highlight-yellow');
+                } else if (data.status_bc === 'release'){
+                    $(row).addClass('highlight-blue');
+                }
+            }
+        });
+    });
+</script>
+
+<script>
     function openWindow(url) {
         window.open(url, '_blank', 'width=1500,height=1000');
     }
 </script>
+
+<script>
+    $(document).on('click', '.formatStandar', function(){
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Apakah anda yakin menerapkan filter ini?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, update it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.showLoading();
+                let filterBy = $('#filter').val();
+                let startDate = $('#start_date').val();
+                let endDate = $('#end_date').val();
+                let noPlp = $('#noplp').val();
+                let noBc11 = $('#nobc_11').val();
+
+                // Redirect user to download link
+                let url = `/fcl/report/formatStandarAkhir?start_date=${startDate}&end_date=${endDate}`;
+                window.location.href = url;
+                Swal.close();
+            }
+        });
+    });
+</script>
+
+<script>
+    $(document).on('click', '.formatBeacukai', function(){
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Apakah anda yakin menerapkan filter ini?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, update it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.showLoading();
+                let filterBy = $('#filter').val();
+                let startDate = $('#start_date').val();
+                let endDate = $('#end_date').val();
+                let noPlp = $('#noplp').val();
+                let noBc11 = $('#nobc_11').val();
+
+                // Redirect user to download link
+                let url = `/fcl/report/formatBeacukaiAkhir?start_date=${startDate}&end_date=${endDate}`;
+                window.location.href = url;
+                Swal.close();
+            }
+        });
+    });
+</script>
+
 @endsection

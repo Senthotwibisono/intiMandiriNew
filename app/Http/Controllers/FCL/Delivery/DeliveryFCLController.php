@@ -312,4 +312,36 @@ class DeliveryFCLController extends Controller
             ]);
         }
     }
+
+    public function gateOutFCL(Request $request)
+    {
+        $cont = Cont::where('id', $request->id)->first();
+        try {
+            if ($cont) {
+                $cont->update([
+                    'nopol' => $request->nopol,
+                    'nopol_mty' => $request->nopol_mty,
+                    'tglkeluar' => $request->tglkeluar,
+                    'jamkeluar' => $request->jamkeluar,
+                ]);
+            }
+            if ($request->hasFile('photos')) {
+                foreach ($request->file('photos') as $photo) {
+                    $fileName = $photo->getClientOriginalName();
+                    $photo->storeAs('imagesInt', $fileName, 'public'); 
+                    $newPhoto = Photo::create([
+                        'master_id' => $cont->id,
+                        'type' => 'fcl',
+                        'action' => 'gate-out',
+                        'photo' => $fileName,
+                        'detil'=> $request->detil,
+                    ]);
+                }
+            }
+            return redirect()->back()->with('status', ['type'=>'success', 'message'=>'Data Berhasil di Update']);
+            
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Oopss, Something Wrong'. $e->getMessage()]);
+        }
+    }
 }

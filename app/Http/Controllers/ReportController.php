@@ -554,7 +554,7 @@ class ReportController extends Controller
 
         $akhir = Manifest::whereHas('cont', function ($query) use ($end) {
             $query->whereDate('tglmasuk', '<=', $end);
-        })->whereNull('tglrelease')->get();
+        })->whereNull('tglrelease')->orWhere('tglrelease', '>', $end)->get();
         
         // ->where(function ($query) use ($end) {
         //     $query->whereDate('tglrelease', '>=', $end)

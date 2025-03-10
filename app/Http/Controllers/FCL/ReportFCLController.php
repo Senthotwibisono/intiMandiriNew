@@ -54,6 +54,8 @@ class ReportFCLController extends Controller
                 $query->where('tno_bc11', 'LIKE', "%{$request->nobc_11}%");
             });
         }
+
+        $cont = $cont->get();
         
         return DataTables::of($cont)
         ->addColumn('detil', function($cont){
@@ -305,7 +307,7 @@ class ReportFCLController extends Controller
         $data['start'] = $start;
         $data['end'] = $end;
 
-        $awal = Cont::whereDate('tglmasuk', '<=', $start)
+        $awal = Cont::whereNotNull('tglmasuk')->whereDate('tglmasuk', '<=', $start)
         ->where(function ($query) use ($start) {
             $query->whereDate('tglkeluar', '>=', $start)
                   ->orWhereNull('tglkeluar');
@@ -387,11 +389,11 @@ class ReportFCLController extends Controller
         $data['volumeKeluarBB'] = $keluarBB->sum('teus');
         $data['volumeKeluarOH'] = $keluarOH->sum('teus');
 
-        $akhir = Cont::whereDate('tglmasuk', '<=', $end)
-        ->where(function ($query) use ($end) {
-            $query->whereDate('tglkeluar', '>=', $end)
-                  ->orWhereNull('tglkeluar');
-        })->get();
+        $akhir = Cont::whereDate('tglmasuk', '<=', $end)->whereNull('tglkeluar')->orWhereDate('tglkeluar', '>', $end)->get();
+        // ->where(function ($query) use ($end) {
+        //     $query->WhereNull('tglkeluar')
+        //           ->orWhereDate('tglkeluar', '>=', $end);
+        // })->get();
         $akhirDry = $akhir->where('ctr_type', 'DRY');
         $akhirBB = $akhir->where('ctr_type', 'BB');
         $akhirOH = $akhir->where('ctr_type', 'OH');
@@ -434,9 +436,11 @@ class ReportFCLController extends Controller
             case 'keluar':
                 $cont = Cont::whereBetween('tglkeluar', [$start, $end])->get();
                 break;
-            
+            case 'total';
+                $cont = Cont::whereDate('tglmasuk', '<=', $end)->whereNull('tglkeluar')->orWhereDate('tglkeluar', '>', $end)->get();
+                break;
             default:
-                $cont = Cont::orderBy('notally', 'desc')->get(); 
+                $cont = Cont::orderBy('id', 'desc')->get(); 
                 break;
         }
 
@@ -559,6 +563,32 @@ class ReportFCLController extends Controller
         })
         ->rawColumns(['detil', 'longStay', 'ctrType', 'classType'])
         ->make(true);
+    }
+
+    public function formatStandarAkhir(Request $request)
+    {
+        $cont = Cont::whereDate('tglmasuk', '<=', $request->end_date)->whereNull('tglkeluar')->orWhereDate('tglkeluar', '>', $request->end_date)->get();
+        
+        $conts = $cont;
+        // dd($request->all(), $cont, $conts);
+        $fileName = 'ReportContainer-FULL.xlsx' ;
+        return Excel::download(new plpCont($conts), $fileName);
+    }
+
+    public function formatBeacukaiAkhir(Request $request)
+    {
+        $cont = Cont::whereDate('tglmasuk', '<=', $request->end_date)->whereNull('tglkeluar')->orWhereDate('tglkeluar', '>', $request->end_date)->get();
+
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+        $tanggalJudul =  $this->formatDateRange($start_date, $end_date);
+
+        $conts = $cont;;
+
+        $judul = 'Laporan Bulanan '. $tanggalJudul;
+
+        $fileName = 'ReportContainer-beacukai'.$start_date.'-'.$end_date.'.xlsx' ;
+        return Excel::download(new ReportBulanan($conts, $judul), $fileName);
     }
 
 }

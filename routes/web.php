@@ -741,6 +741,7 @@ Route::controller(AndroidGateController::class)->group(function(){
             Route::post('/finishCheckBehandle{id}', 'finishCheckBehandle');
             Route::post('/behandleUpdate', 'updateDataBehandle')->name('fcl.delivery.updateBehandle');
             Route::post('/gatePassBonMuat', 'gatePassBonMuat')->name('fcl.delivery.gatePassBonMuat');
+            Route::post('/gateOutFCL', 'gateOutFCL')->name('fcl.delivery.gateOutFCL');
 
             Route::get('/behandleDetil{id}', 'detailBehandle');
 
@@ -761,6 +762,8 @@ Route::controller(AndroidGateController::class)->group(function(){
             Route::get('/photoCont{id?}', 'photoCont');
             Route::get('/formatStandar', 'formatStandar');
             Route::get('/formatBeacukai', 'formatBeacukai');
+            Route::get('/formatStandarAkhir', 'formatStandarAkhir');
+            Route::get('/formatBeacukaiAkhir', 'formatBeacukaiAkhir');
             
             // Daily Report
             

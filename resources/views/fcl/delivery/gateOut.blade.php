@@ -59,7 +59,7 @@
         <div class="card-header">
             <strong>Form Input Gate In Data</strong>
         </div>
-        <form action="{{ route('lcl.mty.update')}}" id="updateForm" method="post" enctype="multipart/form-data">
+        <form action="{{ route('fcl.delivery.gateOutFCL')}}" id="updateForm" method="post" enctype="multipart/form-data">
             <div class="card-body">
                 @csrf
                 <div class="row mt-2">
