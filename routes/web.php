@@ -840,6 +840,7 @@ Route::controller(AndroidGateController::class)->group(function(){
                 Route::post('/deleteInvoice', 'deleteInvoice');
                 Route::get('/edit/{id?}', 'editInvoice');
                 Route::post('/updateInvoice', 'updateInvoice');
+                Route::post('/hiddenInvoice', 'hiddenInvoice');
 
                 Route::post('/deleteKPT/{id?}', 'hapusPhotoKTP');
                 Route::post('/uploadKTP', 'uploadKtp');

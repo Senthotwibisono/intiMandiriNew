@@ -28,9 +28,16 @@ use App\Models\FCL\CanceledInvoice as InvCancel;
 
 class BackendInvoiceController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->password = 'kaloKenaAuditSayaGakIkutan!!';
+        
+    }
+
     public function dataTable(Request $request)
     {
-        $header = Header::orderBy('created_at', 'desc')->orderBy('proforma_no', 'desc')->orderBy('invoice_no', 'desc');
+        $header = Header::orderBy('created_at', 'desc')->orderBy('proforma_no', 'desc')->orderBy('invoice_no', 'desc')->get();
 
         return DataTables::of($header)
         ->addColumn('invoiceNo', function($header){
@@ -183,6 +190,7 @@ class BackendInvoiceController extends Controller
             $lastInvoice = Header::whereYear('created_at', Carbon::now()->year)
                                  ->whereNotNull('invoice_no')
                                  ->orderBy('invoice_no', 'desc')
+                                 ->whereNot('flag_hidden', 'Y')
                                  ->first();
             
             if ($lastInvoice) {
@@ -289,9 +297,12 @@ class BackendInvoiceController extends Controller
                 'status' => 'C'
             ]);
 
-            $noInvoice = invCancel::create([
-                'invoice_no' => $header->invoice_no,
-            ]);
+            if ($header->flag_hidden == 'N') {
+                # code...
+                $noInvoice = invCancel::create([
+                    'invoice_no' => $header->invoice_no,
+                ]);
+            }
 
             return response()->json([
                 'success' => true,
@@ -420,6 +431,46 @@ class BackendInvoiceController extends Controller
         }
     }
 
+    public function hiddenInvoice(Request $request)
+    {
+        // var_dump($request->all());
+        // die();
+        $password = $request->password;
+        if ($password != $this->password) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Password Salah',
+            ]);
+        }
+
+        try {
+            $header = Header::find($request->id);
+
+            if ($header) {
+                $noInvoice = invCancel::create([
+                    'invoice_no' => $header->invoice_no,
+                ]);
+                $header->update([
+                    'invoice_no' => $header->invoice_no . '-R',
+                    'flag_hidden' => 'Y',
+                    'hidden_by' => Auth::user()->id,
+                    'hidden_at' => Carbon::now(),
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Invoice Berhasil di Sembunyikan',
+                ]);
+            }
+        } catch (\Throwable $th) {
+            //throw $th;
+            return response()->json([
+                'success' => false,
+                'message' => 'Opss Something Wrong : ' . $th->getMessage(),
+            ]);
+        }
+    }
+
     public function hapusPhotoKTP($id, Request $request)
     {
         $header = Header::findOrFail($id);
@@ -499,7 +550,7 @@ class BackendInvoiceController extends Controller
             $column = in_array($request->tanggal, ['created_at', 'lunas_at']) ? $request->tanggal : 'created_at';
     
             // Query berdasarkan filter, type, dan tanggal yang dipilih
-            $headers = Header::whereIn('status', $request->filter)
+            $headers = Header::where('flag_hidden', 'N' )->whereIn('status', $request->filter)
                 ->whereIn('type', $request->type)
                 ->whereBetween($column, [$request->start_date, $request->end_date])
                 ->orderBy('invoice_no', 'asc')
@@ -533,7 +584,7 @@ class BackendInvoiceController extends Controller
             $column = in_array($request->tanggal, ['created_at', 'lunas_at']) ? $request->tanggal : 'created_at';
     
             // Query berdasarkan filter, type, dan tanggal yang dipilih
-            $headers = Header::whereIn('status', $request->filter)
+            $headers = Header::where('flag_hidden', 'N' )->whereIn('status', $request->filter)
                 ->whereIn('type', $request->type)
                 ->whereBetween($column, [$request->start_date, $request->end_date])
                 ->orderBy('invoice_no', 'asc')

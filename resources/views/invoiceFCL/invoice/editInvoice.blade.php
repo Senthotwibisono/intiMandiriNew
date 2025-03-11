@@ -1,11 +1,28 @@
 @extends('partial.main')
 
+@section('custom_styles')
+<style>
+    .spinner-text {
+        animation: blinkSpinner 1.5s infinite;
+    }
+
+    @keyframes blinkSpinner {
+        0% { opacity: 0.2; }
+        50% { opacity: 1; }
+        100% { opacity: 0.2; }
+    }
+</style>
+@endsection
+
+
 @section('content')
 
 <body>
     <div class="card">
         <div class="card-header">
-    
+            @if($header->flag_hidden == 'Y')
+            <h4 class="text-danger spinner-text">Invoice Ini Telah di Sembunyikan Pada {{$header->hidden_at ?? '-'}}, oleh {{$header->userHidden->name ?? '-'}}</h4>
+            @endif
         </div>
         <div class="card-body">
             <form action="/invoiceFCL/invoice/updateInvoice" method="post" id="submitForm">
@@ -184,6 +201,12 @@
                 <div class="col-auto">
                     <button class="btn btn-primary" type="button" id="submitButton">Submit</button>
                 </div>
+                <!-- Hidden -->
+                @if($header->flag_hidden == 'N')
+                    <div class="col-auto">
+                        <button class="btn btn-danger" type="button" data-id="{{$header->id}}" id="hiddenInvoice">Make This Invoice Hidden</button>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
@@ -231,11 +254,136 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="passwordModal" tabindex="-1" aria-labelledby="passwordModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="passwordModalLabel">Konfirmasi Password</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <label for="passwordInput">Masukkan Password:</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="passwordInput" placeholder="Password">
+                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                            <i class="fas fa-eye"></i> <!-- Ikon mata -->
+                        </button>
+                    </div>
+                    <div class="text-danger mt-2" id="error-message" style="display: none;">Password salah!</div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-danger" id="submitHidden">Konfirmasi</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 @endsection
 
 @section('custom_js')
+<!-- HiddenInvoice -->
+<script>
+    $(document).ready(function(){
+        $('#togglePassword').on('click', function(){
+            let passwordField = $('#passwordInput');
+            let icon = $(this).find('i');
+
+            // Jika tipe password, ubah menjadi text
+            if (passwordField.attr('type') === 'password') {
+                passwordField.attr('type', 'text');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash'); // Ganti ikon
+            } else {
+                passwordField.attr('type', 'password');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye'); // Kembali ke ikon mata
+            }
+        });
+    });
+</script>
+<script>
+    $(document).ready(function(){
+        let selectedId = null; // Simpan ID Invoice
+        $('#hiddenInvoice').on('click', function(){
+            selectedId = $(this).data('id'); // Simpan ID yang dipilih
+            $('#passwordModal').modal('show'); // Tampilkan modal
+        });
+
+        // Ketika tombol "Konfirmasi" ditekan di dalam modal
+        $('#submitHidden').on('click', function(){
+            let password = $('#passwordInput').val().trim();
+            if (password === '') {
+                $('#error-message').text('Password tidak boleh kosong!').show();
+                return;
+            }
+
+            // Tampilkan loading Swal
+            Swal.fire({
+                title: "Verifikasi...",
+                text: "Memeriksa password...",
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                    $.ajax({
+                        url: "/invoiceFCL/invoice/hiddenInvoice",
+                        type: "POST",
+                        data: {
+                            id : selectedId,
+                            password: password,
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire('Behasil!', response.message , 'success')
+                                .then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire("Error!", response.message , "error");
+                            }
+                        },
+                        error: function() {
+                            Swal.fire("Error!", "Terjadi kesalahan saat memverifikasi password.", "error");
+                        }
+                    });
+                }
+            });
+        });
+
+        // Fungsi untuk menghapus invoice
+        function deleteInvoice(id) {
+            Swal.fire({
+                title: "Menghapus...",
+                text: "Mohon tunggu sebentar.",
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                    $.ajax({
+                        url: "/invoiceFCL/invoice/deleteKPT/" + id, 
+                        type: "POST",
+                        data: { _token: "{{ csrf_token() }}" },
+                        success: function(response) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Terhapus!",
+                                text: "Foto KTP berhasil dihapus.",
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                location.reload();
+                            });
+                        },
+                        error: function() {
+                            Swal.fire("Error!", "Gagal menghapus foto KTP.", "error");
+                        }
+                    });
+                }
+            });
+        }
+    });
+</script>
+
 <script>
     $(document).ready(function() {
         let video = document.getElementById('video');

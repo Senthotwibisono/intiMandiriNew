@@ -46,6 +46,9 @@ class InvoiceHeader extends Model
         'ktp',
         'no_hp',
         'jumlah_bayar',
+        'flag_hidden',
+        'hidden_by',
+        'hidden_at',
     ];
 
     public function Cust()
@@ -56,6 +59,11 @@ class InvoiceHeader extends Model
     public function userCreate()
     {
         return $this->belongsTo(User::class, 'uidCreate', 'id');
+    }
+
+    public function userHidden()
+    {
+        return $this->belongsTo(User::class, 'hidden_by', 'id');
     }
 
     public function userLunas()
