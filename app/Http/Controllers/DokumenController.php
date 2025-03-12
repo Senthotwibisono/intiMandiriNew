@@ -182,7 +182,6 @@ class DokumenController extends Controller
         if(!$xml  || !$xml->children()){
            return back()->with('status', ['type' => 'error', 'message' => 'Error importing data: ' .  $this->response]);
         }
-
         // $groups = [];
         // foreach($xml->children() as $child) {
         //     $groups[] = $child;
@@ -190,6 +189,7 @@ class DokumenController extends Controller
 
         // dd($groups);
        
+        // dd($this->response);
         
         foreach($xml->children() as $child) {
             foreach($child as $key => $value) {
@@ -295,7 +295,7 @@ class DokumenController extends Controller
         // die();
         try{
             \SoapWrapper::service('TpsOnlineSoap', function ($service) use ($data) {        
-                $this->response = $service->call('GetResponPLP_Tujuan', [$data])->GetResponPLP_TujuanResult;      
+                $this->response = $service->call('GetResponPLP_Tujuan', [$data])->GetResponPLP_TujuanResult;                  
             });
         }catch (\SoapFault $e){
             // return redirect()->back()->with('status', ['type' => 'error', 'message' => 'Error importing data: ' . $e->getMessage()]);
@@ -305,8 +305,11 @@ class DokumenController extends Controller
             ]);
         }
         
+
+        
         libxml_use_internal_errors(true);
         $xml = simplexml_load_string($this->response);
+        // return $xml;
         // var_dump($this->response, $xml);
         // die();
         if(!$xml  || !$xml->children()){
@@ -316,27 +319,39 @@ class DokumenController extends Controller
             ]);
         }
         
+        
         $header = null;
-        $detil = [];
+        // $detil = [];
         $groups = [];
-
+        
         // Loop untuk menyimpan elemen XML ke dalam array
         foreach ($xml->children() as $child) {
             $groups[] = $child;
         }
-
+        
         // var_dump(json_encode($groups));
         // die;
         // Iterasi untuk memproses data
         foreach ($groups as $group) {
             // Cek apakah elemen ini adalah "header"
-            if ($group->HEADER || $group->header) {
-                $header = $group;
-            } else {
-                foreach ($group->children() as $detail) {
-                    $detil[] = $detail;
+            // if ($group->HEADER || $group->header) {
+            //     $header = $group;
+            // } else {
+            //     foreach ($group->children() as $detail) {
+            //         $detil[] = $detail;
+            //     }
+            // }
+
+            foreach($group as $key => $value) {
+                if($key == 'header' || $key == 'HEADER'){
+                    $header = $value;
+                }else{
+                    foreach ($value as $detail):
+                        $details[] = $detail;
+                    endforeach;
                 }
             }
+            // dd($xml, $this->response, $group, $header, $details);
         
             // Pastikan `$header` tidak kosong sebelum menyimpan
             if ($header) {
@@ -348,54 +363,57 @@ class DokumenController extends Controller
                         'tgl_upload' => Carbon::now()->format('Ymd'), 
                         'upload_date' => Carbon::today()->format('Y-m-d'), 
                         'upload_time' => Carbon::now()->format('H:i:s'),
-                        'kd_kantor' =>  $header->KD_KANTOR,
+                        'kd_kantor' =>  $header->KD_KANTOR ?? null,
                         'kd_tps' => $this->kode,
-                        'kd_tps_asal' =>  $header->KD_TPS_ASAL,
-                        'gudang_tujuan' =>  $header->GUDANG_TUJUAN,
-                        'no_plp' =>  $header->NO_PLP,
-                        'tgl_plp' =>  $header->TGL_PLP,
-                        'call_sign' =>  $header->CALL_SIGN,
-                        'nm_angkut' =>  $header->NM_ANGKUT,
-                        'no_voy_flight' =>  $header->NO_VOY_FLIGHT,
-                        'tgl_tiba' =>  $header->TGL_TIBA,
-                        'no_surat' =>  $header->NO_SURAT,
-                        'tgl_surat' =>  $header->TGL_SURAT,
-                        'no_bc11' =>  $header->NO_BC11,
-                        'tgl_bc11' =>  $header->TGL_BC11,
+                        'kd_tps_asal' =>  $header->KD_TPS_ASAL ?? null,
+                        'gudang_tujuan' =>  $header->GUDANG_TUJUAN ?? null,
+                        'no_plp' =>  $header->NO_PLP ?? null,
+                        'tgl_plp' =>  $header->TGL_PLP ?? null,
+                        'call_sign' =>  $header->CALL_SIGN ?? null,
+                        'nm_angkut' =>  $header->NM_ANGKUT ?? null,
+                        'no_voy_flight' =>  $header->NO_VOY_FLIGHT ?? null,
+                        'tgl_tiba' =>  $header->TGL_TIBA ?? null,
+                        'no_surat' =>  $header->NO_SURAT ?? null,
+                        'tgl_surat' =>  $header->TGL_SURAT ?? null,
+                        'no_bc11' =>  $header->NO_BC11 ?? null,
+                        'tgl_bc11' =>  $header->TGL_BC11 ?? null,
                         'uid' => Auth::user()->id,
                         'consolidator_id' => $consolidator->id,
                         'namaconsolidator' => $consolidator->namaconsolidator,
-                        'kd_tps_tujuan' =>  $header->KD_TPS_TUJUAN,
-                        'gudang_asal' =>  $header->GUDANG_ASAL,
-                        'ref_number' =>  $header->REF_NUMBER,
+                        'kd_tps_tujuan' =>  $header->KD_TPS_TUJUAN ?? null,
+                        'gudang_asal' =>  $header->GUDANG_ASAL ?? null,
+                        'ref_number' =>  $header->REF_NUMBER ?? null,
                     ]);
                 
                     // Simpan Detail PLP
-                    foreach ($detil as $detail) {
-                        PLPdetail::create([
-                            'plp_id' => $plp->id,
-                            'tgl_upload' => $plp->tgl_upload,
-                            'no_plp' => $plp->no_plp,
-                            'tgl_plp' => $plp->tgl_plp,
-                            'no_cont' =>  $detail->NO_CONT,
-                            'uk_cont' =>  $detail->UK_CONT,
-                            'jns_cont' =>  $detail->JNS_CONT,
-                            'no_bc11' => $plp->no_bc11,
-                            'tgl_bc11' => $plp->tgl_bc11,
-                            'no_pos_bc11' =>  $detail->NO_POS_BC11,
-                            'consignee' =>  $detail->CONSIGNEE,
-                            'jns_kms' => isset($detail->jns_kms) ?  $detail->jns_kms : null,
-                            'jml_kms' => isset($detail->jml_kms) ?  $detail->jml_kms : null,
-                            'no_bl_awb' => isset($detail->NO_BL_AWB) ?  $detail->NO_BL_AWB : null,
-                            'tgl_bl_awb' => isset($detail->TGL_BL_AWB) ?  $detail->TGL_BL_AWB : null,
-                            'flag_spk' => $plp->flag_spk,
+                    foreach ($details as $detail) {
+                        // dd($detail);
+                        $cont = PLPdetail::create([
+                         'plp_id' =>$plp->id,
+                         'tgl_upload' =>$plp->tgl_upload,
+                         'no_plp' =>$plp->no_plp ?? null,
+                         'tgl_plp' =>$plp->tgl_plp ?? null,
+                         'no_cont' =>$detail->NO_CONT ?? null,
+                         'uk_cont' =>$detail->UK_CONT ?? null,
+                         'jns_cont' =>$detail->JNS_CONT ?? null,
+                         'no_bc11' =>$plp->no_bc11 ?? null,
+                         'tgl_bc11' =>$plp->tgl_bc11 ?? null,
+                         'no_pos_bc11' =>$detail->NO_POS_BC11 ?? null,
+                         'consignee' =>$detail->CONSIGNEE ?? null,
+                         'jns_kms' =>$detail->jns_kms ?? NULL,
+                         'jml_kms' =>$detail->jml_kms ?? NULL,
+                         'no_bl_awb' =>$detail->NO_BL_AWB ?? NULL,
+                         'tgl_bl_awb' =>$detail->TGL_BL_AWB ?? NULL,
+                         'flag_spk' =>$plp->flag_spk ?? null,
                         ]);
-                    }
+                     }
+
+                     $details = [];
                 }
             }
         
             // Reset $detil setelah menyimpan data agar tidak tercampur dengan group berikutnya
-            $detil = [];
+            // $detil = [];
         }
 
         return response()->json([

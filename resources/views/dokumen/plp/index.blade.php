@@ -146,72 +146,81 @@
 
 @section('custom_js')
 <script>
-    $(document).on('click', '#otomaticButton', function () {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "Do you want to update this record?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, update it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
+    $(function(){
+        $.ajaxSetup({
+          headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          }
+        })
+        $(function(){
+            $('#otomaticButton').on('click', function () {
                 Swal.fire({
-                    title: 'Processing...',
-                    text: 'Please wait',
-                    icon: 'info',
-                    allowOutsideClick: false,
-                    showConfirmButton: false,
-                    willOpen: () => {
-                        Swal.showLoading();
+                    title: 'Are you sure?',
+                    text: "Do you want to update this record?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, update it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Processing...',
+                            text: 'Please wait',
+                            icon: 'info',
+                            allowOutsideClick: false,
+                            showConfirmButton: false,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+        
+                        // Perform the AJAX request
+                        $.ajax({
+                            url: "{{ route('dokumen.plp.tujuan') }}", // Laravel route helper
+                            type: 'POST',
+                            data: {
+                                _token: "{{ csrf_token() }}", // Include CSRF token for security
+                                // Additional data can be added here
+                            },
+                            success: function(response) {
+                                console.log(response);
+                                if (response.success) {
+                                    Swal.fire('Saved!', '', 'success')
+                                        .then(() => {
+                                            // Memuat ulang halaman setelah berhasil menyimpan data
+                                            window.location.reload();
+                                        });
+                                } else {
+                                    Swal.fire('Error', response.message, 'error')
+                                        .then(() => {
+                                            // Memuat ulang halaman setelah berhasil menyimpan data
+                                            window.location.reload();
+                                        });
+                                }
+                            },
+                            error: function(response) {
+                                var errors = response.responseJSON.errors;
+                                if (errors) {
+                                    var errorMessage = '';
+                                    $.each(errors, function(key, value) {
+                                        errorMessage += value[0] + '<br>';
+                                    });
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Validation Error',
+                                        html: errorMessage,
+                                    });
+                                } else {
+                                    console.log('error:', response);
+                                }
+                            },
+                        });
                     }
                 });
-
-                // Perform the AJAX request
-                $.ajax({
-                    url: "{{ route('dokumen.plp.tujuan') }}", // Laravel route helper
-                    type: 'POST',
-                    data: {
-                        _token: "{{ csrf_token() }}", // Include CSRF token for security
-                        // Additional data can be added here
-                    },
-                    success: function(response) {
-                        console.log(response);
-                        if (response.success) {
-                            Swal.fire('Saved!', '', 'success')
-                                .then(() => {
-                                    // Memuat ulang halaman setelah berhasil menyimpan data
-                                    window.location.reload();
-                                });
-                        } else {
-                            Swal.fire('Error', response.message, 'error')
-                                .then(() => {
-                                    // Memuat ulang halaman setelah berhasil menyimpan data
-                                    window.location.reload();
-                                });
-                        }
-                    },
-                    error: function(response) {
-                        var errors = response.responseJSON.errors;
-                        if (errors) {
-                            var errorMessage = '';
-                            $.each(errors, function(key, value) {
-                                errorMessage += value[0] + '<br>';
-                            });
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Validation Error',
-                                html: errorMessage,
-                            });
-                        } else {
-                            console.log('error:', response);
-                        }
-                    },
-                });
-            }
-        });
-    });
+            });
+        })
+    })
 </script>
 
 <script>
