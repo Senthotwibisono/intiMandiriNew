@@ -363,7 +363,37 @@
         var start = "{{ $start }}";
         var end = "{{ $end }}";
         console.log('tgl ' + start + ' ' + end);
+        let excel = {
+                        extend: 'excelHtml5',
+                        autoFilter: true,
+                        sheetName: 'Exported data',
+                        className: 'btn btn-outline-success',
+                    };
+        let pdf = {
+                    extend: 'pdfHtml5',
+                    text: 'Ekspor PDF',
+                    className: 'btn btn-outline-danger',
+                    orientation: 'landscape', // Mode lanskap untuk tampilan lebih luas
+                    pageSize: 'A1', // Pilihan ukuran kertas (bisa A3, A4, A5, dll.)
+                    download: 'open', // Membuka file langsung tanpa mendownload
+                    exportOptions: {
+                        columns: function (idx, data, node) {
+                            return true; // Semua kolom akan diekspor, termasuk yang tersembunyi
+                        }
+                    },
+                    customize: function (doc) {
+                        doc.defaultStyle.fontSize = 8; // Mengatur ukuran font agar semua data muat
+                        doc.styles.tableHeader.fontSize = 8; // Mengatur ukuran header tabel
+                        doc.styles.title.fontSize = 12; // Ukuran font judul
+                        doc.pageMargins = [2, 2, 2, 2]; // Mengatur margin halaman
+                        doc.content[1].table.widths = Array(doc.content[1].table.body[0].length + 1).join('*').split(''); 
+                    }
+                };
         $('#dataReportContMasuk').DataTable({
+            dom: 'Bfrtip', // Pastikan ada 'B' untuk menampilkan tombol
+            buttons: [
+                'copy', 'csv', excel , pdf, 'print'
+            ],
             processing: true,
             serverSide: true,
             scrollX: true,
@@ -441,7 +471,37 @@
         var start = "{{ $start }}";
         var end = "{{ $end }}";
         console.log('tgl ' + start + ' ' + end);
+        let excel = {
+                        extend: 'excelHtml5',
+                        autoFilter: true,
+                        sheetName: 'Exported data',
+                        className: 'btn btn-outline-success',
+                    };
+        let pdf = {
+                    extend: 'pdfHtml5',
+                    text: 'Ekspor PDF',
+                    className: 'btn btn-outline-danger',
+                    orientation: 'landscape', // Mode lanskap untuk tampilan lebih luas
+                    pageSize: 'A1', // Pilihan ukuran kertas (bisa A3, A4, A5, dll.)
+                    download: 'open', // Membuka file langsung tanpa mendownload
+                    exportOptions: {
+                        columns: function (idx, data, node) {
+                            return true; // Semua kolom akan diekspor, termasuk yang tersembunyi
+                        }
+                    },
+                    customize: function (doc) {
+                        doc.defaultStyle.fontSize = 8; // Mengatur ukuran font agar semua data muat
+                        doc.styles.tableHeader.fontSize = 8; // Mengatur ukuran header tabel
+                        doc.styles.title.fontSize = 12; // Ukuran font judul
+                        doc.pageMargins = [2, 2, 2, 2]; // Mengatur margin halaman
+                        doc.content[1].table.widths = Array(doc.content[1].table.body[0].length + 1).join('*').split(''); 
+                    }
+                };
         $('#dataReportContKeluar').DataTable({
+            dom: 'Bfrtip', // Pastikan ada 'B' untuk menampilkan tombol
+            buttons: [
+                'copy', 'csv', excel , pdf, 'print'
+            ],
             processing: true,
             serverSide: true,
             scrollX: true,
@@ -519,7 +579,37 @@
         var start = "{{ $start }}";
         var end = "{{ $end }}";
         console.log('tgl ' + start + ' ' + end);
+        let excel = {
+                        extend: 'excelHtml5',
+                        autoFilter: true,
+                        sheetName: 'Exported data',
+                        className: 'btn btn-outline-success',
+                    };
+        let pdf = {
+                    extend: 'pdfHtml5',
+                    text: 'Ekspor PDF',
+                    className: 'btn btn-outline-danger',
+                    orientation: 'landscape', // Mode lanskap untuk tampilan lebih luas
+                    pageSize: 'A1', // Pilihan ukuran kertas (bisa A3, A4, A5, dll.)
+                    download: 'open', // Membuka file langsung tanpa mendownload
+                    exportOptions: {
+                        columns: function (idx, data, node) {
+                            return true; // Semua kolom akan diekspor, termasuk yang tersembunyi
+                        }
+                    },
+                    customize: function (doc) {
+                        doc.defaultStyle.fontSize = 8; // Mengatur ukuran font agar semua data muat
+                        doc.styles.tableHeader.fontSize = 8; // Mengatur ukuran header tabel
+                        doc.styles.title.fontSize = 12; // Ukuran font judul
+                        doc.pageMargins = [2, 2, 2, 2]; // Mengatur margin halaman
+                        doc.content[1].table.widths = Array(doc.content[1].table.body[0].length + 1).join('*').split(''); 
+                    }
+                };
         $('#dataReportContAkhir').DataTable({
+            dom: 'Bfrtip', // Pastikan ada 'B' untuk menampilkan tombol
+            buttons: [
+                'copy', 'csv', excel , pdf, 'print'
+            ],
             processing: true,
             serverSide: true,
             scrollX: true,
