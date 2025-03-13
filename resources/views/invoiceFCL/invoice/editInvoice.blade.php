@@ -72,7 +72,7 @@
                      <div class="col-3">
                         <div class="form-group">
                             <label for="">Customer Alamat</label>
-                            <textarea name="" class="form-control" id="" name="cust_alamat">{{$header->cust_alamat ?? '-'}}</textarea>
+                            <textarea class="form-control" id="" name="cust_alamat">{{$header->cust_alamat ?? '-'}}</textarea>
                         </div>
                      </div>
                      <div class="divider divider-left">
