@@ -249,7 +249,9 @@
                     }
                 };
         $('#dataReportCont').DataTable({
-            dom: 'Bfrtip', // Pastikan ada 'B' untuk menampilkan tombol
+            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]], // Pilihan jumlah data
+            pageLength: 25, // Default jumlah data per halaman
+            dom: 'lBfrtip', // Pastikan ada 'B' untuk menampilkan tombol
             buttons: [
                 'copy', 'csv', excel , pdf, 'print'
             ],
