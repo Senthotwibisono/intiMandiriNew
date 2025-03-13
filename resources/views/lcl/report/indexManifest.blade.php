@@ -1,15 +1,6 @@
 @extends('partial.main')
 @section('custom_styles')
 
-<style>
-    .table-responsive td,
-    .table-responsive th {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-</style>
-
 @endsection
 @section('content')
 
@@ -70,45 +61,45 @@
     <div class="card">
         <div class="card-body">
             <div class="table">
-                <table class="table-hover" id="tableManifest" style="white-space: nowrap;">
-                    <thead>
+                <table class="table-hover" id="tableManifest">
+                    <thead style="white-space: nowrap;">
                         <tr>
-                            <th class="text-center">Action</th>
-                            <th class="text-center">No Job Order</th>
-                            <th class="text-center">Nama Angkut</th>
-                            <th class="text-center">No Container</th>
-                            <th class="text-center">Size</th>
-                            <th class="text-center">ETA</th>
-                            <th class="text-center">TPS Asal</th>
-                            <th class="text-center">Consolidator</th>
-                            <th class="text-center">No HBL</th>
-                            <th class="text-center">Tgl HBL</th>
-                            <th class="text-center">NO Tally</th>
-                            <th class="text-center">Customer</th>
-                            <th class="text-center">Quantity</th>
-                            <th class="text-center">Quantity Real Time</th>
-                            <th class="text-center">Nama Kemas</th>
-                            <th class="text-center">Kode Kemas</th>
-                            <th class="text-center">Desc of Goods</th>
-                            <th class="text-center">Weight</th>
-                            <th class="text-center">Meas</th>
-                            <th class="text-center">Packing Tally</th>
-                            <th class="text-center">No PLP</th>
-                            <th class="text-center">Tgl PLP</th>
-                            <th class="text-center">No BC 1.1</th>
-                            <th class="text-center">Tgl BC 1.1</th>
-                            <th class="text-center">Tgl Masuk</th>
-                            <th class="text-center">Jam Masuk</th>
-                            <th class="text-center">Tgl Stripping</th>
-                            <th class="text-center">Jam Stripping</th>
-                            <th class="text-center">Tgl Release</th>
-                            <th class="text-center">Jam Release</th>
-                            <th class="text-center">Nomor Polisi Release</th>
-                            <th class="text-center">Kode Dokumen</th>
-                            <th class="text-center">Nomor Dokumen</th>
-                            <th class="text-center">Tgl Dokumen</th>
-                            <th class="text-center">Location</th>
-                            <th class="text-center">Lama Timbun</th>
+                            <th class="text-center" style="min-width: 100px;">Action</th>
+                            <th class="text-center" style="min-width: 100px;">No Job Order</th>
+                            <th class="text-center" style="min-width: 100px;">Nama Angkut</th>
+                            <th class="text-center" style="min-width: 100px;">No Container</th>
+                            <th class="text-center" style="min-width: 100px;">Size</th>
+                            <th class="text-center" style="min-width: 100px;">ETA</th>
+                            <th class="text-center" style="min-width: 100px;">TPS Asal</th>
+                            <th class="text-center" style="min-width: 100px;">Consolidator</th>
+                            <th class="text-center" style="min-width: 100px;">No HBL</th>
+                            <th class="text-center" style="min-width: 100px;">Tgl HBL</th>
+                            <th class="text-center" style="min-width: 100px;">NO Tally</th>
+                            <th class="text-center" style="min-width: 100px;">Customer</th>
+                            <th class="text-center" style="min-width: 100px;">Quantity</th>
+                            <th class="text-center" style="min-width: 100px;">Quantity Real Time</th>
+                            <th class="text-center" style="min-width: 100px;">Nama Kemas</th>
+                            <th class="text-center" style="min-width: 100px;">Kode Kemas</th>
+                            <th class="text-center" style="min-width: 100px;">Desc of Goods</th>
+                            <th class="text-center" style="min-width: 100px;">Weight</th>
+                            <th class="text-center" style="min-width: 100px;">Meas</th>
+                            <th class="text-center" style="min-width: 100px;">Packing Tally</th>
+                            <th class="text-center" style="min-width: 100px;">No PLP</th>
+                            <th class="text-center" style="min-width: 100px;">Tgl PLP</th>
+                            <th class="text-center" style="min-width: 100px;">No BC 1.1</th>
+                            <th class="text-center" style="min-width: 100px;">Tgl BC 1.1</th>
+                            <th class="text-center" style="min-width: 100px;">Tgl Masuk</th>
+                            <th class="text-center" style="min-width: 100px;">Jam Masuk</th>
+                            <th class="text-center" style="min-width: 100px;">Tgl Stripping</th>
+                            <th class="text-center" style="min-width: 100px;">Jam Stripping</th>
+                            <th class="text-center" style="min-width: 100px;">Tgl Release</th>
+                            <th class="text-center" style="min-width: 100px;">Jam Release</th>
+                            <th class="text-center" style="min-width: 100px;">Nomor Polisi Release</th>
+                            <th class="text-center" style="min-width: 100px;">Kode Dokumen</th>
+                            <th class="text-center" style="min-width: 100px;">Nomor Dokumen</th>
+                            <th class="text-center" style="min-width: 100px;">Tgl Dokumen</th>
+                            <th class="text-center" style="min-width: 100px;">Location</th>
+                            <th class="text-center" style="min-width: 100px;">Lama Timbun</th>
                         </tr>
                     </thead>
                 </table>
@@ -193,43 +184,63 @@
                 }
             },
             columns : [
-                { data:'detil', name:'detil'},
-                { data:'joborder', name:'joborder'},
-                { data:'nm_angkut', name:'nm_angkut'},
-                { data:'nocontainer', name:'nocontainer'},
-                { data:'size', name:'size'},
-                { data:'eta', name:'eta'},
-                { data:'kd_tps_asal', name:'kd_tps_asal'},
-                { data:'namaconsolidator', name:'namaconsolidator'},
-                { data:'nohbl', name:'nohbl'},
-                { data:'tgl_hbl', name:'tgl_hbl'},
-                { data:'notally', name:'notally'},
-                { data:'customer', name:'customer'},
-                { data:'quantity', name:'quantity'},
-                { data:'final_qty', name:'final_qty'},
-                { data:'packingName', name:'packingName'},
-                { data:'packingCode', name:'packingCode'},
-                { data:'desc', name:'desc'},
-                { data:'weight', name:'weight'},
-                { data:'meas', name:'meas'},
-                { data:'packingTally', name:'packingTally'},
-                { data:'noplp', name:'noplp'},
-                { data:'tglPLP', name:'tglPLP'},
-                { data:'no_bc11', name:'no_bc11'},
-                { data:'tgl_bc11', name:'tgl_bc11'},
-                { data:'tglmasuk', name:'tglmasuk'},
-                { data:'jammasuk', name:'jammasuk'},
-                { data:'startstripping', name:'startstripping'},
-                { data:'endstripping', name:'endstripping'},
-                { data:'tglrelease', name:'tglrelease'},
-                { data:'jamrelease', name:'jamrelease'},
-                { data:'nopol_release', name:'nopol_release'},
-                { data:'dokumen', name:'dokumen'},
-                { data:'no_dok', name:'no_dok'},
-                { data:'tglDok', name:'tglDok'},
-                { data:'location', name:'location'},
-                { data:'lamaTimbun', name:'lamaTimbun'},
-            ]
+                { className:'text-center', data:'detil', name:'detil'},
+                { className:'text-center', data:'joborder', name:'joborder'},
+                { className:'text-center', data:'nm_angkut', name:'nm_angkut'},
+                { className:'text-center', data:'nocontainer', name:'nocontainer'},
+                { className:'text-center', data:'size', name:'size'},
+                { className:'text-center', data:'eta', name:'eta'},
+                { className:'text-center', data:'kd_tps_asal', name:'kd_tps_asal'},
+                { className:'text-center', data:'namaconsolidator', name:'namaconsolidator'},
+                { className:'text-center', data:'nohbl', name:'nohbl'},
+                { className:'text-center', data:'tgl_hbl', name:'tgl_hbl'},
+                { className:'text-center', data:'notally', name:'notally'},
+                { className:'text-center', data:'customer', name:'customer'},
+                { className:'text-center', data:'quantity', name:'quantity'},
+                { className:'text-center', data:'final_qty', name:'final_qty'},
+                { className:'text-center', data:'packingName', name:'packingName'},
+                { className:'text-center', data:'packingCode', name:'packingCode'},
+                { className:'text-center', data:'desc', name:'desc'},
+                { className:'text-center', data:'weight', name:'weight'},
+                { className:'text-center', data:'meas', name:'meas'},
+                { className:'text-center', data:'packingTally', name:'packingTally'},
+                { className:'text-center', data:'noplp', name:'noplp'},
+                { className:'text-center', data:'tglPLP', name:'tglPLP'},
+                { className:'text-center', data:'no_bc11', name:'no_bc11'},
+                { className:'text-center', data:'tgl_bc11', name:'tgl_bc11'},
+                { className:'text-center', data:'tglmasuk', name:'tglmasuk'},
+                { className:'text-center', data:'jammasuk', name:'jammasuk'},
+                { className:'text-center', data:'startstripping', name:'startstripping'},
+                { className:'text-center', data:'endstripping', name:'endstripping'},
+                { className:'text-center', data:'tglrelease', name:'tglrelease'},
+                { className:'text-center', data:'jamrelease', name:'jamrelease'},
+                { className:'text-center', data:'nopol_release', name:'nopol_release'},
+                { className:'text-center', data:'dokumen', name:'dokumen'},
+                { className:'text-center', data:'no_dok', name:'no_dok'},
+                { className:'text-center', data:'tglDok', name:'tglDok'},
+                { className:'text-center', data:'location', name:'location'},
+                { className:'text-center', data:'lamaTimbun', name:'lamaTimbun'},
+            ],
+            initComplete: function () {
+                var api = this.api();
+                
+                api.columns().every(function (index) {
+                    var column = this;
+                    var excludedColumns = [0]; // Kolom yang tidak ingin difilter (detil, flag_segel_merah, lamaHari)
+                    
+                    if (excludedColumns.includes(index)) {
+                        $('<th></th>').appendTo(column.header()); // Kosongkan header pencarian untuk kolom yang dikecualikan
+                        return;
+                    }
+
+                    var $th = $(column.header());
+                    var $input = $('<input type="text" class="form-control form-control-sm" placeholder="Search ' + $th.text() + '">')
+                        .appendTo($('<th class="text-center"></th>').appendTo($th))
+                        .on('keyup change', function () {
+                            column.search($(this).val()).draw();
+                        });
+                });
+            }
         });
     });
 </script>

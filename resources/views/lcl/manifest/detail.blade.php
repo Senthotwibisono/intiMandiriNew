@@ -110,27 +110,27 @@
         </div>
         <div class="card-body">
             <div class="table">
-                <table class="table-hover table-stripped" id="tableDetil" style="white-space: nowrap;">
-                    <thead>
+                <table class="table-hover table-stripped" id="tableDetil">
+                    <thead style="white-space: nowrap;">
                         <tr>
-                            <th class="text-center">Edit</th>
-                            <th class="text-center">Detil</th>
-                            <th class="text-center">Barcode</th>
-                            <th class="text-center">Bon Muat</th>
-                            <th class="text-center">No HBL</th>
-                            <th class="text-center">Tgl HBL</th>
-                            <th class="text-center">No Tally</th>
-                            <th class="text-center">Shipper</th>
-                            <th class="text-center">Customer</th>
-                            <th class="text-center">Qty</th>
-                            <th class="text-center">Quantity Final</th>
-                            <th class="text-center">Palet</th>
-                            <th class="text-center">Packing</th>
-                            <th class="text-center">Kode Kemas</th>
-                            <th class="text-center">Desc</th>
-                            <th class="text-center">Tonase</th>
-                            <th class="text-center">Volume</th>
-                            <th class="text-center">Packing Tally</th>
+                            <th class="text-center" style="min-width: 100px">Edit</th>
+                            <th class="text-center" style="min-width: 100px">Detil</th>
+                            <th class="text-center" style="min-width: 100px">Barcode</th>
+                            <th class="text-center" style="min-width: 100px">Bon Muat</th>
+                            <th class="text-center" style="min-width: 100px">No HBL</th>
+                            <th class="text-center" style="min-width: 100px">Tgl HBL</th>
+                            <th class="text-center" style="min-width: 100px">No Tally</th>
+                            <th class="text-center" style="min-width: 100px">Shipper</th>
+                            <th class="text-center" style="min-width: 100px">Customer</th>
+                            <th class="text-center" style="min-width: 100px">Qty</th>
+                            <th class="text-center" style="min-width: 100px">Quantity Final</th>
+                            <th class="text-center" style="min-width: 100px">Palet</th>
+                            <th class="text-center" style="min-width: 100px">Packing</th>
+                            <th class="text-center" style="min-width: 100px">Kode Kemas</th>
+                            <th class="text-center" style="min-width: 100px">Desc</th>
+                            <th class="text-center" style="min-width: 100px">Tonase</th>
+                            <th class="text-center" style="min-width: 100px">Volume</th>
+                            <th class="text-center" style="min-width: 100px">Packing Tally</th>
                         </tr>
                     </thead>
             </div>
@@ -432,7 +432,27 @@
                 { data: 'meas', name: 'meas', className: 'text-center', orderable: true }, // Define the column
                 { data: 'packingTally', name: 'packingTally', className: 'text-center', orderable: true }, // Define the column
              
-            ]
+            ],
+            initComplete: function () {
+                var api = this.api();
+                
+                api.columns().every(function (index) {
+                    var column = this;
+                    var excludedColumns = [0, 1, 2, 3]; // Kolom yang tidak ingin difilter (detil, flag_segel_merah, lamaHari)
+                    
+                    if (excludedColumns.includes(index)) {
+                        $('<th></th>').appendTo(column.header()); // Kosongkan header pencarian untuk kolom yang dikecualikan
+                        return;
+                    }
+
+                    var $th = $(column.header());
+                    var $input = $('<input type="text" class="form-control form-control-sm" placeholder="Search ' + $th.text() + '">')
+                        .appendTo($('<th class="text-center"></th>').appendTo($th))
+                        .on('keyup change', function () {
+                            column.search($(this).val()).draw();
+                        });
+                });
+            }
         })
     });
 </script>

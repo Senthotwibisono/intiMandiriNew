@@ -1,11 +1,6 @@
 @extends('partial.main')
 @section('custom_styles')
 <style>
-    #tableContainer td, #tableContainer th {
-        white-space: nowrap; /* Membuat teks tetap dalam satu baris */
-    }
-</style>
-<style>
     .highlight-yellow {
         background-color: yellow !important;;
     }
@@ -28,36 +23,38 @@
     <div class="card">
         <div class="card-body">
             <br>
-            <table class="table table-hover table-stripped" id="tableContainer">
-                <thead>
-                    <tr>
-                        <th>Edit</th>
-                        <th>Photo</th>
-                        <th>Status Beacukai</th>
-                        <th>Segel Merah</th>
-                        <th>No Job Order</th>
-                        <th>No MBL</th>
-                        <th>No Container</th>
-                        <th>Size</th>
-                        <th>Container Type</th>
-                        <th>Type Class</th>
-                        <th>No BL AWB</th>
-                        <th>Tgl BL AWB</th>
-                        <th>Customer Name</th>
-                        <th>Customer NPWP</th>
-                        <th>Customer Email</th>
-                        <th>No Polisi Masuk</th>
-                        <th>Tgl Masuk</th>
-                        <th>Jam Masuk</th>
-                        <th>No Polisi Keluar</th>
-                        <th>Tgl Keluar</th>
-                        <th>Jam Keluar</th>
-                        <th>Jenis Dok</th>
-                        <th>No Dok</th>
-                        <th>Tgl Dok</th>
-                    </tr>
-                </thead>
-            </table>
+            <div class="table">
+                <table class="table table-hover table-stripped" id="tableContainer" style="white-space: nowrap;">  
+                    <thead>
+                        <tr>
+                            <th class="text-center">Edit</th>
+                            <th class="text-center">Photo</th>
+                            <th class="text-center">Status Beacukai</th>
+                            <th class="text-center">Segel Merah</th>
+                            <th class="text-center">No Job Order</th>
+                            <th class="text-center">No MBL</th>
+                            <th class="text-center">No Container</th>
+                            <th class="text-center" style="min-width: 100px;">Size</th>
+                            <th class="text-center">Container Type</th>
+                            <th class="text-center">Type Class</th>
+                            <th class="text-center">No BL AWB</th>
+                            <th class="text-center">Tgl BL AWB</th>
+                            <th class="text-center">Customer Name</th>
+                            <th class="text-center">Customer NPWP</th>
+                            <th class="text-center">Customer Email</th>
+                            <th class="text-center">No Polisi Masuk</th>
+                            <th class="text-center">Tgl Masuk</th>
+                            <th class="text-center">Jam Masuk</th>
+                            <th class="text-center">No Polisi Keluar</th>
+                            <th class="text-center">Tgl Keluar</th>
+                            <th class="text-center">Jam Keluar</th>
+                            <th class="text-center">Jenis Dok</th>
+                            <th class="text-center">No Dok</th>
+                            <th class="text-center">Tgl Dok</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
         </div>
     </div>
 </section>
@@ -237,30 +234,30 @@
             scrollX: true,
             ajax: '/fcl/containerList/dataTable',
             columns: [
-                {data:'edit', name:'edit'},
-                {data:'photo', name:'photo'},
-                {data:'status_bc', name:'status_bc'},
-                {data:'flag_segel_merah', name:'flag_segel_merah'},
-                {data:'nojob', name:'nojob'},
-                {data:'nombl', name:'nombl'},
-                {data:'nocontainer', name:'nocontainer'},
-                {data:'size', name:'size'},
-                {data:'ctr_type', name:'ctr_type'},
-                {data:'type_class', name:'type_class'},
-                {data:'nobl', name:'nobl'},
-                {data:'tglBL', name:'tglBL'},
-                {data:'customer', name:'customer'},
-                {data:'npwp', name:'npwp'},
-                {data:'email', name:'email'},
-                {data:'nopol', name:'nopol'},
-                {data:'tglmasuk', name:'tglmasuk'},
-                {data:'jammasuk', name:'jammasuk'},
-                {data:'nopol_mty', name:'nopol_mty'},
-                {data:'tglkeluar', name:'tglkeluar'},
-                {data:'jamkeluar', name:'jamkeluar'},
-                {data:'kodeDok', name:'kodeDok'},
-                {data:'noDok', name:'noDok'},
-                {data:'tglDok', name:'tglDok'},
+                {className:'text-center', data:'edit', name:'edit'},
+                {className:'text-center', data:'photo', name:'photo'},
+                {className:'text-center', data:'status_bc', name:'status_bc'},
+                {className:'text-center', data:'flag_segel_merah', name:'flag_segel_merah'},
+                {className:'text-center', data:'nojob', name:'nojob'},
+                {className:'text-center', data:'nombl', name:'nombl'},
+                {className:'text-center', data:'nocontainer', name:'nocontainer'},
+                {className:'text-center', data:'size', name:'size'},
+                {className:'text-center', data:'ctr_type', name:'ctr_type'},
+                {className:'text-center', data:'type_class', name:'type_class'},
+                {className:'text-center', data:'nobl', name:'nobl'},
+                {className:'text-center', data:'tglBL', name:'tglBL'},
+                {className:'text-center', data:'customer', name:'customer'},
+                {className:'text-center', data:'npwp', name:'npwp'},
+                {className:'text-center', data:'email', name:'email'},
+                {className:'text-center', data:'nopol', name:'nopol'},
+                {className:'text-center', data:'tglmasuk', name:'tglmasuk'},
+                {className:'text-center', data:'jammasuk', name:'jammasuk'},
+                {className:'text-center', data:'nopol_mty', name:'nopol_mty'},
+                {className:'text-center', data:'tglkeluar', name:'tglkeluar'},
+                {className:'text-center', data:'jamkeluar', name:'jamkeluar'},
+                {className:'text-center', data:'kodeDok', name:'kodeDok'},
+                {className:'text-center', data:'noDok', name:'noDok'},
+                {className:'text-center', data:'tglDok', name:'tglDok'},
             ],
             createdRow: function (row, data, dataIndex) {
                 if (data.flag_segel_merah === 'Y') {
@@ -270,6 +267,26 @@
                 } else if (data.status_bc === 'release'){
                     $(row).addClass('highlight-blue');
                 }
+            },
+            initComplete: function () {
+                var api = this.api();
+                
+                api.columns().every(function (index) {
+                    var column = this;
+                    var excludedColumns = [0, 1]; // Kolom yang tidak ingin difilter (detil, flag_segel_merah, lamaHari)
+                    
+                    if (excludedColumns.includes(index)) {
+                        $('<th></th>').appendTo(column.header()); // Kosongkan header pencarian untuk kolom yang dikecualikan
+                        return;
+                    }
+
+                    var $th = $(column.header());
+                    var $input = $('<input type="text" class="form-control form-control-sm" placeholder="Search ' + $th.text() + '">')
+                        .appendTo($('<th class="text-center"></th>').appendTo($th))
+                        .on('keyup change', function () {
+                            column.search($(this).val()).draw();
+                        });
+                });
             }
         })
     })

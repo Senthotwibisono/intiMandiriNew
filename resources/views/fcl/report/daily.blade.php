@@ -1,14 +1,6 @@
 @extends('partial.main')
 @section('custom_styles')
 <style>
-    .table-responsive td,
-    .table-responsive th {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-</style>
-<style>
     .highlight-yellow {
         background-color: yellow !important;;
     }
@@ -81,8 +73,8 @@
                                     <th class="text-center">No Container</th>
                                     <th class="text-center">Container Type</th>
                                     <th class="text-center">Class Type</th>
-                                    <th class="text-center">Size</th>
-                                    <th class="text-center">ETA</th>
+                                    <th class="text-center" style="min-width: 100px;">Size</th>
+                                    <th class="text-center" style="min-width: 100px;">ETA</th>
                                     <th class="text-center">TPS Asal</th>
                                     <th class="text-center">Consolidator</th>
                                     <th class="text-center">No PLP</th>
@@ -105,7 +97,7 @@
                 <hr>
                 <div class="card-body h-100 justify-content-center align-items-center mt-0">
                     <div class="table">
-                        <table class="table-responsive table-striiped">
+                        <table class=" table-striiped">
                             <thead>
                                 <tr>
                                     <th>Jumlah</th>
@@ -150,8 +142,8 @@
                                     <th class="text-center">No Container</th>
                                     <th class="text-center">Container Type</th>
                                     <th class="text-center">Class Type</th>
-                                    <th class="text-center">Size</th>
-                                    <th class="text-center">ETA</th>
+                                    <th class="text-center" style="min-width: 100px;">Size</th>
+                                    <th class="text-center" style="min-width: 100px;">ETA</th>
                                     <th class="text-center">TPS Asal</th>
                                     <th class="text-center">Consolidator</th>
                                     <th class="text-center">No PLP</th>
@@ -174,7 +166,7 @@
                 <hr>
                 <div class="card-body h-100 justify-content-center align-items-center mt-0">
                     <div class="table">
-                        <table class="table-responsive table-striiped">
+                        <table class=" table-striiped">
                             <thead>
                                 <tr>
                                     <th>Jumlah</th>
@@ -206,7 +198,7 @@
         </div>
         <div class="card-body">
             <div class="table">
-                <table class="table-responsive table-striped table-bordered">
+                <table class=" table-striped table-bordered">
                     <thead>
                         <tr>
                             <th class="text-center" rowspan="2">Keterangan</th>
@@ -303,62 +295,62 @@
             </div>
         </div>
         <hr>
-            <div class="col-sm-12">
-                <section>
-                    <div class="card h-100 justify-content-center mt-0">
-                        <div class="card-header text-center">
-                            <h4>Stock Lapangan</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="table">
-                                <table class="table-hover" id="dataReportContAkhir" style="white-space: nowrap;">
-                                    <thead>
-                                        <tr>
-                                            <th class="text-center">Action</th>
-                                            <th class="text-center">No Job Order</th>
-                                            <th class="text-center">Nama Angkut</th>
-                                            <th class="text-center">Status Beacukai</th>
-                                            <th class="text-center">Segel Merah</th>
-                                            <th class="text-center">Bill of Loading No</th>
-                                            <th class="text-center">Bill of Loading Date</th>
-                                            <th class="text-center">No Container</th>
-                                            <th class="text-center">Container Type</th>
-                                            <th class="text-center">Class Type</th>
-                                            <th class="text-center">Size</th>
-                                            <th class="text-center">ETA</th>
-                                            <th class="text-center">TPS Asal</th>
-                                            <th class="text-center">Consolidator</th>
-                                            <th class="text-center">No PLP</th>
-                                            <th class="text-center">Tgl PLP</th>
-                                            <th class="text-center">No BC 1.1</th>
-                                            <th class="text-center">Tgl BC 1.1</th>
-                                            <th class="text-center">Tgl Masuk</th>
-                                            <th class="text-center">Jam Masuk</th>
-                                            <th class="text-center">Nomor Polisi</th>
-                                            <th class="text-center">Tgl Keluar</th>
-                                            <th class="text-center">Jam Keluar</th>
-                                            <th class="text-center">Nopol Keluar</th>
-                                            <th class="text-center">Lama Hari</th>
-                                            <th class="text-center">Long Stay</th>
-                                        </tr>
-                                    </thead>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="card-footer">
-                            <div class="button-container">
-                                <div class="col-auto">
-                                    <button class="btn btn-success formatBeacukai"><i class="fa fa-download"></i> Format Beacukai</button>
-                                </div>
-                                <div class="col-auto">
-                                    <button class="btn btn-success formatStandar"><i class="fa fa-download"></i> Format Standar</button>
-                                </div>
-                            </div>
-                        </div>
-                        <hr>
+        <div class="col-sm-12">
+            <section>
+                <div class="card h-100 justify-content-center mt-0">
+                    <div class="card-header text-center">
+                        <h4>Stock Lapangan</h4>
                     </div>
-                </section>
-            </div>
+                    <div class="card-body">
+                        <div class="table">
+                            <table class="table-hover" id="dataReportContAkhir" style="white-space: nowrap;">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Action</th>
+                                        <th class="text-center">No Job Order</th>
+                                        <th class="text-center">Nama Angkut</th>
+                                        <th class="text-center">Status Beacukai</th>
+                                        <th class="text-center">Segel Merah</th>
+                                        <th class="text-center">Bill of Loading No</th>
+                                        <th class="text-center">Bill of Loading Date</th>
+                                        <th class="text-center">No Container</th>
+                                        <th class="text-center">Container Type</th>
+                                        <th class="text-center">Class Type</th>
+                                        <th class="text-center" style="min-width: 100px;">Size</th>
+                                        <th class="text-center" style="min-width: 100px;">ETA</th>
+                                        <th class="text-center">TPS Asal</th>
+                                        <th class="text-center">Consolidator</th>
+                                        <th class="text-center">No PLP</th>
+                                        <th class="text-center">Tgl PLP</th>
+                                        <th class="text-center">No BC 1.1</th>
+                                        <th class="text-center">Tgl BC 1.1</th>
+                                        <th class="text-center">Tgl Masuk</th>
+                                        <th class="text-center">Jam Masuk</th>
+                                        <th class="text-center">Nomor Polisi</th>
+                                        <th class="text-center">Tgl Keluar</th>
+                                        <th class="text-center">Jam Keluar</th>
+                                        <th class="text-center">Nopol Keluar</th>
+                                        <th class="text-center">Lama Hari</th>
+                                        <th class="text-center">Long Stay</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="button-container">
+                            <div class="col-auto">
+                                <button class="btn btn-success formatBeacukai"><i class="fa fa-download"></i> Format Beacukai</button>
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-success formatStandar"><i class="fa fa-download"></i> Format Standar</button>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+            </section>
+        </div>
     </div>
 </section>
 
@@ -375,7 +367,6 @@
             processing: true,
             serverSide: true,
             scrollX: true,
-            scrollCollapse: true,
             ajax: {
                 url: '/fcl/report/dataContDaily',
                 type: 'GET',
@@ -420,6 +411,26 @@
                 } else if (data.status_bc === 'release'){
                     $(row).addClass('highlight-blue');
                 }
+            },
+            initComplete: function () {
+                var api = this.api();
+                
+                api.columns().every(function (index) {
+                    var column = this;
+                    var excludedColumns = [0, 25]; // Kolom yang tidak ingin difilter (detil, flag_segel_merah, lamaHari)
+                    
+                    if (excludedColumns.includes(index)) {
+                        $('<th></th>').appendTo(column.header()); // Kosongkan header pencarian untuk kolom yang dikecualikan
+                        return;
+                    }
+
+                    var $th = $(column.header());
+                    var $input = $('<input type="text" class="form-control form-control-sm" placeholder="Search ' + $th.text() + '">')
+                        .appendTo($('<th class="text-center"></th>').appendTo($th))
+                        .on('keyup change', function () {
+                            column.search($(this).val()).draw();
+                        });
+                });
             }
         });
     });
@@ -434,8 +445,6 @@
             processing: true,
             serverSide: true,
             scrollX: true,
-            scrollX: true,
-            scrollCollapse: true,
             ajax: {
                 url: '/fcl/report/dataContDaily',
                 type: 'GET',
@@ -480,6 +489,26 @@
                 } else if (data.status_bc === 'release'){
                     $(row).addClass('highlight-blue');
                 }
+            },
+            initComplete: function () {
+                var api = this.api();
+                
+                api.columns().every(function (index) {
+                    var column = this;
+                    var excludedColumns = [0, 25]; // Kolom yang tidak ingin difilter (detil, flag_segel_merah, lamaHari)
+                    
+                    if (excludedColumns.includes(index)) {
+                        $('<th></th>').appendTo(column.header()); // Kosongkan header pencarian untuk kolom yang dikecualikan
+                        return;
+                    }
+
+                    var $th = $(column.header());
+                    var $input = $('<input type="text" class="form-control form-control-sm" placeholder="Search ' + $th.text() + '">')
+                        .appendTo($('<th class="text-center"></th>').appendTo($th))
+                        .on('keyup change', function () {
+                            column.search($(this).val()).draw();
+                        });
+                });
             }
         });
     });
@@ -494,8 +523,6 @@
             processing: true,
             serverSide: true,
             scrollX: true,
-            scrollX: true,
-            scrollCollapse: true,
             ajax: {
                 url: '/fcl/report/dataContDaily',
                 type: 'GET',
@@ -540,6 +567,26 @@
                 } else if (data.status_bc === 'release'){
                     $(row).addClass('highlight-blue');
                 }
+            },
+            initComplete: function () {
+                var api = this.api();
+                
+                api.columns().every(function (index) {
+                    var column = this;
+                    var excludedColumns = [0, 25]; // Kolom yang tidak ingin difilter (detil, flag_segel_merah, lamaHari)
+                    
+                    if (excludedColumns.includes(index)) {
+                        $('<th></th>').appendTo(column.header()); // Kosongkan header pencarian untuk kolom yang dikecualikan
+                        return;
+                    }
+
+                    var $th = $(column.header());
+                    var $input = $('<input type="text" class="form-control form-control-sm" placeholder="Search ' + $th.text() + '">')
+                        .appendTo($('<th class="text-center"></th>').appendTo($th))
+                        .on('keyup change', function () {
+                            column.search($(this).val()).draw();
+                        });
+                });
             }
         });
     });

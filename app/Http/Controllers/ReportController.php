@@ -323,6 +323,7 @@ class ReportController extends Controller
 
     public function manifestDataTable(Request $request)
     {
+        // dd($request->all());
       $mans = Manifest::orderBy('joborder_id', 'asc');
 
       if ($request->has('filter') && $request->filter) {
@@ -342,6 +343,12 @@ class ReportController extends Controller
             $mans = Manifest::whereHas('job', function ($query) use ($request) {
                 $query->whereBetween('eta', [$request->start_date, $request->end_date])->orderBy('eta', 'asc');
             });
+        }elseif ($request->filter == 'masuk') {
+            $mans = Manifest::whereBetween('tglmasuk', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc');
+        }elseif ($request->filter == 'keluar') {
+            $mans = Manifest::whereBetween('tglrelease', [$request->start_date, $request->end_date])->orderBy('tglrelease', 'asc');
+        }elseif ($request->filter == 'akhir') {
+            $mans = Manifest::whereDate('tglmasuk', '<=', $request->end_date)->whereNull('tglrelease')->orWhereDate('tglrelease', '>', $request->end_date);
         }
       }
 
@@ -473,6 +480,7 @@ class ReportController extends Controller
     public function generateManifest(Request $request)
     {
         // Mulai Query Builder tanpa langsung `get()`
+        // dd($request->all(), $request->end_date);
         $manifests = Manifest::orderBy('joborder_id', 'asc')->get();
     
 
@@ -493,12 +501,16 @@ class ReportController extends Controller
                 $manifests = Manifest::whereHas('job', function ($query) use ($request) {
                     $query->whereBetween('eta', [$request->start_date, $request->end_date]);
                 })->get();
+            } elseif ($request->filter == 'akhir') {
+                $manifests = Manifest::whereDate('tglmasuk', '<=', $request->end_date)->whereNull('tglrelease')->orWhereDate('tglrelease', '>', $request->end_date)->get();
             }
         }
 
-        $cont = Cont::find($request->container_id);
-        if ($cont) {
-            $manifests = $manifests->where('container_id', $cont->id);
+        if ($request->has('container_id' && $request->container)) {
+            $cont = Cont::find($request->container_id);
+            if ($cont) {
+                $manifests = $manifests->where('container_id', $cont->id);
+            }
         }
         // Ambil data setelah semua filter diterapkan   
       
@@ -534,9 +546,7 @@ class ReportController extends Controller
         $data['tonaseAwal'] = $awal->sum('weight');
         $data['volumeAwal'] = $awal->sum('meas');
 
-        $masuk = Manifest::whereHas('cont', function ($query) use ($start, $end) {
-            $query->whereBetween('tglmasuk', [$start, $end]);
-        })->get();
+        $masuk = Manifest::whereBetween('tglmasuk', [$start, $end])->get();
         
         // dd($masuk);
         $data['masuk'] = $masuk;
@@ -552,9 +562,7 @@ class ReportController extends Controller
         $data['tonaseKeluar'] = $keluar->sum('weight');
         $data['volumeKeluar'] = $keluar->sum('meas');
 
-        $akhir = Manifest::whereHas('cont', function ($query) use ($end) {
-            $query->whereDate('tglmasuk', '<=', $end);
-        })->whereNull('tglrelease')->orWhere('tglrelease', '>', $end)->get();
+        $akhir = Manifest::where('tglmasuk', '<=', $end)->whereNull('tglrelease')->orWhere('tglrelease', '>', $end)->get();
         
         // ->where(function ($query) use ($end) {
         //     $query->whereDate('tglrelease', '>=', $end)

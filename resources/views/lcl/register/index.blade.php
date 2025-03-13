@@ -1,18 +1,5 @@
 @extends('partial.main')
 @section('custom_styles')
-<style>
-    .table-responsive td,
-    .table-responsive th {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-</style>
-<style>
-    #tableJob td, #tableJob th {
-        white-space: nowrap; /* Membuat teks tetap dalam satu baris */
-    }
-</style>
 @endsection
 @section('content')
 <section>
@@ -26,28 +13,28 @@
             <br>
             <div class="table">
                 <table class="table table-hover table-striped" id="tableJob">
-                    <thead>
+                    <thead style="white-space: nowrap;">
                         <tr>
                             <th>Action</th>
-                            <th class="text-center">No Job Order</th>
-                            <th class="text-center">No SPK</th>
-                            <th class="text-center">Forwarding</th>
-                            <th class="text-center">No Container</th>
-                            <th class="text-center">No MBL</th>
-                            <th class="text-center">No PLP</th>
-                            <th class="text-center">Tgl PLP</th>
-                            <th class="text-center">Kd Kantor</th>
-                            <th class="text-center">Kd TPS</th>
-                            <th class="text-center">Kd TPS Asal</th>
-                            <th class="text-center">Kd TPS Tujuan</th>
-                            <th class="text-center">Nama Angkut</th>
-                            <th class="text-center">No Voy</th>
-                            <th class="text-center">No Surat</th>
-                            <th class="text-center">No BC 11</th>
-                            <th class="text-center">Tgl BC 11</th>
-                            <th class="text-center">ETA</th>
-                            <th class="text-center">Vessel</th>
-                            <th class="text-center">UID</th>
+                            <th class="text-center" style="min-width: 100px">No Job Order</th>
+                            <th class="text-center" style="min-width: 100px">No SPK</th>
+                            <th class="text-center" style="min-width: 100px">Forwarding</th>
+                            <th class="text-center" style="min-width: 100px">No Container</th>
+                            <th class="text-center" style="min-width: 100px">No MBL</th>
+                            <th class="text-center" style="min-width: 100px">No PLP</th>
+                            <th class="text-center" style="min-width: 100px">Tgl PLP</th>
+                            <th class="text-center" style="min-width: 100px">Kd Kantor</th>
+                            <th class="text-center" style="min-width: 100px">Kd TPS</th>
+                            <th class="text-center" style="min-width: 100px">Kd TPS Asal</th>
+                            <th class="text-center" style="min-width: 100px">Kd TPS Tujuan</th>
+                            <th class="text-center" style="min-width: 100px">Nama Angkut</th>
+                            <th class="text-center" style="min-width: 100px">No Voy</th>
+                            <th class="text-center" style="min-width: 100px">No Surat</th>
+                            <th class="text-center" style="min-width: 100px">No BC 11</th>
+                            <th class="text-center" style="min-width: 100px">Tgl BC 11</th>
+                            <th class="text-center" style="min-width: 100px">ETA</th>
+                            <th class="text-center" style="min-width: 100px">Vessel</th>
+                            <th class="text-center" style="min-width: 100px">UID</th>
                         </tr>
                     </thead>
                 </table>
@@ -234,26 +221,46 @@
             ajax: '/lcl/registerData',
             columns: [
                 { data: 'actions', name: 'actions', orderable: false, searchable: false },
-                { data: 'nojoborder', name: 'nojoborder' },
-                { data: 'nospk', name: 'nospk' },
-                { data: 'forwarding', name: 'forwarding' },
-                { data: 'nocontainer', name: 'nocontainer' },
-                { data: 'nombl', name: 'nombl' },
-                { data: 'no_plp', name: 'no_plp' },
-                { data: 'tgl_plp', name: 'tgl_plp' },
-                { data: 'kd_kantor', name: 'kd_kantor' },
-                { data: 'kd_tps', name: 'kd_tps' },
-                { data: 'kd_tps_asal', name: 'kd_tps_asal' },
-                { data: 'kd_tps_tujuan', name: 'kd_tps_tujuan' },
-                { data: 'nm_angkut', name: 'nm_angkut' },
-                { data: 'no_voy_flight', name: 'no_voy_flight' },
-                { data: 'no_surat', name: 'no_surat' },
-                { data: 'no_bc11', name: 'no_bc11' },
-                { data: 'tgl_bc11', name: 'tgl_bc11' },
-                { data: 'eta', name: 'eta' },
-                { data: 'Kapal_name', name: 'Kapal_name' },
-                { data: 'user_name', name: 'user_name' }
-            ]
+                { className:'text-center', data: 'nojoborder', name: 'nojoborder' },
+                { className:'text-center', data: 'nospk', name: 'nospk' },
+                { className:'text-center', data: 'forwarding', name: 'forwarding' },
+                { className:'text-center', data: 'nocontainer', name: 'nocontainer' },
+                { className:'text-center', data: 'nombl', name: 'nombl' },
+                { className:'text-center', data: 'no_plp', name: 'no_plp' },
+                { className:'text-center', data: 'tgl_plp', name: 'tgl_plp' },
+                { className:'text-center', data: 'kd_kantor', name: 'kd_kantor' },
+                { className:'text-center', data: 'kd_tps', name: 'kd_tps' },
+                { className:'text-center', data: 'kd_tps_asal', name: 'kd_tps_asal' },
+                { className:'text-center', data: 'kd_tps_tujuan', name: 'kd_tps_tujuan' },
+                { className:'text-center', data: 'nm_angkut', name: 'nm_angkut' },
+                { className:'text-center', data: 'no_voy_flight', name: 'no_voy_flight' },
+                { className:'text-center', data: 'no_surat', name: 'no_surat' },
+                { className:'text-center', data: 'no_bc11', name: 'no_bc11' },
+                { className:'text-center', data: 'tgl_bc11', name: 'tgl_bc11' },
+                { className:'text-center', data: 'eta', name: 'eta' },
+                { className:'text-center', data: 'Kapal_name', name: 'Kapal_name' },
+                { className:'text-center', data: 'user_name', name: 'user_name' }
+            ],
+            initComplete: function () {
+                var api = this.api();
+                
+                api.columns().every(function (index) {
+                    var column = this;
+                    var excludedColumns = [0]; // Kolom yang tidak ingin difilter (detil, flag_segel_merah, lamaHari)
+                    
+                    if (excludedColumns.includes(index)) {
+                        $('<th></th>').appendTo(column.header()); // Kosongkan header pencarian untuk kolom yang dikecualikan
+                        return;
+                    }
+
+                    var $th = $(column.header());
+                    var $input = $('<input type="text" class="form-control form-control-sm" placeholder="Search ' + $th.text() + '">')
+                        .appendTo($('<th class="text-center"></th>').appendTo($th))
+                        .on('keyup change', function () {
+                            column.search($(this).val()).draw();
+                        });
+                });
+            }
         })
     });
 </script>

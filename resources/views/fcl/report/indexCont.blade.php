@@ -1,14 +1,5 @@
 @extends('partial.main')
 @section('custom_styles')
-
-<style>
-    .table-responsive td,
-    .table-responsive th {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-</style>
 <style>
     .highlight-yellow {
         background-color: yellow !important;;
@@ -90,7 +81,7 @@
     <div class="card">
         <div class="card-body">
             <div class="table">
-                <table class="table-hover" id="dataReportCont" style="white-space: nowrap;">
+                <table class="table-hover table-header" id="dataReportCont" style="white-space: nowrap;">
                     <thead>
                         <tr>
                             <th class="text-center">Action</th>
@@ -103,8 +94,8 @@
                             <th class="text-center">No Container</th>
                             <th class="text-center">Container Type</th>
                             <th class="text-center">Class Type</th>
-                            <th class="text-center">Size</th>
-                            <th class="text-center">ETA</th>
+                            <th class="text-center" style="min-width: 100px;">Size</th>
+                            <th class="text-center" style="min-width: 100px;">ETA</th>
                             <th class="text-center">TPS Asal</th>
                             <th class="text-center">Consolidator</th>
                             <th class="text-center">No PLP</th>
@@ -121,6 +112,9 @@
                             <th class="text-center">Long Stay</th>
                         </tr>
                     </thead>
+                    <tbody>
+                        
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -228,9 +222,9 @@
 <script>
     $(document).ready(function(){
         $('#dataReportCont').DataTable({
+            scrollX: true,
             processing: true,
             serverSide: true,
-            scrollX: true,
             ajax: {
                 url: '/fcl/report/dataCont',
                 data: function(d) {
@@ -277,8 +271,29 @@
                 } else if (data.status_bc === 'release'){
                     $(row).addClass('highlight-blue');
                 }
+            },
+
+            initComplete: function () {
+                var api = this.api();
+                
+                api.columns().every(function (index) {
+                    var column = this;
+                    var excludedColumns = [0, 25]; // Kolom yang tidak ingin difilter (detil, flag_segel_merah, lamaHari)
+                    
+                    if (excludedColumns.includes(index)) {
+                        $('<th></th>').appendTo(column.header()); // Kosongkan header pencarian untuk kolom yang dikecualikan
+                        return;
+                    }
+
+                    var $th = $(column.header());
+                    var $input = $('<input type="text" class="form-control form-control-sm" placeholder="Search ' + $th.text() + '">')
+                        .appendTo($('<th class="text-center"></th>').appendTo($th))
+                        .on('keyup change', function () {
+                            column.search($(this).val()).draw();
+                        });
+                });
             }
-        })
+        });
     })
 </script>
 <script>
