@@ -60,6 +60,9 @@ use App\Http\Controllers\pengiriman\CoariCodecoController;
  use App\Http\Controllers\invoiceFCL\FormFCLController;
  use App\Http\Controllers\invoiceFCL\BackendInvoiceController;
  
+
+//  CodecoCoari
+use App\Http\Controllers\DokumenBc\CoariController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -853,3 +856,13 @@ Route::controller(AndroidGateController::class)->group(function(){
             });
         });
     });
+
+// Coari Codeco Controller
+Route::prefix('/pengiriman')->group(function(){
+    // Coari
+    Route::prefix('/coari-lcl')->group(function(){
+        Route::controller(CoariController::class)->group(function(){
+            Route::get('/cont-index', 'indexContLCL');
+        });
+    });
+});

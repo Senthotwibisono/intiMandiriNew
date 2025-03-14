@@ -131,7 +131,7 @@ class CoariCodecoController extends Controller
                     'no_cont' => $cont->nocontainer,
                     'uk_cont' => $cont->size,
                     'no_segel' => $cont->seal->code ?? ' ',
-                    'jns_cont' => 'F',
+                    'jns_cont' => 'L',
                     'no_bc11' => $cont->job->tno_bc11 ?? '',
                     'tgl_bc11' => $cont->job->ttgl_bc11 
                         ? Carbon::createFromFormat('Y-m-d', $cont->job->ttgl_bc11)->format('Ymd') 
