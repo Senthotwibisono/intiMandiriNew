@@ -148,8 +148,8 @@
             columns:[
                 {data:'id', name:'id', className:'text-center', orderable: false,
                     render: function(data, type, row) {
-                        const StatusBC = row.status_bc; // Mengambil status_bc dari row
-                        if (StatusBC === 'HOLDP2') {
+                        const StatusBC = row.flag_segel_merah; // Mengambil status_bc dari row
+                        if (StatusBC === 'Y') {
                             return `<div class="button-container">
                                         <button type="button" class="btn btn-info holdP2" id="holdP2" data-id="${data}"><i class="fa fa-unlock"></i></button>
                                         <a href="javascript:void(0)" onclick="openWindow('/bc-p2/detil-log/${data}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
