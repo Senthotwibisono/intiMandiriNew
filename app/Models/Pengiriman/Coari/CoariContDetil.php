@@ -75,4 +75,9 @@ class CoariContDetil extends Model
         'tgl_entry',
         'jam_entry',
     ];
+
+    // public function Coari()
+    // {
+    //     return $this->belongsTo(CoariCont::class, )
+    // }
 }

@@ -42,6 +42,33 @@
         </ul>
     </li>
 
+    <li class="sidebar-item has-sub @if(Request::is('pengiriman/*')) active @endif">
+        <a href="#" class="sidebar-link">
+            <i class="fa-solid fa-truck"></i>
+            <span>Pengiriman</span>
+        </a>
+        <ul class="submenu @if(Request::is('pengiriman/*')) active @endif">
+            <li class="sidebar-item has-sub @if(Request::is('pengiriman/coari-lcl/*') || Request::is('pengiriman/codeco-lcl/*')) active @endif">
+                <a href="#" class="sidebar-link">
+                    <span>LCL</span>
+                </a>
+                <ul class="submenu">
+                    <li class="sidebar-item has-sub @if(Request::is('pengiriman/coari-lcl/*')) active @endif">
+                        <a href="#" class="sidebar-link">
+                            <span>Coari</span>
+                        </a>
+                        <ul class="submenu @if(Request::is('pengiriman/coari-lcl/*')) active @endif">
+                            <li class="submenu-item @if(Request::is('pengiriman/coari-lcl/cont-index')) active @endif">
+                                <a href="{{ route('pengiriman.lcl.containerIndex') }}">Container</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+
+
     <!-- LCL -->
     <li class="sidebar-item has-sub @if(Request::is('lcl/*')) active @endif">
         <a href="#" class='sidebar-link'>

@@ -862,7 +862,8 @@ Route::prefix('/pengiriman')->group(function(){
     // Coari
     Route::prefix('/coari-lcl')->group(function(){
         Route::controller(CoariController::class)->group(function(){
-            Route::get('/cont-index', 'indexContLCL');
+            Route::get('/cont-index', 'indexContLCL')->name('pengiriman.lcl.containerIndex');
+            Route::get('/cont-data', 'dataContLCL')->name('pengiriman.lcl.containerData');
         });
     });
 });

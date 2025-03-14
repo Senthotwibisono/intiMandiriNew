@@ -28,9 +28,29 @@ use App\Models\Pengiriman\Codeco\CodecoKmsDetil;
 // Reff Number
 use App\Models\Pengiriman\RefNumber as RN;
 
+use DataTables;
+
 class CoariController extends Controller
 {
     public function __construct() {
         $this->middleware('auth');
+    }
+
+    public function indexContLCL()
+    {
+        $data['title'] = 'Data Coari Cont LCL';
+
+        return view('pengiriman.lcl.cont.coari', $data);
+    }
+
+    public function dataContLCL(Request $request)
+    {
+        $cont = CD::where('jns_cont', 'L')->get();
+        return DataTables::of($cont)
+        ->addColumn('action', function($cont){
+            return '-';
+        })
+        ->rawColumns(['action'])
+        ->make(true);
     }
 }

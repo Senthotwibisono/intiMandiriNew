@@ -676,7 +676,7 @@ class CoariCodecoController extends Controller
 
     public function CodecoCont()
     {
-        $conts = Cont::whereNotNull('tglkeluar')->where('coari_flag', '=', 'Y')->where('codeco_flag', '=', 'N')->get();
+        $conts = Cont::whereNotNull('tglkeluar')->where('coari_flag', 'Y')->where('codeco_flag', 'N')->get();
         if (!empty($conts)) {
             \SoapWrapper::override(function ($service) {
                 $service
@@ -733,7 +733,7 @@ class CoariCodecoController extends Controller
                     'no_cont' => $cont->nocontainer,
                     'uk_cont' => $cont->size,
                     'no_segel' => $cont->seal->code ?? ' ',
-                    'jns_cont' => 'F',
+                    'jns_cont' => 'L',
                     'no_bc11' => $cont->job->tno_bc11 ?? '',
                     'tgl_bc11' => $cont->job->ttgl_bc11 
                         ? Carbon::createFromFormat('Y-m-d', $cont->job->ttgl_bc11)->format('Ymd') 
