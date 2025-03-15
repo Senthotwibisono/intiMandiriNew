@@ -9,7 +9,7 @@
     <div class="card">
         <div class="card-header">
             <div class="button-container">
-                <button class="btn btn-primary" id="sendCoari">Kirim Coari</button>
+                <button class="btn btn-primary" id="sendCoari">Kirim Codeco</button>
             </div>
         </div>
         <div class="card-body">
@@ -65,8 +65,8 @@
                     });
 
                     $.ajax({
-                        url: '/testCoariContLCL',
-                        type: 'POST',
+                        url: '/testCodecoContLCL',
+                        type: 'GET',
                         data : {
                             _token: "{{ csrf_token() }}",
                         },
@@ -137,8 +137,8 @@
                     });
 
                     $.ajax({
-                        url: '{{ route('pengiriman.lcl.sendContLCL')}}',
-                        type: 'POST',
+                        url: '/pengiriman/codeco-lcl/cont-kirimUlang',
+                        type: 'GET',
                         data : {
                             _token: "{{ csrf_token() }}",
                             id: id,
@@ -195,7 +195,7 @@
             processing: true, 
             serverSide: true, 
             scrollX: true,
-            ajax: '{{ route('pengiriman.lcl.containerData')}}',
+            ajax: '/pengiriman/codeco-lcl/cont-data',
             columns: [
                 {name: 'action', data: 'action'},
                 {name: 'ref_number', data: 'ref_number'},

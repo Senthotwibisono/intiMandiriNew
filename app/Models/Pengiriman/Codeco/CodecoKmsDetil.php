@@ -4,6 +4,7 @@ namespace App\Models\Pengiriman\Codeco;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Manifest;
 
 class CodecoKmsDetil extends Model
 {
@@ -67,4 +68,9 @@ class CodecoKmsDetil extends Model
         'tgl_entry',
         'jam_entry',
     ];
+
+    public function manifest()
+    {
+        return $this->belongsTo(Manifest::class, 'manifest_id', 'id');
+    }
 }

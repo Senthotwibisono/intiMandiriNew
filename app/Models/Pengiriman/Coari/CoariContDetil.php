@@ -76,8 +76,14 @@ class CoariContDetil extends Model
         'jam_entry',
     ];
 
-    // public function Coari()
-    // {
-    //     return $this->belongsTo(CoariCont::class, )
-    // }
+    public function container()
+    {
+        if ($this->jns_cont == 'l' || $this->jns_cont == 'L') {
+            return $this->belongsTo(Container::class, 'cont_id', 'id');
+        }
+
+        if ($this->jns_cont == 'F' || $this->jns_cont == 'f') {
+            return $this->belongsTo(ContainerFCL::class, 'cont_id', 'id');
+        }
+    }
 }

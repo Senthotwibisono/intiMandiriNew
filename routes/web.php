@@ -63,6 +63,7 @@ use App\Http\Controllers\pengiriman\CoariCodecoController;
 
 //  CodecoCoari
 use App\Http\Controllers\DokumenBc\CoariController;
+use App\Http\Controllers\DokumenBc\CodecoController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -864,6 +865,33 @@ Route::prefix('/pengiriman')->group(function(){
         Route::controller(CoariController::class)->group(function(){
             Route::get('/cont-index', 'indexContLCL')->name('pengiriman.lcl.containerIndex');
             Route::get('/cont-data', 'dataContLCL')->name('pengiriman.lcl.containerData');
+            Route::post('/cont-KirimUlang', 'sendContLCL')->name('pengiriman.lcl.sendContLCL');
+            
+            Route::get('/manifest-index', 'indexManifestLCL')->name('pengiriman.lcl.manifestIndex');
+            Route::get('/manifest-data', 'dataManifestLCL')->name('pengiriman.lcl.manifestData');
+            Route::post('/manifest-KirimUlang', 'sendManifestLCL')->name('pengiriman.lcl.sendManifestLCL');
+            Route::post('/manifest-kirimManual', 'kirimManualManifest')->name('pengiriman.lcl.kirimManualManifest');
+
+            // Route::get('/manifest-')
+        });
+    });
+
+    // Codeco
+    Route::prefix('/codeco-lcl')->group(function(){
+        Route::controller(CodecoController::class)->group(function(){
+            Route::get('/cont-index', 'indexContLCL');
+            Route::get('/cont-data', 'dataContLCL');
+            Route::get('/cont-kirimUlang', 'sendContLCL');
+
+            Route::get('/manifest-index', 'indexManifestLCL');
+            Route::get('/manifest-data', 'dataManifestLCL');
+            Route::post('/manifest-KirimUlang', 'kirimManualManifest');
+            Route::post('/manifest-kirimManual', 'kirimManualManifest');
         });
     });
 });
+
+Route::post('/testCoari', [CoariCodecoController::class, 'CoariKms']);
+Route::post('/testCoariContLCL', [CoariCodecoController::class, 'coariCont']);
+
+Route::get('/testCodecoContLCL', [CoariCodecoController::class, 'CodecoCont']);

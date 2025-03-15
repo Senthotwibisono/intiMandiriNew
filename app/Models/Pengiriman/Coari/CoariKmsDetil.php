@@ -4,6 +4,7 @@ namespace App\Models\Pengiriman\Coari;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Manifest;
 
 class CoariKmsDetil extends Model
 {
@@ -66,4 +67,9 @@ class CoariKmsDetil extends Model
         'tgl_entry',
         'jam_entry',
     ];
+
+    public function manifest()
+    {
+        return $this->belongsTo(Manifest::class, 'manifest_id', 'id');
+    }
 }

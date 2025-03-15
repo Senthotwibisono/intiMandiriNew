@@ -108,7 +108,7 @@ class CoariCodecoController extends Controller
                     'flag_revisi' => 0,
                     'tgl_revisi' => null,
                     'kd_dok' => '5',
-                    'kd_tps' => 'INTI',
+                    'kd_tps' => '1MUT',
                     'nm_angkut' => $cont->job->PLP->nm_angkut ?? $cont->job->Kapal->name ?? null,
                     'no_voy_flight' => $cont->job->PLP->no_voy_flight ?? $cont->job->voy ?? null,
                     'call_sign' => $cont->job->PLP->call_sign ?? $cont->job_callsign ?? null,
@@ -119,7 +119,7 @@ class CoariCodecoController extends Controller
                     'tanggal_dok_inout' => $cont->job->PLP->tgl_plp,
                     'wk_inout' => $wk_in,
                     'no_pol' => $cont->nopol,
-                    'bruto' => $cont->weight,
+                    'bruto' => $cont->weight ?? 0,
                     'no_master_bl_awb' => $cont->job->nombl ?? '',
                     'tgl_master_bl_awb' => $cont->job->tgl_master_bl 
                        ? Carbon::createFromFormat('Y-m-d', $cont->job->tgl_master_bl)->format('Ymd') 
@@ -137,6 +137,10 @@ class CoariCodecoController extends Controller
                         ? Carbon::createFromFormat('Y-m-d', $cont->job->ttgl_bc11)->format('Ymd') 
                         : null,
                 ];
+
+                // var_dump($header['bruto']);
+                // die();
+                
 
                 
                 $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><DOCUMENT></DOCUMENT>');
@@ -166,7 +170,7 @@ class CoariCodecoController extends Controller
                 $contXml->addChild('TGL_MASTER_BL_AWB', !empty($header['tgl_master_bl_awb']) ? $header['tgl_master_bl_awb'] : '');
                 $contXml->addChild('ID_CONSIGNEE', ($cont->id_consignee != 000000000000000) ? $cont->id_consignee : '');
                 $contXml->addChild('CONSIGNEE', ($cont->consignee != '') ? $cont->consignee : '');
-                $contXml->addChild('BRUTO', !empty($header['bruto']) ? $header['bruto'] : '');
+                $contXml->addChild('BRUTO', !empty($header['bruto']) ? $header['bruto'] : 0);
                 $contXml->addChild('NO_BC11', !empty($header['no_bc11']) ? $header['no_bc11'] : '');
                 $contXml->addChild('TGL_BC11', !empty($header['tgl_bc11']) ? $header['tgl_bc11'] : '');        
                 $contXml->addChild('NO_POS_BC11', ($cont->no_pos_bc11 != '') ? $cont->no_pos_bc11 : '');
@@ -209,6 +213,11 @@ class CoariCodecoController extends Controller
                 });
 
                 $response = $this->response;
+                $hasil = strpos($response, "Proses Berhasil") !== false ? true : false;
+                $flag = 'N';
+                if ($hasil == true) {
+                    $flag = 'Y';
+                }
 
                 $coariCont = CC::create([
                     'ref_number' => $header['ref_number'],
@@ -263,9 +272,16 @@ class CoariCodecoController extends Controller
                 ]);
 
                 $cont->update([
-                    'coari_flag' => 'Y',
+                    'coari_flag' => $flag,
                 ]);
             }
+
+            return 'success';
+        }else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Tidak ada container terkirim'
+            ], 400);
         }
     }
 
@@ -304,7 +320,7 @@ class CoariCodecoController extends Controller
                     'flag_revisi' => 0,
                     'tgl_revisi' => null,
                     'kd_dok' => '5',
-                    'kd_tps' => 'INTI',
+                    'kd_tps' => '1MUT',
                     'nm_angkut' => $cont->job->PLP->nm_angkut ?? $cont->job->Kapal->name ?? null,
                     'no_voy_flight' => $cont->job->PLP->no_voy_flight ?? $cont->job->voy ?? null,
                     'call_sign' => $cont->job->PLP->call_sign ?? $cont->job_callsign ?? null,
@@ -362,7 +378,7 @@ class CoariCodecoController extends Controller
                 $contXml->addChild('TGL_MASTER_BL_AWB', !empty($header['tgl_master_bl_awb']) ? $header['tgl_master_bl_awb'] : '');
                 $contXml->addChild('ID_CONSIGNEE', ($cont->id_consignee != 000000000000000) ? $cont->id_consignee : '');
                 $contXml->addChild('CONSIGNEE', ($cont->consignee != '') ? $cont->consignee : '');
-                $contXml->addChild('BRUTO', !empty($header['bruto']) ? $header['bruto'] : '');
+                $contXml->addChild('BRUTO', !empty($header['bruto']) ? $header['bruto'] : 0);
                 $contXml->addChild('NO_BC11', !empty($header['no_bc11']) ? $header['no_bc11'] : '');
                 $contXml->addChild('TGL_BC11', !empty($header['tgl_bc11']) ? $header['tgl_bc11'] : '');        
                 $contXml->addChild('NO_POS_BC11', ($cont->no_pos_bc11 != '') ? $cont->no_pos_bc11 : '');
@@ -405,6 +421,11 @@ class CoariCodecoController extends Controller
                 });
 
                 $response = $this->response;
+                $hasil = strpos($response, "Proses Berhasil") !== false ? true : false;
+                $flag = 'N';
+                if ($hasil == true) {
+                    $flag = 'Y';
+                }
 
                 $coariCont = CC::create([
                     'ref_number' => $header['ref_number'],
@@ -459,7 +480,7 @@ class CoariCodecoController extends Controller
                 ]);
 
                 $cont->update([
-                    'coari_flag' => 'Y',
+                    'coari_flag' => $flag,
                 ]);
             }
         }
@@ -467,16 +488,15 @@ class CoariCodecoController extends Controller
 
     public function CoariKms()
     {
-        $mansifestMaster = Manifest::whereNotNull('tglmasuk')->whereNot('coari_flag', '=', 'Y')->get();
+        $mansifestMaster = Manifest::whereNotNull('tglmasuk')->where('coari_flag', 'N')->get();
+        // dd($mansifestMaster);
 
         if ($mansifestMaster->isEmpty())
         {
-            return;
+            return null;
         }
 
-        $contIds = $mansifestMaster->unique('container_id')->pluck('container_id');
-
-        if ($contIds->isEmpty()) {
+        foreach ($mansifestMaster as $manifest) {
             \SoapWrapper::override(function ($service) {
                 $service
                     ->name('CoarriCodeco_Kemasan')
@@ -493,9 +513,8 @@ class CoariCodecoController extends Controller
                         ])
                     ]);                                                    
             });
-        }
-        foreach ($contIds as $contId) {
-            $cont = Cont::findOrFail($contId);
+
+            $cont = Cont::findOrFail($manifest->container_id);
             $tanggal = Carbon::createFromFormat('Y-m-d', $cont->tglmasuk)->format('Ymd');
             $jam = Carbon::createFromFormat('H:i:s', $cont->jammasuk)->format('His');
             $wk_in = $tanggal . $jam;
@@ -510,7 +529,7 @@ class CoariCodecoController extends Controller
                 'flag_revisi' => 0,
                 'tgl_revisi' => null,
                 'kd_dok' => '5',
-                'kd_tps' => 'INTI',
+                'kd_tps' => '1MUT',
                 'nm_angkut' => $cont->job->PLP->nm_angkut ?? $cont->job->Kapal->name ?? null,
                 'no_voy_flight' => $cont->job->PLP->no_voy_flight ?? $cont->job->voy ?? null,
                 'call_sign' => $cont->job->PLP->call_sign ?? $cont->job_callsign ?? null,
@@ -552,9 +571,10 @@ class CoariCodecoController extends Controller
             $headerXml->addChild('KD_GUDANG', !empty($header['kd_gudang']) ? $header['kd_gudang'] : '');
             $headerXml->addChild('REF_NUMBER', !empty($header['ref_number']) ? $header['ref_number'] : '');
 
-            $manifest = $mansifestMaster->where('container_id', $cont->id);
 
-            foreach ($manifest as $dataDetailkms) {
+            $dataDetailkms = $manifest;
+            // dd($dataDetailkms, $manifest);
+           
                 $kms = $detail->addChild('KMS');
         
                 $kms->addChild('NO_BL_AWB', $dataDetailkms->nohbl);
@@ -570,7 +590,7 @@ class CoariCodecoController extends Controller
                 $kms->addChild('TGL_BC11', $header['tgl_bc11'] );
                 $kms->addChild('NO_POS_BC11', $dataDetailkms->NO_POS_BC11 );
                 $kms->addChild('CONT_ASAL', $dataDetailkms->CONT_ASAL );
-                $kms->addChild('SERI_KEMAS', $dataDetailkms->packing->name ?? null );
+                $kms->addChild('SERI_KEMAS', 1 );
                 $kms->addChild('KD_KEMAS', $dataDetailkms->packing->code ?? null );
                 $kms->addChild('JML_KEMAS', $dataDetailkms->quantity );
                 $kms->addChild('KD_TIMBUN', $dataDetailkms->KD_TIMBUN );
@@ -587,16 +607,16 @@ class CoariCodecoController extends Controller
                 $kms->addChild('PEL_MUAT', $pelMuat);
                 $kms->addChild('PEL_TRANSIT', $pelTransit);
                 $kms->addChild('PEL_BONGKAR', $pelBongkar);
-                $xml->addChild('GUDANG_TUJUAN', ($dataDetailkms->gudang_tujuan != '') ? $dataDetailkms->gudang_tujuan : '');
-                $xml->addChild('KODE_KANTOR', ($dataDetailkms->kode_kantor != '') ? $dataDetailkms->kode_kantor : '');
-                $xml->addChild('NO_DAFTAR_PABEAN', ($dataDetailkms->no_daftar_pabean != '') ? $dataDetailkms->no_daftar_pabean : '');
-                $xml->addChild('TGL_DAFTAR_PABEAN', ($dataDetailkms->tgl_daftar_pabean != '') ? $dataDetailkms->tgl_daftar_pabean : '');
+                $kms->addChild('GUDANG_TUJUAN', '1MUT');
+                $kms->addChild('KODE_KANTOR', !empty($dataDetailkms->kode_kantor) ? $dataDetailkms->kode_kantor : '');
+                $kms->addChild('NO_DAFTAR_PABEAN', !empty($dataDetailkms->no_daftar_pabean) ? $dataDetailkms->no_daftar_pabean : '');
+                $kms->addChild('TGL_DAFTAR_PABEAN', !empty($dataDetailkms->tgl_daftar_pabean) ? $dataDetailkms->tgl_daftar_pabean : '');
                 $kms->addChild('NO_SEGEL_BC', $dataDetailkms->NO_SEGEL_BC);
                 $kms->addChild('TGL_SEGEL_BC', $dataDetailkms->TGL_SEGEL_BC );
                 $kms->addChild('NO_IJIN_TPS', $dataDetailkms->NO_IJIN_TPS );
                 $kms->addChild('TGL_IJIN_TPS', $dataDetailkms->TGL_IJIN_TPS);
-            }
 
+           
             $data = [
                 'Username' => $this->user, 
                 'Password' => $this->password,
@@ -608,7 +628,16 @@ class CoariCodecoController extends Controller
                 $this->response = $service->call('CoarriCodeco_Kemasan', [$data])->CoarriCodeco_KemasanResult;      
             });
 
+            // if ($xml === false) {
+            //     dd("XML tidak valid");
+            // }
             $response = $this->response;
+            // dd($xml, $xml->asXML(), $response);
+            $hasil = strpos($response, "Proses Berhasil") !== false ? true : false;
+            $flag = 'N';
+            if ($hasil == true) {
+                $flag = 'Y';
+            }
 
             $coariKms = KC::create([
                 'tgl_entry' => Carbon::now()->format('Y-m-d'),
@@ -618,7 +647,7 @@ class CoariCodecoController extends Controller
                 'nomor' => null,
             ]);
 
-            foreach ($manifest as $data) {
+            $data = $manifest;
                 $coariKmsDetil = KD::create([
                     'coari_id' => $coariKms->id,
                     'manifest_id' => $data->id,
@@ -643,7 +672,7 @@ class CoariCodecoController extends Controller
                     'no_bc11' => $header['no_bc11'],
                     'tgl_bc11' => $header['tgl_bc11'],
                     
-                    'seri_kemas' => $data->packing->name,
+                    'seri_kemas' => 1,
                     'kd_kemas' => $data->packing->code,
                     'jml_kemas' => $data->quantity,
                     'kd_timbun',
@@ -665,13 +694,13 @@ class CoariCodecoController extends Controller
                 ]);
 
                 $data->update([
-                    'coari_flag' => 'Y',
+                    'coari_flag' => $flag,
                 ]);
+            
+
+
             }
-
-        }
-
-        return 'success';
+            return 'success';
     }
 
     public function CodecoCont()
@@ -710,7 +739,7 @@ class CoariCodecoController extends Controller
                     'flag_revisi' => 0,
                     'tgl_revisi' => null,
                     'kd_dok' => '6',
-                    'kd_tps' => 'INTI',
+                    'kd_tps' => '1MUT',
                     'nm_angkut' => $cont->job->PLP->nm_angkut ?? $cont->job->Kapal->name ?? null,
                     'no_voy_flight' => $cont->job->PLP->no_voy_flight ?? $cont->job->voy ?? null,
                     'call_sign' => $cont->job->PLP->call_sign ?? $cont->job_callsign ?? null,
@@ -768,7 +797,7 @@ class CoariCodecoController extends Controller
                 $contXml->addChild('TGL_MASTER_BL_AWB', !empty($header['tgl_master_bl_awb']) ? $header['tgl_master_bl_awb'] : '');
                 $contXml->addChild('ID_CONSIGNEE', ($cont->id_consignee != 000000000000000) ? $cont->id_consignee : '');
                 $contXml->addChild('CONSIGNEE', ($cont->consignee != '') ? $cont->consignee : '');
-                $contXml->addChild('BRUTO', !empty($header['bruto']) ? $header['bruto'] : '');
+                $contXml->addChild('BRUTO', !empty($header['bruto']) ? $header['bruto'] : 0);
                 $contXml->addChild('NO_BC11', !empty($header['no_bc11']) ? $header['no_bc11'] : '');
                 $contXml->addChild('TGL_BC11', !empty($header['tgl_bc11']) ? $header['tgl_bc11'] : '');        
                 $contXml->addChild('NO_POS_BC11', ($cont->no_pos_bc11 != '') ? $cont->no_pos_bc11 : '');
@@ -811,6 +840,11 @@ class CoariCodecoController extends Controller
                 });
 
                 $response = $this->response;
+                $hasil = strpos($response, "Proses Berhasil") !== false ? true : false;
+                $flag = 'N';
+                if ($hasil == true) {
+                    $flag = 'Y';
+                }
 
                 $codecoCont = CodecoCont::create([
                     'nojoborder' => $header['nojoborder'],
@@ -867,7 +901,7 @@ class CoariCodecoController extends Controller
                 ]);
 
                 $cont->update([
-                    'codeco_flag' => 'Y',
+                    'codeco_flag' => $flag,
                 ]);
             }
         }
@@ -909,7 +943,7 @@ class CoariCodecoController extends Controller
                     'flag_revisi' => 0,
                     'tgl_revisi' => null,
                     'kd_dok' => '6',
-                    'kd_tps' => 'INTI',
+                    'kd_tps' => '1MUT',
                     'nm_angkut' => $cont->job->PLP->nm_angkut ?? $cont->job->Kapal->name ?? null,
                     'no_voy_flight' => $cont->job->PLP->no_voy_flight ?? $cont->job->voy ?? null,
                     'call_sign' => $cont->job->PLP->call_sign ?? $cont->job_callsign ?? null,
@@ -1010,6 +1044,11 @@ class CoariCodecoController extends Controller
                 });
 
                 $response = $this->response;
+                $hasil = strpos($response, "Proses Berhasil") !== false ? true : false;
+                $flag = 'N';
+                if ($hasil == true) {
+                    $flag = 'Y';
+                }
 
                 $codecoCont = CodecoCont::create([
                     'nojoborder' => $header['nojoborder'],
@@ -1066,7 +1105,7 @@ class CoariCodecoController extends Controller
                 ]);
 
                 $cont->update([
-                    'codeco_flag' => 'Y',
+                    'codeco_flag' => $flag,
                 ]);
             }
         }
@@ -1074,16 +1113,14 @@ class CoariCodecoController extends Controller
 
     public function CodecoKms()
     {
-        $mansifestMaster = Manifest::whereNotNull('tglmasuk')->where('coari_flag', '=', 'Y')->whereNotNull('tglbuangmty')->whereNot('codeco_flag', '=', 'Y')->get();
+        $mansifestMaster = Manifest::whereNotNull('tglmasuk')->where('coari_flag', '=', 'Y')->whereNotNull('tglrelease')->where('codeco_flag', '=', 'N')->orWhere('codeco_flag', null)->take(50)->get();
 
         if ($mansifestMaster->isEmpty())
         {
             return;
         }
 
-        $contIds = $mansifestMaster->unique('container_id')->pluck('container_id');
-
-        if ($contIds->isEmpty()) {
+        foreach ($mansifestMaster as $manifest) {
             \SoapWrapper::override(function ($service) {
                 $service
                     ->name('CoarriCodeco_Kemasan')
@@ -1100,10 +1137,11 @@ class CoariCodecoController extends Controller
                         ])
                     ]);                                                    
             });
-        }
-
-        foreach ($contIds as $contId) {
-            $cont = Cont::findOrFail($contId);
+        
+            $cont = Cont::findOrFail($manifest->container_id);
+            if (!$cont) {
+                return 'error';
+            }
             $header = [
                 'nojoborder' => $cont->job->nojoborder,
                 'ref_number' => $this->RefNumber(),
@@ -1116,7 +1154,7 @@ class CoariCodecoController extends Controller
                 'flag_revisi' => 0,
                 'tgl_revisi' => null,
                 'kd_dok' => '6',
-                'kd_tps' => 'INTI',
+                'kd_tps' => '1MUT',
                 'nm_angkut' => $cont->job->PLP->nm_angkut ?? $cont->job->Kapal->name ?? null,
                 'no_voy_flight' => $cont->job->PLP->no_voy_flight ?? $cont->job->voy ?? null,
                 'call_sign' => $cont->job->PLP->call_sign ?? $cont->job_callsign ?? null,
@@ -1151,62 +1189,59 @@ class CoariCodecoController extends Controller
             $headerXml->addChild('TGL_TIBA', !empty($header['tgl_tiba']) ? $header['tgl_tiba'] : '');
             $headerXml->addChild('KD_GUDANG', !empty($header['kd_gudang']) ? $header['kd_gudang'] : '');
             $headerXml->addChild('REF_NUMBER', !empty($header['ref_number']) ? $header['ref_number'] : '');
-
-            $manifest = $mansifestMaster->where('container_id', $cont->id);
-
-            foreach ($manifest as $dataDetailkms) {
-                $tgl_dok = $dataDetailkms->tgl_dok ? Carbon::createFromFormat('Y-m-d', $dataDetailkms->tgl_dok)->format('Ymd') : null;
-                $tanggal = Carbon::createFromFormat('Y-m-d', $dataDetailkms->tglbuangmty)->format('Ymd');
-                $jam = Carbon::createFromFormat('H:i:s', $dataDetailkms->jambuangmty)->format('His');
-                $wk_in = $tanggal . $jam;
-                $detilData = [
-                    'tanggal_dok_inout'=> $tgl_dok,
-                    'kd_dok_inout' => $dataDetailkms->kd_dok_inout ?? null,
-                    'no_dok_inout' => $dataDetailkms->no_dok_inout ?? null,
-                    'wk_inout' => $wk_in,
-                    'no_pol' => $dataDetailkms->nopol_mty ?? null,
-                ];
-                $kms = $detail->addChild('KMS');
-        
-                $kms->addChild('NO_BL_AWB', $dataDetailkms->nohbl);
-                $kms->addChild('TGL_BL_AWB', $dataDetailkms->tgl_hbl 
-                ? Carbon::createFromFormat('Y-m-d', $dataDetailkms->tgl_hbl)->format('Ymd') 
-                : null,); 
-                $kms->addChild('NO_MASTER_BL_AWB', $dataDetailkms->cont->job->nombl); 
-                $kms->addChild('TGL_MASTER_BL_AWB', $header['tgl_master_bl_awb']); 
-                $kms->addChild('ID_CONSIGNEE', ($dataDetailkms->customer_id ?? '00000000'));
-                $kms->addChild('CONSIGNEE', htmlspecialchars($dataDetailkms->customer->name ?? ''));
-                $kms->addChild('BRUTO', $dataDetailkms->weight );
-                $kms->addChild('NO_BC11', $header['no_bc11']);
-                $kms->addChild('TGL_BC11', $header['tgl_bc11'] );
-                $kms->addChild('NO_POS_BC11', $dataDetailkms->NO_POS_BC11 );
-                $kms->addChild('CONT_ASAL', $dataDetailkms->CONT_ASAL );
-                $kms->addChild('SERI_KEMAS', $dataDetailkms->packing->name ?? null );
-                $kms->addChild('KD_KEMAS', $dataDetailkms->packing->code ?? null );
-                $kms->addChild('JML_KEMAS', $dataDetailkms->quantity );
-                $kms->addChild('KD_TIMBUN', $dataDetailkms->KD_TIMBUN );
-                $kms->addChild('KD_DOK_INOUT', $detilData['kd_dok_inout'] );
-                $kms->addChild('NO_DOK_INOUT', $detilData['no_dok_inout'] );
-                $kms->addChild('TGL_DOK_INOUT', $detilData['tanggal_dok_inout'] );
-                $kms->addChild('WK_INOUT', $detilData['wk_inout'] );
-                $kms->addChild('KD_SAR_ANGKUT_INOUT', $dataDetailkms->KD_SAR_ANGKUT_INOUT );
-                $kms->addChild('NO_POL', $detilData['no_pol']);
-                $pelMuat = ($cont->job && $cont->job->muat && $cont->job->muat->kode) ? $cont->job->muat->kode : '';
-                $pelTransit = ($cont->transit && $cont->transit->kode) ? $cont->job->transit->kode : '';
-                $pelBongkar = ($cont->bongkar && $cont->bongkar->kode) ? $cont->job->bongkar->kode : '';
-                
-                $kms->addChild('PEL_MUAT', $pelMuat);
-                $kms->addChild('PEL_TRANSIT', $pelTransit);
-                $kms->addChild('PEL_BONGKAR', $pelBongkar);
-                $xml->addChild('GUDANG_TUJUAN', ($dataDetailkms->gudang_tujuan != '') ? $dataDetailkms->gudang_tujuan : '');
-                $xml->addChild('KODE_KANTOR', ($dataDetailkms->kode_kantor != '') ? $dataDetailkms->kode_kantor : '');
-                $xml->addChild('NO_DAFTAR_PABEAN', ($dataDetailkms->no_daftar_pabean != '') ? $dataDetailkms->no_daftar_pabean : '');
-                $xml->addChild('TGL_DAFTAR_PABEAN', ($dataDetailkms->tgl_daftar_pabean != '') ? $dataDetailkms->tgl_daftar_pabean : '');
-                $kms->addChild('NO_SEGEL_BC', $dataDetailkms->NO_SEGEL_BC);
-                $kms->addChild('TGL_SEGEL_BC', $dataDetailkms->TGL_SEGEL_BC );
-                $kms->addChild('NO_IJIN_TPS', $dataDetailkms->NO_IJIN_TPS );
-                $kms->addChild('TGL_IJIN_TPS', $dataDetailkms->TGL_IJIN_TPS);
-            }
+            $dataDetailkms = $manifest;
+            $tgl_dok = $dataDetailkms->tgl_dok ? Carbon::createFromFormat('Y-m-d', $dataDetailkms->tgl_dok)->format('Ymd') : null;
+            $tanggal = Carbon::createFromFormat('Y-m-d', $dataDetailkms->tglrelease)->format('Ymd');
+            $jam = Carbon::createFromFormat('H:i:s', $dataDetailkms->jamrelease)->format('His');
+            $wk_in = $tanggal . $jam;
+            $detilData = [
+                'tanggal_dok_inout'=> $tgl_dok,
+                'kd_dok_inout' => $dataDetailkms->kd_dok_inout ?? null,
+                'no_dok_inout' => $dataDetailkms->no_dok ?? null,
+                'wk_inout' => $wk_in,
+                'no_pol' => $dataDetailkms->nopol_mty ?? null,
+            ];
+            $kms = $detail->addChild('KMS');
+    
+            $kms->addChild('NO_BL_AWB', $dataDetailkms->nohbl);
+            $kms->addChild('TGL_BL_AWB', $dataDetailkms->tgl_hbl 
+            ? Carbon::createFromFormat('Y-m-d', $dataDetailkms->tgl_hbl)->format('Ymd') 
+            : null,); 
+            $kms->addChild('NO_MASTER_BL_AWB', $dataDetailkms->cont->job->nombl); 
+            $kms->addChild('TGL_MASTER_BL_AWB', $header['tgl_master_bl_awb']); 
+            $kms->addChild('ID_CONSIGNEE', ($dataDetailkms->customer_id ?? '00000000'));
+            $kms->addChild('CONSIGNEE', htmlspecialchars($dataDetailkms->customer->name ?? ''));
+            $kms->addChild('BRUTO', $dataDetailkms->weight );
+            $kms->addChild('NO_BC11', $header['no_bc11']);
+            $kms->addChild('TGL_BC11', $header['tgl_bc11'] );
+            $kms->addChild('NO_POS_BC11', $dataDetailkms->NO_POS_BC11 );
+            $kms->addChild('CONT_ASAL', $dataDetailkms->CONT_ASAL );
+            $kms->addChild('SERI_KEMAS', 1 );
+            $kms->addChild('KD_KEMAS', $dataDetailkms->packing->code ?? null );
+            $kms->addChild('JML_KEMAS', $dataDetailkms->quantity );
+            $kms->addChild('KD_TIMBUN', $dataDetailkms->KD_TIMBUN );
+            $kms->addChild('KD_DOK_INOUT', $detilData['kd_dok_inout'] );
+            $kms->addChild('NO_DOK_INOUT', $detilData['no_dok_inout'] );
+            $kms->addChild('TGL_DOK_INOUT', $detilData['tanggal_dok_inout'] );
+            $kms->addChild('WK_INOUT', $detilData['wk_inout'] );
+            $kms->addChild('KD_SAR_ANGKUT_INOUT', $dataDetailkms->KD_SAR_ANGKUT_INOUT );
+            $kms->addChild('NO_POL', $detilData['no_pol']);
+            $pelMuat = ($cont->job && $cont->job->muat && $cont->job->muat->kode) ? $cont->job->muat->kode : '';
+            $pelTransit = ($cont->transit && $cont->transit->kode) ? $cont->job->transit->kode : '';
+            $pelBongkar = ($cont->bongkar && $cont->bongkar->kode) ? $cont->job->bongkar->kode : '';
+            
+            $kms->addChild('PEL_MUAT', $pelMuat);
+            $kms->addChild('PEL_TRANSIT', $pelTransit);
+            $kms->addChild('PEL_BONGKAR', $pelBongkar);
+            $kms->addChild('GUDANG_TUJUAN', '1MUT');
+            $kms->addChild('KODE_KANTOR', !empty($dataDetailkms->kode_kantor) ? $dataDetailkms->kode_kantor : '');
+            $kms->addChild('NO_DAFTAR_PABEAN', !empty($dataDetailkms->no_daftar_pabean) ? $dataDetailkms->no_daftar_pabean : '');
+            $kms->addChild('TGL_DAFTAR_PABEAN', !empty($dataDetailkms->tgl_daftar_pabean) ? $dataDetailkms->tgl_daftar_pabean : '');        
+            $kms->addChild('NO_SEGEL_BC', $dataDetailkms->NO_SEGEL_BC);
+            $kms->addChild('TGL_SEGEL_BC', $dataDetailkms->TGL_SEGEL_BC );
+            $kms->addChild('NO_IJIN_TPS', $dataDetailkms->NO_IJIN_TPS );
+            $kms->addChild('TGL_IJIN_TPS', $dataDetailkms->TGL_IJIN_TPS);
+            
 
             $data = [
                 'Username' => $this->user, 
@@ -1220,8 +1255,13 @@ class CoariCodecoController extends Controller
             });
 
             $response = $this->response;
+            $hasil = strpos($response, "Proses Berhasil") !== false ? true : false;
+            $flag = 'N';
+            if ($hasil == true) {
+                $flag = 'Y';
+            }
 
-            $codecoKMS = KC::create([
+            $codecoKMS = CodecoKms::create([
                 'nojoborder' => $header['nojoborder'],
                 'tgl_entry' => Carbon::now()->format('Y-m-d'),
                 'jam_entry' => Carbon::now()->format('H:i:s'),
@@ -1230,70 +1270,70 @@ class CoariCodecoController extends Controller
                 'nomor' => null,
             ]);
 
-            foreach ($manifest as $data) {
-                $tgl_dok = $data->tgl_dok ? Carbon::createFromFormat('Y-m-d', $data->tgl_dok)->format('Ymd') : null;
-                $tanggal = Carbon::createFromFormat('Y-m-d', $data->tglbuangmty)->format('Ymd');
-                $jam = Carbon::createFromFormat('H:i:s', $data->jambuangmty)->format('His');
-                $wk_in = $tanggal . $jam;
-                $detilData = [
-                    'tanggal_dok_inout'=> $tgl_dok,
-                    'kd_dok_inout' => $data->kd_dok_inout ?? null,
-                    'no_dok_inout' => $data->no_dok_inout ?? null,
-                    'wk_inout' => $wk_in,
-                    'no_pol' => $data->nopol_mty ?? null,
-                ];
-                $coariKmsDetil = KD::create([
-                    'nojoborder' => $header['nojoborder'],
-                    'codeco_id' => $codecoKMS->id,
-                    'manifest_id' => $data->id,
-                    'ref_number' => $coariKms->ref_number,
-                    'notally' => $data->notally,
-                    'kd_dok' => '5',
-                    'kd_tps' =>$header['kd_tps'],
-                    'nm_angkut' =>$header['nm_angkut'],
-                    'no_voy_flight' => $header['no_voy_flight'],
-                    'call_sign' => $header['call_sign'],
-                    'tgl_tiba' => $header['tgl_tiba'],
-                    'kd_gudang' => $header['kd_gudang'],
-                    'no_bl_awb' => $data->nohbl,
-                    'tgl_bl_awb' => $data->tgl_hbl 
-                    ? Carbon::createFromFormat('Y-m-d', $data->tgl_hbl)->format('Ymd') 
-                    : null,
-                    'no_master_bl_awb' => $data->cont->job->nombl,
-                    'tgl_master_bl_awb' => $header['tgl_master_bl_awb'],
-                    'id_consignee' => $data->customer_id ?? null,
-                    'consignee' => $data->customer->name ?? null,
-                    'bruto' => $data->weight,
-                    'no_bc11' => $header['no_bc11'],
-                    'tgl_bc11' => $header['tgl_bc11'],
-                    
-                    'seri_kemas' => $data->packing->name ?? null,
-                    'kd_kemas' => $data->packing->code ?? null,
-                    'jml_kemas' => $data->quantity,
-                    'kd_timbun',
-                    'kd_dok_inout' => $data->dokumen->kode ?? null,
-                    'no_dok_inout' => $data->no_dok,
-                    'tgl_dok_inout' => $detilData['tanggal_dok_inout'],
-                    'wk_inout' => $detilData['wk_inout'],
-                    'no_pol' => $detilData['no_pol'],
-                    'pel_muat' => $data->cont->job->muat->kode ?? null,
-                    'pel_transit' => $data->cont->job->transit->kode ?? null,
-                    'pel_bongkar' => $data->cont->job->bongkar->kode ?? null,
-                    'gudang_tujuan' => $data->gudang_tujuan ?? null,
-                    'uid' => 'Auto',
-                    'response' => $response,
-                    'kode_kantor' => $data->cont->job->PLP->kode_kantor ?? null,
-                    'kd_tps_asal' => $data->cont->job->PLP->kd_tps_asal ?? null,
-                    'tgl_entry' => $codecoKMS->tgl_entry,
-                    'jam_entry' => $codecoKMS->jam_entry,
-                ]);
-
-                $data->update([
-                    'codeco_flag' => 'Y',
-                ]);
-            }
-
+            $data = $manifest;
+            $tgl_dok = $data->tgl_dok ? Carbon::createFromFormat('Y-m-d', $data->tgl_dok)->format('Ymd') : null;
+            $tanggal = Carbon::createFromFormat('Y-m-d', $data->tglrelease)->format('Ymd');
+            $jam = Carbon::createFromFormat('H:i:s', $data->jamrelease)->format('His');
+            $wk_in = $tanggal . $jam;
+            $detilData = [
+                'tanggal_dok_inout'=> $tgl_dok,
+                'kd_dok_inout' => $data->kd_dok_inout ?? null,
+                'no_dok_inout' => $data->no_dok ?? null,
+                'wk_inout' => $wk_in,
+                'no_pol' => $data->nopol_mty ?? null,
+            ];
+            $coariKmsDetil = CodecoKmsDetil::create([
+                'nojoborder' => $header['nojoborder'],
+                'codeco_id' => $codecoKMS->id,
+                'manifest_id' => $data->id,
+                'ref_number' => $codecoKMS->ref_number,
+                'notally' => $data->notally,
+                'kd_dok' => '5',
+                'kd_tps' =>$header['kd_tps'],
+                'nm_angkut' =>$header['nm_angkut'],
+                'no_voy_flight' => $header['no_voy_flight'],
+                'call_sign' => $header['call_sign'],
+                'tgl_tiba' => $header['tgl_tiba'],
+                'kd_gudang' => $header['kd_gudang'],
+                'no_bl_awb' => $data->nohbl,
+                'tgl_bl_awb' => $data->tgl_hbl 
+                ? Carbon::createFromFormat('Y-m-d', $data->tgl_hbl)->format('Ymd') 
+                : null,
+                'no_master_bl_awb' => $data->cont->job->nombl,
+                'tgl_master_bl_awb' => $header['tgl_master_bl_awb'],
+                'id_consignee' => $data->customer_id ?? null,
+                'consignee' => $data->customer->name ?? null,
+                'bruto' => $data->weight,
+                'no_bc11' => $header['no_bc11'],
+                'tgl_bc11' => $header['tgl_bc11'],
+                
+                'seri_kemas' => 1,
+                'kd_kemas' => $data->packing->code ?? null,
+                'jml_kemas' => $data->quantity,
+                'kd_timbun',
+                'kd_dok_inout' => $data->dokumen->kode ?? null,
+                'no_dok_inout' => $data->no_dok,
+                'tgl_dok_inout' => $detilData['tanggal_dok_inout'],
+                'wk_inout' => $detilData['wk_inout'],
+                'no_pol' => $detilData['no_pol'],
+                'pel_muat' => $data->cont->job->muat->kode ?? null,
+                'pel_transit' => $data->cont->job->transit->kode ?? null,
+                'pel_bongkar' => $data->cont->job->bongkar->kode ?? null,
+                'gudang_tujuan' => $data->gudang_tujuan ?? null,
+                'uid' => 'Auto',
+                'response' => $response,
+                'kode_kantor' => $data->cont->job->PLP->kode_kantor ?? null,
+                'kd_tps_asal' => $data->cont->job->PLP->kd_tps_asal ?? null,
+                'tgl_entry' => $codecoKMS->tgl_entry,
+                'jam_entry' => $codecoKMS->jam_entry,
+            ]);
+            $data->update([
+                'codeco_flag' => $flag,
+            ]);
+    
         }
+
+
 
         return 'success';
     }

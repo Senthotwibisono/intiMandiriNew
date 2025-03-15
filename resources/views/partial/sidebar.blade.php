@@ -52,14 +52,30 @@
                 <a href="#" class="sidebar-link">
                     <span>LCL</span>
                 </a>
-                <ul class="submenu">
+                <ul class="submenu @if(Request::is('pengiriman/coari-lcl/*') || Request::is('pengiriman/codeco-lcl/*')) active @endif">
                     <li class="sidebar-item has-sub @if(Request::is('pengiriman/coari-lcl/*')) active @endif">
                         <a href="#" class="sidebar-link">
                             <span>Coari</span>
                         </a>
-                        <ul class="submenu @if(Request::is('pengiriman/coari-lcl/*')) active @endif">
+                        <ul class="submenu @if(Request::is('pengiriman/coari-lcl/*') || Request::is('pengiriman/codeco-lcl/*')) active @endif">
                             <li class="submenu-item @if(Request::is('pengiriman/coari-lcl/cont-index')) active @endif">
                                 <a href="{{ route('pengiriman.lcl.containerIndex') }}">Container</a>
+                            </li>
+                            <li class="submenu-item @if(Request::is('pengiriman/coari-lcl/manifest-index')) active @endif">
+                                <a href="{{ route('pengiriman.lcl.manifestIndex') }}">Manifest</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="sidebar-item has-sub @if(Request::is('pengiriman/codeco-lcl/*')) active @endif">
+                        <a href="#" class="sidebar-link">
+                            <span>Codeco</span>
+                        </a>
+                        <ul class="submenu @if(Request::is('pengiriman/codeco-lcl/*')) active @endif">
+                            <li class="submenu-item @if(Request::is('pengiriman/codeco-lcl/cont-index')) active @endif">
+                                <a href="/pengiriman/codeco-lcl/cont-index">Container</a>
+                            </li>
+                            <li class="submenu-item @if(Request::is('pengiriman/codeco-lcl/manifest-index')) active @endif">
+                                <a href="/pengiriman/codeco-lcl/manifest-index">Manifest</a>
                             </li>
                         </ul>
                     </li>

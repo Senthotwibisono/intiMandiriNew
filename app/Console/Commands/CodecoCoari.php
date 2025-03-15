@@ -25,16 +25,52 @@ class CodecoCoari extends Command
      */
     public function handle()
     {
-        $controller = new CoariCodecoController(); // Ganti dengan nama controller Anda
-
-        // Panggil semua function
-        $controller->coariCont(); // Ganti dengan nama function pertama
-        $controller->coariContFCL(); // Ganti dengan nama function pertama
-        $controller->CoariKms(); // Ganti dengan nama function kedua
-        $controller->CodecoCont(); // Ganti dengan nama function ketiga
-        $controller->CodecoContFCL(); // Ganti dengan nama function ketiga
-        $controller->CodecoKms(); // Ganti dengan nama function keempat
-
+        $controller = new CoariCodecoController(); 
+    
+        try {
+            $controller->CoariKms();
+            $this->info('CoariKms executed successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Error in CoariKms: ' . $e->getMessage());
+        }
+    
+        try {
+            $controller->CodecoKms();
+            $this->info('CodecoKms executed successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Error in CodecoKms: ' . $e->getMessage());
+        }
+    
+        try {
+            $controller->coariCont();
+            $this->info('coariCont executed successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Error in coariCont: ' . $e->getMessage());
+        }
+    
+        try {
+            $controller->CodecoCont();
+            $this->info('CodecoCont executed successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Error in CodecoCont: ' . $e->getMessage());
+        }
+    
+        try {
+            $controller->coariContFCL();
+            $this->info('coariContFCL executed successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Error in coariContFCL: ' . $e->getMessage());
+        }
+    
+        try {
+            $controller->CodecoContFCL();
+            $this->info('CodecoContFCL executed successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Error in CodecoContFCL: ' . $e->getMessage());
+        }
+    
         $this->info('All daily functions have been executed successfully!');
+        \Log::info('functions:daily executed at ' . now());
     }
+
 }
