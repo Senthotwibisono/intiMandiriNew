@@ -3,12 +3,58 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Scope;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
+
+// class FlagSegelMerahScope implements Scope
+// {
+//     public function apply(Builder $builder, Model $model)
+//     {
+//         if (Auth::check() && Auth::user()->role !== 'bcP2') {
+//             $builder->where('flag_segel_merah', '!=', 'Y');
+//         }
+//     }
+// }
 
 class Manifest extends Model
 {
+    protected static function booted()
+    {
+        // static::addGlobalScope(new FlagSegelMerahScope());
+        parent::boot();
+
+        static::saving(function ($model) {
+            if ($model->flag_segel_merah === 'Y') {
+                if (!Auth::user()->hasRole('bcP2')) {
+                    throw ValidationException::withMessages([
+                        'error' => 'Tidak dapat melakukan perubahan karena sedang segel merah.'
+                    ]);
+                }
+            }
+        });
+
+        static::deleting(function ($model) {
+            if ($model->flag_segel_merah === 'Y' && !Auth::user()->hasRole('bcP2')) {
+                throw ValidationException::withMessages([
+                    'error' => 'Tidak dapat menghapus data karena sedang segel merah.'
+                ]);
+            }
+        });
+
+        // static::retrieved(function ($model) {
+        //     // Hanya untuk mendeteksi pengambilan data, tidak bisa mencegahnya
+        //     if ($model->flag_segel_merah === 'Y' && !Auth::user()->hasRole('BCP2')) {
+        //         throw ValidationException::withMessages([
+        //             'error' => 'Tidak dapat melakukan perubahan karena sedang segel merah.'
+        //         ]);
+        //     }
+        // });
+    }
+    
     use HasFactory;
     protected $table = 'tmanifest';
     protected $primaryKey = 'id';

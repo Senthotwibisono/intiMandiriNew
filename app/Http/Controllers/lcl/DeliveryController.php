@@ -611,6 +611,12 @@ class DeliveryController extends Controller
     public function createBarcode(Request $request)
     {
         $manifest = Manifest::where('id', $request->id)->first();
+        if ($manifest->flag_segel_merah == 'Y') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sedang dalam segel merah!',
+            ]);
+        }
         if ($manifest->no_dok == null) {
             return response()->json([
                 'success' => false,

@@ -247,7 +247,7 @@ class ContainerDokController extends Controller
 
             return redirect()->back()->with('status', ['type'=>'success', 'message'=>'Data Berhasil di simpan']);
         } catch (\Throwable $th) {
-            return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Something Wrong: '.$th->getessage()]);
+            return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Something Wrong: '.$th->getMessage()]);
         }
     }
 }

@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
  //  Api
  use App\Http\Controllers\ApiController;
+ use App\Http\Controllers\Api\CFSController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,3 +26,9 @@ Route::controller(ApiController::class)->group(function(){
         Route::post('/gateService', 'envilogGateService');
     });
 });
+
+Route::controller(CFSController::class)->group(function(){
+    Route::prefix('/cfs')->group(function(){
+        Route::post('/loadBillingDev', 'loadBillingDev');
+    });
+}); 

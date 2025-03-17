@@ -48,6 +48,7 @@ class DokumenController extends Controller
     protected $password;
     protected $kode;
     protected $response;
+    protected $responseCFS;
 
     public function __construct()
     {
@@ -473,6 +474,34 @@ class DokumenController extends Controller
             return back()->with('status', ['type' => 'error', 'message' => 'Error importing data: ' .  $this->response]);
         }
 
+        SoapWrapper::override(function ($service) {
+            $service
+                ->name('ReceiveSPJM_onDemand')
+                ->wsdl('https://ipccfscenter.com/TPSServices/server_plp_dev.php?wsdl')
+                ->trace(true)                                                                                                                                         
+                ->options([
+                    'stream_context' => stream_context_create([
+                        'ssl' => array(
+                            'verify_peer' => false,
+                            'verify_peer_name' => false,
+                            'allow_self_signed' => true
+                        )
+                    ])
+                ]);                                                   
+        });
+        // dd($dataCFS);
+        \SoapWrapper::service('ReceiveSPJM_onDemand', function ($service) use ($xml, $request) {    
+            // dd($service);    
+            $this->responseCFS = $service->call('ReceiveSPJM_onDemand', [
+                'Username' => '1MUT', 
+                'Password' => '1MUT',
+                'noPib' => $request->no_spjm,
+                'tglPib' => Carbon::parse($request->tgl_spjm)->format('dmY'),
+                'fStream' => $xml->asXML()
+            ]);    
+            // dd($this->responseCFS, $xml, $xml->asXML());  
+        });
+
         $header = null;
         $kms = null;
         $dok = null;
@@ -495,10 +524,10 @@ class DokumenController extends Controller
                 }
             }
             // dd($header, $kms, $cont, $dok);
-            // $oldSPJM = SPJM::where('no_pib', $header->NO_PIB)->where('tgl_pib', $header->TGL_PIB)->first();
-            // if ($oldSPJM) {
-            //     return back()->with('status', ['type' => 'error', 'message' => 'Data sudah tersedia']);
-            // }
+            $oldSPJM = SPJM::where('no_pib', $header->NO_PIB)->where('tgl_pib', $header->TGL_PIB)->first();
+            if ($oldSPJM) {
+                return back()->with('status', ['type' => 'error', 'message' => 'Data sudah tersedia']);
+            }
 
             $spjm = SPJM::create([
                 'car'=>$header->CAR,
@@ -601,6 +630,32 @@ class DokumenController extends Controller
             'message' => 'Error : ' . $this->response,
            ]);
         }
+
+        SoapWrapper::override(function ($service) {
+            $service
+                ->name('ReceiveSPJM')
+                ->wsdl('https://ipccfscenter.com/TPSServices/server_plp_dev.php?wsdl')
+                ->trace(true)                                                                                                                                         
+                ->options([
+                    'stream_context' => stream_context_create([
+                        'ssl' => array(
+                            'verify_peer' => false,
+                            'verify_peer_name' => false,
+                            'allow_self_signed' => true
+                        )
+                    ])
+                ]);                                                   
+        });
+        // dd($dataCFS);
+        \SoapWrapper::service('ReceiveSPJM', function ($service) use ($xml) {    
+            // dd($service);    
+            $this->responseCFS = $service->call('ReceiveSPJM', [
+                'Username' => '1MUT', 
+                'Password' => '1MUT',
+                'Kode_TPS' => '1MUT',
+                'fStream' => $xml->asXML()]);    
+                
+        });
         
         $header = array();
         $kms = null;
@@ -826,6 +881,33 @@ class DokumenController extends Controller
         if(!$xml || !$xml->children()){
            return back()->with('status', ['type' => 'error', 'message' => 'Error importing data: ' .  $this->response]);
         }
+
+        \SoapWrapper::override(function ($service) {
+            $service
+                ->name('ReceiveBC23Permit_FASP')
+                ->wsdl('https://ipccfscenter.com/TPSServices/server_plp_dev.php?wsdl')
+                ->trace(true)                                                                                                                                         
+                ->options([
+                    'stream_context' => stream_context_create([
+                        'ssl' => array(
+                            'verify_peer' => false,
+                            'verify_peer_name' => false,
+                            'allow_self_signed' => true
+                        )
+                    ])
+                ]);                                                   
+        });
+        // dd($dataCFS);
+        \SoapWrapper::service('ReceiveBC23Permit_FASP', function ($service) use ($xml) {    
+            // dd($service);    
+            $this->responseCFS = $service->call('ReceiveBC23Permit_FASP', [
+                'Username' => '1MUT', 
+                'Kode_ASP' => '1MUT',
+                'Password' => '1MUT',
+                'fStream' => $xml->asXML()]);    
+                // dd($this->responseCFS, $service);  
+                // dd($this->responseCFS, $xml, $xml->asXML());  
+        });
         
         $header = null;
         $kms = null;
@@ -1023,7 +1105,7 @@ class DokumenController extends Controller
         $data = [
             'UserName' => $this->user, 
             'Password' => $this->password,
-            'Kd_Gudang' => 'ARN1',
+            'Kd_Gudang' => 'INTI',
         ];
         
         // Using the added service
@@ -1041,6 +1123,32 @@ class DokumenController extends Controller
             'message' => 'error : ' . $this->response,
            ]);
         }
+
+        SoapWrapper::override(function ($service) {
+            $service
+                ->name('ReceiveImporPermit_FASP')
+                ->wsdl('https://ipccfscenter.com/TPSServices/server_plp_dev.php?wsdl')
+                ->trace(true)                                                                                                                                         
+                ->options([
+                    'stream_context' => stream_context_create([
+                        'ssl' => array(
+                            'verify_peer' => false,
+                            'verify_peer_name' => false,
+                            'allow_self_signed' => true
+                        )
+                    ])
+                ]);                                                   
+        });
+        // dd($dataCFS);
+        \SoapWrapper::service('ReceiveImporPermit_FASP', function ($service) use ($xml) {    
+            // dd($service);    
+            $this->responseCFS = $service->call('ReceiveImporPermit_FASP', [
+                'Username' => '1MUT', 
+                'Kode_ASP' => '1MUT',
+                'Password' => '1MUT',
+                'fStream' => $xml->asXML()]);    
+                // var_dump($this->responseCFS, $service);  
+        });
         
         $header = array();
         $kms = null;
@@ -1361,6 +1469,35 @@ class DokumenController extends Controller
             return back()->with('status', ['type' => 'error', 'message' => 'Error importing data: ' .  $this->response]);
         }
 
+        \SoapWrapper::override(function ($service) {
+            $service
+                ->name('ReceiveImporPermit_FASP')
+                ->wsdl('https://ipccfscenter.com/TPSServices/server_plp_dev.php?wsdl')
+                ->trace(true)                                                                                                                                         
+                ->options([
+                    'stream_context' => stream_context_create([
+                        'ssl' => array(
+                            'verify_peer' => false,
+                            'verify_peer_name' => false,
+                            'allow_self_signed' => true
+                        )
+                    ])
+                ]);                                                   
+        });
+        // dd($dataCFS);
+        \SoapWrapper::service('ReceiveImporPermit_FASP', function ($service) use ($xml) {    
+            // dd($service);    
+            $this->responseCFS = $service->call('ReceiveImporPermit_FASP', [
+                'Username' => '1MUT', 
+                'Kode_ASP' => '1MUT',
+                'Password' => '1MUT',
+                'fStream' => $xml->asXML()]);    
+                // dd($this->responseCFS, $service); 
+                dd($this->responseCFS, $xml, $xml->asXML());   
+        });
+        // $responseCFS = $this->responseCFS;
+        // dd($responseCFS);
+
         $header = null;
         $kms = null;
         $cont = null;
@@ -1546,7 +1683,7 @@ class DokumenController extends Controller
         $data = [
             'UserName' => $this->user, 
             'Password' => $this->password,
-            'Kd_Gudang' => 'ARN1'
+            'Kd_Gudang' => 'INTI',
         ];
         
         \SoapWrapper::service('TpsOnline', function ($service) use ($data) {        
@@ -1561,6 +1698,32 @@ class DokumenController extends Controller
             'message' => 'Error : ' . $this->response,
            ]);
         }
+
+        \SoapWrapper::override(function ($service) {
+            $service
+                ->name('ReceiveImporPermit_FASP')
+                ->wsdl('https://ipccfscenter.com/TPSServices/server_plp_dev.php?wsdl')
+                ->trace(true)                                                                                                                                         
+                ->options([
+                    'stream_context' => stream_context_create([
+                        'ssl' => array(
+                            'verify_peer' => false,
+                            'verify_peer_name' => false,
+                            'allow_self_signed' => true
+                        )
+                    ])
+                ]);                                                   
+        });
+        // dd($dataCFS);
+        \SoapWrapper::service('ReceiveImporPermit_FASP', function ($service) use ($xml) {    
+            // dd($service);    
+            $this->responseCFS = $service->call('ReceiveImporPermit_FASP', [
+                'Username' => '1MUT', 
+                'Kode_ASP' => '1MUT',
+                'Password' => '1MUT',
+                'fStream' => $xml->asXML()]);    
+                // dd($this->responseCFS, $service);  
+        });
 
         $groups = [];
         $nextGroup = [];
@@ -1621,7 +1784,7 @@ class DokumenController extends Controller
                     if ($sppb->jml_cont > 0) {
                         $contF = ContF::whereNull('tglkeluar')->where('nocontainer', $detailCont->NO_CONT)->where('size', $detailCont->SIZE)->first();
                         if ($contF) {
-                            if ($contF->size == $detail->SIZE) {
+                            if ($contF->size == $detailCont->SIZE) {
                                 $alasanSize = null;
                                 $statusBC = 'release';
                             }else {
