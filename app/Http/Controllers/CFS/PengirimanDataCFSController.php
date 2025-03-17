@@ -264,7 +264,7 @@ class PengirimanDataCFSController extends Controller
 
     public function CoariKMS()
     {
-        $manifestes = Manifest::whereNotNull('tglstripping')->take(1)->get();
+        $manifestes = Manifest::whereNotNull('tglstripping')->whereNotNull('tgl_hbl')->take(1)->get();
         // dd($manifest);
 
         \SoapWrapper::override(function ($service) {
@@ -298,7 +298,8 @@ class PengirimanDataCFSController extends Controller
                 'REF_NUMBER' => $manifest->notally ?? '-',
             ];
 
-            $tglBLawb = $manifest->tglhbl ? Carbon::parse($manifest->tgl_hbl)->format('Ymd') : null;
+            $tglBLawb = $manifest->tgl_hbl ? Carbon::parse($manifest->tgl_hbl)->format('Ymd') : null;
+            // dd($tglBLawb);
             $tglMasterBL = $manifest->job->tgl_master_bl ? Carbon::parse($manifest->job->tgl_master_bl)->format('Ymd') : null;
             $tglBC11 = $manifest->job->ttgl_bc11 ? Carbon::parse($manifest->job->ttgl_bc11)->format('Ymd') : null;
             $tglDokInout = $manifest->tgl_dok ? Carbon::parse($manifest->tgl_dok)->format('Ymd') : null;
@@ -378,7 +379,7 @@ class PengirimanDataCFSController extends Controller
             if ($hasil == true) {
                 $flag = 'Y';
             }
-            dd($xml, $this->response);
+            dd($xml, $this->response, $xml->asXML());
         }
 
     }
