@@ -1493,7 +1493,7 @@ class DokumenController extends Controller
                 'Password' => '1MUT',
                 'fStream' => $xml->asXML()]);    
                 // dd($this->responseCFS, $service); 
-                dd($this->responseCFS, $xml, $xml->asXML());   
+                // dd($this->responseCFS, $xml, $xml->asXML());   
         });
         // $responseCFS = $this->responseCFS;
         // dd($responseCFS);
