@@ -254,9 +254,9 @@
                     <br>
                     <div class="text-center">
                         <tr>
-                            <td>Container</td>
-                            <td> : </td>
-                            <td>{{$barcode->cont->nocontainer}}</td>
+                            <td>Container / BL Awb</td>
+                            <td> : </td> 
+                            <td>{{$barcode->cont->nocontainer}} / {{$barcode->cont->nobl ?? ''}}</td>
                         </tr>
                         <br>
                         <tr>
