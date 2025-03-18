@@ -371,6 +371,21 @@ class BarcodeAutoGateController extends Controller
         }
     }
 
+    public function updateSP2(Request $request)
+    {
+        // var_dump($request->all());
+        $cont = ContF::findOrFail($request->id);
+        $cont->update([
+            'flag_sp2' => 'Y'
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Suksesss',
+            'data' => $cont,
+        ]); 
+    }
+
     public function cetakSP2FCL($id)
     {
         $cont = ContF::find($id);

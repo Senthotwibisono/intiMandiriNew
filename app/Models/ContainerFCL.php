@@ -199,6 +199,7 @@ class ContainerFCL extends Model
 
         'active_to',
         'type_class',
+        'flag_sp2',
     ];
 
     public function user()

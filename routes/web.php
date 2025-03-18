@@ -430,6 +430,7 @@ Route::controller(BarcodeAutoGateController::class)->group(function(){
     Route::get('/autoGate-barcode/data', 'indexData')->name('barcode.autoGate.indexData');
     Route::post('/autoGate', 'autoGateNotification')->name('autoGate.autoGateNotification');
     Route::get('/fcl/sp2/{id?}', 'cetakSP2FCL');
+    Route::post('/fcl/updateSP2', 'updateSP2');
 });
 
 Route::controller(PlacementContainerController::class)->group(function(){

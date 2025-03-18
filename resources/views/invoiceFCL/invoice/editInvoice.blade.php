@@ -12,6 +12,11 @@
         100% { opacity: 0.2; }
     }
 </style>
+<style>
+    .highlight-blue {
+        background-color: lightblue !important;;
+    }
+</style>
 @endsection
 
 
@@ -213,7 +218,7 @@
     <div class="card">
         <div class="card-body">
             <div class="table">
-                <table class="table-custom table-responsive" style="white-space: nowrap;">
+                <table class="tabelCustom table-responsive" style="white-space: nowrap;">
                     <thead>
                         <tr>
                             <th>No Container</th>
@@ -231,7 +236,7 @@
                     </thead>
                     <tbody>
                         @foreach($formC as $cont)
-                            <tr>
+                            <tr class="{{ $cont->cont->flag_sp2 == 'Y' ? 'table-primary' : '' }}">
                                 <td>{{$cont->cont->nocontainer ?? '-'}}</td>
                                 <td>{{$cont->cont->nobl ?? '-'}}</td>
                                 <td>{{$cont->cont->tgl_bl_awb ?? '-'}}</td>
@@ -245,7 +250,8 @@
                                     <button class="btn btn-danger printBarcode" data-id="{{$cont->cont->id}}"><i class="fa fa-print"></i></button>
                                 </td>
                                 <td>
-                                    <a href="/fcl/sp2/{{$cont->cont->id}}" target="blank" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
+                                    <button class="btn btn-sm btn-info" id="sp2Button" data-id="{{$cont->cont->id}}"><i class="fa fa-eye"></i></button>
+                                    <!-- <a href="/fcl/sp2/{{$cont->cont->id}}" target="blank" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a> -->
                                 </td>
                             </tr>
                         @endforeach
@@ -284,6 +290,54 @@
 @endsection
 
 @section('custom_js')
+<script>
+    $(document).on('click', '#sp2Button', function(){
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        let id = $(this).data('id'); // Ambil ID dari tombol yang diklik
+        console.log('Id SP2 : ' + id);
+
+        Swal.showLoading();
+
+        $.ajax({
+            type: 'POST',
+            url: '/fcl/updateSP2',
+            data: { id: id },
+            cache: false,
+            dataType: 'json',
+            success: function(response){
+                console.log(response);
+                if (response.success) {
+                    Swal.fire('Generated!', '', 'success')
+                        .then(() => {
+                            window.open('/fcl/sp2/' + id, '_blank'); // Buka halaman di tab baru
+                        });
+                } else {
+                    Swal.fire('Error', response.message, 'error');
+                }
+            },
+            error: function(response) {
+                var errors = response.responseJSON ? response.responseJSON.errors : null;
+               
+                    var errorMessage = '';
+                    $.each(errors, function(key, value) {
+                        errorMessage += value[0] + '<br>';
+                    });
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Validation Error',
+                        html: errorMessage,
+                    });
+                
+            },
+        });
+    });
+</script>
+
 <!-- HiddenInvoice -->
 <script>
     $(document).ready(function(){
