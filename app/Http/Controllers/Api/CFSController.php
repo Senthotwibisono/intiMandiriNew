@@ -32,7 +32,7 @@ class CFSController extends Controller
         $this->client = new Client(); // Inisialisasi Guzzle Client
     }
 
-    public function loadBillingDev(Request $request)
+    public function loadBilling(Request $request)
     {
         $header = $request->header();
 
