@@ -425,7 +425,7 @@ class CFSController extends Controller
                         'merk_kms' => $detil['MERK_KMS'],
                         'jml_kms' => $detil['JML_KMS'],
                         'status' => 'N',
-                        'rencana_keluar' => $tglKeluar,
+                        'rencana_keluar' => Carbon::parse($request->tgl_keluar),
                         'created_at' => Carbon::now(),
                         'no_bl_awb' => $request->no_bl_awb,
                         'consignee' => $request->consignee,
@@ -696,6 +696,14 @@ class CFSController extends Controller
                 'status' => false,
                 'success' => false,
                 'message' => 'Data tidak ditemukan!!',
+            ]);
+        }
+
+        if ($header->status != 'Y') {
+            return response()->json([
+                'success' => false,
+                'status' => false,
+                'message' => 'Invoice belum Lunas, tidak dapat mencetak barcode',
             ]);
         }
 
