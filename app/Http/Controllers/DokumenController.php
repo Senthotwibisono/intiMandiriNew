@@ -2070,7 +2070,7 @@ class DokumenController extends Controller
                 'teus' => $teus,
                 'uid' => Auth::user()->id,
                 'nobl' => $cont->no_bl_awb,
-                'tgl_bl_awb' => $cont->tgl_bl_awbl ? Carbon::createFromFormat('Ymd', $cont->tgl_bl_awb)->format('Y-m-d') : null,
+                'tgl_bl_awb' => $cont->tgl_bl_awb ? Carbon::createFromFormat('Ymd', $cont->tgl_bl_awb)->format('Y-m-d') : null,
                 'eta'=> $job->eta,
                 'lokasisandar_id' => $job->lokasisandar_id,
                 'cust_id' => $customer->id,
@@ -2100,6 +2100,8 @@ class DokumenController extends Controller
                     'phone' => '111111111',
                 ]);
             }
+
+            // dd($cont->tgl_bl_awb, Carbon::createFromFormat('Ymd', $cont->tgl_bl_awb)->format('Y-m-d'));
             
             ContF::create([
                 'nocontainer' => $cont->no_cont,
@@ -2109,7 +2111,7 @@ class DokumenController extends Controller
                 'teus' => $teus,
                 'uid' => Auth::user()->id,
                 'nobl' => $cont->no_bl_awb,
-                'tgl_bl_awb' => $cont->tgl_bl_awbl ? Carbon::createFromFormat('Ymd', $cont->tgl_bl_awb)->format('Y-m-d') : null,
+                'tgl_bl_awb' => $cont->tgl_bl_awb ? Carbon::createFromFormat('Ymd', $cont->tgl_bl_awb)->format('Y-m-d') : null,
                 'eta'=> $job->eta,
                 'lokasisandar_id' => $job->lokasisandar_id,
                 'cust_id' => $customer->id,

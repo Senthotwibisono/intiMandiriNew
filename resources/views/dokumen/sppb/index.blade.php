@@ -202,7 +202,7 @@
                 // Perform the AJAX request
                 $.ajax({
                     url: "{{ route('dokumen.sppb.import') }}", // Laravel route helper
-                    type: 'POST',
+                    type: 'GET',
                     data: {
                         _token: "{{ csrf_token() }}", // Include CSRF token for security
                         // Additional data can be added here

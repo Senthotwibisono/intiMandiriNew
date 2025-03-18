@@ -65,7 +65,7 @@ class PengirimanDataCFSController extends Controller
             $wkInOut = $tglMasuk.$jamMasuk;
             $tglBl = $cont->tgl_bl_awb ? Carbon::parse($cont->tgl_bl_awb)->format('Ymd') : null;
             $tglBC11 = $cont->job->ttgl_bc11 ? Carbon::parse($cont->job->ttgl_bc11)->format('Ymd') : null; 
-            $tglPLP = $cont->jon->ttgl_plp ? Carbon::parse($cont->jon->ttgl_plp)->format('Ymd') : null;
+            $tglPLP = $cont->job->ttgl_plp ? Carbon::parse($cont->job->ttgl_plp)->format('Ymd') : null;
             $pelMuat = ($cont->job && $cont->job->muat && $cont->job->muat->kode) ? $cont->job->muat->kode : '';
             $pelTransit = ($cont->transit && $cont->transit->kode) ? $cont->job->transit->kode : '';
             $pelBongkar = ($cont->bongkar && $cont->bongkar->kode) ? $cont->job->bongkar->kode : '';
@@ -98,7 +98,7 @@ class PengirimanDataCFSController extends Controller
                 'pel_bongkar' => $pelBongkar ?? '-',
                 'gudang_tujuan' => '1MUT',
                 'kode_kantor' => '040300',
-                'no_daftar_pabean' => '-',
+                'no_daftar_pabean' => '',
                 'tgl_daftar_pabean' => null,
                 'no_segel_bc' => ' ',
                 'tgl_segel_bc' => null,
@@ -106,10 +106,10 @@ class PengirimanDataCFSController extends Controller
                 'tgl_ijin_tps' => null,
             ];
 
-            $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><DOCUMENT></DOCUMENT>');
+            $xml = new \SimpleXMLElement('<DOCUMENT xmlns="cococont.xsd"/>');
 
             // Tambahkan elemen utama
-            $xmldata = $xml->addAttribute('xmlns', 'cococont.xsd');
+            // $xmldata = $xml->addAttribute('xmlns', 'cococont.xsd');
             $xmldata = $xml->addchild('COCOCONT');
             $headerXml = $xmldata->addChild('HEADER');
             $detailXml = $xmldata->addChild('DETIL');
@@ -121,16 +121,24 @@ class PengirimanDataCFSController extends Controller
             // Dump hasil XML
             // dd($xml);
     
+            $output = preg_replace('/\s+/', ' ', $xml->asXML());
+            // dd($output);
             $datas = [
                 'Username' => $this->user, 
                 'Password' => $this->password,
                 'fStream' => $xml->asXML()
             ];
+            $userName = $this->user;
+            $password = $this->password;
 
             // dd($datas);
             
-            \SoapWrapper::service('CoarriCodeco_Container', function ($service) use ($datas) {        
-                $this->response = $service->call('CoarriCodeco_Container', [$datas]);      
+            \SoapWrapper::service('CoarriCodeco_Container', function ($service) use ($output, $userName, $password) {        
+                $this->response = $service->call('CoarriCodeco_Container', [
+                    'fStream' => $output,
+                    'Username' => $userName,
+                    'Password' => $password,
+                ]);      
             });
             $response = $this->response;
     
@@ -340,9 +348,9 @@ class PengirimanDataCFSController extends Controller
                 'tgl_segel_bc' => null,
                 'no_ijin_tps' => null,
                 'tgl_ijin_tps' => null,
-                'nama_consolidator' => 'PT INTI MANDIRI UTAMA TRANS',
-                'npwp_consolidator' => '0022383483042000',
-                'alamat_consolidator' => 'Jl. Bugis Raya No. 15 Kebon Bawang Tanjung Priok',
+                // 'nama_consolidator' => 'PT INTI MANDIRI UTAMA TRANS',
+                // 'npwp_consolidator' => '0022383483042000',
+                // 'alamat_consolidator' => 'Jl. Bugis Raya No. 15 Kebon Bawang Tanjung Priok',
             ];
 
 
@@ -383,15 +391,21 @@ class PengirimanDataCFSController extends Controller
                 'Password' => $this->password,
                 'fStream' => $output,
             ];
+            $userName = $this->user;
+            $password = $this->password;
 
             // dd($datas);
             try {
-                \SoapWrapper::service('CoarriCodeco_Kemasan', function ($service) use ($datas) {        
-                    $this->response = $service->call('CoarriCodeco_Kemasan', [$datas]);  
-                    dd($this->response, $datas);    
+                \SoapWrapper::service('CoarriCodeco_Kemasan', function ($service) use ($output, $userName, $password) {        
+                    $this->response = $service->call('CoarriCodeco_Kemasan', [
+                        'fstream' => $output,
+                        'Username' => $userName,
+                        'Password' => $password,
+                    ]);      
                 });
                 $response = $this->response;
         
+                dd($response, $output);
                 $hasil = strpos($response, "Proses Berhasil") !== false ? true : false;
                 $flag = 'N';
                 if ($hasil == true) {
@@ -442,7 +456,7 @@ class PengirimanDataCFSController extends Controller
                 'REF_NUMBER' => $manifest->notally ?? '-',
             ];
 
-            $tglBLawb = $manifest->tglhbl ? Carbon::parse($manifest->tgl_hbl)->format('Ymd') : null;
+            $tglBLawb = $manifest->tgl_hbl ? Carbon::parse($manifest->tgl_hbl)->format('Ymd') : null;
             $tglMasterBL = $manifest->job->tgl_master_bl ? Carbon::parse($manifest->job->tgl_master_bl)->format('Ymd') : null;
             $tglBC11 = $manifest->job->ttgl_bc11 ? Carbon::parse($manifest->job->ttgl_bc11)->format('Ymd') : null;
             $tglDokInout = $manifest->tgl_dok ? Carbon::parse($manifest->tgl_dok)->format('Ymd') : null;
@@ -455,34 +469,34 @@ class PengirimanDataCFSController extends Controller
                 'tgl_bl_awb' => $tglBLawb,
                 'no_master_bl_awb' => $manifest->job->nombl,
                 'tgl_master_bl_awb' => $tglMasterBL,
-                'id_consignee' => $manifest->customer->id ?? '-',
-                'consignee' => $manifest->customer->name ?? '-',
+                'id_consignee' => $manifest->customer->id ?? null,
+                'consignee' => $manifest->customer->name ?? null,
                 'bruto' => $manifest->weight ?? 0,
                 'no_bc11' => $manifest->job->tno_bc11,
                 'tgl_bc11' => $tglBC11,
-                'no_pos_bc11' => $manifest->no_pos_bc11 ?? '-',
-                'cont_asal' => $manifest->cont->nocontainer ?? '-',
+                'no_pos_bc11' => $manifest->no_pos_bc11 ?? null,
+                'cont_asal' => $manifest->cont->nocontainer ?? null,
                 'seri_kemas' => 1,
-                'kd_kemas' => $manifest->packing->code ?? '-',
+                'kd_kemas' => $manifest->packing->code ?? null,
                 'jml_kemas' => $manifest->quantity ?? 0,
-                'kd_timbun' => $manifest->kd_timbun ?? '-',
+                'kd_timbun' => $manifest->kd_timbun ?? null,
                 'kd_dok_inout' => $manifest->kd_dok_inout,
-                'no_dok_input' => $manifest->no_dok,
+                'no_dok_inout' => $manifest->no_dok,
                 'tgl_dok_inout' => $tglDokInout,
                 'wk_inout' => $wkInOut,
                 'kd_sar_angkut_inout' => 1,
-                'no_pol' => $manifest->cont->nopol ?? '-',
-                'pel_muat' => $pelMuat ?? '-',
-                'pel_transit' => $pelTransit ?? '-',
-                'pel_bongkar' => $pelBongkar ?? '-',
+                'no_pol' => $manifest->cont->nopol ?? null,
+                'pel_muat' => $pelMuat ?? null,
+                'pel_transit' => $pelTransit ?? null,
+                'pel_bongkar' => $pelBongkar ?? null,
                 'gudang_tujuan' => '1MUT',
                 'kode_kantor' => '040300',
-                'no_daftar_pabean' => '-',
-                'tgl_daftar_pabean' => '-',
-                'no_segel_bc' => ' ',
-                'tgl_segel_bc' => ' ',
-                'no_ijin_tps' => ' ',
-                'tgl_ijin_tps' => ' ',
+                'no_daftar_pabean' => null,
+                'tgl_daftar_pabean' => null,
+                'no_segel_bc' => null,
+                'tgl_segel_bc' => null,
+                'no_ijin_tps' => null,
+                'tgl_ijin_tps' => null,
                 'nama_consolidator' => 'PT INTI MANDIRI UTAMA TRANS',
                 'npwp_consolidator' => '0022383483042000',
                 'alamat_consolidator' => 'Jl. Bugis Raya No. 15 Kebon Bawang Tanjung Priok',
@@ -503,6 +517,8 @@ class PengirimanDataCFSController extends Controller
             
             // Dump hasil XML
             // dd($xml);
+
+            $output = preg_replace('/\s+/', ' ', $xml->asXML());
     
             $datas = [
                 'Username' => $this->user, 
@@ -510,11 +526,18 @@ class PengirimanDataCFSController extends Controller
                 'fStream' => $xml->asXML()
             ];
 
+            $userName = $this->user;
+            $password = $this->password;
+
             // dd($datas);
             
-            \SoapWrapper::service('CoarriCodeco_Kemasan', function ($service) use ($datas) {    
+            \SoapWrapper::service('CoarriCodeco_Kemasan', function ($service) use ($output, $userName, $password) {    
                 // dd($service);    
-                $this->response = $service->call('CoarriCodeco_Kemasan', [$datas]);      
+                $this->response = $service->call('CoarriCodeco_Kemasan', [
+                    'fstream' => $output,
+                    'Username' => $userName,
+                    'Password' => $password,
+                ]);      
             });
             $response = $this->response;
     
@@ -523,7 +546,7 @@ class PengirimanDataCFSController extends Controller
             if ($hasil == true) {
                 $flag = 'Y';
             }
-            dd($xml, $this->response);
+            dd($this->response, $output, $xml);
         }
 
     }

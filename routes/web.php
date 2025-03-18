@@ -271,7 +271,7 @@ Route::controller(DokumenController::class)->group(function (){
      Route::get('/dokumen/sppb/cont{id?}', 'sppbCont')->name('dokumen.sppb.detailCont');
      Route::post('/dokumen/sppb/updateDetail', 'sppbUpdateDetail')->name('dokumen.sppb.update.detail');
      Route::post('/dokumen/sppb-getData', 'GetImpor_SPPB_OnDemand')->name('dokumen.sppb.onDemand');
-     Route::post('/dokumen/sppb-getData-automatic', 'GetImporPermit')->name('dokumen.sppb.import');
+     Route::get('/dokumen/sppb-getData-automatic', 'GetImporPermit')->name('dokumen.sppb.import');
      
      //   manual
      Route::get('/dokumen/manual', 'manualIndex')->name('dokumen.manual.index');
