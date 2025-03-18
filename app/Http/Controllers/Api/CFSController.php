@@ -14,7 +14,7 @@ use App\Models\Manifest;
 use App\Models\Container as cont;
 use App\Models\TarifCFS as Tarif;
 use App\Models\InvoiceCSF as Header;
-use App\Models\invoiceCSFDetil as Detil;
+use App\Models\InvoiceCSFDetil as Detil;
 use App\Models\BarcodeGate as Barcode;
 
 use GuzzleHttp\Client;
