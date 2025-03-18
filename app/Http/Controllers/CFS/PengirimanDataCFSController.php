@@ -77,7 +77,7 @@ class PengirimanDataCFSController extends Controller
                 'no_bl_awb' => $cont->nobl ?? '',
                 'tgl_bl_awb' => $tglBl,
                 'no_master_bl_awb' => '', 
-                'tgl_master_bl_awb' => '', 
+                'tgl_master_bl_awb' => null, 
                 'id_conseignee' => '',
                 'conseignee' => '',
                 'bruto' => $cont->weight ?? 0,
@@ -99,11 +99,11 @@ class PengirimanDataCFSController extends Controller
                 'gudang_tujuan' => '1MUT',
                 'kode_kantor' => '040300',
                 'no_daftar_pabean' => '-',
-                'tgl_daftar_pabean' => '-',
+                'tgl_daftar_pabean' => null,
                 'no_segel_bc' => ' ',
-                'tgl_segel_bc' => ' ',
+                'tgl_segel_bc' => null,
                 'no_ijin_tps' => ' ',
-                'tgl_ijin_tps' => ' ',
+                'tgl_ijin_tps' => null,
             ];
 
             $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><DOCUMENT></DOCUMENT>');
@@ -302,7 +302,7 @@ class PengirimanDataCFSController extends Controller
             // dd($tglBLawb);
             $tglMasterBL = $manifest->job->tgl_master_bl ? Carbon::parse($manifest->job->tgl_master_bl)->format('Ymd') : null;
             $tglBC11 = $manifest->job->ttgl_bc11 ? Carbon::parse($manifest->job->ttgl_bc11)->format('Ymd') : null;
-            $tglDokInout = $manifest->tgl_dok ? Carbon::parse($manifest->tgl_dok)->format('Ymd') : null;
+            $tglDokInout = $manifest->job->ttgl_plp ? Carbon::parse($manifest->job->ttgl_plp)->format('Ymd') : null;
             $wkInOut = $tglMasuk.$jamMasuk;
             $pelMuat = ($manifest->cont->job && $manifest->cont->job->muat && $manifest->cont->job->muat->kode) ? $manifest->cont->job->muat->kode : '';
             $pelTransit = ($manifest->cont->transit && $manifest->cont->transit->kode) ? $manifest->cont->job->transit->kode : '';
@@ -312,74 +312,95 @@ class PengirimanDataCFSController extends Controller
                 'tgl_bl_awb' => $tglBLawb,
                 'no_master_bl_awb' => $manifest->job->nombl,
                 'tgl_master_bl_awb' => $tglMasterBL,
-                'id_consignee' => $manifest->customer->id ?? '-',
-                'consignee' => $manifest->customer->name ?? '-',
+                'id_consignee' => $manifest->customer->id ?? null,
+                'consignee' => $manifest->customer->name ?? null,
                 'bruto' => $manifest->weight ?? 0,
                 'no_bc11' => $manifest->job->tno_bc11,
                 'tgl_bc11' => $tglBC11,
-                'no_pos_bc11' => $manifest->no_pos_bc11 ?? '-',
-                'cont_asal' => $manifest->cont->nocontainer ?? '-',
+                'no_pos_bc11' => $manifest->no_pos_bc11 ?? null,
+                'cont_asal' => $manifest->cont->nocontainer ?? null,
                 'seri_kemas' => 1,
-                'kd_kemas' => $manifest->packing->code ?? '-',
+                'kd_kemas' => $manifest->packing->code ?? null,
                 'jml_kemas' => $manifest->quantity ?? 0,
-                'kd_timbun' => $manifest->kd_timbun ?? '-',
-                'kd_dok_inout' => $manifest->kd_dok_inout,
-                'no_dok_input' => $manifest->no_dok,
+                'kd_timbun' => $manifest->kd_timbun ?? null,
+                'kd_dok_inout' => 3,
+                'no_dok_inout' => $manifest->job->noplp,
                 'tgl_dok_inout' => $tglDokInout,
                 'wk_inout' => $wkInOut,
                 'kd_sar_angkut_inout' => 1,
-                'no_pol' => $manifest->cont->nopol ?? '-',
-                'pel_muat' => $pelMuat ?? '-',
-                'pel_transit' => $pelTransit ?? '-',
-                'pel_bongkar' => $pelBongkar ?? '-',
+                'no_pol' => $manifest->cont->nopol ?? null,
+                'pel_muat' => $pelMuat ?? null,
+                'pel_transit' => $pelTransit ?? null,
+                'pel_bongkar' => $pelBongkar ?? null,
                 'gudang_tujuan' => '1MUT',
                 'kode_kantor' => '040300',
-                'no_daftar_pabean' => '-',
-                'tgl_daftar_pabean' => '-',
-                'no_segel_bc' => ' ',
-                'tgl_segel_bc' => ' ',
-                'no_ijin_tps' => ' ',
-                'tgl_ijin_tps' => ' ',
+                'no_daftar_pabean' => null,
+                'tgl_daftar_pabean' => null,
+                'no_segel_bc' => null,
+                'tgl_segel_bc' => null,
+                'no_ijin_tps' => null,
+                'tgl_ijin_tps' => null,
                 'nama_consolidator' => 'PT INTI MANDIRI UTAMA TRANS',
                 'npwp_consolidator' => '0022383483042000',
                 'alamat_consolidator' => 'Jl. Bugis Raya No. 15 Kebon Bawang Tanjung Priok',
             ];
 
-            $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><DOCUMENT></DOCUMENT>');
+
 
             // Tambahkan elemen utama
-            $xmldata = $xml->addAttribute('xmlns', 'cocokms.xsd');
-            $xmldata = $xml->addchild('COCOKMS');
+            $xml = new \SimpleXMLElement('<DOCUMENT xmlns="cocokms.xsd"/>');
+
+            // Tambahkan namespace ke elemen root
+            // $xml->addAttribute('xmlns', 'cocokms.xsd');
+                    
+            // Tambahkan elemen utama
+            $xmldata = $xml->addChild('COCOKMS');
             $headerXml = $xmldata->addChild('HEADER');
             $detailXml = $xmldata->addChild('DETIL');
             $kmsXml = $detailXml->addChild('KMS');
-            
+                    
             // Konversi array ke XML
             $this->arrayToXml($dataHeader, $headerXml);
             $this->arrayToXml($dataDetil, $kmsXml);
+                    
+            // Tambahkan deklarasi XML secara manual saat menyimpan atau mencetak
+            // $dom = new DOMDocument('1.0', 'UTF-8');
+            // $dom->preserveWhiteSpace = false;
+            // $dom->formatOutput = true;
+            // $dom->loadXML($xml->asXML());
+                    
+            // // Output hasil XML dengan deklarasi yang benar
+            // echo $dom->saveXML();
             
             // Dump hasil XML
             // dd($xml);
+
+            $output = preg_replace('/\s+/', ' ', $xml->asXML());
+            // dd($output);
     
             $datas = [
                 'Username' => $this->user, 
                 'Password' => $this->password,
-                'fStream' => $xml->asXML()
+                'fStream' => $output,
             ];
 
             // dd($datas);
-            
-            \SoapWrapper::service('CoarriCodeco_Kemasan', function ($service) use ($datas) {        
-                $this->response = $service->call('CoarriCodeco_Kemasan', [$datas]);      
-            });
-            $response = $this->response;
-    
-            $hasil = strpos($response, "Proses Berhasil") !== false ? true : false;
-            $flag = 'N';
-            if ($hasil == true) {
-                $flag = 'Y';
+            try {
+                \SoapWrapper::service('CoarriCodeco_Kemasan', function ($service) use ($datas) {        
+                    $this->response = $service->call('CoarriCodeco_Kemasan', [$datas]);  
+                    dd($this->response, $datas);    
+                });
+                $response = $this->response;
+        
+                $hasil = strpos($response, "Proses Berhasil") !== false ? true : false;
+                $flag = 'N';
+                if ($hasil == true) {
+                    $flag = 'Y';
+                }
+            } catch (\Throwable $th) {
+                dd($th->getMessage());
             }
-            dd($xml, $this->response, $xml->asXML());
+           
         }
 
     }
@@ -641,7 +662,7 @@ class PengirimanDataCFSController extends Controller
             if ($hasil == true) {
                 $flag = 'Y';
             }
-            dd($xml, $this->response);
+            dd($xml->asXML(), $this->response);
         // }
         
     }

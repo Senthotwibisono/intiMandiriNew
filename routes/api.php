@@ -30,5 +30,8 @@ Route::controller(ApiController::class)->group(function(){
 Route::controller(CFSController::class)->group(function(){
     Route::prefix('/cfs')->group(function(){
         Route::post('/loadBillingDev', 'loadBillingDev');
+        Route::post('/CancelProforma', 'CancelProforma');
+        Route::post('/FlagLunas', 'FlagLunas');
+        Route::post('/gatePass', 'gatePass');
     });
 }); 

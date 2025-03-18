@@ -644,11 +644,17 @@ class DeliveryController extends Controller
         }else {
             $action = 'hold';
         }
+        if ($manifest->active_to == null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tanggal rencana keluar belum di atur',
+            ]);
+        }
         $barcode = Barcode::where('ref_id', $manifest->id)->where('ref_type', '=', 'Manifest')->where('ref_action', 'release')->first();
         if ($barcode) {
             $barcode->update([
                 // 'expired'=> $header->expired_date,
-                'expired'=> Carbon::now()->addDay(3),
+                'expired'=> $manifest->active_to,
             ]);
             return response()->json([
                 'success' => true,
@@ -667,7 +673,7 @@ class DeliveryController extends Controller
                 'barcode'=> $uniqueBarcode,
                 'status'=> $action,
                 // 'expired'=> $header->expired_date,
-                'expired'=> Carbon::now()->addDay(3),
+                'expired'=> $manifest->active_to,
                 'uid'=> Auth::user()->id,
                 'created_at'=> Carbon::now(),
             ]);

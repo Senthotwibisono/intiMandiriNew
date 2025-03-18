@@ -282,6 +282,11 @@ class InvoiceController extends Controller
             'no_hp' => $request->no_hp,
         ]);
 
+        $manifest = Manifest::findOrFail($header->manifest_id);
+        $manifest->update([
+            'active_to' => ($header->expired_date > $manifest->active_to) ? $header->expired_date : $manifest->active_to,
+        ]);
+
         return redirect()->back()->with('status', ['type' => 'success', 'message' => 'Berhasil di Simpan']);
     } catch (\Throwable $th) {
         return redirect()->back()->with('status', ['type' => 'error', 'message' => 'Opss Somtehing Wrong: ' . $th->getMessage()]);
