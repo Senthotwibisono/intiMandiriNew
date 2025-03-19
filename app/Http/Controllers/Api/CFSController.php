@@ -61,12 +61,12 @@ class CFSController extends Controller
             'no_cont'        => 'required',
             'consignee'      => 'required',
             'npwp_consignee' => 'required',
-            'no_pol'         => 'required',
+            // 'no_pol'         => 'required',
             'jns_kms'        => 'required',
-            'merk_kms'       => 'required',
+            // 'merk_kms'       => 'required',
             'jml_kms'        => 'required|integer',
-            'user'           => 'required',
-            'warehouse'      => 'required',
+            // 'user'           => 'required',
+            // 'warehouse'      => 'required',
         ];
         
         // Tambahkan aturan validasi jika jenis transaksi adalah 'P'
@@ -87,13 +87,13 @@ class CFSController extends Controller
             'no_cont.required'        => 'Nomor kontainer wajib diisi.',
             'consignee.required'      => 'Consignee wajib diisi.',
             'npwp_consignee.required' => 'NPWP Consignee wajib diisi.',
-            'no_pol.required'         => 'Nomor polisi wajib diisi.',
+            // 'no_pol.required'         => 'Nomor polisi wajib diisi.',
             'jns_kms.required'        => 'Jenis kemasan wajib diisi.',
-            'merk_kms.required'       => 'Merk kemasan wajib diisi.',
+            // 'merk_kms.required'       => 'Merk kemasan wajib diisi.',
             'jml_kms.required'        => 'Jumlah kemasan wajib diisi.',
             'jml_kms.integer'         => 'Jumlah kemasan harus berupa angka.',
-            'user.required'           => 'User wajib diisi.',
-            'warehouse.required'      => 'Warehouse wajib diisi.',
+            // 'user.required'           => 'User wajib diisi.',
+            // 'warehouse.required'      => 'Warehouse wajib diisi.',
         ];
         
         $validator = Validator::make($request->all(), $rules, $messages);
@@ -117,21 +117,21 @@ class CFSController extends Controller
             // $manifest = Manifest::where('nohbl', $request->no_bl_awb)->where('cont.nocontainer', $request->no_cont)->first();
     
             if ($manifest) {
-                if ($manifest->customer->name != $request->consignee ) {
-                    return response()->json([
-                        'status' => false,
-                        'success' => false,
-                        'message' => 'Nama Consignee berbeda',
-                    ]);
-                }
+                // if ($manifest->customer->name != $request->consignee ) {
+                //     return response()->json([
+                //         'status' => false,
+                //         'success' => false,
+                //         'message' => 'Nama Consignee berbeda',
+                //     ]);
+                // }
     
-                if ($manifest->customer->npwp != $request->npwp_consignee ) {
-                    return response()->json([
-                        'status' => false,
-                        'success' => false,
-                        'message' => 'NPWP Consignee berbeda',
-                    ]);
-                }
+                // if ($manifest->customer->npwp != $request->npwp_consignee ) {
+                //     return response()->json([
+                //         'status' => false,
+                //         'success' => false,
+                //         'message' => 'NPWP Consignee berbeda',
+                //     ]);
+                // }
                 if ($manifest->packing->code != $request->jns_kms ) {
                     return response()->json([
                         'status' => false,
@@ -207,12 +207,12 @@ class CFSController extends Controller
     
                      if ($massa1 > 0) {
                         $tarifMassa1 = ($type == 'NORMAL') ? Tarif::find(4) : Tarif::find(7);
-                        $hargaMassa1 = ($tarifMassa1->tarif_dasar * $massa1 * $cbm);
+                        $hargaMassa1 = ($tarifMassa1->tarif_dasar * 1 * $cbm);
                         $storage1 = [
                             "KODE_TARIF" => $tarifMassa1->kode_bill,
                             "TARIF_DASAR" => $tarifMassa1->tarif_dasar,
                             "QTY" => $cbm,
-                            "HARI" => $massa1,
+                            "HARI" => 1,
                             "NILAI" => $hargaMassa1,
                             "SATUAN" => ($manifest->quantity).($manifest->packing->code ?? '')
                         ] ;
@@ -310,12 +310,12 @@ class CFSController extends Controller
                     // dd('tglStripping: ' . $tglStripping , 'IntervalAwal: ' . $intervalAwal, 'interval : ' . $interval, 'Massa1 : ' . $massa1, 'oldMassa1 : ' . $OldMassa1, 'Massa2 : ' . $massa2, 'massa 3 : ' . $massa3);
                     if ($massa1 > 0) {
                         $tarifMassa1 = ($type == 'NORMAL') ? Tarif::find(4) : Tarif::find(7);
-                        $hargaMassa1 = ($tarifMassa1->tarif_dasar * $cbm * $massa1);
+                        $hargaMassa1 = ($tarifMassa1->tarif_dasar * $cbm * 1);
                         $storage1 = [
                             "KODE_TARIF" => $tarifMassa1->kode_bill,
                             "TARIF_DASAR" => $tarifMassa1->tarif_dasar,
                             "QTY" => $cbm,
-                            "HARI" => $massa1,
+                            "HARI" => 1,
                             "NILAI" => $hargaMassa1,
                             "SATUAN" => ($manifest->quantity).($manifest->packing->code ?? '')
                         ];
