@@ -113,9 +113,12 @@ class CFSController extends Controller
             $manifest = Manifest::where('nohbl', $request->no_bl_awb)->whereHas('cont', function ($query) use ($request){
                 $query->where('nocontainer', $request->no_cont);
             })->first();
+
+            // dd($manifest);
     
             // $manifest = Manifest::where('nohbl', $request->no_bl_awb)->where('cont.nocontainer', $request->no_cont)->first();
     
+            // dd($request->all());
             if ($manifest) {
                 // if ($manifest->customer->name != $request->consignee ) {
                 //     return response()->json([
@@ -299,7 +302,7 @@ class CFSController extends Controller
                     $intervalAwal = $tglStripping->diff($tglKeluarLama->addDays(1))->days;
                     $massa1 = 0; $massa2 = 0; $massa3 = 0;
                     if ($intervalAwal > 5) {
-                        $massa3 = $intervalAwal;
+                        $massa3 = $interval;
                     }else {
                         $OldMassa1 = $intervalAwal;
                         $massa1 = max(0, min(3, (3 - $OldMassa1)));
@@ -355,6 +358,8 @@ class CFSController extends Controller
                         $tarif[] = $storage3;
                      }
                 }
+
+                // dd('tglStripping: ' . $tglStripping , 'IntervalAwal: ' . $intervalAwal, 'interval : ' . $interval, 'Massa1 : ' . $massa1, 'Massa2 : ' . $massa2, 'massa 3 : ' . $massa3);
     
                  //  Admin
                  $tarifAdmin = Tarif::find(13);
@@ -453,6 +458,12 @@ class CFSController extends Controller
                     'success' => true,
                     'message' => 'Data ditemukan',
                     'data' => $data,
+                ]);
+            }else {
+                return response()->json([
+                    'status' => false,
+                    'success' => false,
+                    'message' => 'Data tidak dotemukan',
                 ]);
             }
         } catch (\Throwable $th) {
