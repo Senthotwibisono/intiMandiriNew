@@ -135,6 +135,7 @@ class Container extends Model
         'yard_detil_id',
         'coari_flag',
         'codeco_flag',
+        'coari_cfs_flag',
     ];
 
     public function DepoMty()

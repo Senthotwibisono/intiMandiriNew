@@ -29,7 +29,12 @@ class Manifest extends Model
 
         static::saving(function ($model) {
             if ($model->flag_segel_merah === 'Y') {
-                if (!Auth::user()->hasRole('bcP2')) {
+                // Jika dijalankan via CLI (scheduler), lewati pengecekan Auth
+                if (app()->runningInConsole()) {
+                    return;
+                }
+
+                if (!Auth::check() || !(Auth::user()->hasRole('bcP2') || Auth::user()->id == 1)) {
                     throw ValidationException::withMessages([
                         'error' => 'Tidak dapat melakukan perubahan karena sedang segel merah.'
                     ]);
@@ -38,10 +43,17 @@ class Manifest extends Model
         });
 
         static::deleting(function ($model) {
-            if ($model->flag_segel_merah === 'Y' && !Auth::user()->hasRole('bcP2')) {
-                throw ValidationException::withMessages([
-                    'error' => 'Tidak dapat menghapus data karena sedang segel merah.'
-                ]);
+            if ($model->flag_segel_merah === 'Y') {
+                // Jika dijalankan via CLI (scheduler), lewati pengecekan Auth
+                if (app()->runningInConsole()) {
+                    return;
+                }
+
+                if (!Auth::check() || !(Auth::user()->hasRole('bcP2') || Auth::user()->id == 1)) {
+                    throw ValidationException::withMessages([
+                        'error' => 'Tidak dapat menghapus data karena sedang segel merah.'
+                    ]);
+                }
             }
         });
 
@@ -272,6 +284,9 @@ class Manifest extends Model
         'mulai_muat',
         'selesai_muat',
         'uid_muat',
+        'coari_cfs_flag',
+        'codeco_cfs_flag',
+        'detil_hbl_cfs_flag',
     ];
 
     public function user()

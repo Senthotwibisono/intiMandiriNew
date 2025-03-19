@@ -2740,7 +2740,35 @@ class DokumenController extends Controller
         if(!$xml || !$xml->children()){
             return back()->with('status', ['type' => 'error', 'message' => 'Error importing data: ' .  $this->response]);
         }
-        
+
+        \SoapWrapper::override(function ($service) {
+            $service
+                ->name('ReceiveImporPermit_Manual')
+                ->wsdl('https://ipccfscenter.com/TPSServices/server_plp_dev.php?wsdl')
+                ->trace(true)                                                                                                                                         
+                ->options([
+                    'stream_context' => stream_context_create([
+                        'ssl' => array(
+                            'verify_peer' => false,
+                            'verify_peer_name' => false,
+                            'allow_self_signed' => true
+                        )
+                    ])
+                ]);                                                   
+        });
+        // dd($dataCFS);
+        \SoapWrapper::service('ReceiveImporPermit_Manual', function ($service) use ($xml) {    
+            // dd($service);    
+            $this->responseCFS = $service->call('ReceiveImporPermit_Manual', [
+                'Username' => '1MUT', 
+                'Kode_ASP' => '1MUT',
+                'Password' => '1MUT',
+                'fStream' => $xml->asXML()]);    
+                // dd($this->responseCFS, $service);  
+        });
+
+        dd($this->responseCFS);
+
         $docmanual_id = 0;
         $header = null;
         $kms = null;

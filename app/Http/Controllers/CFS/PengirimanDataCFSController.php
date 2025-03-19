@@ -20,7 +20,8 @@ class PengirimanDataCFSController extends Controller
     public function __construct() {
         // $this->middleware('auth');
 
-        $this->wsdl = 'https://ipccfscenter.com/TPSServices/server_plp_dev.php?wsdl';
+        // $this->wsdl = 'https://ipccfscenter.com/TPSServices/server_plp_dev.php?wsdl';
+        $this->wsdl = 'https://pelindo-cfscenter.com/TPSServices/server_plp.php?wsdl ';
         $this->user = '1MUT';
         $this->password = '1MUT';
         $this->kode = '1MUT';
@@ -28,8 +29,8 @@ class PengirimanDataCFSController extends Controller
 
     public function CoariCont()
     {
-        // $conts = Cont::whereNotNull('tglmasuk')->get();
-        $cont = Cont::find(3);
+        $conts = Cont::whereNotNull('tglmasuk')->where('coari_cfs_flag', 'N')->get();
+        // $cont = Cont::find(3);
 
         \SoapWrapper::override(function ($service) {
             $service
@@ -48,7 +49,7 @@ class PengirimanDataCFSController extends Controller
                 ]);                                                   
         });
 
-    //     foreach ($conts as $cont) {
+        foreach ($conts as $cont) {
             $tglMasuk = $cont->tglmasuk ? Carbon::parse($cont->tglmasuk ?? $cont->tglmasuk)->format('Ymd') : null;
             $jamMasuk = $cont->jammasuk ? Carbon::parse($cont->jammasuk ?? $cont->jammasuk)->format('His') : null;
             $tglTiba = Carbon::parse($cont->job->eta)->format('Ymd');
@@ -106,17 +107,17 @@ class PengirimanDataCFSController extends Controller
                 'tgl_ijin_tps' => null,
             ];
 
-            $xml = new \SimpleXMLElement('<DOCUMENT xmlns="cococont.xsd"/>');
+            $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><DOCUMENT></DOCUMENT>');
 
             // Tambahkan elemen utama
-            // $xmldata = $xml->addAttribute('xmlns', 'cococont.xsd');
+            $xmldata = $xml->addAttribute('xmlns', 'cococont.xsd');
             $xmldata = $xml->addchild('COCOCONT');
             $headerXml = $xmldata->addChild('HEADER');
             $detailXml = $xmldata->addChild('DETIL');
-            $kmsXml = $detailXml->addChild('CONT');
+            $contXml = $detailXml->addChild('CONT');
 
             $this->arrayToXml($dataHeader, $headerXml);
-            $this->arrayToXml($dataDetil, $kmsXml);
+            $this->arrayToXml($dataDetil, $contXml);
             
             // Dump hasil XML
             // dd($xml);
@@ -147,132 +148,144 @@ class PengirimanDataCFSController extends Controller
             if ($hasil == true) {
                 $flag = 'Y';
             }
-            dd($xml, $this->response);
-    //    }
+            $cont->update([
+                'coari_cfs_flag' => $flag
+            ]);
+        }
+        return true;
 
     }
 
-    public function CodecoCont()
-    {
-        // $conts = Cont::whereNotNull('tglmasuk')->get();
-        $cont = Cont::find(3);
+    // public function CodecoCont()
+    // {
+    //     // $conts = Cont::whereNotNull('tglmasuk')->get();
+    //     $cont = Cont::find(3);
 
-        \SoapWrapper::override(function ($service) {
-            $service
-                ->name('CoarriCodeco_Container')
-                ->wsdl($this->wsdl)
-                ->trace(true)                                                                                                                                                
-                ->cache(WSDL_CACHE_NONE)                                        
-                ->options([
-                    'stream_context' => stream_context_create([
-                        'ssl' => array(
-                            'verify_peer' => false,
-                            'verify_peer_name' => false,
-                            'allow_self_signed' => true
-                        )
-                    ])
-                ]);                                                   
-        });
+    //     \SoapWrapper::override(function ($service) {
+    //         $service
+    //             ->name('CoarriCodeco_Container')
+    //             ->wsdl($this->wsdl)
+    //             ->trace(true)                                                                                                                                                
+    //             ->cache(WSDL_CACHE_NONE)                                        
+    //             ->options([
+    //                 'stream_context' => stream_context_create([
+    //                     'ssl' => array(
+    //                         'verify_peer' => false,
+    //                         'verify_peer_name' => false,
+    //                         'allow_self_signed' => true
+    //                     )
+    //                 ])
+    //             ]);                                                   
+    //     });
 
-    //     foreach ($conts as $cont) {
-            $tglMasuk = $cont->tglkeluar ? Carbon::parse($cont->tglkeluar ?? $cont->tglkeluar)->format('Ymd') : null;
-            $jamMasuk = $cont->jamkeluar ? Carbon::parse($cont->jamkeluar ?? $cont->jamkeluar)->format('His') : null;
-            $tglTiba = Carbon::parse($cont->job->eta)->format('Ymd');
-            $dataHeader = [
-                'kd_dok' => 6,
-                'kd_tps' => '1MUT',
-                'nm_angkut' => $cont->job->PLP->nm_angkut ?? '-',
-                'no_voy_flight' => $cont->job->voy ?? '-',
-                'call_sign' => $cont->job->PLP->call_sign ?? '-',
-                'TGL_TIBA' => $tglTiba,
-                'KD_GUDANG' => '1MUT',
-                'REF_NUMBER' => $cont->job->nojoborder ?? '-',
-            ];
-            $wkInOut = $tglMasuk.$jamMasuk;
-            $tglBl = $cont->tgl_bl_awb ? Carbon::parse($cont->tgl_bl_awb)->format('Ymd') : null;
-            $tglBC11 = $cont->job->ttgl_bc11 ? Carbon::parse($cont->job->ttgl_bc11)->format('Ymd') : null; 
-            $tglPLP = $cont->jon->ttgl_plp ? Carbon::parse($cont->jon->ttgl_plp)->format('Ymd') : null;
-            $pelMuat = ($cont->job && $cont->job->muat && $cont->job->muat->kode) ? $cont->job->muat->kode : '';
-            $pelTransit = ($cont->transit && $cont->transit->kode) ? $cont->job->transit->kode : '';
-            $pelBongkar = ($cont->bongkar && $cont->bongkar->kode) ? $cont->job->bongkar->kode : '';
-            $dataDetil = [
-                'no_cont' => $cont->nocontainer,
-                'uk_cont' => $cont->size,
-                'no_segel' => '-',
-                'jns_cont' => 'L',
-                'no_bl_awb' => $cont->nobl ?? '',
-                'tgl_bl_awb' => $tglBl,
-                'no_master_bl_awb' => '', 
-                'tgl_master_bl_awb' => '', 
-                'id_conseignee' => '',
-                'conseignee' => '',
-                'bruto' => $cont->weight ?? 0,
-                'no_bc11' => $cont->job->tno_bc11 ?? '',
-                'tgl_bc11' => $tglBC11,
-                'no_pos_bc11' => '',
-                'kd_timbun' => '',
-                'kd_dok_inout' => 3,
-                'no_dok_inout' => $cont->job->noplp ?? $cont->job->PLP->no_plp ?? '-',
-                'tgl_dok_inout' => $tglPLP,
-                'wk_inout' => $wkInOut,
-                'kd_sar_angkut_inout' => '',
-                'nopol' => $cont->nopol ?? '',
-                'fl_cont_kosong' => '',
-                'iso_code' => '',
-                'pel_muat' => $pelMuat ?? '-',
-                'pel_transit' => $pelTransit ?? '-',
-                'pel_bongkar' => $pelBongkar ?? '-',
-                'gudang_tujuan' => '1MUT',
-                'kode_kantor' => '040300',
-                'no_daftar_pabean' => '-',
-                'tgl_daftar_pabean' => '-',
-                'no_segel_bc' => ' ',
-                'tgl_segel_bc' => ' ',
-                'no_ijin_tps' => ' ',
-                'tgl_ijin_tps' => ' ',
-            ];
+    // //     foreach ($conts as $cont) {
+    //         $tglMasuk = $cont->tglkeluar ? Carbon::parse($cont->tglkeluar ?? $cont->tglkeluar)->format('Ymd') : null;
+    //         $jamMasuk = $cont->jamkeluar ? Carbon::parse($cont->jamkeluar ?? $cont->jamkeluar)->format('His') : null;
+    //         $tglTiba = Carbon::parse($cont->job->eta)->format('Ymd');
+    //         $dataHeader = [
+    //             'kd_dok' => 6,
+    //             'kd_tps' => '1MUT',
+    //             'nm_angkut' => $cont->job->PLP->nm_angkut ?? '-',
+    //             'no_voy_flight' => $cont->job->voy ?? '-',
+    //             'call_sign' => $cont->job->PLP->call_sign ?? '-',
+    //             'TGL_TIBA' => $tglTiba,
+    //             'KD_GUDANG' => '1MUT',
+    //             'REF_NUMBER' => $cont->job->nojoborder ?? '-',
+    //         ];
+    //         $wkInOut = $tglMasuk.$jamMasuk;
+    //         $tglBl = $cont->tgl_bl_awb ? Carbon::parse($cont->tgl_bl_awb)->format('Ymd') : null;
+    //         $tglBC11 = $cont->job->ttgl_bc11 ? Carbon::parse($cont->job->ttgl_bc11)->format('Ymd') : null; 
+    //         $tglPLP = $cont->job->ttgl_plp ? Carbon::parse($cont->job->ttgl_plp)->format('Ymd') : null;
+    //         $pelMuat = ($cont->job && $cont->job->muat && $cont->job->muat->kode) ? $cont->job->muat->kode : '';
+    //         $pelTransit = ($cont->transit && $cont->transit->kode) ? $cont->job->transit->kode : '';
+    //         $pelBongkar = ($cont->bongkar && $cont->bongkar->kode) ? $cont->job->bongkar->kode : '';
+    //         $dataDetil = [
+    //             'no_cont' => $cont->nocontainer,
+    //             'uk_cont' => $cont->size,
+    //             'no_segel' => null,
+    //             'jns_cont' => 'L',
+    //             'no_bl_awb' => $cont->nobl ?? null,
+    //             'tgl_bl_awb' => $tglBl,
+    //             'no_master_bl_awb' => null, 
+    //             'tgl_master_bl_awb' => null, 
+    //             'id_conseignee' => null,
+    //             'conseignee' => null,
+    //             'bruto' => $cont->weight ?? 0,
+    //             'no_bc11' => $cont->job->tno_bc11 ?? null,
+    //             'tgl_bc11' => $tglBC11,
+    //             'no_pos_bc11' => null,
+    //             'kd_timbun' => null,
+    //             'kd_dok_inout' => 3,
+    //             'no_dok_inout' => $cont->job->noplp ?? $cont->job->PLP->no_plp ?? null,
+    //             'tgl_dok_inout' => $tglPLP,
+    //             'wk_inout' => $wkInOut,
+    //             'kd_sar_angkut_inout' => null,
+    //             'nopol' => $cont->nopol_mty ?? null,
+    //             'fl_cont_kosong' => null,
+    //             'iso_code' => null,
+    //             'pel_muat' => $pelMuat ?? null,
+    //             'pel_transit' => $pelTransit ?? null,
+    //             'pel_bongkar' => $pelBongkar ?? null,
+    //             'gudang_tujuan' => '1MUT',
+    //             'kode_kantor' => '040300',
+    //             'no_daftar_pabean' => null,
+    //             'tgl_daftar_pabean' => null,
+    //             'no_segel_bc' => null,
+    //             'tgl_segel_bc' => null,
+    //             'no_ijin_tps' => null,
+    //             'tgl_ijin_tps' => null,
+    //         ];
 
-            $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><DOCUMENT></DOCUMENT>');
+    //         $xml = new \SimpleXMLElement('<DOCUMENT xmlns="cococont.xsd"/>');
 
-            // Tambahkan elemen utama
-            $xmldata = $xml->addAttribute('xmlns', 'cococont.xsd');
-            $xmldata = $xml->addchild('COCOCONT');
-            $headerXml = $xmldata->addChild('HEADER');
-            $detailXml = $xmldata->addChild('DETIL');
-            $kmsXml = $detailXml->addChild('CONT');
+    //         // Tambahkan elemen utama
+    //         // $xmldata = $xml->addAttribute('xmlns', 'cococont.xsd');
+    //         $xmldata = $xml->addchild('COCOCONT');
+    //         $headerXml = $xmldata->addChild('HEADER');
+    //         $detailXml = $xmldata->addChild('DETIL');
+    //         $contXml = $detailXml->addChild('CONT');
 
-            $this->arrayToXml($dataHeader, $headerXml);
-            $this->arrayToXml($dataDetil, $kmsXml);
+    //         $this->arrayToXml($dataHeader, $headerXml);
+    //         $this->arrayToXml($dataDetil, $contXml);
             
-            // Dump hasil XML
-            // dd($xml);
+    //         // Dump hasil XML
+    //         // dd($xml);
     
-            $datas = [
-                'Username' => $this->user, 
-                'Password' => $this->password,
-                'fStream' => $xml->asXML()
-            ];
-
-            // dd($datas);
+    //         $output = preg_replace('/\s+/', ' ', $xml->asXML());
             
-            \SoapWrapper::service('CoarriCodeco_Container', function ($service) use ($datas) {        
-                $this->response = $service->call('CoarriCodeco_Container', [$datas]);      
-            });
-            $response = $this->response;
+    //         // Dump hasil XML
+    //         // dd($xml);
     
-            $hasil = strpos($response, "Proses Berhasil") !== false ? true : false;
-            $flag = 'N';
-            if ($hasil == true) {
-                $flag = 'Y';
-            }
-            dd($xml, $this->response);
-    //    }
+    //         $datas = [
+    //             'Username' => $this->user, 
+    //             'Password' => $this->password,
+    //             'fStream' => $xml->asXML()
+    //         ];
 
-    }
+    //         // dd($datas);
+            
+    //         \SoapWrapper::service('CoarriCodeco_Container', function ($service) use ($datas) {        
+    //             $this->response = $service->call('CoarriCodeco_Container', [
+    //                 'fStream' => $output,
+    //                 'Username' => $userName,
+    //                 'Password' => $password,
+    //             ]);      
+    //         });
+    //         $response = $this->response;
+    
+    //         $hasil = strpos($response, "Proses Berhasil") !== false ? true : false;
+    //         $flag = 'N';
+    //         if ($hasil == true) {
+    //             $flag = 'Y';
+    //         }
+    //         dd($xml, $this->response);
+    // //    }
+
+    // }
 
     public function CoariKMS()
     {
-        $manifestes = Manifest::whereNotNull('tglstripping')->whereNotNull('tgl_hbl')->take(1)->get();
+        $manifestes = Manifest::whereNotNull('tglstripping')->whereNotNull('tgl_hbl')->where('coari_cfs_flag', 'N')->get();
         // dd($manifest);
 
         \SoapWrapper::override(function ($service) {
@@ -348,20 +361,18 @@ class PengirimanDataCFSController extends Controller
                 'tgl_segel_bc' => null,
                 'no_ijin_tps' => null,
                 'tgl_ijin_tps' => null,
-                // 'nama_consolidator' => 'PT INTI MANDIRI UTAMA TRANS',
-                // 'npwp_consolidator' => '0022383483042000',
-                // 'alamat_consolidator' => 'Jl. Bugis Raya No. 15 Kebon Bawang Tanjung Priok',
+                'nama_consolidator' => 'PT INTI MANDIRI UTAMA TRANS',
+                'npwp_consolidator' => '0022383483042000',
+                'alamat_consolidator' => 'Jl. Bugis Raya No. 15 Kebon Bawang Tanjung Priok',
             ];
 
 
 
             // Tambahkan elemen utama
-            $xml = new \SimpleXMLElement('<DOCUMENT xmlns="cocokms.xsd"/>');
+            $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><DOCUMENT></DOCUMENT>');
 
-            // Tambahkan namespace ke elemen root
-            // $xml->addAttribute('xmlns', 'cocokms.xsd');
-                    
             // Tambahkan elemen utama
+            $xmldata = $xml->addAttribute('xmlns', 'cocokms.xsd');
             $xmldata = $xml->addChild('COCOKMS');
             $headerXml = $xmldata->addChild('HEADER');
             $detailXml = $xmldata->addChild('DETIL');
@@ -395,34 +406,35 @@ class PengirimanDataCFSController extends Controller
             $password = $this->password;
 
             // dd($datas);
-            try {
-                \SoapWrapper::service('CoarriCodeco_Kemasan', function ($service) use ($output, $userName, $password) {        
-                    $this->response = $service->call('CoarriCodeco_Kemasan', [
-                        'fstream' => $output,
-                        'Username' => $userName,
-                        'Password' => $password,
-                    ]);      
-                });
-                $response = $this->response;
-        
-                dd($response, $output);
-                $hasil = strpos($response, "Proses Berhasil") !== false ? true : false;
-                $flag = 'N';
-                if ($hasil == true) {
-                    $flag = 'Y';
-                }
-            } catch (\Throwable $th) {
-                dd($th->getMessage());
+   
+            \SoapWrapper::service('CoarriCodeco_Kemasan', function ($service) use ($output, $userName, $password) {        
+                $this->response = $service->call('CoarriCodeco_Kemasan', [
+                    'fstream' => $output,
+                    'Username' => $userName,
+                    'Password' => $password,
+                ]);      
+            });
+            $response = $this->response;
+    
+            // dd($response, $output);
+            $hasil = strpos($response, "Proses Berhasil") !== false ? true : false;
+            $flag = 'N';
+            if ($hasil == true) {
+                $flag = 'Y';
             }
-           
+            
+            $manifest->update([
+                'coari_cfs_flag' => $flag
+            ]);
         }
 
+        return true;
     }
 
 
     public function CodecoKMS()
     {
-        $manifestes = Manifest::whereNotNull('tglstripping')->whereNotNull('tglrelease')->take(1)->get();
+        $manifestes = Manifest::whereNotNull('tglstripping')->whereNotNull('tglrelease')->where('codeco_cfs_flag', 'N')->get();
         // dd($manifest);
 
         \SoapWrapper::override(function ($service) {
@@ -546,15 +558,20 @@ class PengirimanDataCFSController extends Controller
             if ($hasil == true) {
                 $flag = 'Y';
             }
-            dd($this->response, $output, $xml);
+            // dd($this->response, $output, $xml);
+            $manifest->update([
+                'codeco_cfs_flag' => $flag,
+            ]);
         }
+
+        return true;
 
     }
     
     public function detilHouseBl() 
     {
-        // $manifestes = Manifest::whereNotNull('tglstripping')->take(1)->get();
-        $manifest = Manifest::find(58);
+        $manifestes = Manifest::whereNotNull('tglstripping')->where('detil_hbl_cfs_flag', 'N')->take(5)->get();
+        // $manifest = Manifest::find(58);
         \SoapWrapper::override(function ($service) {
             $service
                 ->name('DetailHouseBL')
@@ -592,7 +609,7 @@ class PengirimanDataCFSController extends Controller
 //         });
 
 
-        // foreach ($manifestes as $manifest) {
+        foreach ($manifestes as $manifest) {
             $tglBLawb = $manifest->tgl_hbl ? Carbon::parse($manifest->tgl_hbl)->format('Y-m-d') : null;
             $tglMasterBL = $manifest->job->tgl_master_bl ? Carbon::parse($manifest->job->tgl_master_bl)->format('Y-m-d') : null;
             $tglBC11 = $manifest->job->ttgl_bc11 ? Carbon::parse($manifest->job->ttgl_bc11)->format('Y-m-d') : null;
@@ -626,7 +643,7 @@ class PengirimanDataCFSController extends Controller
             $tglBehandle = $manifest->tglbehandle ? Carbon::parse($manifest->tglbehandle)->format('Y-m-d') : NULL;
             $jamBehandle = $manifest->jambehandle ? Carbon::parse($manifest->jambehandle)->format('Y-m-d') : NULL;
             $behandleAt = $tglBehandle.$jamBehandle;
-            $tglSegelMerah = $manifest->tanggal_segel_merah ? Carbon::parse($manifest->tanggal_segel_merah)->foramt('Y-m-d H:i:s') : NULL;
+            $tglSegelMerah = $manifest->tanggal_segel_merah ? Carbon::parse($manifest->tanggal_segel_merah)->format('Y-m-d H:i:s') : NULL;
             $dataDetil = [
                 'no_bl_awb' => $manifest->nohbl,
                 'tgl_bl_awb' => $tglBLawb,
@@ -685,9 +702,12 @@ class PengirimanDataCFSController extends Controller
             if ($hasil == true) {
                 $flag = 'Y';
             }
-            dd($xml->asXML(), $this->response);
-        // }
-        
+            
+            $manifest->update([
+                'detil_hbl_cfs_flag' => $flag
+            ]);
+        }
+        return true;
     }
 
     private function arrayToXml($data, &$xmlData)

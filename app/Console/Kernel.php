@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->command('functions:daily')->everyMinute();
+        $schedule->command('functions:cfsScheduler')->everyMinute();
     }
 
     /**
