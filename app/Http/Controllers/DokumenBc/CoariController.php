@@ -527,4 +527,22 @@ class CoariController extends Controller
             'message' => 'data berhasil di kirim :' . $response
         ]);
     }
+
+    public function indexContFCL()
+    {
+        $data['title'] = 'Data Coari Cont FCL';
+
+        return view('pengiriman.fcl.coari', $data);
+    }
+
+    public function dataContFCL(Request $request)
+    {
+        $cont = CD::where('jns_cont', 'F')->get();
+        return DataTables::of($cont)
+        ->addColumn('action', function($cont){
+            return '<button class="btn btn-outline-success kirimUlang" id="kirimUlang" data-id="'.$cont->cont_id.'">Kirim Ulang</button>';
+        })
+        ->rawColumns(['action'])
+        ->make(true);
+    }
 }

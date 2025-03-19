@@ -573,7 +573,8 @@ class CFSController extends Controller
 
         $rules = [
             'no_order'       => 'required',
-            'no_bl_awb'      => 'required',
+            'no_invoice'      => 'required',
+            'flag_date'      => 'required|date_format:Y-m-d H:i:s',
         ];
         
         // Tambahkan aturan validasi jika jenis transaksi adalah 'P'
@@ -583,7 +584,8 @@ class CFSController extends Controller
         
         $messages = [
             'no_order.required'       => 'Nomor order wajib diisi.',
-            'no_bl_awb.required'      => 'Nomor BL/AWB wajib diisi.',
+            'no_invoice.required'      => 'Nomor Invoice wajib diisi.',
+            'flag_date.required'      => 'Tanggal Lunas wajib diisi.',
         ];
         
         $validator = Validator::make($request->all(), $rules, $messages);
@@ -598,7 +600,7 @@ class CFSController extends Controller
             ], 400);
         }
 
-        $header = Header::where('no_order', $request->no_order)->where('no_bl_awb', $request->no_bl_awb)->first();
+        $header = Header::where('no_order', $request->no_order)->first();
         if (!$header) {
             return response()->json([
                 'status' => false,
@@ -619,7 +621,8 @@ class CFSController extends Controller
         try {
             $header->updateOrFail([
                 'status' => 'Y',
-                'lunas_at' => ($header->lunas_at) ? $header->lunas_at : Carbon::now(),
+                'no_invoice' => $request->no_invoice,
+                'lunas_at' => ($request->flag_date) ? Carbon::parse($request->flag_date) : Carbon::now(),
             ]);
             $manifest = Manifest::findOrFail($header->manifest_id);
             $manifest->update([

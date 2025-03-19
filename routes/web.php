@@ -890,6 +890,14 @@ Route::prefix('/pengiriman')->group(function(){
             Route::post('/manifest-kirimManual', 'kirimManualManifest');
         });
     });
+
+    Route::prefix('/caori-fcl')->group(function(){
+        Route::controller(CoariController::class)->group(function(){
+            Route::get('/index', 'indexContFCL')->name('pengiriman.fcl.index');
+            Route::get('/data', 'dataContFCL')->name('pengiriman.fcl.data');
+        });
+    });
+
 });
 
 Route::post('/testCoari', [CoariCodecoController::class, 'CoariKms']);

@@ -81,6 +81,34 @@
                     </li>
                 </ul>
             </li>
+            <!-- FCL -->
+            <li class="sidebar-item has-sub @if(Request::is('pengiriman/coari-fcl/*') || Request::is('pengiriman/codeco-fcl/*')) active @endif">
+                <a href="#" class="sidebar-link">
+                    <span>FCL</span>
+                </a>
+                <ul class="submenu @if(Request::is('pengiriman/coari-fcl/*') || Request::is('pengiriman/codeco-fcl/*')) active @endif">
+                    <li class="sidebar-item has-sub @if(Request::is('pengiriman/coari-fcl/*')) active @endif">
+                        <a href="#" class="sidebar-link">
+                            <span>Coari</span>
+                        </a>
+                        <ul class="submenu @if(Request::is('pengiriman/coari-fcl/*') || Request::is('pengiriman/codeco-fcl/*')) active @endif">
+                            <li class="submenu-item @if(Request::is('pengiriman/coari-fcl/index')) active @endif">
+                                <a href="{{ route('pengiriman.fcl.index') }}">Container</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="sidebar-item has-sub @if(Request::is('pengiriman/codeco-lcl/*')) active @endif">
+                        <a href="#" class="sidebar-link">
+                            <span>Codeco</span>
+                        </a>
+                        <ul class="submenu @if(Request::is('pengiriman/codeco-lcl/*')) active @endif">
+                            <li class="submenu-item @if(Request::is('pengiriman/codeco-lcl/cont-index')) active @endif">
+                                <a href="/pengiriman/codeco-lcl/cont-index">Container</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
         </ul>
     </li>
 

@@ -17,6 +17,7 @@ class InvoiceCSF extends Model
         'consignee',
         'npwp_consignee',
         'no_order',
+        'no_invoice',
         'jenis_billing',
         'jenis_bayar',
         'jenis_transaksi',
