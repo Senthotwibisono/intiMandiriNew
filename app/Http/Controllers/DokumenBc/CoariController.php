@@ -38,7 +38,7 @@ class CoariController extends Controller
         $this->wsdl = 'https://tpsonline.beacukai.go.id/tps/service.asmx?WSDL';
         $this->user = '1MUT';
         $this->password = 'INTIMANDIRI1';
-        $this->kode = 'INTI';
+        $this->kode = '1MUT';
     }
 
     private function RefNumber()
@@ -135,7 +135,7 @@ class CoariController extends Controller
                 'flag_revisi' => 0,
                 'tgl_revisi' => null,
                 'kd_dok' => '5',
-                'kd_tps' => 'INTI',
+                'kd_tps' => '1MUT',
                 'nm_angkut' => $cont->job->PLP->nm_angkut ?? $cont->job->Kapal->name ?? null,
                 'no_voy_flight' => $cont->job->PLP->no_voy_flight ?? $cont->job->voy ?? null,
                 'call_sign' => $cont->job->PLP->call_sign ?? $cont->job_callsign ?? null,
@@ -373,7 +373,7 @@ class CoariController extends Controller
             'flag_revisi' => 0,
             'tgl_revisi' => null,
             'kd_dok' => '5',
-            'kd_tps' => 'INTI',
+            'kd_tps' => '1MUT',
             'nm_angkut' => $cont->job->PLP->nm_angkut ?? $cont->job->Kapal->name ?? null,
             'no_voy_flight' => $cont->job->PLP->no_voy_flight ?? $cont->job->voy ?? null,
             'call_sign' => $cont->job->PLP->call_sign ?? $cont->job_callsign ?? null,

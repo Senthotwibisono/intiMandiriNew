@@ -38,7 +38,7 @@ class CodecoController extends Controller
         $this->wsdl = 'https://tpsonline.beacukai.go.id/tps/service.asmx?WSDL';
         $this->user = '1MUT';
         $this->password = 'INTIMANDIRI1';
-        $this->kode = 'INTI';
+        $this->kode = '1MUT';
     }
 
     private function RefNumber()
