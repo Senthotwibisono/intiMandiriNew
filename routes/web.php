@@ -67,6 +67,7 @@ use App\Http\Controllers\DokumenBc\CodecoController;
 
 // Cfs
 use App\Http\Controllers\CFS\CfsDefaultController;
+use App\Http\Controllers\CFS\InvoiceCSFController;
 
 /*
 |--------------------------------------------------------------------------
@@ -929,5 +930,13 @@ Route::prefix('/lcl/cfs')->group(function(){
         Route::post('/manifest-resend-coari', 'coariManifest')->name('cfs.manifest.coari');
         Route::post('/manifest-resend-codeco', 'codecoManifest')->name('cfs.manifest.codeco');
         Route::post('/manifest-resend-detil', 'detilManifest')->name('cfs.manifest.detil');
+    });    
+});
+
+Route::prefix('/invoice/cfs')->group(function(){
+    Route::controller(InvoiceCSFController::class)->group(function(){
+        Route::get('/index', 'index')->name('cfs.invoice.index');
+        Route::get('/data', 'data')->name('cfs.invoice.data');
+        Route::get('/print', 'print')->name('cfs.invoice.print');
     });
 });

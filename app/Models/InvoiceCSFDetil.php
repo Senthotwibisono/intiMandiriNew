@@ -26,4 +26,9 @@ class InvoiceCSFDetil extends Model
     {
         return $this->belongsTo(InvoiceCSF::class, 'header_id', 'id');
     }
+
+    public function desc()
+    {
+        return $this->belongsTo(TarifCFS::class, 'kode_tarif', 'kode_bill');
+    }
 }

@@ -431,6 +431,7 @@ class CFSController extends Controller
                         'jml_kms' => $detil['JML_KMS'],
                         'status' => 'N',
                         'rencana_keluar' => Carbon::parse($request->tgl_keluar),
+                        'rencana_keluar_lama' => ($request->tgl_keluar_lama) ? Carbon::parse($request->tgl_keluar_lama) : null,
                         'created_at' => Carbon::now(),
                         'no_bl_awb' => $request->no_bl_awb,
                         'consignee' => $request->consignee,

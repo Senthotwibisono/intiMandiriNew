@@ -421,6 +421,16 @@
             <li class="submenu-item @if(Request::is('invoice/report')) active @endif">
                 <a href="{{ url('/invoice/report')}}">Rport Invoice</a>
             </li>
+            <li class="sidebar-item has-sub @if(Request::is('invoice/cfs/*')) active @endif">
+                <a href="#" class='sidebar-link'>
+                    <span>Invoice CFS Center</span>
+                </a>
+                <ul class="submenu @if(Request::is('invoice/cfs/*')) active @endif">
+                    <li class="submenu-item @if(Request::is('invoice/cfs/*')) active @endif">
+                        <a href="{{ route('cfs.invoice.index')}}">List Invoice</a>
+                    </li>
+                </ul>
+            </li>
         </ul>
     </li>
     <!-- Invoice FCL -->

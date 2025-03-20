@@ -32,6 +32,7 @@ class InvoiceCSF extends Model
         'tarif',
         'status',
         'rencana_keluar',
+        'rencana_keluar_lama',
         'lunas_at',
         'cancel_at',
         'created_at',
