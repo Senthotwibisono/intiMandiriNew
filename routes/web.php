@@ -766,6 +766,7 @@ Route::controller(AndroidGateController::class)->group(function(){
             Route::get('/dataCont', 'dataCont');
             Route::get('/photoCont{id?}', 'photoCont');
             Route::get('/formatStandar', 'formatStandar');
+            Route::get('/formatJict', 'formatJict');
             Route::get('/formatBeacukai', 'formatBeacukai');
             Route::get('/formatStandarAkhir', 'formatStandarAkhir');
             Route::get('/formatBeacukaiAkhir', 'formatBeacukaiAkhir');
