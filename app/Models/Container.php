@@ -136,6 +136,8 @@ class Container extends Model
         'coari_flag',
         'codeco_flag',
         'coari_cfs_flag',
+        'coari_cfs_response',
+        'coari_cfs_at',
     ];
 
     public function DepoMty()

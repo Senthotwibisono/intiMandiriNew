@@ -64,6 +64,10 @@ use App\Http\Controllers\pengiriman\CoariCodecoController;
 //  CodecoCoari
 use App\Http\Controllers\DokumenBc\CoariController;
 use App\Http\Controllers\DokumenBc\CodecoController;
+
+// Cfs
+use App\Http\Controllers\CFS\CfsDefaultController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -913,3 +917,17 @@ Route::post('/testCoariContFCL', [CoariCodecoController::class, 'coariContFCL'])
 
 Route::post('/testCodecoContLCL', [CoariCodecoController::class, 'CodecoCont']);
 Route::post('/testCodecoContFCL', [CoariCodecoController::class, 'CodecoContFCL']);
+
+Route::prefix('/lcl/cfs')->group(function(){
+    Route::controller(CfsDefaultController::class)->group(function(){
+        Route::get('/container', 'indexContainer')->name('cfs.container.index');
+        Route::get('/contianer-data', 'dataContainer')->name('cfs.container.data');
+        Route::post('/contianer-resend', 'resendContainer')->name('cfs.container.resend');
+
+        Route::get('/manifest', 'indexManifest')->name('cfs.manifest.index');
+        Route::get('/manifest-data', 'dataManifest')->name('cfs.manifest.data');
+        Route::post('/manifest-resend-coari', 'coariManifest')->name('cfs.manifest.coari');
+        Route::post('/manifest-resend-codeco', 'codecoManifest')->name('cfs.manifest.codeco');
+        Route::post('/manifest-resend-detil', 'detilManifest')->name('cfs.manifest.detil');
+    });
+});

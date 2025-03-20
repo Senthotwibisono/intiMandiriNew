@@ -185,6 +185,19 @@
                     </li>
                 </ul>
             </li>
+            <li class="sidebar-item has-sub @if(Request::is('lcl/cfs/*')) active @endif">
+                <a href="#" class="sidebar-link">
+                    <span>CFS Data Center</span>
+                </a>
+                <ul class="submenu @if(Request::is('lcl/cfs/*')) active @endif">
+                    <li class="submenu-item @if(Request::is('lcl/cfs/container')) active @endif">
+                        <a href="{{ route('cfs.container.index') }}">Container</a>
+                    </li>
+                    <li class="submenu-item @if(Request::is('lcl/cfs/manifest')) active @endif">
+                        <a href="{{ route('cfs.manifest.index') }}">Manifest</a>
+                    </li>
+                </ul>
+            </li>
         </ul>
     </li>
 

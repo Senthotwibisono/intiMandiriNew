@@ -9,7 +9,10 @@ use App\Models\Manifest;
 use App\Models\Container as Cont;
 use App\Models\Item;
 
-class PengirimanDataCFSController extends Controller
+use Auth;
+use DataTables;
+
+class CfsDefaultController extends Controller
 {
     private string $wsdl;
     private string $user;
@@ -18,20 +21,84 @@ class PengirimanDataCFSController extends Controller
     protected $response;
 
     public function __construct() {
-        // $this->middleware('auth');
+        $this->middleware('auth');
 
-        // $this->wsdl = 'https://ipccfscenter.com/TPSServices/server_plp_dev.php?wsdl';
+        $this->wsdlProd = 'https://ipccfscenter.com/TPSServices/server_plp_dev.php?wsdl';
         $this->wsdl = 'https://pelindo-cfscenter.com/TPSServices/server_plp.php?wsdl ';
         $this->user = '1MUT';
         $this->password = '1MUT';
         $this->kode = '1MUT';
     }
 
-    public function CoariCont()
+    private function arrayToXml($data, &$xmlData)
     {
-        $conts = Cont::whereNotNull('tglmasuk')->where('coari_cfs_flag', 'N')->get();
-        // $cont = Cont::find(3);
+        foreach ($data as $key => $value) {
+            $key = strtoupper($key); // Ubah nama elemen menjadi huruf kapital
 
+            if (is_array($value)) {
+                $subnode = $xmlData->addChild($key);
+                $this->arrayToXml($value, $subnode);
+            } else {
+                $xmlData->addChild($key, htmlspecialchars($value));
+            }
+        }
+    }
+
+    public function indexContainer()
+    {
+        $data['title'] = 'Container LCL - CFS Center';
+        // $data['containers'] = Cont::where('coari_cfs_flag', 'N')->get();
+
+        return view('cfs.data.container', $data);
+    }
+
+    public function dataContainer()
+    {
+        $containers = Cont::with(['job'])->where('coari_cfs_flag', 'Y')->get();
+
+        return DataTables::of($containers)
+        ->addColumn('action', function($containers){
+            return '<button class="btn btn-info resend" id="resend" data-id="'.$containers->id.'">Kirim Ulang</button>';
+        })
+        ->addColumn('kd_tps_asal', function($containers){
+            return $containers->job->sandar->kd_tps_asal ?? '-';
+        })
+        ->addColumn('kapal', function($containers){
+            return $containers->job->Kapal->name ?? '-';
+        })
+        // ->addColumn('noplp', function($containers){
+        //     return $containers->job->noplp ?? '-';
+        // })
+        // ->addColumn('ttgl_plp', function($containers){
+        //     return $containers->job->ttgl_plp ?? '-';
+        // })
+        // ->addColumn('tno_bc11', function($containers){
+        //     return $containers->job->tno_bc11 ?? '-';
+        // })
+        // ->addColumn('ttgl_bc11', function($containers){
+        //     return $containers->job->ttgl_bc11 ?? '-';
+        // })
+        // ->addColumn('eta', function($containers){
+        //     return $containers->job->eta ?? '-';
+        // })
+        // ->addColumn('voy', function($containers){
+        //     return $containers->job->voy ?? '-';
+        // })
+        ->rawColumns(['action', 'checkBox'])
+        ->make(true);
+
+    }
+
+    public function resendContainer(Request $request)
+    {
+        if (!$request->has('ids')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pilih Container dahulu!'
+            ]);
+        }
+
+        $containers = Cont::whereIn('id', $request->ids)->get();
         \SoapWrapper::override(function ($service) {
             $service
                 ->name('CoarriCodeco_Container')
@@ -49,247 +116,178 @@ class PengirimanDataCFSController extends Controller
                 ]);                                                   
         });
 
-        foreach ($conts as $cont) {
-            $tglMasuk = $cont->tglmasuk ? Carbon::parse($cont->tglmasuk ?? $cont->tglmasuk)->format('Ymd') : null;
-            $jamMasuk = $cont->jammasuk ? Carbon::parse($cont->jammasuk ?? $cont->jammasuk)->format('His') : null;
-            $tglTiba = Carbon::parse($cont->job->eta)->format('Ymd');
-            $dataHeader = [
-                'kd_dok' => 5,
-                'kd_tps' => '1MUT',
-                'nm_angkut' => $cont->job->PLP->nm_angkut ?? '-',
-                'no_voy_flight' => $cont->job->voy ?? '-',
-                'call_sign' => $cont->job->PLP->call_sign ?? '-',
-                'TGL_TIBA' => $tglTiba,
-                'KD_GUDANG' => '1MUT',
-                'REF_NUMBER' => $cont->job->nojoborder ?? '-',
-            ];
-            $wkInOut = $tglMasuk.$jamMasuk;
-            $tglBl = $cont->tgl_bl_awb ? Carbon::parse($cont->tgl_bl_awb)->format('Ymd') : null;
-            $tglBC11 = $cont->job->ttgl_bc11 ? Carbon::parse($cont->job->ttgl_bc11)->format('Ymd') : null; 
-            $tglPLP = $cont->job->ttgl_plp ? Carbon::parse($cont->job->ttgl_plp)->format('Ymd') : null;
-            $pelMuat = ($cont->job && $cont->job->muat && $cont->job->muat->kode) ? $cont->job->muat->kode : '';
-            $pelTransit = ($cont->transit && $cont->transit->kode) ? $cont->job->transit->kode : '';
-            $pelBongkar = ($cont->bongkar && $cont->bongkar->kode) ? $cont->job->bongkar->kode : '';
-            $dataDetil = [
-                'no_cont' => $cont->nocontainer,
-                'uk_cont' => $cont->size,
-                'no_segel' => '-',
-                'jns_cont' => 'L',
-                'no_bl_awb' => $cont->nobl ?? '',
-                'tgl_bl_awb' => $tglBl,
-                'no_master_bl_awb' => '', 
-                'tgl_master_bl_awb' => null, 
-                'id_conseignee' => '',
-                'conseignee' => '',
-                'bruto' => $cont->weight ?? 0,
-                'no_bc11' => $cont->job->tno_bc11 ?? '',
-                'tgl_bc11' => $tglBC11,
-                'no_pos_bc11' => '',
-                'kd_timbun' => '',
-                'kd_dok_inout' => 3,
-                'no_dok_inout' => $cont->job->noplp ?? $cont->job->PLP->no_plp ?? '-',
-                'tgl_dok_inout' => $tglPLP,
-                'wk_inout' => $wkInOut,
-                'kd_sar_angkut_inout' => '',
-                'nopol' => $cont->nopol ?? '',
-                'fl_cont_kosong' => '',
-                'iso_code' => '',
-                'pel_muat' => $pelMuat ?? '-',
-                'pel_transit' => $pelTransit ?? '-',
-                'pel_bongkar' => $pelBongkar ?? '-',
-                'gudang_tujuan' => '1MUT',
-                'kode_kantor' => '040300',
-                'no_daftar_pabean' => '',
-                'tgl_daftar_pabean' => null,
-                'no_segel_bc' => ' ',
-                'tgl_segel_bc' => null,
-                'no_ijin_tps' => ' ',
-                'tgl_ijin_tps' => null,
-            ];
-
-            $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><DOCUMENT></DOCUMENT>');
-
-            // Tambahkan elemen utama
-            $xmldata = $xml->addAttribute('xmlns', 'cococont.xsd');
-            $xmldata = $xml->addchild('COCOCONT');
-            $headerXml = $xmldata->addChild('HEADER');
-            $detailXml = $xmldata->addChild('DETIL');
-            $contXml = $detailXml->addChild('CONT');
-
-            $this->arrayToXml($dataHeader, $headerXml);
-            $this->arrayToXml($dataDetil, $contXml);
-            
-            // Dump hasil XML
-            // dd($xml);
+        try {
+            foreach ($containers as $cont) {
+                $tglMasuk = $cont->tglmasuk ? Carbon::parse($cont->tglmasuk ?? $cont->tglmasuk)->format('Ymd') : null;
+                $jamMasuk = $cont->jammasuk ? Carbon::parse($cont->jammasuk ?? $cont->jammasuk)->format('His') : null;
+                $tglTiba = Carbon::parse($cont->job->eta)->format('Ymd');
+                $dataHeader = [
+                    'kd_dok' => 5,
+                    'kd_tps' => '1MUT',
+                    'nm_angkut' => $cont->job->PLP->nm_angkut ?? '-',
+                    'no_voy_flight' => $cont->job->voy ?? '-',
+                    'call_sign' => $cont->job->PLP->call_sign ?? '-',
+                    'TGL_TIBA' => $tglTiba,
+                    'KD_GUDANG' => '1MUT',
+                    'REF_NUMBER' => $cont->job->nojoborder ?? '-',
+                ];
+                $wkInOut = $tglMasuk.$jamMasuk;
+                $tglBl = $cont->tgl_bl_awb ? Carbon::parse($cont->tgl_bl_awb)->format('Ymd') : null;
+                $tglBC11 = $cont->job->ttgl_bc11 ? Carbon::parse($cont->job->ttgl_bc11)->format('Ymd') : null; 
+                $tglPLP = $cont->job->ttgl_plp ? Carbon::parse($cont->job->ttgl_plp)->format('Ymd') : null;
+                $pelMuat = ($cont->job && $cont->job->muat && $cont->job->muat->kode) ? $cont->job->muat->kode : '';
+                $pelTransit = ($cont->transit && $cont->transit->kode) ? $cont->job->transit->kode : '';
+                $pelBongkar = ($cont->bongkar && $cont->bongkar->kode) ? $cont->job->bongkar->kode : '';
+                $dataDetil = [
+                    'no_cont' => $cont->nocontainer,
+                    'uk_cont' => $cont->size,
+                    'no_segel' => '-',
+                    'jns_cont' => 'L',
+                    'no_bl_awb' => $cont->nobl ?? '',
+                    'tgl_bl_awb' => $tglBl,
+                    'no_master_bl_awb' => '', 
+                    'tgl_master_bl_awb' => null, 
+                    'id_conseignee' => '',
+                    'conseignee' => '',
+                    'bruto' => $cont->weight ?? 0,
+                    'no_bc11' => $cont->job->tno_bc11 ?? '',
+                    'tgl_bc11' => $tglBC11,
+                    'no_pos_bc11' => '',
+                    'kd_timbun' => '',
+                    'kd_dok_inout' => 3,
+                    'no_dok_inout' => $cont->job->noplp ?? $cont->job->PLP->no_plp ?? '-',
+                    'tgl_dok_inout' => $tglPLP,
+                    'wk_inout' => $wkInOut,
+                    'kd_sar_angkut_inout' => '',
+                    'nopol' => $cont->nopol ?? '',
+                    'fl_cont_kosong' => '',
+                    'iso_code' => '',
+                    'pel_muat' => $pelMuat ?? '-',
+                    'pel_transit' => $pelTransit ?? '-',
+                    'pel_bongkar' => $pelBongkar ?? '-',
+                    'gudang_tujuan' => '1MUT',
+                    'kode_kantor' => '040300',
+                    'no_daftar_pabean' => '',
+                    'tgl_daftar_pabean' => null,
+                    'no_segel_bc' => ' ',
+                    'tgl_segel_bc' => null,
+                    'no_ijin_tps' => ' ',
+                    'tgl_ijin_tps' => null,
+                ];
     
-            $output = preg_replace('/\s+/', ' ', $xml->asXML());
-            // dd($output);
-            $datas = [
-                'Username' => $this->user, 
-                'Password' => $this->password,
-                'fStream' => $xml->asXML()
-            ];
-            $userName = $this->user;
-            $password = $this->password;
-
-            // dd($datas);
-            
-            \SoapWrapper::service('CoarriCodeco_Container', function ($service) use ($output, $userName, $password) {        
-                $this->response = $service->call('CoarriCodeco_Container', [
-                    'fStream' => $output,
-                    'Username' => $userName,
-                    'Password' => $password,
-                ]);      
-            });
-            $response = $this->response;
+                $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><DOCUMENT></DOCUMENT>');
     
-            $hasil = strpos($response, "Proses Berhasil") !== false ? true : false;
-            $flag = 'N';
-            if ($hasil == true) {
-                $flag = 'Y';
+                // Tambahkan elemen utama
+                $xmldata = $xml->addAttribute('xmlns', 'cococont.xsd');
+                $xmldata = $xml->addchild('COCOCONT');
+                $headerXml = $xmldata->addChild('HEADER');
+                $detailXml = $xmldata->addChild('DETIL');
+                $contXml = $detailXml->addChild('CONT');
+    
+                $this->arrayToXml($dataHeader, $headerXml);
+                $this->arrayToXml($dataDetil, $contXml);
+                
+                // Dump hasil XML
+                // dd($xml);
+        
+                $output = preg_replace('/\s+/', ' ', $xml->asXML());
+                // dd($output);
+                $datas = [
+                    'Username' => $this->user, 
+                    'Password' => $this->password,
+                    'fStream' => $xml->asXML()
+                ];
+                $userName = $this->user;
+                $password = $this->password;
+    
+                // dd($datas);
+                
+                \SoapWrapper::service('CoarriCodeco_Container', function ($service) use ($output, $userName, $password) {        
+                    $this->response = $service->call('CoarriCodeco_Container', [
+                        'fStream' => $output,
+                        'Username' => $userName,
+                        'Password' => $password,
+                    ]);      
+                });
+                $response = $this->response;
+        
+                $hasil = strpos($response, "Proses Berhasil") !== false ? true : false;
+                $flag = 'N';
+                if ($hasil == true) {
+                    $flag = 'Y';
+                }
+                $cont->update([
+                    'coari_cfs_flag' => $flag,
+                    'coari_cfs_response' => $response,
+                    'coari_cfs_at' => Carbon::now(),
+                ]);
             }
-            $cont->update([
-                'coari_cfs_flag' => $flag,
-                'coari_cfs_response' => $response,
-                'coari_cfs_at' => Carbon::now(),
-            ]);
-        }
-        return true;
 
+            return response()->json([
+                'success' => true,
+                'message' => 'Data berhasil disimpan',
+            ]);
+            
+        } catch (\Throwable $th) {
+           return response()->json([
+            'success' => false,
+            'message' => 'Opss Something Wrong : ' .$th->getMessage(),
+           ]);
+        }
     }
 
-    // public function CodecoCont()
-    // {
-    //     // $conts = Cont::whereNotNull('tglmasuk')->get();
-    //     $cont = Cont::find(3);
-
-    //     \SoapWrapper::override(function ($service) {
-    //         $service
-    //             ->name('CoarriCodeco_Container')
-    //             ->wsdl($this->wsdl)
-    //             ->trace(true)                                                                                                                                                
-    //             ->cache(WSDL_CACHE_NONE)                                        
-    //             ->options([
-    //                 'stream_context' => stream_context_create([
-    //                     'ssl' => array(
-    //                         'verify_peer' => false,
-    //                         'verify_peer_name' => false,
-    //                         'allow_self_signed' => true
-    //                     )
-    //                 ])
-    //             ]);                                                   
-    //     });
-
-    // //     foreach ($conts as $cont) {
-    //         $tglMasuk = $cont->tglkeluar ? Carbon::parse($cont->tglkeluar ?? $cont->tglkeluar)->format('Ymd') : null;
-    //         $jamMasuk = $cont->jamkeluar ? Carbon::parse($cont->jamkeluar ?? $cont->jamkeluar)->format('His') : null;
-    //         $tglTiba = Carbon::parse($cont->job->eta)->format('Ymd');
-    //         $dataHeader = [
-    //             'kd_dok' => 6,
-    //             'kd_tps' => '1MUT',
-    //             'nm_angkut' => $cont->job->PLP->nm_angkut ?? '-',
-    //             'no_voy_flight' => $cont->job->voy ?? '-',
-    //             'call_sign' => $cont->job->PLP->call_sign ?? '-',
-    //             'TGL_TIBA' => $tglTiba,
-    //             'KD_GUDANG' => '1MUT',
-    //             'REF_NUMBER' => $cont->job->nojoborder ?? '-',
-    //         ];
-    //         $wkInOut = $tglMasuk.$jamMasuk;
-    //         $tglBl = $cont->tgl_bl_awb ? Carbon::parse($cont->tgl_bl_awb)->format('Ymd') : null;
-    //         $tglBC11 = $cont->job->ttgl_bc11 ? Carbon::parse($cont->job->ttgl_bc11)->format('Ymd') : null; 
-    //         $tglPLP = $cont->job->ttgl_plp ? Carbon::parse($cont->job->ttgl_plp)->format('Ymd') : null;
-    //         $pelMuat = ($cont->job && $cont->job->muat && $cont->job->muat->kode) ? $cont->job->muat->kode : '';
-    //         $pelTransit = ($cont->transit && $cont->transit->kode) ? $cont->job->transit->kode : '';
-    //         $pelBongkar = ($cont->bongkar && $cont->bongkar->kode) ? $cont->job->bongkar->kode : '';
-    //         $dataDetil = [
-    //             'no_cont' => $cont->nocontainer,
-    //             'uk_cont' => $cont->size,
-    //             'no_segel' => null,
-    //             'jns_cont' => 'L',
-    //             'no_bl_awb' => $cont->nobl ?? null,
-    //             'tgl_bl_awb' => $tglBl,
-    //             'no_master_bl_awb' => null, 
-    //             'tgl_master_bl_awb' => null, 
-    //             'id_conseignee' => null,
-    //             'conseignee' => null,
-    //             'bruto' => $cont->weight ?? 0,
-    //             'no_bc11' => $cont->job->tno_bc11 ?? null,
-    //             'tgl_bc11' => $tglBC11,
-    //             'no_pos_bc11' => null,
-    //             'kd_timbun' => null,
-    //             'kd_dok_inout' => 3,
-    //             'no_dok_inout' => $cont->job->noplp ?? $cont->job->PLP->no_plp ?? null,
-    //             'tgl_dok_inout' => $tglPLP,
-    //             'wk_inout' => $wkInOut,
-    //             'kd_sar_angkut_inout' => null,
-    //             'nopol' => $cont->nopol_mty ?? null,
-    //             'fl_cont_kosong' => null,
-    //             'iso_code' => null,
-    //             'pel_muat' => $pelMuat ?? null,
-    //             'pel_transit' => $pelTransit ?? null,
-    //             'pel_bongkar' => $pelBongkar ?? null,
-    //             'gudang_tujuan' => '1MUT',
-    //             'kode_kantor' => '040300',
-    //             'no_daftar_pabean' => null,
-    //             'tgl_daftar_pabean' => null,
-    //             'no_segel_bc' => null,
-    //             'tgl_segel_bc' => null,
-    //             'no_ijin_tps' => null,
-    //             'tgl_ijin_tps' => null,
-    //         ];
-
-    //         $xml = new \SimpleXMLElement('<DOCUMENT xmlns="cococont.xsd"/>');
-
-    //         // Tambahkan elemen utama
-    //         // $xmldata = $xml->addAttribute('xmlns', 'cococont.xsd');
-    //         $xmldata = $xml->addchild('COCOCONT');
-    //         $headerXml = $xmldata->addChild('HEADER');
-    //         $detailXml = $xmldata->addChild('DETIL');
-    //         $contXml = $detailXml->addChild('CONT');
-
-    //         $this->arrayToXml($dataHeader, $headerXml);
-    //         $this->arrayToXml($dataDetil, $contXml);
-            
-    //         // Dump hasil XML
-    //         // dd($xml);
-    
-    //         $output = preg_replace('/\s+/', ' ', $xml->asXML());
-            
-    //         // Dump hasil XML
-    //         // dd($xml);
-    
-    //         $datas = [
-    //             'Username' => $this->user, 
-    //             'Password' => $this->password,
-    //             'fStream' => $xml->asXML()
-    //         ];
-
-    //         // dd($datas);
-            
-    //         \SoapWrapper::service('CoarriCodeco_Container', function ($service) use ($datas) {        
-    //             $this->response = $service->call('CoarriCodeco_Container', [
-    //                 'fStream' => $output,
-    //                 'Username' => $userName,
-    //                 'Password' => $password,
-    //             ]);      
-    //         });
-    //         $response = $this->response;
-    
-    //         $hasil = strpos($response, "Proses Berhasil") !== false ? true : false;
-    //         $flag = 'N';
-    //         if ($hasil == true) {
-    //             $flag = 'Y';
-    //         }
-    //         dd($xml, $this->response);
-    // //    }
-
-    // }
-
-    public function CoariKMS()
+    public function indexManifest()
     {
-        $manifestes = Manifest::whereNotNull('tglstripping')->whereNotNull('tgl_hbl')->where('coari_cfs_flag', 'N')->get();
-        // dd($manifest);
+        $data['title'] = 'Manifest LCL - CFS Center';
 
+        return view('cfs.data.manifest', $data);
+    }
+
+    public function dataManifest(Request $request)
+    {
+        $manifest = Manifest::with(['job', 'cont'])->where('coari_cfs_flag' ,'Y')->orWhere('codeco_cfs_flag', 'Y')->orWhere('detil_hbl_cfs_flag', 'Y')->get();
+
+        return DataTables::of($manifest)
+        ->addColumn('coari', function($manifest){
+            return '<button class="btn btn-success coariResend" id="coariResend" data-id="'.$manifest->id.'">Resend Coari</button>';
+        })
+        ->addColumn('codeco', function($manifest){
+            return '<button class="btn btn-warning" id="codecoResend" data-id="'.$manifest->id.'">Resend Codeco</button>';
+        })
+        ->addColumn('detail', function($manifest){
+            return '<button class="btn btn-danger" id="detailResend" data-id="'.$manifest->id.'">Resend Detail HBL</button>';
+        })
+        ->addColumn('kapal', function($manifest){
+            return $manifest->job->Kapal->name ?? '-';
+        })
+        ->addColumn('kd_tps_asal', function($manifest){
+            return $manifest->job->sandar->kd_tps_asal ?? '-';
+        })
+        ->rawColumns(['coari', 'codeco', 'detail'])
+        ->make(true);
+    }
+
+    public function coariManifest(Request $request)
+    {
+        if (!$request->has('ids')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pilih Manifest terlebih dahulu'
+            ]);
+        }
+
+        $manifestes = Manifest::whereIn('id', $request->ids)->get();
+        $notAllowed = $manifestes->whereNull('tglmasuk');
+        if ($notAllowed->isNotEmpty()) {
+            $noHbl = $notAllowed->pluck('nohbl')->implode(', ');
+            // var_dump($noHbl);
+            // die();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Kamu tidak dapat mengirimkan pilihan karena ada No HBL yang belum gate-in : ' . $noHbl . ', Hubungi admin atau petugas gate',
+            ]);
+        }
         \SoapWrapper::override(function ($service) {
             $service
                 ->name('CoarriCodeco_Kemasan')
@@ -431,15 +429,30 @@ class PengirimanDataCFSController extends Controller
                 'coari_cfs_at' => Carbon::now(),
             ]);
         }
-
-        return true;
+        return response()->json([
+            'success' => true,
+            'message' => 'Data berhasil di kirim',
+        ]);
     }
 
-
-    public function CodecoKMS()
+    public function codecoManifest(Request $request)
     {
-        $manifestes = Manifest::whereNotNull('tglstripping')->whereNotNull('tglrelease')->where('codeco_cfs_flag', 'N')->get();
-        // dd($manifest);
+        if (!$request->has('ids')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pilih Manifest terlebih dahulu'
+            ]);
+        }
+
+        $manifestes = Manifest::whereIn('id', $request->ids)->get();
+        $notAllowed = $manifestes->whereNull('tglrelease');
+        if ($notAllowed->isNotEmpty()) {
+            $noHbl = $notAllowed->pluck('nohbl')->implode(', ');
+            return response()->json([
+                'success' => false,
+                'message' => 'Kamu tidak dapat mengirimkan pilihan karena ada No HBL yang belum gate-out : ' . $noHbl . ', Hubungi admin atau petugas gate',
+            ]);
+        }
 
         \SoapWrapper::override(function ($service) {
             $service
@@ -570,14 +583,31 @@ class PengirimanDataCFSController extends Controller
             ]);
         }
 
-        return true;
-
+        return response()->json([
+            'success' => true,
+            'message' => 'Data berhasil di kirim'
+        ]);
     }
-    
-    public function detilHouseBl() 
+
+    public function detilManifest(Request $request)
     {
-        $manifestes = Manifest::whereNotNull('tglstripping')->where('detil_hbl_cfs_flag', 'N')->take(5)->get();
-        // $manifest = Manifest::find(58);
+        if (!$request->has('ids')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pilih Manifest terlebih dahulu'
+            ]);
+        }
+
+        $manifestes = Manifest::whereIn('id', $request->ids)->get();
+        $notAllowed = $manifestes->whereNull('tglstripping');
+        if ($notAllowed->isNotEmpty()) {
+            $noHbl = $notAllowed->pluck('nohbl')->implode(', ');
+            return response()->json([
+                'success' => false,
+                'message' => 'Kamu tidak dapat mengirimkan pilihan karena ada No HBL yang belum Stripping : ' . $noHbl . ', Hubungi admin atau petugas gudang',
+            ]);
+        }
+
         \SoapWrapper::override(function ($service) {
             $service
                 ->name('DetailHouseBL')
@@ -715,21 +745,10 @@ class PengirimanDataCFSController extends Controller
                 'detil_hbl_cfs_at' => Carbon::now(),
             ]);
         }
-        return true;
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data Berhasil Dikirim',
+        ]);
     }
-
-    private function arrayToXml($data, &$xmlData)
-    {
-        foreach ($data as $key => $value) {
-            $key = strtoupper($key); // Ubah nama elemen menjadi huruf kapital
-
-            if (is_array($value)) {
-                $subnode = $xmlData->addChild($key);
-                $this->arrayToXml($value, $subnode);
-            } else {
-                $xmlData->addChild($key, htmlspecialchars($value));
-            }
-        }
-    }
-
 }

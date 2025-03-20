@@ -287,6 +287,13 @@ class Manifest extends Model
         'coari_cfs_flag',
         'codeco_cfs_flag',
         'detil_hbl_cfs_flag',
+        'coari_cfs_response',
+        'codeco_cfs_response',
+        'detil_hbl_cfs_response',
+        'coari_cfs_at',
+        'codeco_cfs_at',
+        'detil_hbl_cfs_at',
+        
     ];
 
     public function user()
