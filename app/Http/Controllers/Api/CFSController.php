@@ -256,35 +256,35 @@ class CFSController extends Controller
                         $tarif[] = $storage3;
                      }
     
-                     if ($type == 'DG') {
-                        $tarifSurchargeDG = Tarif::find(14);
-                        $hargaSurchargeDG = ($tarifSurchargeDG->tarif_dasar);
-                        $surchargeDG = [
-                            "KODE_TARIF" => $tarifSurchargeDG->kode_bill,
-                            "TARIF_DASAR" => $tarifSurchargeDG->tarif_dasar,
-                            "QTY" => 1,
-                            "HARI" => 0,
-                            "NILAI" => $hargaSurchargeDG,
-                            "SATUAN" => ($manifest->quantity).($manifest->packing->code ?? '')
-                        ];
-                        $total += $hargaSurchargeDG;
-                        $tarif[] = $surchargeDG;
-                     }
+                    //  if ($type == 'DG') {
+                    //     $tarifSurchargeDG = Tarif::find(14);
+                    //     $hargaSurchargeDG = ($tarifSurchargeDG->tarif_dasar);
+                    //     $surchargeDG = [
+                    //         "KODE_TARIF" => $tarifSurchargeDG->kode_bill,
+                    //         "TARIF_DASAR" => $tarifSurchargeDG->tarif_dasar,
+                    //         "QTY" => 1,
+                    //         "HARI" => 0,
+                    //         "NILAI" => $hargaSurchargeDG,
+                    //         "SATUAN" => ($manifest->quantity).($manifest->packing->code ?? '')
+                    //     ];
+                    //     $total += $hargaSurchargeDG;
+                    //     $tarif[] = $surchargeDG;
+                    //  }
     
-                     if ($flagOH == 'Y') {
-                        $tarifSurchargeOH = Tarif::find(15);
-                        $hargaSurchargeOH = ($tarifSurchargeOH->tarif_dasar);
-                        $surchargeOH = [
-                            "KODE_TARIF" => $tarifSurchargeOH->kode_bill,
-                            "TARIF_DASAR" => $tarifSurchargeOH->tarif_dasar,
-                            "QTY" => 1,
-                            "HARI" => 0,
-                            "NILAI" => $hargaSurchargeOH,
-                            "SATUAN" => ($manifest->quantity).($manifest->packing->code ?? '')
-                        ]; 
-                        $total += $hargaSurchargeOH;
-                        $tarif[] = $surchargeOH;
-                     }
+                    //  if ($flagOH == 'Y') {
+                    //     $tarifSurchargeOH = Tarif::find(15);
+                    //     $hargaSurchargeOH = ($tarifSurchargeOH->tarif_dasar);
+                    //     $surchargeOH = [
+                    //         "KODE_TARIF" => $tarifSurchargeOH->kode_bill,
+                    //         "TARIF_DASAR" => $tarifSurchargeOH->tarif_dasar,
+                    //         "QTY" => 1,
+                    //         "HARI" => 0,
+                    //         "NILAI" => $hargaSurchargeOH,
+                    //         "SATUAN" => ($manifest->quantity).($manifest->packing->code ?? '')
+                    //     ]; 
+                    //     $total += $hargaSurchargeOH;
+                    //     $tarif[] = $surchargeOH;
+                    //  }
     
                     //  dd('Jumlah Hari : ' . $interval, $total, $tarif);
                     
