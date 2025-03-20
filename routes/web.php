@@ -882,7 +882,7 @@ Route::prefix('/pengiriman')->group(function(){
         Route::controller(CodecoController::class)->group(function(){
             Route::get('/cont-index', 'indexContLCL');
             Route::get('/cont-data', 'dataContLCL');
-            Route::get('/cont-kirimUlang', 'sendContLCL');
+            Route::post('/cont-kirimUlang', 'sendContLCL');
 
             Route::get('/manifest-index', 'indexManifestLCL');
             Route::get('/manifest-data', 'dataManifestLCL');
@@ -891,16 +891,24 @@ Route::prefix('/pengiriman')->group(function(){
         });
     });
 
-    Route::prefix('/caori-fcl')->group(function(){
+    Route::prefix('/coari-fcl')->group(function(){
         Route::controller(CoariController::class)->group(function(){
             Route::get('/index', 'indexContFCL')->name('pengiriman.fcl.index');
             Route::get('/data', 'dataContFCL')->name('pengiriman.fcl.data');
         });
     });
 
+    Route::prefix('/codeco-fcl')->group(function(){
+        Route::controller(CodecoController::class)->group(function(){
+            Route::get('/index', 'indexContFCL');
+            Route::get('/data', 'dataContFCL');
+        });
+    });
 });
 
 Route::post('/testCoari', [CoariCodecoController::class, 'CoariKms']);
 Route::post('/testCoariContLCL', [CoariCodecoController::class, 'coariCont']);
+Route::post('/testCoariContFCL', [CoariCodecoController::class, 'coariContFCL']);
 
-Route::get('/testCodecoContLCL', [CoariCodecoController::class, 'CodecoCont']);
+Route::post('/testCodecoContLCL', [CoariCodecoController::class, 'CodecoCont']);
+Route::post('/testCodecoContFCL', [CoariCodecoController::class, 'CodecoContFCL']);

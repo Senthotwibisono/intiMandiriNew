@@ -126,7 +126,7 @@ class CoariCodecoController extends Controller
                        : null,
                     'no_bl_awb' => $cont->nobl ?? '',
                     'tgl_bl_awb' => $cont->tgl_bl_awb 
-                       ? Carbon::createFromFormat('Y-m-d', $cont->job->tgl_master_bl)->format('Ymd') 
+                       ? Carbon::createFromFormat('Y-m-d', $cont->tgl_bl_awb)->format('Ymd') 
                        : null,
                     'no_cont' => $cont->nocontainer,
                     'uk_cont' => $cont->size,
@@ -338,7 +338,7 @@ class CoariCodecoController extends Controller
                        : null,
                     'no_bl_awb' => $cont->nobl ?? '',
                     'tgl_bl_awb' => $cont->tgl_bl_awb 
-                       ? Carbon::createFromFormat('Y-m-d', $cont->job->tgl_master_bl)->format('Ymd') 
+                       ? Carbon::createFromFormat('Y-m-d', $cont->tgl_bl_awb)->format('Ymd') 
                        : null,
                     'no_cont' => $cont->nocontainer,
                     'uk_cont' => $cont->size,
@@ -483,6 +483,16 @@ class CoariCodecoController extends Controller
                     'coari_flag' => $flag,
                 ]);
             }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data berhasil di kirim',
+            ]);
+        }else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Belul ada data yang perlu di kirim',
+            ]);
         }
     }
 
@@ -757,7 +767,7 @@ class CoariCodecoController extends Controller
                        : null,
                     'no_bl_awb' => $cont->nobl ?? '',
                     'tgl_bl_awb' => $cont->tgl_bl_awb 
-                       ? Carbon::createFromFormat('Y-m-d', $cont->job->tgl_master_bl)->format('Ymd') 
+                       ? Carbon::createFromFormat('Y-m-d', $cont->tgl_bl_awb)->format('Ymd') 
                        : null,
                     'no_cont' => $cont->nocontainer,
                     'uk_cont' => $cont->size,
@@ -961,7 +971,7 @@ class CoariCodecoController extends Controller
                        : null,
                     'no_bl_awb' => $cont->nobl ?? '',
                     'tgl_bl_awb' => $cont->tgl_bl_awb 
-                       ? Carbon::createFromFormat('Y-m-d', $cont->job->tgl_master_bl)->format('Ymd') 
+                       ? Carbon::createFromFormat('Y-m-d', $cont->tgl_bl_awb)->format('Ymd') 
                        : null,
                     'no_cont' => $cont->nocontainer,
                     'uk_cont' => $cont->size,

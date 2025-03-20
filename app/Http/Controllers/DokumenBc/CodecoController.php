@@ -88,7 +88,20 @@ class CodecoController extends Controller
 
     public function sendContLCL(Request $request)
     {
-        $cont = Cont::find($request->id);
+        switch ($request->type) {
+            case 'LCL':
+                $cont = Cont::find($request->id);
+                $typeCont = 'L';
+                break;
+            case 'FCL':
+                $cont = ContF::find($request->id);
+                $typeCont = 'F';
+            break;
+            default:
+                # code...
+                break;
+        }
+
         \SoapWrapper::override(function ($service) {
             $service
                 ->name('CoarriCodeco_Container')
@@ -139,12 +152,12 @@ class CodecoController extends Controller
                : null,
             'no_bl_awb' => $cont->nobl ?? '',
             'tgl_bl_awb' => $cont->tgl_bl_awb 
-               ? Carbon::createFromFormat('Y-m-d', $cont->job->tgl_master_bl)->format('Ymd') 
+               ? Carbon::createFromFormat('Y-m-d', $cont->tgl_bl_awb)->format('Ymd') 
                : null,
             'no_cont' => $cont->nocontainer,
             'uk_cont' => $cont->size,
             'no_segel' => $cont->seal->code ?? ' ',
-            'jns_cont' => 'L',
+            'jns_cont' => $typeCont,
             'no_bc11' => $cont->job->tno_bc11 ?? '',
             'tgl_bc11' => $cont->job->ttgl_bc11 
                 ? Carbon::createFromFormat('Y-m-d', $cont->job->ttgl_bc11)->format('Ymd') 
@@ -536,6 +549,24 @@ class CodecoController extends Controller
         }
 
         return 'success';
+    }
+
+    public function indexContFCL()
+    {
+        $data['title'] = 'Data Codeco Cont FCL';
+
+        return view('pengiriman.fcl.codeco', $data);
+    }
+
+    public function dataContFCL(Request $request)
+    {
+        $cont = CodecoContDetil::where('jns_cont', 'F')->get();
+        return DataTables::of($cont)
+        ->addColumn('action', function($cont){
+            return '<button class="btn btn-outline-success kirimUlang" id="kirimUlang" data-id="'.$cont->cont_id.'">Kirim Ulang</button>';
+        })
+        ->rawColumns(['action'])
+        ->make(true);
     }
 
 }

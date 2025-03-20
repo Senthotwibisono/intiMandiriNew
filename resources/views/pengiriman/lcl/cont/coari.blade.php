@@ -141,6 +141,7 @@
                         type: 'POST',
                         data : {
                             _token: "{{ csrf_token() }}",
+                            type : 'LCL',
                             id: id,
                         },
                         success: function(response){

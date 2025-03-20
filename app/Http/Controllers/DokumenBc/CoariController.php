@@ -88,9 +88,20 @@ class CoariController extends Controller
 
     public function sendContLCL(Request $request)
     {
-
-        $cont = Cont::find($request->id);
-
+        switch ($request->type) {
+            case 'LCL':
+                $cont = Cont::find($request->id);
+                $typeCont = 'L';
+                break;
+            case 'FCL':
+                $cont = ContF::find($request->id);
+                $typeCont = 'F';
+            break;
+            default:
+                # code...
+                break;
+        }
+        
         try {
 
             \SoapWrapper::override(function ($service) {
@@ -112,6 +123,7 @@ class CoariController extends Controller
             $tanggal = Carbon::createFromFormat('Y-m-d', $cont->tglmasuk)->format('Ymd');
             $jam = Carbon::createFromFormat('H:i:s', $cont->jammasuk)->format('His');
             $wk_in = $tanggal . $jam;
+            // var_dump($cont->tglmasuk, $cont->jammasuk, $cont->job->tgl_master_bl, $cont->tgl_bl_awb);
             $header = [
                 'ref_number' => $this->RefNumber(),
                 'tgl_entry' => Carbon::now()->format('YYYY-MM-DD'),
@@ -141,19 +153,20 @@ class CoariController extends Controller
                    : null,
                 'no_bl_awb' => $cont->nobl ?? '',
                 'tgl_bl_awb' => $cont->tgl_bl_awb 
-                   ? Carbon::createFromFormat('Y-m-d', $cont->job->tgl_master_bl)->format('Ymd') 
+                   ? Carbon::createFromFormat('Y-m-d', $cont->tgl_bl_awb)->format('Ymd') 
                    : null,
                 'no_cont' => $cont->nocontainer,
                 'uk_cont' => $cont->size,
                 'no_segel' => $cont->seal->code ?? ' ',
-                'jns_cont' => 'L',
+                'jns_cont' => $typeCont,
                 'no_bc11' => $cont->job->tno_bc11 ?? '',
                 'tgl_bc11' => $cont->job->ttgl_bc11 
                     ? Carbon::createFromFormat('Y-m-d', $cont->job->ttgl_bc11)->format('Ymd') 
                     : null,
             ];
 
-            // var_dump($header['bruto']);
+            // var_dump($header);
+            // die();
             
             $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><DOCUMENT></DOCUMENT>');
             $xmldata = $xml->addAttribute('xmlns', 'cococont.xsd');
@@ -220,6 +233,7 @@ class CoariController extends Controller
                 $this->response = $service->call('CoarriCodeco_Container', [$datas])->CoarriCodeco_ContainerResult;      
             });
             $response = $this->response;
+            $hasil = strpos($response, "Proses Berhasil") !== false ? true : false;
             $flag = 'N';
             if ($hasil == true) {
                 $flag = 'Y';

@@ -66,7 +66,7 @@
 
                     $.ajax({
                         url: '/testCodecoContLCL',
-                        type: 'GET',
+                        type: 'POST',
                         data : {
                             _token: "{{ csrf_token() }}",
                         },
@@ -138,9 +138,10 @@
 
                     $.ajax({
                         url: '/pengiriman/codeco-lcl/cont-kirimUlang',
-                        type: 'GET',
+                        type: 'POST',
                         data : {
                             _token: "{{ csrf_token() }}",
+                            type: 'LCL',
                             id: id,
                         },
                         success: function(response){
