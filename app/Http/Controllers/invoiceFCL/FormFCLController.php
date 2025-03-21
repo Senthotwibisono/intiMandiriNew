@@ -571,6 +571,21 @@ class FormFCLController extends Controller
                             'jumlah_hari' => 0,
                             'total' => $totalPerawatanIT,
                         ]);
+                        // Econ
+                        $totalEcon = $tarifTPS->econ * $jumlah;
+                        Detil::create([
+                            'form_id' => $form->id,
+                            'invoice_id' => $header->id,
+                            'tps' => $request->kd_tps_asal,
+                            'keterangan' => 'Econ (' . $size . ' / ' .$ctr_type.' )',
+                            'size' => $size,
+                            'type' => $ctr_type,
+                            'tarif_dasar' => $tarifTPS->econ,
+                            'satuan' => '0',
+                            'jumlah' => $jumlah,
+                            'jumlah_hari' => 0,
+                            'total' => $totalEcon,
+                        ]);
                         // Gate Pass
                         $totalGatePass = $tarifTPS->gate_pass * $jumlah;
                         Detil::create([

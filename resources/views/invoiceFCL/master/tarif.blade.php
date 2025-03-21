@@ -32,6 +32,7 @@
                                     <th>Lift On</th>
                                     <th>Hydro Scan</th>
                                     <th>Nota dan Perawatan IT</th>
+                                    <th>Econ</th>
                                     <th>Gate Pass</th>
                                     <th>Refeer (Power for Refeer)</th>
                                     <th>Refeer (Monitooring)</th>
@@ -182,6 +183,12 @@
                                 <div class="form-group">
                                     <label for="">Nota & Perawatan IT</label>
                                     <input type="number" name="perawatan_it" class="form-control" step="0.001" min="0" max="9999999999.999">
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="">Econ</label>
+                                    <input type="number" name="econ" class="form-control" step="0.001" min="0" max="9999999999.999">
                                 </div>
                             </div>
                             <div class="col-4">
@@ -341,6 +348,12 @@
                                 <div class="form-group">
                                     <label for="">Nota & Perawatan IT</label>
                                     <input type="number" name="perawatan_it" id="perawatan_it_edit" class="form-control" step="0.001" min="0" max="9999999999.999">
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="">Econ</label>
+                                    <input type="number" name="econ" id="econ_edit" class="form-control" step="0.001" min="0" max="9999999999.999">
                                 </div>
                             </div>
                             <div class="col-4">
@@ -830,6 +843,7 @@
                 {data:'lift_on', name:'lift_on', className:'nowrap', render: formatRupiah},
                 {data:'hyro_scan', name:'hyro_scan', className:'nowrap', render: formatRupiah},
                 {data:'perawatan_it', name:'perawatan_it', className:'nowrap', render: formatRupiah},
+                {data:'econ', name:'econ', className:'nowrap', render: formatRupiah},
                 {data:'gate_pass', name:'gate_pass', className:'nowrap', render: formatRupiah},
                 {data:'refeer', name:'refeer', className:'nowrap', render: formatRupiah},
                 {data:'monitoring', name:'monitoring', className:'nowrap', render: formatRupiah},
@@ -906,6 +920,7 @@
                 $('#lift_on_edit').val(response.data.lift_on);
                 $('#hyro_scan_edit').val(response.data.hyro_scan);
                 $('#perawatan_it_edit').val(response.data.perawatan_it);
+                $('#econ_edit').val(response.data.econ);
                 $('#gate_pass_edit').val(response.data.gate_pass);
                 $('#admin_edit').val(response.data.admin);
             },

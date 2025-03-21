@@ -187,6 +187,7 @@
                     <h5>Tarif TPS {{$form->LokasiSandar->kd_tps_asal ?? '-'}}</h5>
                     @php
                         $totalTPS = 0; // Initialize the grand total
+                        $totalCont = $containerInvoice->count();
                     @endphp
                     @foreach($size as $sz)
                         <div class="row">
@@ -301,6 +302,17 @@
                                                 <td>{{number_format($totalPerawatanIT, 0)}}</td>
                                             </tr>
                                             <tr>
+                                                <td>Econ</td>
+                                                <td>{{number_format($hargaTPS->econ,0)}}</td>
+                                                <td>{{$jumlahCont}}</td>
+                                                <td>0</td>
+                                                @php
+                                                    $totalEcon = $hargaTPS->econ * $jumlahCont;
+                                                    $totalTPS += $totalEcon;
+                                                @endphp
+                                                <td>{{number_format($totalEcon, 0)}}</td>
+                                            </tr>
+                                            <tr>
                                                 <td>Gate Pass</td>
                                                 <td>{{number_format($hargaTPS->gate_pass,0)}}</td>
                                                 <td>{{$jumlahCont}}</td>
@@ -318,14 +330,14 @@
                             @endforeach
                         </div>
                     @endforeach
-                    <div class="row text-white p-3">
+                    <div class="row  p-3">
                         <div class="col-6 text-center">
                             <h4 class="lead ">Admin TPS</h4>
                             <h4 class="lead ">Total Harga TPS</h4>
                         </div>
                         <div class="col-6" style="text-align:center;">
                             @php
-                                $adminTPS = $tarifTPS->first()->pluck('admin')->first();
+                                $adminTPS = ($tarifTPS->first()->pluck('admin')->first()) * $totalCont;
                                 $totalTPSAdmin = $adminTPS + $totalTPS;
                             @endphp
                             <h4 class="lead ">{{ number_format($adminTPS, 0) }}</h4>
@@ -455,7 +467,7 @@
                             @endforeach
                         </div>
                     @endforeach
-                    <div class="row text-white p-3">
+                    <div class="row  p-3">
                         <div class="col-6 text-center">
                             <h4 class="lead ">Admin WMS</h4>
                             <h4 class="lead ">Total Harga WMS</h4>
@@ -471,7 +483,7 @@
                     </div>
                 </div>
                 <div class="card-footer">
-                    <div class="row text-white p-3">
+                    <div class="row  p-3">
                         <div class="col-6">
                             @php
                                 $totalAdmin = $adminTPS + $adminWMS;

@@ -25,6 +25,7 @@ class MTarifTPS extends Model
         'lift_on',
         'hyro_scan',
         'perawatan_it',
+        'econ',
         'gate_pass',
         'refeer',
         'monitoring',
