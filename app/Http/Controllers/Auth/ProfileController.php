@@ -34,11 +34,13 @@ class ProfileController extends Controller
             if ($request->has('file')) {
                 $file = $request->file('file');
                 $extension = $file->getClientOriginalExtension();
-                $fileName = 'profile-'. Auth::user()->id .'-'. Carbon::now()->format('YmdHis') . '.' . $extension;
-                $file->storeAs('profil', $fileName, 'public'); 
-                $user->update([
-                    'profile' => $fileName,
-                ]);
+                if ($extension) {
+                    $fileName = 'profile-'. Auth::user()->id .'-'. Carbon::now()->format('YmdHis') . '.' . $extension;
+                    $file->storeAs('profil', $fileName, 'public'); 
+                    $user->update([
+                        'profile' => $fileName,
+                    ]);
+                }
             }
             $user->update([
                 'name' => $request->name,
