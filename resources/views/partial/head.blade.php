@@ -43,17 +43,6 @@
 
 <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/css/dropify.min.css" integrity="sha512-EZSUkJWTjzDlspOoPSpUFR0o0Xy7jdzW//6qhUkoZ9c4StFkVsp9fbbd0O06p9ELS3H486m4wmrCELjza4JEog==" crossorigin="anonymous" /> -->
 
-<link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
-
-<!-- <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet" />
-<script src="https://unpkg.com/filepond/dist/filepond.js"></script> -->
-
-
-<!-- <link rel="stylesheet" href="{{asset('dist/assets/extensions/filepond/filepond.css')}}">
-<link rel="stylesheet" href="{{asset('dist/assets/extensions/filepond-plugin-image-preview/filepond-plugin-image-preview.css')}}">
-<link rel="stylesheet" href="{{asset('dist/assets/extensions/toastify-js/src/toastify.css')}}">
-<link rel="stylesheet" href="{{asset('dist/assets/css/pages/filepond.css')}}"> -->
-
 
 <style>
   .logoicon {

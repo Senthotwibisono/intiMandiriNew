@@ -218,11 +218,6 @@
     });
     </script>
 
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    FilePond.parse(document.body);
-  });
-</script>
     <!-- <script src="{{ asset('query-ui/jquery-ui.js') }}"></script>
     <script src="{{ asset('query-ui/jquery-ui.min.js') }}" type="text/javascript"></script>
     <script src="{{asset('jquery-3.6.4.min.js')}}" type="text/javascript"></script> -->

@@ -2301,12 +2301,40 @@ class DokumenController extends Controller
         \SoapWrapper::service('TpsOnline_GetDokumenManual_OnDemand', function ($service) use ($data) {        
             $this->response = $service->call('GetDokumenManual_OnDemand', [$data])->GetDokumenManual_OnDemandResult;      
         });
+
+        // dd($this->response);
         
         libxml_use_internal_errors(true);
         $xml = simplexml_load_string($this->response);
         if(!$xml || !$xml->children()){
             return back()->with('status', ['type' => 'error', 'message' => 'Error importing data: ' .  $this->response]);
         }
+
+        \SoapWrapper::override(function ($service) {
+            $service
+                ->name('ReceiveImporPermit_Manual')
+                ->wsdl('https://ipccfscenter.com/TPSServices/server_plp_dev.php?wsdl')
+                ->trace(true)                                                                                                                                         
+                ->options([
+                    'stream_context' => stream_context_create([
+                        'ssl' => array(
+                            'verify_peer' => false,
+                            'verify_peer_name' => false,
+                            'allow_self_signed' => true
+                        )
+                    ])
+                ]);                                                   
+        });
+        // dd($dataCFS);
+        \SoapWrapper::service('ReceiveImporPermit_Manual', function ($service) use ($xml) {    
+            // dd($service);    
+            $this->responseCFS = $service->call('ReceiveImporPermit_Manual', [
+                'Username' => '1MUT', 
+                'Kode_ASP' => '1MUT',
+                'Password' => '1MUT',
+                'fStream' => $xml->asXML()]);    
+                // dd($this->responseCFS, $service);  
+        });
         
         $docmanual_id = 0;
         $header = null;
@@ -2479,7 +2507,8 @@ class DokumenController extends Controller
         
         // Using the added service
         \SoapWrapper::service('TpsOnline_GetDokumenManual', function ($service) use ($data) {        
-            $this->response = $service->call('GetDokumenManual', [$data])->GetDokumenManualResult;      
+            // $this->response = $service->call('GetDokumenManual', [$data])->GetDokumenManualResult;      
+            $this->response = '<?xml version="1.0"?><!--BC-Doc.Manual--><DOCUMENT><MANUAL><HEADER><ID>25032000015649</ID><KD_KANTOR>040300</KD_KANTOR><KD_DOK_INOUT>13</KD_DOK_INOUT><NO_DOK_INOUT>000462/KPU.PAB/I/2025</NO_DOK_INOUT><TGL_DOK_INOUT>20/03/2025</TGL_DOK_INOUT><ID_CONSIGNEE>P7651061</ID_CONSIGNEE><CONSIGNEE>DEEPESH GOGADE</CONSIGNEE><NPWP_PPJK></NPWP_PPJK><NAMA_PPJK></NAMA_PPJK><NM_ANGKUT>MOL EXPLORER</NM_ANGKUT><NO_VOY_FLIGHT>087S</NO_VOY_FLIGHT><KD_GUDANG>INTI</KD_GUDANG><JML_CONT>1</JML_CONT><NO_BC11>002812</NO_BC11><TGL_BC11>15/03/2025</TGL_BC11><NO_POS_BC11>063600220000</NO_POS_BC11><NO_BL_AWB>DL24S0008619</NO_BL_AWB><TG_BL_AWB></TG_BL_AWB><FL_SEGEL>N</FL_SEGEL></HEADER><DETIL><CONT><ID>25032000015649</ID><NO_CONT>ONEU5608303</NO_CONT><SIZE>40</SIZE><JNS_MUAT></JNS_MUAT></CONT><KMS><ID>25032000015649</ID><JNS_KMS>LV</JNS_KMS><MERK_KMS></MERK_KMS><JML_KMS>1</JML_KMS></KMS></DETIL></MANUAL></DOCUMENT>';      
         });
         
         libxml_use_internal_errors(true);
@@ -2490,6 +2519,32 @@ class DokumenController extends Controller
              'message' => 'Error : ' . $this->response,
             ]);
          }
+
+        //  \SoapWrapper::override(function ($service) {
+        //     $service
+        //         ->name('ReceiveImporPermit_Manual')
+        //         ->wsdl('https://ipccfscenter.com/TPSServices/server_plp_dev.php?wsdl')
+        //         ->trace(true)                                                                                                                                         
+        //         ->options([
+        //             'stream_context' => stream_context_create([
+        //                 'ssl' => array(
+        //                     'verify_peer' => false,
+        //                     'verify_peer_name' => false,
+        //                     'allow_self_signed' => true
+        //                 )
+        //             ])
+        //         ]);                                                   
+        // });
+        // // dd($dataCFS);
+        // \SoapWrapper::service('ReceiveImporPermit_Manual', function ($service) use ($xml) {    
+        //     // dd($service);    
+        //     $this->responseCFS = $service->call('ReceiveImporPermit_Manual', [
+        //         'Username' => '1MUT', 
+        //         'Kode_ASP' => '1MUT',
+        //         'Password' => '1MUT',
+        //         'fStream' => $xml->asXML()]);    
+        //         // dd($this->responseCFS, $service);  
+        // });
         
          $groups = [];
          $nextGroup = [];
@@ -2500,10 +2555,14 @@ class DokumenController extends Controller
          foreach ($xml->children() as $child) {
              $groups[] = $child;
          }
+
+        //  var_dump($groups);
+        //  die();
          
          foreach ($groups as $group) {
              $header = $group->header ?? $group->HEADER;
              $oldManual = Manual::where('id', $header->ID)->first();
+            //  var_dump($oldManual);
              if (!$oldManual) {
                 $manual = Manual::create([
                         'id'=>$header->ID,
@@ -2533,10 +2592,10 @@ class DokumenController extends Controller
                  foreach ($group->DETIL->CONT as $detailCont) {
                     $manualCont = ManualCont::create([
                         'manual_id'=>$manual->idm,
-                        'id'=>$detail->ID,
-                        'no_cont'=>$detail->NO_CONT,
-                        'size'=>$detail->SIZE,
-                        'jns_muat'=>$detail->JNS_MUAT,
+                        'id'=>$detailCont->ID,
+                        'no_cont'=>$detailCont->NO_CONT,
+                        'size'=>$detailCont->SIZE,
+                        'jns_muat'=>$detailCont->JNS_MUAT,
                     ]);
  
                      if ($manualCont->jml_cont > 0) {

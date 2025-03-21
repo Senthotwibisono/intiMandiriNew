@@ -27,7 +27,7 @@
                         </div>
                         <div class="form-group">
                             <label for="">Tanggal BC11</label>
-                            <input type="date" class="form-control" name="tgl_bc11" value="{{ !empty($dok->tgl_bc11) ?\Carbon\Carbon::parse($dok->tgl_bc11)->format('Y-m-d') : ' '}}">                        
+                            <input type="date" class="form-control" name="tgl_bc11" value="{{ !empty($dok->tgl_bc11) ? \Carbon\Carbon::createFromFormat('d/m/Y', $dok->tgl_bc11)->format('Y-m-d') : '' }}">>                        
                         </div>
                         <div class="form-group">
                             <label for="">No POS BC 11</label>

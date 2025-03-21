@@ -69,6 +69,9 @@ use App\Http\Controllers\DokumenBc\CodecoController;
 use App\Http\Controllers\CFS\CfsDefaultController;
 use App\Http\Controllers\CFS\InvoiceCSFController;
 
+// User Profile
+use App\Http\Controllers\Auth\ProfileController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -938,5 +941,12 @@ Route::prefix('/invoice/cfs')->group(function(){
         Route::get('/index', 'index')->name('cfs.invoice.index');
         Route::get('/data', 'data')->name('cfs.invoice.data');
         Route::get('/print', 'print')->name('cfs.invoice.print');
+    });
+});
+
+Route::prefix('/user-profile')->group(function(){
+    Route::controller(ProfileController::class)->group(function(){
+        Route::get('/index', 'index')->name('user.profile.index');
+        Route::post('/update', 'update')->name('user.profile.update');
     });
 });
