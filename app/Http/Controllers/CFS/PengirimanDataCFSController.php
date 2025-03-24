@@ -21,7 +21,7 @@ class PengirimanDataCFSController extends Controller
         // $this->middleware('auth');
 
         // $this->wsdl = 'https://ipccfscenter.com/TPSServices/server_plp_dev.php?wsdl';
-        $this->wsdl = 'https://pelindo-cfscenter.com/TPSServices/server_plp.php?wsdl ';
+        $this->wsdl = 'https://pelindo-cfscenter.com/TPSServices/server_plp_dev.php?wsdl ';
         $this->user = '1MUT';
         $this->password = '1MUT';
         $this->kode = '1MUT';
@@ -29,7 +29,7 @@ class PengirimanDataCFSController extends Controller
 
     public function CoariCont()
     {
-        $conts = Cont::whereNotNull('tglmasuk')->where('coari_cfs_flag', 'N')->get();
+        $conts = Cont::where('id', 2)->whereNotNull('tglmasuk')->where('coari_cfs_flag', 'N')->get();
         // $cont = Cont::find(3);
 
         \SoapWrapper::override(function ($service) {
@@ -440,7 +440,7 @@ class PengirimanDataCFSController extends Controller
     {
         $manifestes = Manifest::whereNotNull('tglstripping')->whereNotNull('tglrelease')->where('codeco_cfs_flag', 'N')->get();
         // dd($manifest);
-
+        // $manifest = Manifest::find(8);
         \SoapWrapper::override(function ($service) {
             $service
                 ->name('CoarriCodeco_Kemasan')
@@ -513,9 +513,9 @@ class PengirimanDataCFSController extends Controller
                 'tgl_segel_bc' => null,
                 'no_ijin_tps' => null,
                 'tgl_ijin_tps' => null,
-                'nama_consolidator' => 'PT INTI MANDIRI UTAMA TRANS',
-                'npwp_consolidator' => '0022383483042000',
-                'alamat_consolidator' => 'Jl. Bugis Raya No. 15 Kebon Bawang Tanjung Priok',
+                'nama_consolidator' => 'PT. LOGISTIK KARYA BERMITRA',
+                'npwp_consolidator' => '0924302722427000',
+                'alamat_consolidator' => 'JL. BINTARA 9 NO. 158 RT. 001 RW. 005 BINTARA BEKASI BARAT KOTA BEKASI JAWA BARAT 97134',
             ];
 
             $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><DOCUMENT></DOCUMENT>');
@@ -557,6 +557,7 @@ class PengirimanDataCFSController extends Controller
             });
             $response = $this->response;
     
+            // dd($response, $xml);
             $hasil = strpos($response, "Proses Berhasil") !== false ? true : false;
             $flag = 'N';
             if ($hasil == true) {
@@ -577,7 +578,7 @@ class PengirimanDataCFSController extends Controller
     public function detilHouseBl() 
     {
         $manifestes = Manifest::whereNotNull('tglstripping')->where('detil_hbl_cfs_flag', 'N')->take(5)->get();
-        // $manifest = Manifest::find(58);
+        // $manifest = Manifest::find(8);
         \SoapWrapper::override(function ($service) {
             $service
                 ->name('DetailHouseBL')
@@ -616,11 +617,12 @@ class PengirimanDataCFSController extends Controller
 
 
         foreach ($manifestes as $manifest) {
+            # code...
             $tglBLawb = $manifest->tgl_hbl ? Carbon::parse($manifest->tgl_hbl)->format('Y-m-d') : null;
             $tglMasterBL = $manifest->job->tgl_master_bl ? Carbon::parse($manifest->job->tgl_master_bl)->format('Y-m-d') : null;
             $tglBC11 = $manifest->job->ttgl_bc11 ? Carbon::parse($manifest->job->ttgl_bc11)->format('Y-m-d') : null;
             $tglPLP = $manifest->job->ttgl_plp ? Carbon::parse($manifest->job->ttgl_plp)->format('Y-m-d') : null;
-            $tglStripping = $manifest->tglstripping ? Carbon::parse($manifest->tglstripping) : null;
+            $tglStripping = $manifest->tglstripping ? Carbon::now() : null;
             $jamStripping = $manifest->jamstripping ? Carbon::parse($manifest->jamstripping) : null;
             $strippingAt = $tglStripping;
 
@@ -630,7 +632,7 @@ class PengirimanDataCFSController extends Controller
             }
 
             if ($manifest->dg_label == 'Y' ) {
-                $type = 'BB';
+                $type = 'DG';
             }
 
             $item = Item::where('manifest_id', $manifest->id)->with('tier')->whereNotNull('tier')->get();
@@ -669,9 +671,9 @@ class PengirimanDataCFSController extends Controller
                 'tgl_behandle' => $behandleAt,
                 'fl_segel_merah' => $manifest->flag_segel_merah,
                 'tgl_segel_merah' => $tglSegelMerah,
-                'nama_consolidator' => 'PT INTI MANDIRI UTAMA TRANS',
-                'npwp_consolidator' => '0022383483042000',
-                'alamat_consolidator' => 'Jl. Bugis Raya No. 15 Kebon Bawang Tanjung Priok',
+                'nama_consolidator' => 'PT. LOGISTIK KARYA BERMITRA',
+                'npwp_consolidator' => '0924302722427000',
+                'alamat_consolidator' => 'JL. BINTARA 9 NO. 158 RT. 001 RW. 005 BINTARA BEKASI BARAT KOTA BEKASI JAWA BARAT 97134',
             ];
 
             $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="utf-8" standalone="yes"?><DOCUMENT></DOCUMENT>');
@@ -703,6 +705,7 @@ class PengirimanDataCFSController extends Controller
             });
             $response = $this->response;
 
+            // dd($response, $xml);
             $hasil = strpos($response, "Berhasil insert data") !== false ? true : false;
             $flag = 'N';
             if ($hasil == true) {
@@ -715,6 +718,7 @@ class PengirimanDataCFSController extends Controller
                 'detil_hbl_cfs_at' => Carbon::now(),
             ]);
         }
+        
         return true;
     }
 

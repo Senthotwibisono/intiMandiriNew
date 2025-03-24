@@ -311,20 +311,20 @@ class CFSController extends Controller
                         
                     }
                     // dd('tglStripping: ' . $tglStripping , 'IntervalAwal: ' . $intervalAwal, 'interval : ' . $interval, 'Massa1 : ' . $massa1, 'oldMassa1 : ' . $OldMassa1, 'Massa2 : ' . $massa2, 'massa 3 : ' . $massa3);
-                    if ($massa1 > 0) {
-                        $tarifMassa1 = ($type == 'NORMAL') ? Tarif::find(4) : Tarif::find(7);
-                        $hargaMassa1 = ($tarifMassa1->tarif_dasar * $cbm * 1);
-                        $storage1 = [
-                            "KODE_TARIF" => $tarifMassa1->kode_bill,
-                            "TARIF_DASAR" => $tarifMassa1->tarif_dasar,
-                            "QTY" => $cbm,
-                            "HARI" => 1,
-                            "NILAI" => $hargaMassa1,
-                            "SATUAN" => ($manifest->quantity).($manifest->packing->code ?? '')
-                        ];
-                        $total += $hargaMassa1;
-                        $tarif [] = $storage1;
-                    }
+                    // if ($massa1 > 0) {
+                    //     $tarifMassa1 = ($type == 'NORMAL') ? Tarif::find(4) : Tarif::find(7);
+                    //     $hargaMassa1 = ($tarifMassa1->tarif_dasar * $cbm * 1);
+                    //     $storage1 = [
+                    //         "KODE_TARIF" => $tarifMassa1->kode_bill,
+                    //         "TARIF_DASAR" => $tarifMassa1->tarif_dasar,
+                    //         "QTY" => $cbm,
+                    //         "HARI" => 1,
+                    //         "NILAI" => $hargaMassa1,
+                    //         "SATUAN" => ($manifest->quantity).($manifest->packing->code ?? '')
+                    //     ];
+                    //     $total += $hargaMassa1;
+                    //     $tarif [] = $storage1;
+                    // }
     
                     if ($massa2 > 0) {
                         $tarifMassa2 = ($type == 'NORMAL') ? Tarif::find(5) : Tarif::find(9);
