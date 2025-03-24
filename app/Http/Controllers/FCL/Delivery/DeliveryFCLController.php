@@ -31,6 +31,7 @@ use App\Models\YardDesign as YD;
 use App\Models\YardDetil as RowTier;
 use App\Models\InvoiceHeader as Header;
 use App\Models\KeteranganPhoto as KP;
+use DataTables;
 
 class DeliveryFCLController extends Controller
 {
@@ -49,36 +50,90 @@ class DeliveryFCLController extends Controller
         return view('fcl.delivery.behandle', $data);
     }
 
+    public function behandleData(Request $request)
+    {
+        $cont = Cont::with(['job'])->get();
+
+        return DataTables::of($cont)
+        ->addColumn('action', function($cont){
+            return '<button class="btn btn-warning editButton" data-id="'.$cont->id.'"><i class="fa fa-pencil"></i></button>';
+        })
+        ->addColumn('photo', function($cont){
+            return '<a href="javascript:void(0)" onclick="openWindow(\'/fcl/delivery/behandleDetil/'.$cont->id.'\')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>';
+        })
+        ->addColumn('statusBehandle', function($cont){
+            if ($cont->no_spjm == null) {
+                return '<span class="badge bg-warning">Dokumen SPJM Belum tersedia</span>';
+            } else {
+                if ($cont->status_behandle == 1) {
+                    return '<button class="btn btn-outline-primary checkProses" data-id="'.$cont->id.'">Checking Proses</button>';
+                } elseif ($status_behandle == 2) {
+                    return '<button class="btn btn-primary FinishBehandle" data-id="'.$cont->id.'">Finish</button>';
+                } else {
+                    return '<button class="btn btn-outline-primary ReadyCheck" data-id="'.$cont->id.'">Make It Ready</button>';
+                }
+            }
+
+        })
+        ->addColumn('status', function($cont){
+            if ($cont->status_beahandle == 1) {
+                return '<span class="badge bg-primary">Ready</span>';
+            } elseif ($cont->status_behandle == 2) {
+                return '<span class="badge bg-warning">On Progress</span>';
+            } elseif ($cont->status_behandle == 3) {
+                return '<span class="badge bg-info">Finish</span>';
+            }else {
+                // return '<span class="badge bg-light-warning">Dokumen SPJM Belum tersedia</span>';
+                return '-';
+            }
+        })
+        ->rawColumns(['action', 'photo', 'statusBehandle', 'status'])
+        ->make(true);
+    }
+
     public function getDataCont($id)
     {
+        // dd($id);
         $cont = Cont::where('id', $id)->first();
-        if ($cont) {
-            $job = Job::where('id', $cont->joborder_id)->first();
-            $user = Auth::user()->name;
-            $userId = Auth::user()->id;
-            $uid = User::where('id', $cont->uidmasuk)->first();
-            $rowTier = RowTier::where('id', $cont->yard_detil_id)->first();
-            // var_dump($cont->yard_detil_id, $rowTier);
-            // die;
-            if ($rowTier) {
-                $slot = $rowTier->slot;
-                $row = $rowTier->row;
-                $tier = $rowTier->tier;
-            } else {
-                $slot = null;
-                $row = null;
-                $tier = null;
+        try {
+            if ($cont) {
+                $job = Job::where('id', $cont->joborder_id)->first();
+                $user = Auth::user()->name;
+                $userId = Auth::user()->id;
+                $uid = User::where('id', $cont->uidmasuk)->first();
+                $rowTier = RowTier::where('id', $cont->yard_detil_id)->first();
+                // var_dump($cont->yard_detil_id, $rowTier);
+                // die;
+                if ($rowTier) {
+                    $slot = $rowTier->slot;
+                    $row = $rowTier->row;
+                    $tier = $rowTier->tier;
+                } else {
+                    $slot = null;
+                    $row = null;
+                    $tier = null;
+                }
+                return response()->json([
+                    'success' => true,
+                    'data' => $cont,
+                    'job' =>$job,
+                    'user' => $user,
+                    'userId' => $userId,
+                    'uid' => $uid,
+                    'slot' => $slot,
+                    'row' => $row,
+                    'tier' => $tier,
+                ]);
+            }else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Opss Something wrong : CONTAINER TIDAK DITEUKAN',
+                ]);
             }
+        } catch (\Throwable $th) {
             return response()->json([
-                'success' => true,
-                'data' => $cont,
-                'job' =>$job,
-                'user' => $user,
-                'userId' => $userId,
-                'uid' => $uid,
-                'slot' => $slot,
-                'row' => $row,
-                'tier' => $tier,
+                'success' => false,
+                'message' => 'Opss Something wrong : ' . $th->getMessage(),
             ]);
         }
     }

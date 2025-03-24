@@ -212,6 +212,11 @@ class ContainerFCL extends Model
         'active_to',
         'type_class',
         'flag_sp2',
+
+        // SPJM
+        'jenis_spjm',
+        'no_spjm',
+        'tgl_spjm',
     ];
 
     public function user()

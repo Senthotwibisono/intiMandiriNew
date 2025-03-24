@@ -31,75 +31,29 @@
             </div>
         </div> -->
         <div class="card-body">
-            <div style="overflow-x:auto;">
-                <table class="tabelCustom table-hover table-stripped">
-                    <thead>
+            <div class="table">
+                <table class="table-hover table-stripped" id="tableBehandle">
+                    <thead style="white-space: nowrap;">
                         <tr>
-                            <th class="text-center">Action</th>
-                            <th class="text-center">Status Behandle</th>
-                            <th class="text-center">No Job Order</th>
-                            <th class="text-center">No MBL</th>
-                            <th class="text-center">Tgl MBL</th>
-                            <th class="text-center">No Container</th>
-                            <th class="text-center">Size</th>
-                            <th class="text-center">Teus</th>
-                            <th class="text-center">No PLP</th>
-                            <th class="text-center">Tgl PLP</th>
-                            <th class="text-center">Tgl Ready Behandle</th>
-                            <th class="text-center">Tgl Mulai Behandle </th>
-                            <th class="text-center">Deskripsi Behandle</th>
-                            <th class="text-center">Tanggal Selesai Behandle</th>
-                            <th class="text-center">Deskripsi Selesai Behandle</th>
+                            <th style="min-width: 150px;" class="text-center">Action</th>
+                            <th style="min-width: 150px;" class="text-center">Photo</th>
+                            <th style="min-width: 150px;" class="text-center">Action Behandle</th>
+                            <th style="min-width: 150px;" class="text-center">Status Behandle</th>
+                            <th style="min-width: 150px;" class="text-center">No Job Order</th>
+                            <th style="min-width: 150px;" class="text-center">No MBL</th>
+                            <th style="min-width: 150px;" class="text-center">Tgl MBL</th>
+                            <th style="min-width: 150px;" class="text-center">No Container</th>
+                            <th style="min-width: 150px;" class="text-center">Size</th>
+                            <th style="min-width: 150px;" class="text-center">Teus</th>
+                            <th style="min-width: 150px;" class="text-center">No PLP</th>
+                            <th style="min-width: 150px;" class="text-center">Tgl PLP</th>
+                            <th style="min-width: 150px;" class="text-center">Tgl Ready Behandle</th>
+                            <th style="min-width: 150px;" class="text-center">Tgl Mulai Behandle </th>
+                            <th style="min-width: 150px;" class="text-center">Deskripsi Behandle</th>
+                            <th style="min-width: 150px;" class="text-center">Tanggal Selesai Behandle</th>
+                            <th style="min-width: 150px;" class="text-center">Deskripsi Selesai Behandle</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach($containers as $mans)
-                            <tr class="{{ $mans->status_behandle == 1 ? 'highlight-yellow' : ($mans->status_behandle == 3 ? 'highlight-blue' : ($mans->status_behandle == 2 ? 'highlight-green' : '')) }}">
-                                <td>
-                                    <div class="button-container">
-                                        <button class="btn btn-warning editButton" data-id="{{$mans->id}}"><i class="fa fa-pencil"></i></button>
-                                        <a href="javascript:void(0)" onclick="openWindow('/fcl/delivery/behandleDetil{{$mans->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
-                                            @if($mans->status_behandle == 1)
-                                                <button class="btn btn-outline-primary checkProses" data-id="{{$mans->id}}">Checking Proses</button>
-                                            @elseif($mans->status_behandle == 2)
-                                                @if(Auth::check() && Auth::user()->hasRole('bc'))
-                                                <button class="btn btn-primary FinishBehandle" data-id="{{$mans->id}}">Finish</button>
-                                                @endif
-                                            @elseif($mans->status_behandle == null)
-                                                <button class="btn btn-outline-primary ReadyCheck" data-id="{{$mans->id}}">Make It Ready</button>
-                                            @endif
-                                    </div>
-                                </td>
-                                <td>
-                                    @if($mans->status_behandle == 1)
-                                        <!-- <p>On Progress</p> -->
-                                        <span class="badge bg-light-warning">Ready</span>
-                                        @elseif($mans->status_behandle == 2)
-                                        <!-- <p>Ready</p> -->
-                                        <span class="badge bg-light-success">On Proggress</span>
-                                        @elseif($mans->status_behandle == 3)
-                                        <!-- <p>Finish</p> -->
-                                        <span class="badge bg-light-info">Finish</span>
-                                    @else
-                                        {{$mans->status_behandle}}
-                                    @endif
-                                </td>
-                                <td>{{$mans->job->nojoborder ?? ''}}</td>
-                                <td>{{$mans->job->nombl ?? ''}}</td>
-                                <td>{{$mans->tgl_master_bl ?? ''}}</td>
-                                <td>{{$mans->nocontainer ?? ''}}</td>
-                                <td>{{$mans->size ?? ''}}</td>
-                                <td>{{$mans->teus ?? ''}}</td>
-                                <td>{{$mans->job->PLP->no_plp ?? ''}}</td>
-                                <td>{{$mans->job->PLP->tgl_plp ?? ''}}</td>
-                                <td>{{$mans->date_ready_behandle ?? ''}}</td>
-                                <td>{{$mans->date_check_behandle ?? ''}}</td>
-                                <td>{{$mans->desc_check_behandle ?? ''}}</td>
-                                <td>{{$mans->date_finish_behandle ?? ''}}</td>
-                                <td>{{$mans->desc_finish_behandle ?? ''}}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
                 </table>
             </div>
         </div>
@@ -129,7 +83,7 @@
                             <label for="">Size</label>
                             <input type="text" name="size" id="size_edit" class="form-control" readonly>
                         </div>
-                        <div class="form-group">
+                        <!-- <div class="form-group">
                             <label for="">Yard Block</label>
                             <select name="yard_id" id="yard_id" style="width:100%;" class="js-example-basic-single select2 form-select">
                                 <option disabled selected>Pilih Satu!</option>
@@ -155,6 +109,35 @@
                             <select name="tier" id="yard_tier" style="width:100%;" class="js-example-basic-single select2 form-select">
                                 <option disabled selected>Pilih Row Terlebih Dahulu!</option>
                             </select>
+                        </div> -->
+
+                        <div class="row">
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="">Jenis Dokumen</label>
+                                    <select name="jenis_spjm" id="jenis_spjm" class="form-select selet2 js-example-basic-single" style="width: 100%;">
+                                        <option disabled selected value>Pilih Satu!</option>
+                                        <option value="spjm">SPJM</option>
+                                        <option value="karantina">Karantina</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="">No SPJM</label>
+                                    <input type="text" class="form-control" id="no_spjm" name="no_spjm">
+                                </div>
+                            </div>
+
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="">Tgl SPJM</label>
+                                    <div class="input-group mb-3">
+                                        <input type="date" class="form-control" id="tgl_spjm" name="tgl_spjm">
+                                        <button type="button" class="btn btn-primary" id="searchSPJM"><i class="fas fa-search"></i></button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         
                     </div>
@@ -227,6 +210,123 @@
 @endsection
 
 @section('custom_js')
+<script>
+    $('#searchSPJM').on('click', function(){
+        var jenis_spjm = $('#jenis_spjm').val(); 
+        var no_spjm = $('#no_spjm').val(); 
+        var tgl_spjm = $('#tgl_spjm').val();
+        var id = $('#id_edit').val();
+        console.log(id);
+        if (!id || id.length == 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Pilih Container Terlebih Dahulu',
+                confirmButtonText: 'OK',
+            });
+        }
+        console.log('no_spjm & tgl_spjm = ' + no_spjm + ', ' + tgl_spjm + ', ' + jenis_spjm + ', ' + id); 
+        Swal.fire({
+            icon: 'warning',
+            title: 'Apakah dokumen yang anda masukkan sudah sesuai?',
+            showCancelButton: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                swal.fire({
+                    title: 'Processing...',
+                    text: 'Please wait',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                        willOpen: () => {
+                            Swal.showLoading();
+                        }
+                })
+            }
+        });
+    })
+</script>
+
+<script>
+    let excel = {
+                    extend: 'excelHtml5',
+                    autoFilter: true,
+                    sheetName: 'Exported data',
+                    className: 'btn btn-outline-success',
+                };
+    let pdf = {
+                extend: 'pdfHtml5',
+                text: 'Ekspor PDF',
+                className: 'btn btn-outline-danger',
+                orientation: 'landscape', // Mode lanskap untuk tampilan lebih luas
+                pageSize: 'A1', // Pilihan ukuran kertas (bisa A3, A4, A5, dll.)
+                download: 'open', // Membuka file langsung tanpa mendownload
+                exportOptions: {
+                    columns: function (idx, data, node) {
+                        return true; // Semua kolom akan diekspor, termasuk yang tersembunyi
+                    }
+                },
+                customize: function (doc) {
+                    doc.defaultStyle.fontSize = 8; // Mengatur ukuran font agar semua data muat
+                    doc.styles.tableHeader.fontSize = 8; // Mengatur ukuran header tabel
+                    doc.styles.title.fontSize = 12; // Ukuran font judul
+                    doc.pageMargins = [2, 2, 2, 2]; // Mengatur margin halaman
+                    doc.content[1].table.widths = Array(doc.content[1].table.body[0].length + 1).join('*').split(''); 
+                }
+            };
+    $(document).ready(function(){
+        $('#tableBehandle').dataTable({
+            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]], // Pilihan jumlah data
+            pageLength: 25, // Default jumlah data per halaman
+            dom: 'lBfrtip', // Pastikan ada 'B' untuk menampilkan tombol
+            buttons: [
+                'copy', 'csv', excel , pdf, 'print'
+            ],
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('fcl.behandle.dataTable') }}",
+            scrollX: true,
+            columns: [
+                {className:'text-center', data:'action', name:'action', searchable:false, orderable:false},
+                {className:'text-center', data:'photo', name:'photo', searchable:false, orderable:false},
+                {className:'text-center', data:'statusBehandle', name:'statusBehandle', searchable:false, orderable:false},
+                {className:'text-center', data:'status', name:'status'},
+                {className:'text-center', data:'job.nojoborder', name:'job.nojoborder'},
+                {className:'text-center', data:'nobl', name:'nobl'},
+                {className:'text-center', data:'tgl_bl_awb', name:'tgl_bl_awb'},
+                {className:'text-center', data:'nocontainer', name:'nocontainer'},
+                {className:'text-center', data:'size', name:'size'},
+                {className:'text-center', data:'teus', name:'teus'},
+                {className:'text-center', data:'job.noplp', name:'job.noplp'},
+                {className:'text-center', data:'job.ttgl_plp', name:'job.ttgl_plp'},
+                {className:'text-center', data:'date_ready_behandle', name:'date_ready_behandle'},
+                {className:'text-center', data:'date_check_behandle', name:'date_check_behandle'},
+                {className:'text-center', data:'desc_check_behandle', name:'desc_check_behandle'},
+                {className:'text-center', data:'date_finish_behandle', name:'date_finish_behandle'},
+                {className:'text-center', data:'desc_finish_behandle', name:'desce_finish_behandle'},
+            ],
+            initComplete: function () {
+                var api = this.api();
+                
+                api.columns().every(function (index) {
+                    var column = this;
+                    var excludedColumns = [0, 1,2,3]; // Kolom yang tidak ingin difilter (detil, flag_segel_merah, lamaHari)
+
+                    if (excludedColumns.includes(index)) {
+                        $('<th></th>').appendTo(column.header()); // Kosongkan header pencarian untuk kolom yang dikecualikan
+                        return;
+                    }
+                    var $th = $(column.header());
+                    var $input = $('<input type="text" class="form-control form-control-sm" placeholder="Search ' + $th.text() + '">')
+                        .appendTo($('<th class="text-center"></th>').appendTo($th))
+                        .on('keyup change', function () {
+                            column.search($(this).val()).draw();
+                        });
+                });
+            }
+        })
+    })
+</script>
+
 <script>
 $(document).ready(function() {
     let slotValue, rowValue, tierValue;
@@ -329,9 +429,10 @@ $(document).ready(function() {
                 }
         });
     let id = $(this).data('id');
+    console.log(id);
     $.ajax({
       type: 'GET',
-      url: '/fcl/realisasi/placementEdit-' + id,
+      url: '/fcl/delivery/dataCont/' + id,
       cache: false,
       data: {
         id: id
@@ -342,28 +443,39 @@ $(document).ready(function() {
         swal.close();
 
         console.log(response);
-        $("#id_edit").val(response.data.id);
-        $("#nocontainer_edit").val(response.data.nocontainer);
-        $("#nojoborder_edit").val(response.job.nojoborder);
-        $("#size_edit").val(response.data.size);
-        $("#no_spjm_edit").val(response.data.no_spjm);
-        $("#tgl_spjm_edit").val(response.data.tgl_spjm);
-        $("#date_ready_behandle_edit").val(response.data.date_ready_behandle);
-        $("#date_check_behandle_edit").val(response.data.date_check_behandle);
-        $("#desc_check_behandle_edit").val(response.data.desc_check_behandle);
-        $("#desc_finish_behandle_edit").val(response.data.desc_finish_behandle);
-       
-            if (response.data.yard_id) {
-                slotValue = response.slot;
-                rowValue = response.row;
-                tierValue = response.tier;
-                $("#yard_id").val(response.data.yard_id).trigger('change');
-            } else {
-                $('#yard_id').val(null).append('<option disabled selected>Pilih Satu</option>');
-                $('#yard_slot').empty().append('<option disabled selected>Pilih Block Terlebih Dahulu!</option>');
-                $('#yard_row').empty().append('<option disabled selected>Pilih Slot Terlebih Dahulu!</option>');
-                $('#yard_tier').empty().append('<option disabled selected>Pilih Row Terlebih Dahulu!</option>');
-            }
+        if (response.success) {
+            
+            $("#id_edit").val(response.data.id);
+            $("#nocontainer_edit").val(response.data.nocontainer);
+            $("#jenis_spjm").val(response.data.jenis_spjm).trigger('change');
+            $("#no_spjm").val(response.data.no_spjm);
+            $("#tgl_spjm").val(response.data.tgl_spjm);
+            $("#nojoborder_edit").val(response.job.nojoborder);
+            $("#size_edit").val(response.data.size);
+            $("#no_spjm_edit").val(response.data.no_spjm);
+            $("#tgl_spjm_edit").val(response.data.tgl_spjm);
+            $("#date_ready_behandle_edit").val(response.data.date_ready_behandle);
+            $("#date_check_behandle_edit").val(response.data.date_check_behandle);
+            $("#desc_check_behandle_edit").val(response.data.desc_check_behandle);
+            $("#desc_finish_behandle_edit").val(response.data.desc_finish_behandle);
+           
+                if (response.data.yard_id) {
+                    slotValue = response.slot;
+                    rowValue = response.row;
+                    tierValue = response.tier;
+                    $("#yard_id").val(response.data.yard_id).trigger('change');
+                } else {
+                    $('#yard_id').val(null).append('<option disabled selected>Pilih Satu</option>');
+                    $('#yard_slot').empty().append('<option disabled selected>Pilih Block Terlebih Dahulu!</option>');
+                    $('#yard_row').empty().append('<option disabled selected>Pilih Slot Terlebih Dahulu!</option>');
+                    $('#yard_tier').empty().append('<option disabled selected>Pilih Row Terlebih Dahulu!</option>');
+                }
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: response.message,
+            });
+        }
       },
       error: function(data) {
         console.log('error:', data)

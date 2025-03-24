@@ -472,13 +472,22 @@
             </li>
             <li class="sidebar-item @if(Request::is('invoiceFCL/invoice/index') || Request::is('/invoiceFCL/invoice/index')) active @endif">
                 <a href="/invoiceFCL/invoice/index" class='sidebar-link'>
-                    <i class="bi bi-grid-fill"></i>
                     <span>List Invoice FCL</span>
                 </a>
             </li>
             
             <li class="submenu-item @if(Request::is('invoiceFCL/invoice/report/index')) active @endif">
                 <a href="{{ url('/invoiceFCL/invoice/report/index')}}">Rport Invoice</a>
+            </li>
+            <li class="sidebar-item has-sub @if(Request::is('invoiceFCL/behandle/*')) active @endif">
+                <a href="#" class='sidebar-link'>
+                    <span>Behandle</span>
+                </a>
+                <ul class="submenu @if(Request::is('invoiceFCL/behandle/*')) active @endif">
+                    <li class="submenu-item @if(Request::is('invoiceFCL/behandle/form-index')) active @endif">
+                        <a href="{{ route('invoiceFCL.behandle.formIndex')}}">Form</a>
+                    </li>
+                </ul>
             </li>
         </ul>
     </li>

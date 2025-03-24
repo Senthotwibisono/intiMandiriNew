@@ -59,6 +59,7 @@ use App\Http\Controllers\pengiriman\CoariCodecoController;
  use App\Http\Controllers\invoiceFCL\MasterTarifFCLController;
  use App\Http\Controllers\invoiceFCL\FormFCLController;
  use App\Http\Controllers\invoiceFCL\BackendInvoiceController;
+ use App\Http\Controllers\invoiceFCL\Behandle\InvoiceBehandleFCLController;
  
 
 //  CodecoCoari
@@ -747,7 +748,8 @@ Route::controller(AndroidGateController::class)->group(function(){
 
         Route::prefix('/delivery')->controller(DeliveryFCLController::class)->group(function(){
             Route::get('/behandle', 'indexBehandle');
-            Route::get('/dataCont{id}', 'getDataCont');
+            Route::get('/behandle-data', 'behandleData')->name('fcl.behandle.dataTable');
+            Route::get('/dataCont/{id}', 'getDataCont');
 
             Route::post('/behandleReadyCheck{id}', 'readyCheckBehandle');
             Route::post('/prosesCheckBehandle{id}', 'prosesCheckBehandle');
@@ -864,6 +866,18 @@ Route::controller(AndroidGateController::class)->group(function(){
                     Route::get('/excel', 'excelReport');
                     Route::get('/pdf', 'pdfReport');
                 });
+            });
+        });
+
+        Route::prefix('/behandle')->group(function(){
+            Route::controller(InvoiceBehandleFCLController::class)->group(function(){
+                // Form
+                Route::get('/form-index', 'formIndex')->name('invoiceFCL.behandle.formIndex');
+                Route::get('/form-data', 'formData')->name('invoiceFCL.behandle.formData');
+                Route::post('/form-create', 'formCreate')->name('invoiceFCL.behandle.formCreate');
+                    // Step1
+                    Route::get('/form-step1/{id?}', 'indexStep1');
+                    Route::get('/form-getCont', 'getContainer')->name('invoiceFCL.behandle.getContainer');
             });
         });
     });
