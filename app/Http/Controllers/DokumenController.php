@@ -1214,7 +1214,7 @@ class DokumenController extends Controller
                             }else {
                                 $alasanSize = null;
                             }
-                            $alasanFinal = 'Bukan Dokumen SPPB. ' . $alasanFinal;
+                            $alasanFinal = 'Bukan Dokumen SPPB. ' . $alasanSize;
                             $cust = Customer::where('name', $bc23->nama_imp)->first();
                             if ($cust) {
                                 $cust->update([
@@ -2454,7 +2454,7 @@ class DokumenController extends Controller
                         }else {
                             $alasanSize = null;
                         }
-                        $alasanFinal = 'Bukan Dokumen SPPB. ' . $alasanFinal;
+                        $alasanFinal = 'Bukan Dokumen SPPB. ' . $alasanSize;
                         $cust = Customer::where('name', $manual->consignee)->first();
                             $newCust = null;
                             if (!$cust && $manual->consignee != null) {
@@ -2606,7 +2606,7 @@ class DokumenController extends Controller
                             }else {
                                 $alasanSize = null;
                             }
-                            $alasanFinal = 'Bukan Dokumen SPPB. ' . $alasanFinal;
+                            $alasanFinal = 'Bukan Dokumen SPPB. ' . $alasanSize;
                             $cust = Customer::where('name', $manual->consignee)->first();
                             $newCust = null;
                             if (!$cust && $manual->consignee != null) {
