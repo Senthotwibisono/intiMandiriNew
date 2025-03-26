@@ -517,7 +517,7 @@ class FormFCLController extends Controller
                                     'type' => $ctr_type,
                                     'tarif_dasar' => $tarifTPS->tarif_dasar_massa,
                                     'satuan' => $tarifTPS->massa3,
-                                    'jumlah' => $jumlah,
+                                    'jumlah' => $jumlahContByMassa,
                                     'jumlah_hari' => $massa3TPS,
                                     'total' => $totalMassa3TPS,
                                 ]);
