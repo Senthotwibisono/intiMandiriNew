@@ -244,7 +244,7 @@ body {
                                             <td class="text-left">{{$wms->keterangan}}</td>
                                             <td>{{ number_format($wms->tarif_dasar, 0)}}</td>
                                             <td>{{$wms->jumlah_hari}}</td>
-                                            <td>{{ number_format($wms->total, 0)}}</td>
+                                            <td>{{ number_format($totalWMS, 0)}}</td>
                                         </tr>  
                                 @endif
                             @endforeach
