@@ -8,6 +8,8 @@ use Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 use App\Models\ContainerFCL as Cont;
 use App\Models\JobOrderFCL as Job;
@@ -15,6 +17,7 @@ use App\Models\Eseal;
 use App\Models\User;
 use App\Models\Photo;
 use App\Models\TpsSPJM as SPJM;
+use App\Models\TpsSPJMCont as SPJMCont;
 use App\Models\TpsSPPB as SPPB;
 use App\Models\TpsSPPBCont as SPPBCont;
 use App\Models\TpsSPPBKms as SPPBKms;
@@ -43,7 +46,7 @@ class DeliveryFCLController extends Controller
     public function indexBehandle()
     {
         $data['title'] = "FCL - Behandle";
-        $data['containers'] = Cont::whereNotNull('tglmasuk')->whereNull('tglkeluar')->get();
+      
         $data['kets'] = KP::where('tipe', 'Container')->where('kegiatan', '=', 'behandle')->get();
         $data['yards'] = YD::whereNot('yard_block', null)->get();
 
@@ -67,7 +70,7 @@ class DeliveryFCLController extends Controller
             } else {
                 if ($cont->status_behandle == 1) {
                     return '<button class="btn btn-outline-primary checkProses" data-id="'.$cont->id.'">Checking Proses</button>';
-                } elseif ($status_behandle == 2) {
+                } elseif ($cont->status_behandle == 2) {
                     return '<button class="btn btn-primary FinishBehandle" data-id="'.$cont->id.'">Finish</button>';
                 } else {
                     return '<button class="btn btn-outline-primary ReadyCheck" data-id="'.$cont->id.'">Make It Ready</button>';
@@ -76,7 +79,7 @@ class DeliveryFCLController extends Controller
 
         })
         ->addColumn('status', function($cont){
-            if ($cont->status_beahandle == 1) {
+            if ($cont->status_behandle == 1) {
                 return '<span class="badge bg-primary">Ready</span>';
             } elseif ($cont->status_behandle == 2) {
                 return '<span class="badge bg-warning">On Progress</span>';
@@ -134,6 +137,112 @@ class DeliveryFCLController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Opss Something wrong : ' . $th->getMessage(),
+            ]);
+        }
+    }
+
+    public function searchSPJM(Request $request)
+    {
+        $rules = [
+            'jenis_spjm' => 'required',
+            'no_spjm'  => 'required',
+            'tgl_spjm'  => 'required',
+        ];
+
+        $messages = [
+            'jenis_spjm'       => 'Jenis SPJM Tidak Boleh Null',
+            'no_spjm'  => 'No SPJM Tidak Boleh Null',
+            'tgl_spjm'  => 'Tgl SPJM Tidak Boleh Null',
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages);
+        
+        if ($validator->fails()) {
+            $errors = collect($validator->errors())->map(fn($error) => $error[0])->toArray();
+            return response()->json([
+                'status'  => false,
+                'success' => false,
+                'message' => implode(", ", $errors),
+                'errors'  => $validator->errors(),
+            ], 400);
+        }
+
+        $cont = Cont::find($request->id);
+        if (!$cont) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Container tidak ditemukan',
+            ]);
+        }
+
+        if (!$request->tgl_spjm || $request->tgl_spjm == null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tgl SPJM Tidak Boleh ',
+            ]);
+        }
+
+        try {
+            if ($request->jenis_spjm == 'karantina') {
+                $cont->update([
+                    'jenis_spjm' => $request->jenis_spjm,
+                    'no_spjm' => $request->no_spjm,
+                    'tgl_spjm' => $request->tgl_spjm,
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Data Berhasil di Simpan'
+                ]);
+            }else {
+                // dd($request->all());
+                $spjm = SPJM::where('no_spjm', $request->no_spjm)->first();
+                if (!$spjm) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Data tidak ditemukan',
+                    ]);
+                }
+
+                $tglSPJM = ($spjm->tgl_spjm) ? Carbon::parse($spjm->tgl_spjm)->format('Y-m-d') : null;
+                // dd($tglSPJM);
+                if ($tglSPJM != $request->tgl_spjm) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Tgl SPJM Berbeda, Harap hubung Beacukai',
+                    ]);
+                }
+
+                $spjmCont = SPJMCont::where('spjm_id', $spjm->id)->where('no_cont', $cont->nocontainer)->first();
+                if (!$spjmCont) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Tidak ada container yang sama, harap lakukan cross check kembali',
+                    ]);
+                }
+                
+                if ($spjmCont->size != $cont->size) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Ukuran Container Berbeda, harap lakukan update terlebih dahulu',
+                    ]);
+                }
+
+                $cont->update([
+                    'jenis_spjm' => $request->jenis_spjm,
+                    'no_spjm' => $request->no_spjm,
+                    'tgl_spjm' => $request->tgl_spjm,
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Data berhasil di simpan',
+                ]);
+            }
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => $th->getMessage(),
             ]);
         }
     }

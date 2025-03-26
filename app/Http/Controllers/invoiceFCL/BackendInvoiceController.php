@@ -31,7 +31,7 @@ class BackendInvoiceController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->password = 'kaloKenaAuditSayaGakIkutan!!';
+        $this->password = '4646';
         
     }
 
@@ -67,6 +67,14 @@ class BackendInvoiceController extends Controller
                 return '<a type="button" href="/invoiceFCL/invoice/invoice-'.$header->id.'" target="_blank" class="btn btn-sm btn-info text-white"><i class="fa fa-file"></i></a>';
             }
         })
+        ->addColumn('tranparansi', function($header){
+            if ($header->status == 'C') {
+                return '<span class="badge bg-danger text-white">Canceled</span>';
+            }else {
+                # code...
+                return '<a type="button" href="/invoiceFCL/invoice/tranparansi-'.$header->id.'" target="_blank" class="btn btn-sm btn-danger text-white"><i class="fa fa-file"></i></a>';
+            }
+        })
         ->addColumn('action', function($header){
             if ($header->status == 'Y') {
                 return '<span class="badge bg-info text-white">Lunas</span>';
@@ -94,7 +102,7 @@ class BackendInvoiceController extends Controller
                 return '<span class="badge bg-warning text-white">Belum Lunas</span>';
             }
         })
-        ->rawColumns(['invoiceNo', 'pranota', 'invoice', 'action', 'deleteOrCancel', 'edit'])
+        ->rawColumns(['invoiceNo', 'pranota', 'invoice', 'action', 'deleteOrCancel', 'edit', 'tranparansi'])
         ->make(true);
     }
 
@@ -640,5 +648,47 @@ class BackendInvoiceController extends Controller
         return $start->translatedFormat('j F Y') . ' - ' . $end->translatedFormat('j F Y');
     }
 
+    public function Tranparansi($id)
+    {
+
+        $data['title'] = 'Invoice FCL';
+        $data['header'] = Header::find($id);
+
+        if ($data['header']->status != 'Y') {
+            return redirect()->back()->with('status', ['type'=> 'error', 'message' => 'Invoice belum di lunasi, anda di larang membuka halaman ini']);
+        }
+        
+        $container = FormC::where('form_id', $data['header']->form_id)->get();
+        $data['containers'] = $container;
+        $data['jenisContainer'] = $container->pluck('size')->unique()->implode(', ');
+        $data['typeContainer'] = $container->pluck('ctr_type')->unique()->implode(', ');
+
+        $data['size'] = $container->pluck('size')->unique();
+        $data['type'] = $container->pluck('ctr_type')->unique();
+        $data['nocontainer'] = $container->pluck('cont.nocontainer')->implode(', ');
+
+        $data['detilTPS'] = Detil::where('invoice_id', $id)->whereNot('tps', '=', 'Depo')->orderByRaw("CASE 
+        WHEN keterangan LIKE 'Penumpukkan Massa 1%' THEN 1
+        WHEN keterangan LIKE 'Penumpukkan Massa 2%' THEN 2
+        WHEN keterangan LIKE 'Penumpukkan Massa 3%' THEN 3
+        ELSE 4 
+        END")->orderBy('keterangan', 'desc')->get();
+        $data['detilWMS'] = Detil::where('invoice_id', $id)->where('tps', '=', 'Depo')->orderByRaw("CASE 
+        WHEN keterangan LIKE 'Penumpukan %' THEN 1
+        WHEN keterangan LIKE 'Paket PLP %' THEN 2
+        WHEN keterangan LIKE 'Lift On %' THEN 3
+        WHEN keterangan LIKE 'Lift Off %' THEN 4
+        ELSE 5
+        END")->orderBy('keterangan', 'desc')->get();
+
+        $data['terbilang'] = $this->terbilang($data['header']->grand_total);
+
+        if ($data['header']->type == 'EXTEND') {
+            return view('invoiceFCL.invoice.tranparansiExtend', $data);
+        }else {
+            # code...
+            return view('invoiceFCL.invoice.tranparansi', $data);
+        }
+    }
     
 }

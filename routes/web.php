@@ -750,6 +750,7 @@ Route::controller(AndroidGateController::class)->group(function(){
             Route::get('/behandle', 'indexBehandle');
             Route::get('/behandle-data', 'behandleData')->name('fcl.behandle.dataTable');
             Route::get('/dataCont/{id}', 'getDataCont');
+            Route::get('/searchSPJM', 'searchSPJM')->name('fcl.behandle.searchSPJM');
 
             Route::post('/behandleReadyCheck{id}', 'readyCheckBehandle');
             Route::post('/prosesCheckBehandle{id}', 'prosesCheckBehandle');
@@ -850,6 +851,7 @@ Route::controller(AndroidGateController::class)->group(function(){
                 Route::get('/dataTable', 'dataTable');
                 Route::get('/pranota-{id?}', 'pranota');
                 Route::get('/invoice-{id?}', 'Invoice');
+                Route::get('/tranparansi-{id?}', 'Tranparansi');
                 Route::get('/getDataInvoice-{id?}', 'getDataInvoice');
                 Route::post('/paidInvoice', 'paidInvoice');
                 Route::post('/cancelInvoice', 'cancelInvoice');
@@ -876,8 +878,22 @@ Route::controller(AndroidGateController::class)->group(function(){
                 Route::get('/form-data', 'formData')->name('invoiceFCL.behandle.formData');
                 Route::post('/form-create', 'formCreate')->name('invoiceFCL.behandle.formCreate');
                     // Step1
-                    Route::get('/form-step1/{id?}', 'indexStep1');
+                    Route::get('/form-step1/{id?}', 'indexStep1')->name('invoiceFCL.behandle.step1');
                     Route::get('/form-getCont', 'getContainer')->name('invoiceFCL.behandle.getContainer');
+                    Route::post('/form-postStep1', 'postStep1')->name('invoiceFCL.behandle.postStep1');
+                    Route::post('/form-delete', 'delete')->name('invoiceFCL.behandle.delete');
+
+                    // Preinvoice
+                    Route::get('/preinvoice/{id?}', 'preinvoice')->name('invoiceFCL.behandel.preinvoice');
+                    Route::post('/create-invoice', 'createInvoice')->name('invoiceFCL.behandel.createInvoice');
+
+                // Invoice
+                Route::get('/invoice-index', 'invoiceIndex')->name('invoiceFCL.behandle.invoiceIndex');
+                Route::get('/invoice-data', 'invoiceData')->name('invoiceFCL.behandle.invoiceData');
+                Route::get('/invoice-pranota/{id?}', 'invoicePranota')->name('invoiceFCL.behandle.invoicePranota');
+                Route::post('/invoice-pay', 'invoicePay')->name('invoiceFCL.behandle.invoicePay');
+                Route::get('/invoice-invoice/{id?}', 'invoiceInvoice')->name('invoiceFCL.behandle.invoiceInvoice');
+                Route::post('/invoice-cancel', 'invoiceCancel')->name('invoiceFCL.behandle.invoiceCancel');
             });
         });
     });

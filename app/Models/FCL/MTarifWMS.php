@@ -27,6 +27,7 @@ class MTarifWMS extends Model
         'surcharge',
         'behandle',
         'admin',
+        'admin_behandle',
         'uid',
         'created_at',
     ];

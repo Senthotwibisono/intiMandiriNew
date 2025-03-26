@@ -241,6 +241,47 @@
                             Swal.showLoading();
                         }
                 })
+
+                $.ajax({
+                    url: '{{ route('fcl.behandle.searchSPJM') }}',
+                    type: 'GET',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        jenis_spjm : jenis_spjm,
+                        no_spjm : no_spjm,
+                        tgl_spjm : tgl_spjm,
+                        id : id
+                    },
+                    cache: false,
+                    dataType: 'json',
+                    success: function(response) {
+                        console.log(response);
+                        if (response.success) {
+                            swal.fire({
+                                icon: 'success',
+                                text: response.message,
+                                title: 'Success',
+                            }).then((result) => {
+                                location.reload();
+                            });
+                        } else {
+                            swal.fire({
+                                icon: 'error',
+                                text: 'Something Wrong: ' + response.message,
+                                title: 'Error',
+                            }).then((result) => {
+                                location.reload();
+                            });
+                        }
+                    },
+                    error: function(response) {
+                        swal.fire({
+                            icon: 'error',
+                            text: 'Something Wrong: ' + response.responseJSON?.message,
+                            title: 'Error',
+                        });
+                    }
+                });
             }
         });
     })

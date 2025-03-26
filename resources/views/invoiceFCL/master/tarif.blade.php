@@ -412,6 +412,7 @@
                                     <th>Refeer (Monitooring)</th>
                                     <th>Surcharge</th>
                                     <th>Admin</th>
+                                    <th>Admin Behandle</th>
                                     <th>Created By</th>
                                     <th>Created At</th>
                                     <th>Last Update</th>
@@ -560,6 +561,12 @@
                                     <input type="number" name="admin" class="form-control" step="0.001" min="0" max="9999999999.999">
                                 </div>
                             </div>
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="">Admin Behandle</label>
+                                    <input type="number" name="admin_behandle" class="form-control" step="0.001" min="0" max="9999999999.999">
+                                </div>
+                            </div>
                          </div>
                      </div>
                     </form>
@@ -705,6 +712,12 @@
                                 <div class="form-group">
                                     <label for="">Admin</label>
                                     <input type="number" name="admin" id="admin_edit" class="form-control" step="0.001" min="0" max="9999999999.999">
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="">Admin Behandle</label>
+                                    <input type="number" name="admin_behandle" id="admin_behandle" class="form-control" step="0.001" min="0" max="9999999999.999">
                                 </div>
                             </div>
                          </div>
@@ -959,6 +972,7 @@
                 {data:'monitoring', name:'monitoring', className:'nowrap', render: formatRupiah},
                 {data:'surcharge', name:'surcharge', className:'nowrap', render: formatRupiah},
                 {data:'admin', name:'admin', className:'nowrap', render: formatRupiah},
+                {data:'admin_behandle', name:'admin_behandle', className:'nowrap', render: formatRupiah},
                 {data:'user.name', name:'user.name'},
                 {data:'created_at', name:'created_at'},
                 {data:'last_update', name:'last_update'},
@@ -999,6 +1013,7 @@
                 $('#editCustWMS #lift_off_edit').val(response.data.lift_off);
                 $('#editCustWMS #gate_pass_edit').val(response.data.gate_pass);
                 $('#editCustWMS #admin_edit').val(response.data.admin);
+                $('#editCustWMS #admin_behandle').val(response.data.admin_behandle);
             },
             error: function(response){
                 swal.fire({

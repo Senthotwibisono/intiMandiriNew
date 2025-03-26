@@ -24,6 +24,7 @@
                             <th>Created By</th>
                             <th>Pranota</th>
                             <th>Invoice</th>
+                            <th>Cetak Transparansi</th>
                             <th>Action</th>
                             <th>Delete or Cancel</th>
                             <th>Edit</th>
@@ -235,6 +236,7 @@
                 {data:'createdBy', name:'createdBy'},
                 {data:'pranota', name:'pranota'},
                 {data:'invoice', name:'invoice'},
+                {data:'tranparansi', name:'tranparansi'},
                 {data:'action', name:'action'},
                 {data:'deleteOrCancel', name:'deleteOrCancel'},
                 {data:'edit', name:'edit'},

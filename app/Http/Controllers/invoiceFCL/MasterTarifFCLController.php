@@ -151,6 +151,7 @@ class MasterTarifFCLController extends Controller
                 'monitoring' => $request->monitoring,
                 'surcharge' => $request->surcharge,
                 'admin' => $request->admin,
+                'admin_behandle' => $request->admin_behandle,
                 'uid' => Auth::user()->id,
                 'created_at' => Carbon::now(),
             ]);
@@ -202,6 +203,7 @@ class MasterTarifFCLController extends Controller
                 'monitoring' => $request->monitoring,
                 'surcharge' => $request->surcharge,
                 'admin' => $request->admin,
+                'admin_behandle' => $request->admin_behandle,
                 'uid' => Auth::user()->id,
                 'created_at' => Carbon::now(),
             ]);

@@ -56,6 +56,74 @@
 
 <script>
     $(document).ready(function(){
+        $('#tableForm').on('click', '#cancelButton', function(){
+            var id = $(this).data('id');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Yakin menghapus data ini?',
+                showCancelButton: true,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading(); // Menampilkan loading animasi
+                        }
+                    });
+
+                    $.ajax({
+                        url: '{{ route('invoiceFCL.behandle.delete') }}',
+                        type: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            id:id
+                        },
+                        cache: false,
+                        dataType: 'json',
+                        success: function(response) {
+                            console.log(response);
+                            if (response.success == true) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Behasil!',
+                                    text: response.message,
+                                }).then(() => {
+                                    Swal.fire({
+                                        title: 'Mengirim ulang...',
+                                        html: 'Harap tunggu...',
+                                        allowOutsideClick: false,
+                                        didOpen: () => {
+                                            Swal.showLoading();
+                                        }
+                                    });
+                                    setTimeout(() => {
+                                        window.location.href = '{{route('invoiceFCL.behandle.formIndex')}}';
+                                    }, 2000);
+                                });
+                            }else
+                                swal.fire({
+                                    icon: 'error',
+                                    text: 'Something Wrong: ' + response.message,
+                                    title: 'Error',
+                                });
+                        },
+                        error: function(response){
+                            swal.fire({
+                                icon: 'error',
+                                text: 'Something Wrong: ' + response.responseJSON?.message,
+                                title: 'Error',
+                            });
+                        }
+                    })
+
+                }
+            });
+        })
+    })
+</script>
+
+<script>
+    $(document).ready(function(){
         $('#createButton').on('click', function(){
             Swal.fire({
                 icon: 'warning',

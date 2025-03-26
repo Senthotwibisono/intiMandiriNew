@@ -499,7 +499,7 @@ class FormPerpanjanganController extends Controller
             'type' => 'P',
             'manifest_id' => $form->manifest_id,
             'customer_id' => $form->customer_id,
-            'judul_invoice' => $isMekanik ? 'Perpanjangan Mekanik ' . $request->judul_invoice : 'Perpanajangan ' . $request->judul_invoice,
+            'judul_invoice' => $isMekanik ? 'Perpanjangan Mekanik ' . $request->judul_invoice : 'Perpanjangan ' . $request->judul_invoice,
             'order_no' => $oldHeader->order_no ?? $this->getNextOrderNo(),
             'time_in' => $form->time_in,
             'expired_date' => $form->expired_date,

@@ -5,6 +5,7 @@ namespace App\Models\FCL\Behandle;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
+use App\Models\Customer;
 
 class Form extends Model
 {
@@ -17,6 +18,7 @@ class Form extends Model
         'no_spjm',
         'tgl_spjm',
         'status',
+        'customer_id',
         'created_at',
         'uid',
     ];
@@ -24,5 +26,10 @@ class Form extends Model
     public function user()
     {
        return $this->belongsTo(User::class, 'uid', 'id');
+    }
+
+    public function cust()
+    {
+       return $this->belongsTo(Customer::class, 'customer_id', 'id');
     }
 }
