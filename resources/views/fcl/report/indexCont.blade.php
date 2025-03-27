@@ -89,6 +89,8 @@
                             <th class="text-center">Nama Angkut</th>
                             <th class="text-center">Status Beacukai</th>
                             <th class="text-center">Segel Merah</th>
+                            <th class="text-center">No Segel Merah</th>
+                            <th class="text-center">Tanggal Segel Merah</th>
                             <th class="text-center">Bill of Loading No</th>
                             <th class="text-center">Bill of Loading Date</th>
                             <th class="text-center">No Container</th>
@@ -122,6 +124,9 @@
             <div class="button-container">
                 <div class="col-auto">
                     <button class="btn btn-success formatBeacukai"><i class="fa fa-download"></i> Format Beacukai</button>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-success formatBeacukaiNew"><i class="fa fa-download"></i> Format Beacukai Baru</button>
                 </div>
                 <div class="col-auto">
                     <button class="btn btn-success formatStandar"><i class="fa fa-download"></i> Format Standar</button>
@@ -250,6 +255,34 @@
     });
 </script>
 
+<script>
+    $(document).on('click', '.formatBeacukaiNew', function(){
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Apakah anda yakin menerapkan filter ini?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, update it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.showLoading();
+                let filterBy = $('#filter').val();
+                let startDate = $('#start_date').val();
+                let endDate = $('#end_date').val();
+                let noPlp = $('#noplp').val();
+                let noBc11 = $('#nobc_11').val();
+
+                // Redirect user to download link
+                let url = `/fcl/report/formatBeacukaiNew?filter=${filterBy}&start_date=${startDate}&end_date=${endDate}&noplp=${noPlp}&nobc_11=${noBc11}`;
+                window.location.href = url;
+                Swal.close();
+            }
+        });
+    });
+</script>
+
 
 <script>
     $(document).ready(function(){
@@ -305,6 +338,8 @@
                 { data:'nm_angkut', name:'nm_angkut', className:'text-center' },
                 { data:'status_bc', name:'status_bc', className:'text-center' },
                 { data:'flag_segel_merah', name:'flag_segel_merah', className:'text-center' },
+                { data:'nosegel', name:'nosegel', className:'text-center' },
+                { data:'tanggal_segel_merah', name:'tanggal_segel_merah', className:'text-center' },
                 { data:'nobl', name:'nobl', className:'text-center' },
                 { data:'tgl_bl_awb', name:'tgl_bl_awb', className:'text-center' },
                 { data:'nocontainer', name:'nocontainer', className:'text-center' },

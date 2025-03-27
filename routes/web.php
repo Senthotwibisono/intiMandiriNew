@@ -517,6 +517,7 @@ Route::controller(ReportController::class)->group(function(){
     Route::get('/lcl/report/manifestDataTable', 'manifestDataTable');
     Route::get('/lcl/report/manifestPhoto{id?}', 'photoManifest')->name('report.lcl.photoManifest');
     Route::get('/lcl/report/manifestGenerate', 'generateManifest')->name('report.lcl.generateManifest');
+    Route::get('/lcl/report/manifestGenerateBeaCukai', 'generateManifestBeaCukaiNew')->name('report.lcl.generateManifestBeaCukaiNew');
 
     // Daily
     Route::get('/lcl/report/daily', 'indexDaily')->name('report.lcl.daily');
@@ -779,6 +780,7 @@ Route::controller(AndroidGateController::class)->group(function(){
             Route::get('/formatStandar', 'formatStandar');
             Route::get('/formatJict', 'formatJict');
             Route::get('/formatBeacukai', 'formatBeacukai');
+            Route::get('/formatBeacukaiNew', 'formatBeacukaiNew');
             Route::get('/formatStandarAkhir', 'formatStandarAkhir');
             Route::get('/formatBeacukaiAkhir', 'formatBeacukaiAkhir');
             

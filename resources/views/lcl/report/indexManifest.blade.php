@@ -82,6 +82,9 @@
                         <tr>
                             <th class="text-center" style="min-width: 100px;">Action</th>
                             <th class="text-center" style="min-width: 100px;">Flag Segel Merah</th>
+                            <th class="text-center" style="min-width: 100px;">No Segel Merah</th>
+                            <th class="text-center" style="min-width: 100px;">Tanggal Segel Merah</th>
+                            <th class="text-center" style="min-width: 100px;">Tanggal Lepas Segel Merah</th>
                             <th class="text-center" style="min-width: 100px;">No Job Order</th>
                             <th class="text-center" style="min-width: 100px;">Nama Angkut</th>
                             <th class="text-center" style="min-width: 100px;">No Container</th>
@@ -126,6 +129,9 @@
             <div class="button-container">
                 <div class="col-auto">
                     <button class="btn btn-success formatBeacukai"><i class="fa fa-download"></i> Excel</button>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-success beaCukaiBaru"><i class="fa fa-download"></i> Format Beacukai Baru</button>
                 </div>
             </div>
         </div>
@@ -186,6 +192,33 @@
 </script>
 
 <script>
+    $(document).on('click', '.beaCukaiBaru', function(){
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Apakah anda yakin menerapkan filter ini?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, update it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.showLoading();
+                let filterBy = $('#filter').val();
+                let startDate = $('#start_date').val();
+                let endDate = $('#end_date').val();
+                let container_id = $('#container_id').val();
+
+                // Redirect user to download link
+                let url = `/lcl/report/manifestGenerateBeaCukai?filter=${filterBy}&start_date=${startDate}&end_date=${endDate}&container_id=${container_id}`;
+                window.location.href = url;
+                Swal.close();
+            }
+        });
+    });
+</script>
+
+<script>
     let excel = {
                         extend: 'excelHtml5',
                         autoFilter: true,
@@ -235,6 +268,9 @@
             columns : [
                 { className:'text-center', data:'detil', name:'detil'},
                 { className:'text-center', data:'flag_segel_merah', name:'flag_segel_merah'},
+                { className:'text-center', data:'nosegel', name:'nosegel'},
+                { className:'text-center', data:'tanggal_segel_merah', name:'tanggal_segel_merah'},
+                { className:'text-center', data:'tanggal_lepas_segel_merah', name:'tanggal_lepas_segel_merah'},
                 { className:'text-center', data:'joborder', name:'joborder'},
                 { className:'text-center', data:'nm_angkut', name:'nm_angkut'},
                 { className:'text-center', data:'nocontainer', name:'nocontainer'},

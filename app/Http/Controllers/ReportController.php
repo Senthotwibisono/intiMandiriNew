@@ -14,6 +14,7 @@ use App\Models\Photo;
 use App\Exports\lcl\ReportCont;
 use App\Exports\lcl\ReportContJICT;
 use App\Exports\lcl\ReportManifest;
+use App\Exports\lcl\ReportManifestBeaCukaiNew;
 
 use DataTables;
 
@@ -522,6 +523,53 @@ class ReportController extends Controller
         $fileName = 'ReportManifest-' . $request->start_date . '-' . $request->end_date . '.xlsx';
 
         return Excel::download(new ReportManifest($manifests), $fileName);
+    }
+
+    public function generateManifestBeaCukaiNew(Request $request)
+    {
+        // Mulai Query Builder tanpa langsung `get()`
+        // dd($request->all(), $request->end_date);
+        $manifests = Manifest::orderBy('joborder_id', 'asc')->get();
+    
+
+        if ($request->has('filter') && $request->filter) {
+            if ($request->filter == 'Tgl PLP') {
+                $manifests = Manifest::whereHas('job', function ($query) use ($request) {
+                    $query->whereBetween('ttgl_plp', [$request->start_date, $request->end_date]);
+                })->get();
+            } elseif ($request->filter == 'Tgl Gate In') {
+                $manifests = Manifest::whereBetween('tglmasuk', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc')->get();
+            } elseif ($request->filter == 'Tgl Release') {
+                $manifests = Manifest::whereBetween('tglrelease', [$request->start_date, $request->end_date])->orderBy('tglrelease', 'asc')->get();
+            } elseif ($request->filter == 'Tgl BC 1.1') {
+                $manifests = Manifest::whereHas('job', function ($query) use ($request) {
+                    $query->whereBetween('ttgl_bc11', [$request->start_date, $request->end_date]);
+                })->get();
+            } elseif ($request->filter == 'ETA') {
+                $manifests = Manifest::whereHas('job', function ($query) use ($request) {
+                    $query->whereBetween('eta', [$request->start_date, $request->end_date]);
+                })->get();
+            } elseif ($request->filter == 'akhir') {
+                $manifests = Manifest::whereDate('tglmasuk', '<=', $request->end_date)->whereNull('tglrelease')->orWhereDate('tglrelease', '>', $request->end_date)->get();
+            }
+        }
+
+        if ($request->has('container_id' && $request->container)) {
+            $cont = Cont::find($request->container_id);
+            if ($cont) {
+                $manifests = $manifests->where('container_id', $cont->id);
+            }
+        }
+        // Ambil data setelah semua filter diterapkan   
+      
+        // dd($manifests, $request->container_id, $request->all());
+
+        // Cek hasil sebelum download (bisa dihapus jika sudah benar)
+        
+
+        $fileName = 'ReportManifestBeaCukaiNew-' . $request->start_date . '-' . $request->end_date . '.xlsx';
+
+        return Excel::download(new ReportManifestBeaCukaiNew($manifests), $fileName);
     }
 
 
