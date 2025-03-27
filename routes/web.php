@@ -896,6 +896,8 @@ Route::controller(AndroidGateController::class)->group(function(){
                 Route::post('/invoice-pay', 'invoicePay')->name('invoiceFCL.behandle.invoicePay');
                 Route::get('/invoice-invoice/{id?}', 'invoiceInvoice')->name('invoiceFCL.behandle.invoiceInvoice');
                 Route::post('/invoice-cancel', 'invoiceCancel')->name('invoiceFCL.behandle.invoiceCancel');
+                Route::get('/invoice-edit/{id?}', 'editInvoice')->name('invoiceFCL.behandle.editInvoice');
+                Route::post('/invoice-hidden', 'hiddenInvoice')->name('invoiceFCL.behandle.hiddenInvoice');
             });
         });
     });

@@ -374,7 +374,8 @@ class InvoiceBehandleFCLController extends Controller
         })
         ->addColumn('edit', function($header){
             if ($header->status == 'Y') {
-                return '<a href="/invoiceFCL/invoice/edit/'.$header->id.'" class="btn btn-info editInvoice"><i class="fa fa-pencil"></i></a>';
+                $url = route('invoiceFCL.behandle.editInvoice', ['id' => $header->id]);
+                return '<a href="'.$url.'" class="btn btn-info editInvoice"><i class="fa fa-pencil"></i></a>';
             }elseif ($header->status == 'C') {
                 return '<span class="badge bg-danger text-white">Canceled</span>';
             } else {
@@ -493,7 +494,7 @@ class InvoiceBehandleFCLController extends Controller
     {
         $header = Header::find($request->id);
         try {
-            if ($header->hidden_flag == 'Y') {
+            if ($header->hidden_flag == 'N' || $header->hidden_flag == null || $header->hidden_flag == '') {
                 $cancel = Cancel::create([
                     'invoice_no' => $header->invoice_no,
                 ]);
@@ -510,6 +511,53 @@ class InvoiceBehandleFCLController extends Controller
             ]);
         } catch (\Throwable $th) {
             return response()->json([
+                'success' => false,
+                'message' => $th->getMessage(),
+            ]);
+        }
+    }
+
+    public function editInvoice($id)
+    {
+        $header = Header::find($id);
+        $data['header'] = $header;
+
+        $data['title'] = 'Edit Invoice - ' . ($header->invoice_no) ? $header->invoice_no : $header->proforma_no; 
+        return view('invoiceFCL.behandle.invoice.edit', $data);
+    }
+
+    public function hiddenInvoice(Request $request)
+    {
+        try {
+            $header = Header::find($request->id);
+            if (!$header) {
+                return response()->json([
+                    'status' => 404,
+                    'success' => false,
+                    'message' => 'Error, Data tidak ditemukan',
+                ]);
+            }
+            $oldCancel = Cancel::where('invoice_no', $header->invoice_no)->first();
+            if (!$oldCancel) {
+                $noInvoice = Cancel::create([
+                    'invoice_no' => $header->invoice_no,
+                ]);
+            }
+            $header->update([
+                'invoice_no' => $header->invoice_no . '-R',
+                'flag_hidden' => 'Y',
+                'hidden_by' => Auth::user()->id,
+                'hidden_at' => Carbon::now(),
+            ]);
+
+            return response()->json([
+                'status' => 200,
+                'success' => true,
+                'message' => 'Data berhasil di Simpan',
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 500,
                 'success' => false,
                 'message' => $th->getMessage(),
             ]);

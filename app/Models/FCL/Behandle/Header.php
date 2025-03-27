@@ -65,4 +65,9 @@ class Header extends Model
     {
        return $this->belongsTo(User::class, 'cancel_by', 'id');
     }
+
+    public function userHidden()
+    {
+        return $this->belongsTo(User::class, 'hidden_by', 'id');
+    }
 }
