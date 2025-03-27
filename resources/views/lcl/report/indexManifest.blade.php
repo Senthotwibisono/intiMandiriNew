@@ -1,6 +1,22 @@
 @extends('partial.main')
 @section('custom_styles')
+<style>
+    .highlight-yellow {
+        background-color: yellow !important;;
+    }
+</style>
 
+<style>
+    .highlight-blue {
+        background-color: lightblue !important;;
+    }
+</style>
+
+<style>
+    .highlight-red {
+        background-color: red !important;;
+    }
+</style>
 @endsection
 @section('content')
 
@@ -65,6 +81,7 @@
                     <thead style="white-space: nowrap;">
                         <tr>
                             <th class="text-center" style="min-width: 100px;">Action</th>
+                            <th class="text-center" style="min-width: 100px;">Flag Segel Merah</th>
                             <th class="text-center" style="min-width: 100px;">No Job Order</th>
                             <th class="text-center" style="min-width: 100px;">Nama Angkut</th>
                             <th class="text-center" style="min-width: 100px;">No Container</th>
@@ -217,6 +234,7 @@
             },
             columns : [
                 { className:'text-center', data:'detil', name:'detil'},
+                { className:'text-center', data:'flag_segel_merah', name:'flag_segel_merah'},
                 { className:'text-center', data:'joborder', name:'joborder'},
                 { className:'text-center', data:'nm_angkut', name:'nm_angkut'},
                 { className:'text-center', data:'nocontainer', name:'nocontainer'},
@@ -253,6 +271,15 @@
                 { className:'text-center', data:'location', name:'location'},
                 { className:'text-center', data:'lamaTimbun', name:'lamaTimbun'},
             ],
+            createdRow: function (row, data, dataIndex) {
+                if (data.flag_segel_merah === 'Y') {
+                    $(row).addClass('highlight-red text-white');
+                } else if (data.status_bc === 'HOLD') {
+                    $(row).addClass('highlight-yellow');
+                } else if (data.status_bc === 'release'){
+                    $(row).addClass('highlight-blue');
+                }
+            },
             initComplete: function () {
                 var api = this.api();
                 
