@@ -586,6 +586,21 @@ class FormFCLController extends Controller
                             'jumlah_hari' => 0,
                             'total' => $totalEcon,
                         ]);
+                        // Pelayanan Tambahan
+                        $totalPelayananTambahan = $tarifTPS->pelayanan_tambahan * $jumlah;
+                        Detil::create([
+                            'form_id' => $form->id,
+                            'invoice_id' => $header->id,
+                            'tps' => $request->kd_tps_asal,
+                            'keterangan' => 'Paket Pelayanan Tambahan (' . $size . ' / ' .$ctr_type.' )',
+                            'size' => $size,
+                            'type' => $ctr_type,
+                            'tarif_dasar' => $tarifTPS->pelayanan_tambahan,
+                            'satuan' => '0',
+                            'jumlah' => $jumlah,
+                            'jumlah_hari' => 0,
+                            'total' => $totalPelayananTambahan,
+                        ]);
                         // Gate Pass
                         $totalGatePass = $tarifTPS->gate_pass * $jumlah;
                         Detil::create([

@@ -206,6 +206,8 @@
                                     $hargaTPS = $tarifTPS->where('size', $sz)->where('type', $tp)->first();
                                     $jumlahCont = $containerInvoice->where('size', $sz)->where('ctr_type', $tp)->count();
                                 @endphp
+                                @if($jumlahCont > 0)
+
                                 <div class="table text-center">
                                     <table class="table-hover table-stripped table-bordered mx-auto">
                                         <thead>
@@ -313,6 +315,17 @@
                                                 <td>{{number_format($totalEcon, 0)}}</td>
                                             </tr>
                                             <tr>
+                                                <td>Pelayanan Tambahan</td>
+                                                <td>{{number_format($hargaTPS->pelayanan_tambahan,0)}}</td>
+                                                <td>{{$jumlahCont}}</td>
+                                                <td>0</td>
+                                                @php
+                                                    $totalPelayananTambahan = $hargaTPS->pelayanan_tambahan * $jumlahCont;
+                                                    $totalTPS += $totalPelayananTambahan;
+                                                @endphp
+                                                <td>{{number_format($totalPelayananTambahan, 0)}}</td>
+                                            </tr>
+                                            <tr>
                                                 <td>Gate Pass</td>
                                                 <td>{{number_format($hargaTPS->gate_pass,0)}}</td>
                                                 <td>{{$jumlahCont}}</td>
@@ -327,6 +340,7 @@
                                         </tbody>
                                     </table>
                                 </div>
+                                @endif
                             @endforeach
                         </div>
                     @endforeach
@@ -369,6 +383,7 @@
                                     $tarif = $tarifWMS->where('size', $sz)->where('type', $tp)->first();
                                     $jumlahCont = $containerInvoice->where('size', $sz)->where('ctr_type', $tp)->count();
                                 @endphp
+                                @if($jumlahCont > 0)
                                 <div class="table text-center">
                                     <table class="table-hover table-stripped table-bordered mx-auto">
                                         <thead>
@@ -464,6 +479,7 @@
                                             @endif
                                     </table>
                                 </div>
+                                @endif
                             @endforeach
                         </div>
                     @endforeach

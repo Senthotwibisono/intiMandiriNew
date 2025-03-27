@@ -30,6 +30,7 @@ class MTarifTPS extends Model
         'refeer',
         'monitoring',
         'surcharge',
+        'pelayanan_tambahan',
         'admin',
         'uid',
         'created_at',

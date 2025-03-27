@@ -34,6 +34,7 @@
                                     <th>Nota dan Perawatan IT</th>
                                     <th>Econ</th>
                                     <th>Gate Pass</th>
+                                    <th>Pelayanan Tambahan</th>
                                     <th>Refeer (Power for Refeer)</th>
                                     <th>Refeer (Monitooring)</th>
                                     <th>Surcharge</th>
@@ -189,6 +190,12 @@
                                 <div class="form-group">
                                     <label for="">Econ</label>
                                     <input type="number" name="econ" class="form-control" step="0.001" min="0" max="9999999999.999">
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="">Paket Pelayanan Tambahan</label>
+                                    <input type="number" name="pelayanan_tambahan" class="form-control" step="0.001" min="0" max="9999999999.999">
                                 </div>
                             </div>
                             <div class="col-4">
@@ -354,6 +361,12 @@
                                 <div class="form-group">
                                     <label for="">Econ</label>
                                     <input type="number" name="econ" id="econ_edit" class="form-control" step="0.001" min="0" max="9999999999.999">
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="">Paket Pelayanan Tambahan</label>
+                                    <input type="number" name="pelayanan_tambahan" id="pelayanan_tambahan_edit" class="form-control" step="0.001" min="0" max="9999999999.999">
                                 </div>
                             </div>
                             <div class="col-4">
@@ -858,6 +871,7 @@
                 {data:'perawatan_it', name:'perawatan_it', className:'nowrap', render: formatRupiah},
                 {data:'econ', name:'econ', className:'nowrap', render: formatRupiah},
                 {data:'gate_pass', name:'gate_pass', className:'nowrap', render: formatRupiah},
+                {data:'pelayanan_tambahan', name:'pelayanan_tambahan', className:'nowrap', render: formatRupiah},
                 {data:'refeer', name:'refeer', className:'nowrap', render: formatRupiah},
                 {data:'monitoring', name:'monitoring', className:'nowrap', render: formatRupiah},
                 {data:'surcharge', name:'surcharge', className:'nowrap', render: formatRupiah},
@@ -935,6 +949,7 @@
                 $('#perawatan_it_edit').val(response.data.perawatan_it);
                 $('#econ_edit').val(response.data.econ);
                 $('#gate_pass_edit').val(response.data.gate_pass);
+                $('#pelayanan_tambahan_edit').val(response.data.pelayanan_tambahan);
                 $('#admin_edit').val(response.data.admin);
             },
             error: function(response){

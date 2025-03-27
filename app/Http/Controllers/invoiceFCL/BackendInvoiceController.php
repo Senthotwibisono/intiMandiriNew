@@ -119,13 +119,13 @@ class BackendInvoiceController extends Controller
         $data['type'] = $container->pluck('ctr_type')->unique();
         $data['nocontainer'] = $container->pluck('cont.nocontainer')->implode(', ');
 
-        $data['detilTPS'] = Detil::where('invoice_id', $id)->whereNot('tps', '=', 'Depo')->orderByRaw("CASE 
+        $data['detilTPS'] = Detil::where('invoice_id', $id)->where('total', '>', 0)->whereNot('tps', '=', 'Depo')->orderByRaw("CASE 
         WHEN keterangan LIKE 'Penumpukkan Massa 1%' THEN 1
         WHEN keterangan LIKE 'Penumpukkan Massa 2%' THEN 2
         WHEN keterangan LIKE 'Penumpukkan Massa 3%' THEN 3
         ELSE 4 
         END")->orderBy('keterangan', 'desc')->get();
-        $data['detilWMS'] = Detil::where('invoice_id', $id)->where('tps', '=', 'Depo')->orderByRaw("CASE 
+        $data['detilWMS'] = Detil::where('invoice_id', $id)->where('tps', '=', 'Depo')->where('total', '>', 0)->orderByRaw("CASE 
         WHEN keterangan LIKE 'Penumpukan %' THEN 1
         WHEN keterangan LIKE 'Paket PLP %' THEN 2
         WHEN keterangan LIKE 'Lift On %' THEN 3
