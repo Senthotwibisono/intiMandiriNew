@@ -898,6 +898,11 @@ Route::controller(AndroidGateController::class)->group(function(){
                 Route::post('/invoice-cancel', 'invoiceCancel')->name('invoiceFCL.behandle.invoiceCancel');
                 Route::get('/invoice-edit/{id?}', 'editInvoice')->name('invoiceFCL.behandle.editInvoice');
                 Route::post('/invoice-hidden', 'hiddenInvoice')->name('invoiceFCL.behandle.hiddenInvoice');
+                Route::post('/invoice-update', 'updateInvoice')->name('invoiceFCL.behandle.updateInvoice');
+
+                // Report
+                Route::get('/invoice-report', 'indexReport')->name('invoiceFCL.behandle.indexReport');
+                Route::get('/data-report', 'dataReport')->name('invoiceFCL.behandle.dataReport');
             });
         });
     });

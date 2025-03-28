@@ -564,6 +564,90 @@ class InvoiceBehandleFCLController extends Controller
         }
     }
 
+    public function updateInvoice(Request $request)
+    {
+        // dd($request->all());
+        $header = Header::find($request->id);
+        if ($header) {
+            try {
+                $header->update([
+                    'customer_name' => $request->customer_name,
+                    'customer_npwp' => $request->customer_npwp,
+                    'customer_fax' => $request->customer_fax,
+                    'customer_alamat' => $request->customer_alamat,
+                    'total' => $request->total,
+                    'admin' => $request->admin,
+                    'ppn' => $request->ppn,
+                    'grand_total' => $request->grand_total,
+                    'order_at' => $request->order_at,
+                    'lunas_at' => $request->lunas_at,
+                ]);
+                return redirect()->back()->with('status',['type'=>'success', 'message'=>'Berhasil di Simpan']);
+            } catch (\Throwable $th) {
+                return redirect()->back()->with('status',['type'=>'error', 'message'=>$th->getMessage()]);
+            }
+        }
+    }
+
+    // Repprt
+    public function indexReport()
+    {
+        $data['title'] = 'Report Invoice Behandle';
+
+        return view('invoiceFCL.behandle.report', $data);
+    }
+
+    public function dataReport(Request $request)
+    {
+        $data = Header::where('flag_hidden', 'N');
+        if ($request->has('filter')) {
+            $data = $data->whereIn('status', $request->filter);
+        }
+
+        if ($request->has('start_date') && $request->start_date != null) {
+            $data->whereDate('order_at', '>=', $request->start_date);
+        }
+
+        if ($request->has('end_date') && $request->end_date != null) {
+            $data->whereDate('order_at', '<=', $request->end_date);
+        }
+
+        $header = $data->get();
+        return DataTables::of($header)
+        ->addColumn('status', function($header){
+           if ($header->status == 'C') {
+                return '<span class="badge bg-danger text-white">Canceled</span>';
+            }elseif ($header->status == 'Y') {
+               return '<span class="badge bg-success text-white">Lunas</span>';
+            }else {
+               return '<span class="badge bg-warning text-white">Baelum Bayar</span>';
+           }
+        })
+        ->addColumn('order_by', function($header){
+            return $header->order->name ?? '-';
+        })
+        ->addColumn('cancel_by', function($header){
+            return $header->cancel->name ?? '-';
+        })
+        ->addColumn('lunas_by', function($header){
+            return $header->lunas->name ?? '-';
+        })
+        ->addColumn('admin', function($header){
+            return number_format($header->admin, '0');
+        })
+        ->addColumn('total', function($header){
+            return number_format($header->total, '0');
+        })
+        ->addColumn('ppn', function($header){
+            return number_format($header->ppn, '0');
+        })
+        ->addColumn('grand_total', function($header){
+            return number_format($header->grand_total, '0');
+        })
+        ->rawColumns(['status'])
+        ->make(true);
+    }
+
     private function terbilang($number)
     {
         $x = abs($number);

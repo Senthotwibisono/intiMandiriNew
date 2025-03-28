@@ -26,7 +26,7 @@
         @endif
     </div>
     <div class="card-body">
-        <form action="/invoiceFCL/invoice/updateInvoice" method="post" id="submitForm">
+        <form action="{{ route('invoiceFCL.behandle.updateInvoice') }}" method="post" id="submitForm">
             @csrf
             <div class="divider divider-center">
                 <div class="divider-text">
@@ -146,6 +146,31 @@
 @endsection
 
 @section('custom_js')
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Attach event listener to the update button
+        document.getElementById('submitButton').addEventListener('click', function (e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Show SweetAlert confirmation dialog
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Pastikan Data yang Anda Masukkan sudah Benar",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, update it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.showLoading();
+                    document.getElementById('submitForm').submit();
+                }
+            });
+        });
+    });
+</script>>
 
 <script>
     document.addEventListener('DOMContentLoaded', function(){

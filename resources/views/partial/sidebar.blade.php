@@ -490,6 +490,9 @@
                     <li class="submenu-item @if(Request::is('invoiceFCL/behandle/invoice-index')) active @endif">
                         <a href="{{ route('invoiceFCL.behandle.invoiceIndex')}}">Invoice</a>
                     </li>
+                    <li class="submenu-item @if(Request::is('invoiceFCL/behandle/invoice-report')) active @endif">
+                        <a href="{{ route('invoiceFCL.behandle.indexReport')}}">Report</a>
+                    </li>
                 </ul>
             </li>
         </ul>
