@@ -2,19 +2,14 @@
 @section('custom_styles')
 <style>
     .highlight-yellow {
-        background-color: yellow !important;;
+        background-color: yellow !important;
     }
-</style>
-
-<style>
     .highlight-blue {
-        background-color: lightblue !important;;
+        background-color: lightblue !important;
     }
-</style>
-
-<style>
     .highlight-red {
-        background-color: red !important;;
+        background-color: red !important;
+        color: white !important; /* Agar teks tetap terlihat */
     }
 </style>
 @endsection
@@ -161,32 +156,31 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-3">
+                            <div class="col-4">
                                 <div class="form-group">
                                     <label for="">Kode Dokumen</label>
-                                    <select name="kd_dok_inout" id="kd_dok_edit" style="width: 100%; " class="js-example-basic-single form-select select2">
-                                        <option value disabled selected>Pilih Satu</option>
+                                    <select name="kd_dok" id="kd_dok" class="js-example-basic-single form-select select2" style="width: 100%;">
+                                        <option disabeled selected value>Pilih Satu!</option>
                                         @foreach($doks as $dok)
-                                            <option value="{{$dok->kode}}">{{$dok->name}}</option>
+                                            <option value="{{$dok->id}}">{{$dok->name}}</option>
                                         @endforeach
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-3">
+                            <div class="col-4">
                                 <div class="form-group">
-                                    <label for="">No Dok</label>
-                                    <input type="text" name="no_dok" id="no_dok_edit" class="form-control">
+                                    <label for="">No Dokumen</label>
+                                    <input type="text" name="no_dok" id="no_dok" class="form-control">
                                 </div>
                             </div>
-                            <div class="col-3">
+                            <div class="col-4">
                                 <div class="form-group">
-                                    <label for="">Tgl Dok </label>
-                                    <input type="date" name="tgl_dok" id="tgl_dok_edit" class="form-control">
+                                    <label for="">Tgl Dokumen</label>
+                                    <div class="input-group">
+                                        <input type="date" name="tgl_dok" id="tgl_dok" class="form-control">
+                                        <button type="button" class="btn btn-primary" id="" onclick="searchDok()"><i class="fas fa-search"></i></button>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-2">
-                                <br>
-                                <button class="btn btn-outline-info CheckSPJMDok" type="button">Check</button>
                             </div>
                         </div>
                     </div>
@@ -202,6 +196,100 @@
 @endsection
 
 @section('custom_js')
+<script>
+    function searchDok() {
+        const id = document.getElementById('id').value;
+        const kode = document.getElementById('kd_dok').value;
+        const noDok = document.getElementById('no_dok').value; 
+        const tglDok = document.getElementById('tgl_dok').value; 
+        console.log(id + kode + noDok + tglDok);
+        const fields = [
+            { id: 'id', message: 'Pilih Container Terlebih Dahulu!' },
+            { id: 'kd_dok', message: 'Kode Dokumen harus diisi!' },
+            { id: 'no_dok', message: 'Nomor Dokumen harus diisi!' },
+            { id: 'tgl_dok', message: 'Tanggal Dokumen harus diisi!' }
+        ];
+
+        for (let field of fields) {
+            const value = document.getElementById(field.id).value.trim();
+            if (!value) {
+                Swal.fire({
+                    icon: 'error',
+                    title: field.message,
+                });
+                return; // Hentikan eksekusi jika ada yang kosong
+            }
+        }
+
+        Swal.fire({
+            icon: 'warning',
+            title: 'Apakah anda sudah yakin?',
+            showCancelButton: true,
+        }).then( (result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'in Progress',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    willOpen: async () => {
+                        Swal.showLoading();
+                        try {
+                            let response = await fetch('{{route('fcl.delivery.searchDokumenGate')}}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                },
+                                body: JSON.stringify({
+                                    id: id,
+                                    kode: kode,
+                                    noDok:noDok,
+                                    tglDok:tglDok,
+                                })
+                            });
+                            console.log(response);
+
+                            if (response.ok) {
+                               const result = await response.json();
+                               console.log(result);
+                               if (result.success == true) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: result.message,
+                                    }).then(() => {
+                                        location.reload();
+                                    });
+                               }else{
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: result.message,
+                                    }).then(() => {
+                                        location.reload();
+                                    });
+                               }
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Opss Something wrong ...',
+                                    text: 'error in : ' + response.status + ' ' + response.statusText,
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            }
+                        } catch (error) {
+                            console.error(error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Terjadi Kesalahan!',
+                                text: 'Tidak dapat menghubungi server. Coba lagi nanti.',
+                            });
+                        }
+                    }
+                })
+            }
+        })
+    }
+</script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Attach event listener to the update button
@@ -292,6 +380,7 @@
                 {className:'text-center', data:'tglDok', name:'tglDok'},
             ],
             createdRow: function (row, data, dataIndex) {
+               // console.log(data); // Cek data di console browser
                 if (data.flag_segel_merah === 'Y') {
                     $(row).addClass('highlight-red text-white');
                 } else if (data.status_bc === 'HOLD') {
@@ -321,7 +410,7 @@
                 });
             }
         })
-    })
+    });
 </script>
 
 <script>
@@ -358,9 +447,9 @@ $(document).ready(function() {
         $("#jammasuk").val(response.data.jammasuk);
         $("#ctr_type_edit").val(response.data.ctr_type).trigger('change');
         $("#type_class_edit").val(response.data.type_class).trigger('change');
-        $("#kd_dok_edit").val(response.data.kd_dok_inout).trigger('change');
-        $("#no_dok_edit").val(response.data.no_dok);
-        $("#tgl_dok_edit").val(response.data.tgl_dok);
+        $("#kd_dok").val(response.data.kd_dok_inout).trigger('change');
+        $("#no_dok").val(response.data.no_dok);
+        $("#tgl_dok").val(response.data.tgl_dok);
       },
       error: function(data) {
         console.log('error:', data)
@@ -455,67 +544,5 @@ $(document).ready(function() {
             }
         });
     });
-</script>
-
-<script>
-$(document).on('click', '.CheckSPJMDok', function() {
-    var data = {
-          'id' : $('#id_edit').val(),
-          'kd_dok' : $('#kd_dok_edit').val(),
-          'no_dok' : $('#no_dok_edit').val(),
-          'tgl_dok' : $('#tgl_dok_edit').val(),
-        }
-    Swal.fire({
-        title: 'Konfirmasi',
-        text: '',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Ya!',
-        cancelButtonText: 'Batal',
-    }).then((result) => {
-        if (result.isConfirmed) {
-            $.ajax({
-                type: 'POST',
-                url: '/fcl/containerList/dataDok',
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                cache: false,
-                data: data,
-                dataType: 'json',
-                success: function(response) {
-                    console.log(response);
-                    if (response.success) {
-                        Swal.fire({
-                            title: 'Sukses!',
-                            text: response.message,
-                            icon: 'success',
-                        }).then(() => {
-                            location.reload();
-                        });
-                    } else {
-                        Swal.fire({
-                            title: 'Error!',
-                            text: response.message,
-                            icon: 'error',
-                        }).then(() => {
-                            location.reload();
-                        });
-                    }
-                },
-                error: function(data) {
-                    console.log('error:', data);
-                    Swal.fire({
-                        title: 'Error!',
-                        text: 'Terjadi kesalahan saat menghapus data.',
-                        icon: 'error',
-                    }).then(() => {
-                            location.reload();
-                        });
-                }
-            });
-        }
-    });
-});
 </script>
 @endsection

@@ -179,24 +179,20 @@ class BeaCukaiController extends Controller
         if ($manifest) {
             $barcode = Barcode::where('ref_id', $manifest->id)->where('ref_type', '=', 'Manifest')->where('status', 'hold')->first();
             if ($barcode) {
-                $manifest->update([
-                    'status_bc'=>'release',
-                    'release_bc_date' => Carbon::now(),
-                    'release_bc_uid' => Auth::user()->id,
-                ]);
                 $barcode->update([
-                    'ref_action' => 'release',
-                ]);
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Manifest Persilahkan Keluar',
-                ]);
-            }else {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Barcode belum di cetak !!',
+                    'status' => 'active',
                 ]);
             }
+            $manifest->update([
+                'status_bc'=>'release',
+                'release_bc_date' => Carbon::now(),
+                'release_bc_uid' => Auth::user()->id,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Manifest Persilahkan Keluar',
+            ]);
             
         }else {
             return response()->json([
@@ -554,12 +550,26 @@ class BeaCukaiController extends Controller
     public function releaseFCLCont(Request $request)
     {
         $cont = ContF::find($request->id);
+        if ($cont->flag_segel_merah == 'Y') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Masih dalam Segel Merah !!',
+            ]);
+        }
         try {
             $cont->update([
                 'status_bc' => 'release',
                 'release_bc_date' => Carbon::now(),
                 'release_bc_uid' =>  Auth::user()->name,
             ]);
+
+
+            $barcode = Barcode::where('ref_id', $cont->id)->where('ref_type', '=', 'FCL')->where('ref_action', 'release')->first();
+            if ($barcode) {
+                $barcode->update([
+                    'status' => 'active',
+                ]);
+            }
 
             return response()->json([
                 'success' => true,

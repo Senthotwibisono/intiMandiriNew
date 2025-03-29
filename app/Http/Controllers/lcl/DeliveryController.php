@@ -26,6 +26,9 @@ use App\Models\TpsManualKms as ManualKms;
 use App\Models\TpsSPPBBC23 as BC23;
 use App\Models\TpsSPPBBC23Cont as BC23Cont;
 use App\Models\TpsSPPBBC23Kms as BC23Kms;
+use App\Models\TpsPabean as Pabean;
+use App\Models\TpsPabeanCont as PabeanCont;
+use App\Models\TpsPabeanKms as PabeanKms;
 use App\Models\BarcodeGate as Barcode;
 use App\Models\PlacementManifest as PM;
 use App\Models\Item;
@@ -435,6 +438,7 @@ class DeliveryController extends Controller
         $kdDok = $request->kd_dok;
         $tglDok = Carbon::parse($request->tgl_dok)->format('n/j/Y');
         $tglDokManual = Carbon::parse($request->tgl_dok)->format('d/m/Y');
+        $tglDokPabean = Carbon::parse($request->tgl_dok)->format('Ymd');
         // var_dump($tglDok, $request->no_dok, $request->kd_dok);
         // die();
         if ($kdDok == 1) {
@@ -514,6 +518,31 @@ class DeliveryController extends Controller
                         'message' => 'No HBL Berbeda',
                     ]);
                 }
+            }else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data tidak di temukan',
+                ]);
+            }
+        }elseif (in_array($kdDok, [41, 44])) {
+            $dok = Pabean::where('kd_dok_inout', $kdDok)->where('no_dok_inout', $request->no_dok)->where('tgl_dok_inout', $tglDokPabean)->first();
+            if ($dok) {
+                if ($dok->no_bl_awb != $manifest->nohbl) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'No HBL Berbeda',
+                    ]);
+                }
+                $manifest->update([
+                    'kd_dok_inout' => $kdDok,
+                    'no_dok' => $request->no_dok,
+                    'tgl_dok' => $request->tgl_dok,
+                    'status_bc' => 'HOLD',
+                ]);
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Data di temukan',
+                ]);
             }else {
                 return response()->json([
                     'success' => false,
@@ -639,11 +668,17 @@ class DeliveryController extends Controller
         //         'message' => 'Invoice belum dibayar',
         //     ]);
         // }
-        if ($manifest->status_bc == 'release') {
-            $action = 'active';
+
+        if ($manifest->flag_segel_merah == 'Y') {
+            $action = 'holdp2';
         }else {
-            $action = 'hold';
+            if ($manifest->status_bc == 'release') {
+                $action = 'active';
+            }else {
+                $action = 'hold';
+            }
         }
+        
         if ($manifest->active_to == null) {
             return response()->json([
                 'success' => false,

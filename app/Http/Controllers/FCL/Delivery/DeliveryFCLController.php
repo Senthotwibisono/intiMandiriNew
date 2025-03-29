@@ -28,6 +28,9 @@ use App\Models\TpsManualKms as ManualKms;
 use App\Models\TpsSPPBBC23 as BC23;
 use App\Models\TpsSPPBBC23Cont as BC23Cont;
 use App\Models\TpsSPPBBC23Kms as BC23Kms;
+use App\Models\TpsPabean as Pabean;
+use App\Models\TpsPabeanCont as PabeanCont;
+use App\Models\TpsPabeanKms as PabeanKms;
 use App\Models\BarcodeGate as Barcode;
 use App\Models\PlacementManifest as PM;
 use App\Models\YardDesign as YD;
@@ -401,14 +404,178 @@ class DeliveryFCLController extends Controller
     public function indexGateOut()
     {
         $data['title'] = "FCL - Gate Out";
-        $data['containers'] = Cont::whereNotNull('tglmasuk')->where(function ($query) {
-            $query->where('status_behandle', '3')
-                  ->orWhereNull('status_behandle');
-        })->get();
+        $data['doks'] = Kode::orderBy('kode', 'asc')->get();
         $data['kets'] = KP::where('tipe', 'Container')->where('kegiatan', '=', 'gate-out')->get();
-        
         $data['user'] = Auth::user()->id;
         return view('fcl.delivery.gateOut', $data);
+    }
+
+    public function dataGateOutFCL(Request $request)
+    {
+        $conts = Cont::with(['job', 'user'])->whereNotNull('tglmasuk')->get();
+
+        return DataTables::of($conts)
+        ->addColumn('edit', function ($conts){
+            return '<buttpn class="btn btn-outline-warning editButton" data-id="'.$conts->id.'"><i class="fa fa-pen"></i></buttpn>';
+        })
+        ->addColumn('detil', function($conts){
+            return '<a href="javascript:void(0)" onclick="openWindow(\'/lcl/realisasi/mty-detail'.$conts->id.'\')" class="btn btn-sm btn-info">
+                <i class="fa fa-eye"></i>
+            </a>';
+        })
+        ->addColumn('printBarcode', function($conts){
+            return '<button class="btn btn-danger printBarcode" data-id="'.$conts->id.'"><i class="fa fa-print"></i></button>';
+        })
+        ->rawColumns(['edit', 'detil', 'printBarcode'])
+        ->make(true);
+    }
+
+    public function searchingDokumenGate(Request $request)
+    {
+        $kode = $request->kode;
+        $cont = Cont::find($request->id);
+        if ($kode == 1) {
+            $sppb = SPPB::where('no_sppb', $request->noDok)->first();
+            if ($sppb) {
+                $tglSPPB = Carbon::parse($sppb->tgl_sppb)->format('Y-m-d');
+                if ($tglSPPB != $request->tglDok) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Dokumen tidak Diemukan!!',
+                    ]);
+                }
+
+                $contDok = SPPBCont::where('sppb_id', $sppb->id)->where('no_cont', $cont->nocontainer)->first();
+                if (!$contDok) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Container tidak ditemukan!!',
+                    ]);
+                }
+                if ($contDok->size != $cont->size) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Ukuran Container tidak sesuai!!',
+                    ]);
+                }
+
+                $cont->update([
+                    'kd_dok_inout' => $kode,
+                    'no_dok' => $request->noDok,
+                    'tgl_dok' => $request->tglDok,
+                ]);
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Berhasil Disimpan!!',
+                ]);
+            }else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Dokumen tidak Diemukan!!',
+                ]);
+            }
+        }elseif ($kode == 2) {
+            $bc23 = BC23::where('no_sppb', $request->noDok)->first();
+            if ($bc23) {
+                $tglBC23 = Carbon::parse($bc23->tgl_sppb)->format('Y-m-d');
+                if ($tglBC23 != $request->tglDok) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Dokumen tidak Diemukan!!',
+                    ]);
+                }
+                $contDok = BC23Cont::where('sppb23_id', $bc23->id)->where('no_cont', $cont->nocontainer)->first();
+                if (!$contDok || $contDok->size != $cont->size) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Container tidak ditemukan!!',
+                    ]);
+                }
+                $cont->update([
+                    'kd_dok_inout' => $kode,
+                    'no_dok' => $request->noDok,
+                    'tgl_dok' => $request->tglDok,
+                ]);
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Berhasil Disimpan!!',
+                ]);
+            }else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Dokumen tidak Diemukan!!',
+                ]);
+            }
+        }elseif (in_array($kode, [41, 42])) {
+            $pabean = Pabean::where('kd_dok_inout', $kode)->where('no_dok_inout', $request->noDok)->first();
+            if ($pabean) {
+                $tglPabean = Crbon::parse($pabean->tgl_dok_inout)->format('Y-m-d');
+                if ($tglPabean != $request->tglDok) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Dokumen tidak Diemukan!!',
+                    ]);
+                }
+                $contDok = PabeanCont::where('pabean_id', $pabean->id)->where('no_cont', $cont->nocontianer)->where('size', $cont->size)->first();
+                if (!$cont) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Container tidak Diemukan!!',
+                    ]);
+                }
+                $cont->update([
+                    'kd_dok_inout' => $kode,
+                    'no_dok' => $request->noDok,
+                    'tgl_dok' => $request->tglDok,
+                ]);
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Data berhasil disimpan!!',
+                ]);
+            }else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Dokumen tidak Diemukan!!',
+                ]);
+            }
+        }else {
+            $manual = Manual::where('kd_dok_inout', $kode)->where('no_dok_inout', $request->noDok)->first();
+            if ($manual) {
+                $tglManual = Carbon::parse($manual->tgl_dok_inout)->format('Y-m-d');
+                if ($tglManual != $request->tglDok) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Dokumen tidak Diemukan!!',
+                    ]);
+                }
+                $contDok = ManualCont::where('manual_id', $manual->idm)->where('no_cont', $cont->nocontainer)->where('size', $cont->size)->first();
+                if (!$contDok) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Container tidak Diemukan!!',
+                    ]);
+                }
+                $cont->update([
+                    'kd_dok_inout' => $kode,
+                    'no_dok' => $request->noDok,
+                    'tgl_dok' => $request->tglDok,
+                ]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Behasil disimpan!!',
+                ]);
+            }else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Dokumen tidak Diemukan!!',
+                ]);
+            }
+        }
+       
+        return response()->json([
+            'success' => false,
+            'message' => 'Dokumen tidak Diemukan!!',
+        ]);
     }
 
     public function gatePassBonMuat(Request $request)
@@ -420,26 +587,23 @@ class DeliveryFCLController extends Controller
                 'message' => 'Harap melunasi invoice terlebih dahulu',
             ]);
         }
-        // $expiredCheck = Carbon::now()->addDay();
-        // // var_dump($expiredCheck);
-        // // die;
-        // if ($cont->active_to < Carbon::today()) {
-        //     return response()->json([
-        //         'success' => false,
-        //         'message' => 'Invoice Container telah expired sejak: ' . Carbon::parse($cont->active_to)->format('d/m/Y') . '. Harap melakukan perpanjangan terlebih dahulu',
-        //     ]);
-        // }
+        
+        if ($cont->flag_segel_merah == 'Y') {
+            $action = 'holdp2';
+        }else {
+            if ($cont->status_bc != 'release') {
+                $action = 'hold';
+            }else {
+                $action = 'active';
+            }
+        }
         
         $barcode = Barcode::where('ref_id', $cont->id)->where('ref_type', '=', 'FCL')->where('ref_action', 'release')->first();
         if ($barcode) {
                 $now = Carbon::now();
                 if ($barcode->status == 'inactive' || $barcode->expired <= $now) {
-                    do {
-                        $uniqueBarcode = Str::random(20);
-                    } while (Barcode::where('barcode', $uniqueBarcode)->exists());
                     $barcode->update([
-                        'barcode'=> $uniqueBarcode,
-                        'status'=>'active',
+                        'status'=> $action,
                         'expired'=> $cont->active_to,
                     ]);
                     return response()->json([
@@ -464,7 +628,7 @@ class DeliveryFCLController extends Controller
                 'ref_action'=>'release',
                 'ref_number'=>$cont->nocontainer,
                 'barcode'=> $uniqueBarcode,
-                'status'=>'active',
+                'status'=> $action,
                 'expired'=> $cont->active_to,
                 'uid'=> Auth::user()->id,
                 'created_at'=> Carbon::now(),

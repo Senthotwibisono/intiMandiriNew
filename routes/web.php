@@ -763,6 +763,8 @@ Route::controller(AndroidGateController::class)->group(function(){
             Route::get('/behandleDetil{id}', 'detailBehandle');
 
             Route::get('/gateOut', 'indexGateOut');
+            Route::get('/dataGateOutFCL', 'dataGateOutFCL')->name('fcl.delivery.dataGateOutFCL');
+            Route::post('/searchDockGate', 'searchingDokumenGate')->name('fcl.delivery.searchDokumenGate');
             
         });
 

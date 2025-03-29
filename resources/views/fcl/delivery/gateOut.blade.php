@@ -2,7 +2,19 @@
 @section('custom_styles')
 <style>
     .highlight-yellow {
-        background-color: yellow !important;
+        background-color: yellow !important;;
+    }
+</style>
+
+<style>
+    .highlight-blue {
+        background-color: lightblue !important;;
+    }
+</style>
+
+<style>
+    .highlight-red {
+        background-color: red !important;;
     }
 </style>
 @endsection
@@ -11,44 +23,24 @@
     <div class="card">
         <div class="card-body fixed-height-cardBody">
             <br>
-            <table class="tabelCustom" style="overflow-x:auto;">
-                <thead>
+            <table class="table table-hover table-stripped" id="tableGateOut">
+                <thead style="white-space: nowrap;">
                     <tr>
-                        <th>Action</th>
+                        <th>Edit</th>
+                        <th>Photo</th>
+                        <th>Barcode</th>
                         <th>Status BC</th>
                         <th>No Job Order</th>
                         <th>No SPK</th>
                         <th>No Container</th>
-                        <th>No MBL</th>
+                        <th>No BL</th>
+                        <th>Tgl BL</th>
                         <th>Tgl Masuk</th>
                         <th>Jam Masuk</th>
                         <th>Tgl Keluar</th>
                         <th>Jam Keluar</th>
                         <th>UID</th>
                     </tr>
-                    <tbody>
-                        @foreach($containers as $cont)
-                            <tr class="{{ $cont->status_bc !== 'release' ? 'highlight-yellow' : '' }}">
-                                <td>
-                                    <div class="button-container">
-                                        <buttpn class="btn btn-outline-warning editButton" data-id="{{$cont->id}}"><i class="fa fa-pen"></i></buttpn>
-                                        <a href="javascript:void(0)" onclick="openWindow('/lcl/realisasi/mty-detail{{$cont->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
-                                        <button class="btn btn-danger printBarcode" data-id="{{$cont->id}}"><i class="fa fa-print"></i></button>
-                                    </div>
-                                </td>
-                                <td>{{$cont->status_bc ?? ''}}</td>
-                                <td>{{$cont->job->nojoborder ?? ''}}</td>
-                                <td>{{$cont->job->nospk ?? ''}}</td>
-                                <td>{{$cont->nocontainer ?? ''}}</td>
-                                <td>{{$cont->job->nombl ?? ''}}</td>
-                                <td>{{$cont->tglmasuk ?? 'Belum Masuk'}}</td>
-                                <td>{{$cont->jammasuk ?? 'Belum Masuk'}}</td>
-                                <td>{{$cont->tglkeluar ?? 'Belum Keluar'}}</td>
-                                <td>{{$cont->jamkeluar ?? 'Belum Keluar'}}</td>
-                                <td>{{$cont->user->name ?? ''}}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
                 </thead>
             </table>
         </div>
@@ -109,6 +101,34 @@
                     </div>
                     <div class="col-6">
                         <div class="row">
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="">Kode Dokumen</label>
+                                    <select name="kd_dok" id="kd_dok" class="js-example-basic-single form-select select2" style="width: 100%;">
+                                        <option disabeled selected value>Pilih Satu!</option>
+                                        @foreach($doks as $dok)
+                                            <option value="{{$dok->id}}">{{$dok->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="">No Dokumen</label>
+                                    <input type="text" name="no_dok" id="no_dok" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="">Tgl Dokumen</label>
+                                    <div class="input-group">
+                                        <input type="date" name="tgl_dok" id="tgl_dok" class="form-control">
+                                        <button type="button" class="btn btn-primary" id="" onclick="searchDok()"><i class="fas fa-search"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-6">
                                 <div class="form-group">
                                     <label for="">Tgl Keluar</label>
@@ -144,6 +164,138 @@
 @endsection
 
 @section('custom_js')
+
+<script>
+    function searchDok() {
+        const id = document.getElementById('id').value;
+        const kode = document.getElementById('kd_dok').value;
+        const noDok = document.getElementById('no_dok').value; 
+        const tglDok = document.getElementById('tgl_dok').value; 
+        console.log(id + kode + noDok + tglDok);
+        const fields = [
+            { id: 'id', message: 'Pilih Container Terlebih Dahulu!' },
+            { id: 'kd_dok', message: 'Kode Dokumen harus diisi!' },
+            { id: 'no_dok', message: 'Nomor Dokumen harus diisi!' },
+            { id: 'tgl_dok', message: 'Tanggal Dokumen harus diisi!' }
+        ];
+
+        for (let field of fields) {
+            const value = document.getElementById(field.id).value.trim();
+            if (!value) {
+                Swal.fire({
+                    icon: 'error',
+                    title: field.message,
+                });
+                return; // Hentikan eksekusi jika ada yang kosong
+            }
+        }
+
+        Swal.fire({
+            icon: 'warning',
+            title: 'Apakah anda sudah yakin?',
+            showCancelButton: true,
+        }).then( (result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'in Progress',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    willOpen: async () => {
+                        Swal.showLoading();
+                        try {
+                            let response = await fetch('{{route('fcl.delivery.searchDokumenGate')}}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                },
+                                body: JSON.stringify({
+                                    id: id,
+                                    kode: kode,
+                                    noDok:noDok,
+                                    tglDok:tglDok,
+                                })
+                            });
+                            console.log(response);
+
+                            if (response.ok) {
+                               const result = await response.json();
+                               console.log(result);
+                               if (result.success == true) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: result.message,
+                                    }).then(() => {
+                                        location.reload();
+                                    });
+                               }else{
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: result.message,
+                                    }).then(() => {
+                                        location.reload();
+                                    });
+                               }
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Opss Something wrong ...',
+                                    text: 'error in : ' + response.status + ' ' + response.statusText,
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            }
+                        } catch (error) {
+                            console.error(error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Terjadi Kesalahan!',
+                                text: 'Tidak dapat menghubungi server. Coba lagi nanti.',
+                            });
+                        }
+                    }
+                })
+            }
+        })
+    }
+</script>
+
+<script>
+    $(document).ready(function(){
+        $('#tableGateOut').dataTable({
+            processing: true,
+            serverSide: true,
+            scrollX: true,
+            ajax: '{{route('fcl.delivery.dataGateOutFCL')}}',
+            columns: [
+                {className:'text-center', name:'edit', data:'edit', searchable:false, orderable:false},
+                {className:'text-center', name:'detil', data:'detil', searchable:false, orderable:false},
+                {className:'text-center', name:'printBarcode', data:'printBarcode', searchable:false, orderable:false},
+                {className:'text-center', name:'status_bc', data:'status_bc'},
+                {className:'text-center', name:'job.nojoborder', data:'job.nojoborder'},
+                {className:'text-center', name:'job.nospk', data:'job.nospk'},
+                {className:'text-center', name:'nocontainer', data:'nocontainer'},
+                {className:'text-center', name:'nobl', data:'nobl'},
+                {className:'text-center', name:'tgl_bl_awb', data:'tgl_bl_awb'},
+                {className:'text-center', name:'tglmasuk', data:'tglmasuk'},
+                {className:'text-center', name:'jammasuk', data:'jammasuk'},
+                {className:'text-center', name:'tglkeluar', data:'tglkeluar'},
+                {className:'text-center', name:'jamkeluar', data:'jamkeluar'},
+                {className:'text-center', name:'user.name', data:'user.name'},
+            ],
+            rowCallback: function (row, data, dataIndex) {
+                if (data.flag_segel_merah === 'Y') {
+                    $(row).addClass('highlight-red text-white');
+                } else if (data.status_bc === 'HOLD') {
+                    $(row).addClass('highlight-yellow');
+                } else if (data.status_bc === 'release'){
+                    $(row).addClass('highlight-blue');
+                }
+            },
+        })
+    })
+</script>
+
 <script>
 $(document).ready(function() {
     // When Cancel button is clicked
@@ -177,6 +329,9 @@ $(document).ready(function() {
         $("#tglkeluar").val(response.data.tglkeluar);
         $("#jamkeluar").val(response.data.jamkeluar);
         $("#nopol_mty").val(response.data.nopol_mty);
+        $("#kd_dok").val(response.data.kd_dok_inout).trigger('change');
+        $("#no_dok").val(response.data.no_dok);
+        $("#tgl_dok").val(response.data.tgl_dok);
         $("#uidmty").val(response.data.uid.id ?? response.userId);
         $("#nameUid").val(response.uid.name ?? response.user);
       },
