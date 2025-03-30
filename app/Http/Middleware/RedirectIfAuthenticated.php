@@ -32,6 +32,17 @@ class RedirectIfAuthenticated
                     return redirect()->route('android.dashboard');
                 }
 
+                if ($user->hasRole('lapangan')) {
+                    return redirect()->route('android.dashboard');
+                }
+
+                if ($user->hasRole('invoiceLCL')) {
+                    return redirect()->route('dashboard.invoiceLCL');
+                }
+                if ($user->hasRole('invoiceFCL')) {
+                    return redirect()->route('dashboard.invoiceFCL');
+                }
+
                 // Arahkan ke halaman home default jika pengguna tidak memiliki peran 'bc'
                 return redirect(RouteServiceProvider::HOME);
             }

@@ -98,25 +98,40 @@ Route::get('/', function () {
 Route::post('/unset-session/{key}', 'SessionController@unsetSession')->name('unset-session');
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::middleware(['auth', 'RedirectIfAuthenticated'])->get('/', [App\Http\Controllers\HomeController::class, 'index']);
+Route::middleware(['auth', 'role:admin|adminLCL|tpsFCL'])->get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::middleware(['auth', 'role:admin|adminLCL|invoiceLCL'])->get('/dashboard-invoiceLCL', [App\Http\Controllers\HomeController::class, 'indexInvoiceLCL'])->name('dashboard.invoiceLCL');
+Route::middleware(['auth', 'role:admin|adminFCL|invoiceFCL'])->get('/dashboard-invoiceFCL', [App\Http\Controllers\HomeController::class, 'indexInvoiceLFCL'])->name('dashboard.invoiceFCL');
 Route::get('/testJson', [TestJsonController::class, 'test']);
 
 Route::controller(SystemController::class)->group(function () {
     // user
     Route::get('/user/index-user', 'IndexUser')->name('user.index');
-    Route::get('/user/edit-{id?}', 'editUser')->name('user.edit');
-    Route::post('/user/create', 'createUser')->name('user.create');
-    Route::post('/user/update', 'updateUser')->name('user.update');
-    Route::delete('/user/delete{id?}', 'deleteUser')->name('user.delete');
+    Route::middleware('permission:editUser')->get('/user/edit-{id?}', 'editUser')->name('user.edit');
+    Route::middleware('permission:createUser')->post('/user/create', 'createUser')->name('user.create');
+    Route::middleware('permission:editUser')->post('/user/update', 'updateUser')->name('user.update');
+    Route::middleware('permission:deleteUser')->delete('/user/delete{id?}', 'deleteUser')->name('user.delete');
     // role
-    Route::get('/role/index-role', 'IndexRole')->name('role.index');
-    Route::get('/role/edit-{id?}', 'editRole')->name('role.edit');
-    Route::post('/role/create', 'createRole')->name('role.create');
-    Route::post('/role/update', 'updateRole')->name('role.update');
-    Route::delete('/role/delete{id?}', 'deleteRole')->name('role.delete');
+    Route::middleware('permission:role')->group(function(){
+        Route::get('/role/index-role', 'IndexRole')->name('role.index');
+        Route::get('/role/edit-{id?}', 'editRole')->name('role.edit');
+        Route::post('/role/create', 'createRole')->name('role.create');
+        Route::post('/role/update', 'updateRole')->name('role.update');
+        Route::delete('/role/delete{id?}', 'deleteRole')->name('role.delete');
+    });
+
+    // Route::middleware('permission:permission')->group(function(){
+        Route::get('/permisson/index', 'indexPermisson');
+        Route::post('/permisson/post', 'postPermisson')->name('system.permission.post');
+    
+        // AssingPermission
+        Route::get('/user/permission-index/{id?}', 'assignPermission');
+        Route::post('/user/permission-post/{id?}', 'assignPermissionPost');
+    // });
+    // Permisson
 });
 
-Route::controller(MasterController::class)->group(function (){
+Route::middleware('permission:dataMaster')->controller(MasterController::class)->group(function (){
     // customer
     Route::get('/master/customer', 'CustomerIndex')->name('master.customer.index');
     Route::post('/master/customer-excel', 'CustomerExcel')->name('master.customer.excel');
@@ -239,7 +254,7 @@ Route::controller(MasterController::class)->group(function (){
     Route::delete('/master/photo-delete{id?}', 'photoDelete');
 });
 
-Route::controller(DokumenController::class)->group(function (){
+Route::middleware('permission:tpsOnline')->controller(DokumenController::class)->group(function (){
    
     // PLP
     Route::get('/dokumen/plp', 'plpIndex')->name('dokumen.plp.index');
@@ -305,7 +320,7 @@ Route::controller(DokumenController::class)->group(function (){
 
 // LCL
     // Register
-    Route::controller(RegisterController::class)->group(function(){
+    Route::middleware('permission:registerLCL')->controller(RegisterController::class)->group(function(){
         Route::get('/lcl/register', 'index')->name('lcl.register.index');
         Route::get('/lcl/registerData', 'indexData')->name('lcl.register.data');
         Route::post('/lcl/register/post', 'create')->name('lcl.register.create');
@@ -319,7 +334,7 @@ Route::controller(DokumenController::class)->group(function (){
         Route::post('/lcl/register/barcodeGate', 'createBarcode')->name('lcl.register.barcode.gate');
     });
 
-    Route::controller(ManifestController::class)->group(function(){
+    Route::middleware('permission:mainfestDetail')->controller(ManifestController::class)->group(function(){
         Route::get('/lcl/manifest', 'index')->name('lcl.manifest.idex');
         Route::get('/lcl/manifest/data', 'indexData')->name('lcl.manifest.data');
         Route::get('/lcl/manifest/detail-{id?}', 'detail')->name('lcl.manifest.detail');
@@ -343,7 +358,7 @@ Route::controller(DokumenController::class)->group(function (){
     });
 
     // Stripping
-    Route::controller(StrippingController::class)->group(function(){
+    Route::middleware('permission:stripping')->controller(StrippingController::class)->group(function(){
         Route::get('/lcl/realisasi/stripping', 'index')->name('lcl.stripping.index');
         Route::get('/lcl/realisasi/stripping/data', 'indexData')->name('lcl.stripping.dataIndex');
         Route::get('/lcl/realisasi/stripping/proses-{id?}', 'proses')->name('lcl.stripping.proses');
@@ -358,20 +373,23 @@ Route::controller(DokumenController::class)->group(function (){
 
     // Delivery
     Route::controller(DeliveryController::class)->group(function(){
-        Route::get('/lcl/delivery/behandle/index', 'indexBehandle')->name('lcl.delivery.behandle');
-        Route::get('/lcl/delivery/behandle/behandleData', 'behandleData');
-        Route::post('/lcl/delivery/behandle/spjmCheck', 'spjmBehandle')->name('lcl.delivery.spjmCheck');
-        Route::post('/lcl/delivery/behandle/update', 'behandle')->name('lcl.delivery.updateBehandle');
-        Route::get('/lcl/realisasi/behandle-detail{id?}', 'detailBehandle')->name('lcl.delivery.detailBehandle');
-        Route::post('/lcl/delivery/behandle/readyCheck-{id?}', 'readyCheckBehandle')->name('lcl.delivery.readyCheckBehandle');
-        Route::post('/lcl/delivery/behandle/finishCheck-{id?}', 'finishBehandle')->name('lcl.delivery.finishBehandle');
-        
-        Route::get('/lcl/delivery/gateOut', 'indexGateOut')->name('lcl.delivery.gateOut');
-        Route::get('/lcl/delivery/dataGateOut', 'dataGateOut');
-        Route::post('/lcl/delivery/gateOut/check', 'dokumenGateOut')->name('lcl.delivery.DokumenGateOut');
-        Route::post('/lcl/delivery/gateOut/update', 'gateOut')->name('lcl.delivery.updateGateOut');
-        Route::get('/lcl/realisasi/GateOut-detail{id?}', 'detailGateOut')->name('lcl.delivery.detailGateOut');
-        Route::post('/lcl/delivery/gateOut-barcodeGate', 'createBarcode')->name('lcl.delivery.barcodeGate');
+        Route::middleware('permission:behandleLCL')->group(function(){
+            Route::get('/lcl/delivery/behandle/index', 'indexBehandle')->name('lcl.delivery.behandle');
+            Route::get('/lcl/delivery/behandle/behandleData', 'behandleData');
+            Route::post('/lcl/delivery/behandle/spjmCheck', 'spjmBehandle')->name('lcl.delivery.spjmCheck');
+            Route::post('/lcl/delivery/behandle/update', 'behandle')->name('lcl.delivery.updateBehandle');
+            Route::get('/lcl/realisasi/behandle-detail{id?}', 'detailBehandle')->name('lcl.delivery.detailBehandle');
+            Route::post('/lcl/delivery/behandle/readyCheck-{id?}', 'readyCheckBehandle')->name('lcl.delivery.readyCheckBehandle');
+            Route::post('/lcl/delivery/behandle/finishCheck-{id?}', 'finishBehandle')->name('lcl.delivery.finishBehandle');
+        });
+        Route::middleware('permission:gateOutLCL')->group(function(){
+            Route::get('/lcl/delivery/gateOut', 'indexGateOut')->name('lcl.delivery.gateOut');
+            Route::get('/lcl/delivery/dataGateOut', 'dataGateOut');
+            Route::post('/lcl/delivery/gateOut/check', 'dokumenGateOut')->name('lcl.delivery.DokumenGateOut');
+            Route::post('/lcl/delivery/gateOut/update', 'gateOut')->name('lcl.delivery.updateGateOut');
+            Route::get('/lcl/realisasi/GateOut-detail{id?}', 'detailGateOut')->name('lcl.delivery.detailGateOut');
+            Route::post('/lcl/delivery/gateOut-barcodeGate', 'createBarcode')->name('lcl.delivery.barcodeGate');
+        });
 
         Route::get('/lcl/delivery/cetakSuratJalan-{id?}', 'cetakSuratJalan');
 
@@ -394,24 +412,29 @@ Route::controller(DokumenController::class)->group(function (){
 
     // Gate In
     Route::controller(GateInController::class)->group(function(){
-        Route::get('/lcl/realisasi/gateIn', 'index')->name('lcl.gateIn.index');
-        Route::get('/lcl/realisasi/gateIn-edt{id?}', 'edit')->name('lcl.gateIn.edit');
-        Route::post('/lcl/realisasi/gateIn-update', 'update')->name('lcl.gateIn.update');
-        Route::get('/lcl/realisasi/gateIn-detail{id?}', 'detail')->name('lcl.gateIn.detail');
-        Route::post('/lcl/realisasi/gateIn-detailDelete', 'detailDelete')->name('lcl.gateIn.delete.detail');
+        Route::middleware('permission:gateInLCL')->group(function(){
+            Route::get('/lcl/realisasi/gateIn', 'index')->name('lcl.gateIn.index');
+            Route::get('/lcl/realisasi/gateIn-edt{id?}', 'edit')->name('lcl.gateIn.edit');
+            Route::post('/lcl/realisasi/gateIn-update', 'update')->name('lcl.gateIn.update');
+            Route::get('/lcl/realisasi/gateIn-detail{id?}', 'detail')->name('lcl.gateIn.detail');
+            Route::post('/lcl/realisasi/gateIn-detailDelete', 'detailDelete')->name('lcl.gateIn.delete.detail');
+        });
+        Route::middleware('permission:sealLCL')->group(function(){
+            Route::get('/lcl/realisasi/seal', 'indexSeal')->name('lcl.seal.index');
+            Route::get('/lcl/realisasi/dataSeal', 'dataSeal')->name('lcl.seal.data');
+            Route::post('/lcl/realisasi/seal-update', 'updateSeal')->name('lcl.seal.update');
+            Route::post('/lcl/realisasi/easyGo-send', 'easyGoSend');
+            Route::post('/lcl/realisasi/easyGo-closeDO', 'closeDO');
+        });
+        Route::middleware('permission:buangMTY')->group(function(){
+            Route::get('/lcl/realisasi/buangMT', 'indexMt')->name('lcl.mty.index');
+            Route::get('/lcl/realisasi/emptyTable', 'emptyTable');
+            Route::get('/lcl/realisasi/mty-detail{id?}', 'detailMt')->name('lcl.mty.detail');
+            Route::post('/lcl/realisasi/mty-update', 'updateMt')->name('lcl.mty.update');
+            Route::post('/lcl/realisasi/mty-barcodeGate', 'createBarcode')->name('lcl.mty.barcode.gate');
+            Route::get('/lcl/realisasi/suratJalan-BuangEmpty{id?}', 'suratJalan');
+        });
         
-        Route::get('/lcl/realisasi/seal', 'indexSeal')->name('lcl.seal.index');
-        Route::get('/lcl/realisasi/dataSeal', 'dataSeal')->name('lcl.seal.data');
-        Route::post('/lcl/realisasi/seal-update', 'updateSeal')->name('lcl.seal.update');
-        Route::post('/lcl/realisasi/easyGo-send', 'easyGoSend');
-        Route::post('/lcl/realisasi/easyGo-closeDO', 'closeDO');
-        
-        Route::get('/lcl/realisasi/buangMT', 'indexMt')->name('lcl.mty.index');
-        Route::get('/lcl/realisasi/emptyTable', 'emptyTable');
-        Route::get('/lcl/realisasi/mty-detail{id?}', 'detailMt')->name('lcl.mty.detail');
-        Route::post('/lcl/realisasi/mty-update', 'updateMt')->name('lcl.mty.update');
-        Route::post('/lcl/realisasi/mty-barcodeGate', 'createBarcode')->name('lcl.mty.barcode.gate');
-        Route::get('/lcl/realisasi/suratJalan-BuangEmpty{id?}', 'suratJalan');
     });
 
 // Photo
@@ -430,16 +453,19 @@ Route::controller(PhotoController::class)->group(function(){
 });
 // Barcode
 Route::controller(BarcodeAutoGateController::class)->group(function(){
-    Route::get('/barcode/autoGate-index{id?}', 'index')->name('barcode.autoGate.index');
-    Route::get('/barcode/autoGate-bonmuat{id?}', 'bonmuat')->name('barcode.autoGate.bonmuat');
-    Route::get('/barcode/autoGate-PrintAll{id?}', 'indexViewAll');
-    Route::get('/barcode/autoGate-photoIn{id?}', 'photoIn');
-    Route::get('/barcode/autoGate-photoOut{id?}', 'photoOut');
-    Route::get('/autoGate-barcode', 'indexAll')->name('barcode.autoGate.indexAll');
-    Route::get('/autoGate-barcode/data', 'indexData')->name('barcode.autoGate.indexData');
+    Route::middleware('permission:barcode')->group(function(){
+        Route::get('/barcode/autoGate-index{id?}', 'index')->name('barcode.autoGate.index');
+        Route::get('/barcode/autoGate-bonmuat{id?}', 'bonmuat')->name('barcode.autoGate.bonmuat');
+        Route::get('/barcode/autoGate-PrintAll{id?}', 'indexViewAll');
+        Route::get('/barcode/autoGate-photoIn{id?}', 'photoIn');
+        Route::get('/barcode/autoGate-photoOut{id?}', 'photoOut');
+        Route::get('/autoGate-barcode', 'indexAll')->name('barcode.autoGate.indexAll');
+        Route::get('/autoGate-barcode/data', 'indexData')->name('barcode.autoGate.indexData');
+        Route::get('/fcl/sp2/{id?}', 'cetakSP2FCL');
+        Route::post('/fcl/updateSP2', 'updateSP2');
+    });
+    
     Route::post('/autoGate', 'autoGateNotification')->name('autoGate.autoGateNotification');
-    Route::get('/fcl/sp2/{id?}', 'cetakSP2FCL');
-    Route::post('/fcl/updateSP2', 'updateSP2');
 });
 
 Route::controller(PlacementContainerController::class)->group(function(){
@@ -581,7 +607,7 @@ Route::controller(AndroidGateController::class)->group(function(){
         Route::get('/dashboard-invoice', 'dashboard');
     });
     // Master
-    Route::controller(MasterInvoiceController::class)->group(function(){
+    Route::middleware('permission:tarifLCL')->controller(MasterInvoiceController::class)->group(function(){
         Route::get('/invoice/master/tarif', 'tarifIndex');
         Route::post('/invoice/master/tarif-Post', 'tarifPost');
         Route::delete('/invoice/master/tarif-Delete{id?}', 'tarifDelete');
@@ -590,7 +616,7 @@ Route::controller(AndroidGateController::class)->group(function(){
     });
 
     // Form
-    Route::controller(FormController::class)->group(function(){
+    Route::middleware('permission:formInvoiceLCL')->controller(FormController::class)->group(function(){
         Route::get('/invoice/form/index', 'index')->name('form.index');
         Route::post('/invoice/form/create', 'create');
         Route::delete('/invoice/form/delete-{id?}', 'delete');
@@ -608,7 +634,7 @@ Route::controller(AndroidGateController::class)->group(function(){
     });
 
     // Index
-    Route::controller(InvoiceController::class)->group(function(){
+    Route::middleware('permission:invoiceLCL')->controller(InvoiceController::class)->group(function(){
         Route::get('/invoice/form/unpaid', 'unpaidIndex')->name('invoice.unpaid');
         Route::get('/invoice/form/unpaidData', 'unpaidData');
         Route::get('/invoice/pranota-{id?}', 'pranotaIndex');
@@ -625,7 +651,7 @@ Route::controller(AndroidGateController::class)->group(function(){
     });
 
     // Form Perpanjangan
-    Route::controller(FormPerpanjanganController::class)->group(function(){
+    Route::middleware('permission:perpajanganLCL')->controller(FormPerpanjanganController::class)->group(function(){
         Route::get('/invoice/form/perpanjangan/index', 'index')->name('form.index');
         Route::post('/invoice/form/perpanjangan/create', 'create');
         Route::delete('/invoice/form/perpanjangan/delete-{id?}', 'delete');
@@ -642,7 +668,7 @@ Route::controller(AndroidGateController::class)->group(function(){
     });
 
     // Invoice Perpanjangan
-    Route::controller(InvoicePerpanjanganController::class)->group(function(){
+    Route::middleware('permission:perpajanganLCL')->controller(InvoicePerpanjanganController::class)->group(function(){
         Route::get('/invoice/form/perpanjangan/unpaid', 'unpaidIndex')->name('invoice.perpanjangan.unpaid');
         Route::get('/invoice/perpanjangan/pranota-{id?}', 'pranotaIndex');
         Route::delete('/invoice/perpanjangan/deleteHeader-{id?}', 'deleteInvoice');
@@ -715,7 +741,7 @@ Route::controller(AndroidGateController::class)->group(function(){
 
     // FCL
     Route::prefix('/fcl')->group(function(){
-        Route::prefix('/register')->controller(RegisterFCLController::class)->group(function(){
+        Route::middleware('permission:registerFCL')->prefix('/register')->controller(RegisterFCLController::class)->group(function(){
             Route::get('/index', 'index')->name('fcl.register.index');
             Route::get('/data', 'indexData');
             Route::get('/detail-{id}', 'detail')->name('fcl.register.detail');
@@ -735,40 +761,43 @@ Route::controller(AndroidGateController::class)->group(function(){
         });
 
         Route::prefix('/realisasi')->controller(GateInFCLCotroller::class)->group(function(){
-            Route::get('/gateIn', 'index')->name('fcl.gateIn.index');
-            Route::get('/gateIn-edt{id?}', 'edit')->name('fcl.gateIn.edit');
-            Route::post('/gateIn-update', 'update')->name('fcl.gateIn.update');
-            Route::get('/gateIn-detail{id?}', 'detail')->name('fcl.gateIn.detail');
-            Route::post('/gateIn-detailDelete', 'detailDelete')->name('fcl.gateIn.delete.detail');
-
-            Route::get('/seal', 'indexSeal');
-            Route::post('/seal-update', 'updateSeal')->name('fcl.seal.update');
-            Route::post('/easyGo-send', 'easyGoSend');
-            Route::post('/easyGo-closeDO', 'closeDO');
+            Route::middleware('permission:gateInFCL')->group(function(){
+                Route::get('/gateIn', 'index')->name('fcl.gateIn.index');
+                Route::get('/gateIn-edt{id?}', 'edit')->name('fcl.gateIn.edit');
+                Route::post('/gateIn-update', 'update')->name('fcl.gateIn.update');
+                Route::get('/gateIn-detail{id?}', 'detail')->name('fcl.gateIn.detail');
+                Route::post('/gateIn-detailDelete', 'detailDelete')->name('fcl.gateIn.delete.detail');
+                Route::get('/seal', 'indexSeal');
+                Route::post('/seal-update', 'updateSeal')->name('fcl.seal.update');
+                Route::post('/easyGo-send', 'easyGoSend');
+                Route::post('/easyGo-closeDO', 'closeDO');
+            });
         });
 
         Route::prefix('/delivery')->controller(DeliveryFCLController::class)->group(function(){
-            Route::get('/behandle', 'indexBehandle');
-            Route::get('/behandle-data', 'behandleData')->name('fcl.behandle.dataTable');
-            Route::get('/dataCont/{id}', 'getDataCont');
-            Route::get('/searchSPJM', 'searchSPJM')->name('fcl.behandle.searchSPJM');
-
-            Route::post('/behandleReadyCheck{id}', 'readyCheckBehandle');
-            Route::post('/prosesCheckBehandle{id}', 'prosesCheckBehandle');
-            Route::post('/finishCheckBehandle{id}', 'finishCheckBehandle');
-            Route::post('/behandleUpdate', 'updateDataBehandle')->name('fcl.delivery.updateBehandle');
-            Route::post('/gatePassBonMuat', 'gatePassBonMuat')->name('fcl.delivery.gatePassBonMuat');
-            Route::post('/gateOutFCL', 'gateOutFCL')->name('fcl.delivery.gateOutFCL');
-
-            Route::get('/behandleDetil{id}', 'detailBehandle');
-
-            Route::get('/gateOut', 'indexGateOut');
-            Route::get('/dataGateOutFCL', 'dataGateOutFCL')->name('fcl.delivery.dataGateOutFCL');
-            Route::post('/searchDockGate', 'searchingDokumenGate')->name('fcl.delivery.searchDokumenGate');
+            Route::middleware('permission:behandleFCL|gateOutFCL')->group(function(){
+                Route::get('/behandle', 'indexBehandle');
+                Route::get('/behandle-data', 'behandleData')->name('fcl.behandle.dataTable');
+                Route::get('/dataCont/{id}', 'getDataCont');
+                Route::get('/searchSPJM', 'searchSPJM')->name('fcl.behandle.searchSPJM');
+    
+                Route::post('/behandleReadyCheck{id}', 'readyCheckBehandle');
+                Route::post('/prosesCheckBehandle{id}', 'prosesCheckBehandle');
+                Route::post('/finishCheckBehandle{id}', 'finishCheckBehandle');
+                Route::post('/behandleUpdate', 'updateDataBehandle')->name('fcl.delivery.updateBehandle');
+                Route::post('/gatePassBonMuat', 'gatePassBonMuat')->name('fcl.delivery.gatePassBonMuat');
+                Route::post('/gateOutFCL', 'gateOutFCL')->name('fcl.delivery.gateOutFCL');
+    
+                Route::get('/behandleDetil{id}', 'detailBehandle');
+    
+                Route::get('/gateOut', 'indexGateOut');
+                Route::get('/dataGateOutFCL', 'dataGateOutFCL')->name('fcl.delivery.dataGateOutFCL');
+                Route::post('/searchDockGate', 'searchingDokumenGate')->name('fcl.delivery.searchDokumenGate');
+            });
             
         });
 
-        Route::prefix('/containerList')->controller(ContainerDokController::class)->group(function(){
+        Route::middleware('permission:containerFCL')->prefix('/containerList')->controller(ContainerDokController::class)->group(function(){
             Route::get('/index', 'index');
             Route::get('/dataTable', 'dataTable');
             Route::post('/dataDok', 'dataDok');
@@ -795,7 +824,7 @@ Route::controller(AndroidGateController::class)->group(function(){
 
     Route::prefix('/invoiceFCL')->group(function(){
         Route::get('/dashboard', [InvoiceFCLMainController::class, 'dashboardInvoiceFCL']);
-        Route::prefix('/masterTarif')->group(function(){
+        Route::middleware('permission:invoiceFCL')->prefix('/masterTarif')->group(function(){
             Route::get('/index', [InvoiceFCLMainController::class, 'indexMasterTarif']);
             Route::controller(MasterTarifFCLController::class)->group(function(){
                 // Tarif TPS
@@ -812,7 +841,7 @@ Route::controller(AndroidGateController::class)->group(function(){
                 
             });
         });
-        Route::prefix('/form')->group(function(){
+        Route::middleware('permission:formInvoiceFCL')->prefix('/form')->group(function(){
             Route::get('/index', [InvoiceFCLMainController::class, 'indexForm']);
             Route::controller(FormFCLController::class)->group(function(){
                 Route::get('/dataTable', 'dataTable');
@@ -852,59 +881,65 @@ Route::controller(AndroidGateController::class)->group(function(){
         Route::prefix('/invoice')->group(function(){
             Route::get('/index', [InvoiceFCLMainController::class, 'invoiceIndex']);
             Route::controller(BackendInvoiceController::class)->group(function(){
-                Route::get('/dataTable', 'dataTable');
-                Route::get('/pranota-{id?}', 'pranota');
-                Route::get('/invoice-{id?}', 'Invoice');
-                Route::get('/tranparansi-{id?}', 'Tranparansi');
-                Route::get('/getDataInvoice-{id?}', 'getDataInvoice');
-                Route::post('/paidInvoice', 'paidInvoice');
-                Route::post('/cancelInvoice', 'cancelInvoice');
-                Route::post('/deleteInvoice', 'deleteInvoice');
-                Route::get('/edit/{id?}', 'editInvoice');
-                Route::post('/updateInvoice', 'updateInvoice');
-                Route::post('/hiddenInvoice', 'hiddenInvoice');
-
-                Route::post('/deleteKPT/{id?}', 'hapusPhotoKTP');
-                Route::post('/uploadKTP', 'uploadKtp');
-
-                Route::prefix('/report')->group(function(){
-                    Route::get('/index', 'indexReport');
-                    Route::get('/excel', 'excelReport');
-                    Route::get('/pdf', 'pdfReport');
+                Route::middleware('permission:invoiceFCL')->group(function(){
+                    Route::get('/dataTable', 'dataTable');
+                    Route::get('/pranota-{id?}', 'pranota');
+                    Route::get('/invoice-{id?}', 'Invoice');
+                    Route::get('/tranparansi-{id?}', 'Tranparansi');
+                    Route::get('/getDataInvoice-{id?}', 'getDataInvoice');
+                    Route::post('/paidInvoice', 'paidInvoice');
+                    Route::post('/cancelInvoice', 'cancelInvoice');
+                    Route::post('/deleteInvoice', 'deleteInvoice');
+                    Route::get('/edit/{id?}', 'editInvoice');
+                    Route::post('/updateInvoice', 'updateInvoice');
+                    
+                    Route::post('/deleteKPT/{id?}', 'hapusPhotoKTP');
+                    Route::post('/uploadKTP', 'uploadKtp');
+                    Route::prefix('/report')->group(function(){
+                        Route::get('/index', 'indexReport');
+                        Route::get('/excel', 'excelReport');
+                        Route::get('/pdf', 'pdfReport');
+                    });
                 });
+                
+                Route::middleware('permission:hiddenInvoiceFCL')->post('/hiddenInvoice', 'hiddenInvoice');
             });
         });
 
         Route::prefix('/behandle')->group(function(){
             Route::controller(InvoiceBehandleFCLController::class)->group(function(){
+                Route::middleware('permission:invoiceFCL|formInvoiceFCL')->group(function(){
+
+                    Route::get('/form-index', 'formIndex')->name('invoiceFCL.behandle.formIndex');
+                    Route::get('/form-data', 'formData')->name('invoiceFCL.behandle.formData');
+                    Route::post('/form-create', 'formCreate')->name('invoiceFCL.behandle.formCreate');
+                        // Step1
+                        Route::get('/form-step1/{id?}', 'indexStep1')->name('invoiceFCL.behandle.step1');
+                        Route::get('/form-getCont', 'getContainer')->name('invoiceFCL.behandle.getContainer');
+                        Route::post('/form-postStep1', 'postStep1')->name('invoiceFCL.behandle.postStep1');
+                        Route::post('/form-delete', 'delete')->name('invoiceFCL.behandle.delete');
+    
+                        // Preinvoice
+                        Route::get('/preinvoice/{id?}', 'preinvoice')->name('invoiceFCL.behandel.preinvoice');
+                        Route::post('/create-invoice', 'createInvoice')->name('invoiceFCL.behandel.createInvoice');
+    
+                    // Invoice
+                    Route::get('/invoice-index', 'invoiceIndex')->name('invoiceFCL.behandle.invoiceIndex');
+                    Route::get('/invoice-data', 'invoiceData')->name('invoiceFCL.behandle.invoiceData');
+                    Route::get('/invoice-pranota/{id?}', 'invoicePranota')->name('invoiceFCL.behandle.invoicePranota');
+                    Route::post('/invoice-pay', 'invoicePay')->name('invoiceFCL.behandle.invoicePay');
+                    Route::get('/invoice-invoice/{id?}', 'invoiceInvoice')->name('invoiceFCL.behandle.invoiceInvoice');
+                    Route::post('/invoice-cancel', 'invoiceCancel')->name('invoiceFCL.behandle.invoiceCancel');
+                    Route::get('/invoice-edit/{id?}', 'editInvoice')->name('invoiceFCL.behandle.editInvoice');
+                    Route::post('/invoice-update', 'updateInvoice')->name('invoiceFCL.behandle.updateInvoice');
+                    
+                    // Report
+                    Route::get('/invoice-report', 'indexReport')->name('invoiceFCL.behandle.indexReport');
+                    Route::get('/data-report', 'dataReport')->name('invoiceFCL.behandle.dataReport');
+                });
                 // Form
-                Route::get('/form-index', 'formIndex')->name('invoiceFCL.behandle.formIndex');
-                Route::get('/form-data', 'formData')->name('invoiceFCL.behandle.formData');
-                Route::post('/form-create', 'formCreate')->name('invoiceFCL.behandle.formCreate');
-                    // Step1
-                    Route::get('/form-step1/{id?}', 'indexStep1')->name('invoiceFCL.behandle.step1');
-                    Route::get('/form-getCont', 'getContainer')->name('invoiceFCL.behandle.getContainer');
-                    Route::post('/form-postStep1', 'postStep1')->name('invoiceFCL.behandle.postStep1');
-                    Route::post('/form-delete', 'delete')->name('invoiceFCL.behandle.delete');
-
-                    // Preinvoice
-                    Route::get('/preinvoice/{id?}', 'preinvoice')->name('invoiceFCL.behandel.preinvoice');
-                    Route::post('/create-invoice', 'createInvoice')->name('invoiceFCL.behandel.createInvoice');
-
-                // Invoice
-                Route::get('/invoice-index', 'invoiceIndex')->name('invoiceFCL.behandle.invoiceIndex');
-                Route::get('/invoice-data', 'invoiceData')->name('invoiceFCL.behandle.invoiceData');
-                Route::get('/invoice-pranota/{id?}', 'invoicePranota')->name('invoiceFCL.behandle.invoicePranota');
-                Route::post('/invoice-pay', 'invoicePay')->name('invoiceFCL.behandle.invoicePay');
-                Route::get('/invoice-invoice/{id?}', 'invoiceInvoice')->name('invoiceFCL.behandle.invoiceInvoice');
-                Route::post('/invoice-cancel', 'invoiceCancel')->name('invoiceFCL.behandle.invoiceCancel');
-                Route::get('/invoice-edit/{id?}', 'editInvoice')->name('invoiceFCL.behandle.editInvoice');
-                Route::post('/invoice-hidden', 'hiddenInvoice')->name('invoiceFCL.behandle.hiddenInvoice');
-                Route::post('/invoice-update', 'updateInvoice')->name('invoiceFCL.behandle.updateInvoice');
-
-                // Report
-                Route::get('/invoice-report', 'indexReport')->name('invoiceFCL.behandle.indexReport');
-                Route::get('/data-report', 'dataReport')->name('invoiceFCL.behandle.dataReport');
+                
+                Route::middleware('permission:hiddenInvoiceFCL')->post('/invoice-hidden', 'hiddenInvoice')->name('invoiceFCL.behandle.hiddenInvoice');
             });
         });
     });
@@ -977,7 +1012,7 @@ Route::prefix('/lcl/cfs')->group(function(){
     });    
 });
 
-Route::prefix('/invoice/cfs')->group(function(){
+Route::middleware('permission:invoiceCSF')->prefix('/invoice/cfs')->group(function(){
     Route::controller(InvoiceCSFController::class)->group(function(){
         Route::get('/index', 'index')->name('cfs.invoice.index');
         Route::get('/data', 'data')->name('cfs.invoice.data');

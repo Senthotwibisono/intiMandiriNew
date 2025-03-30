@@ -8,6 +8,7 @@ use Auth;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Role;
+use App\Models\Permission;
 use Illuminate\Support\Facades\Hash;
 
 class SystemController extends Controller
@@ -148,6 +149,47 @@ class SystemController extends Controller
         $role->delete();
     
         return response()->json(['success' => 'Role deleted successfully']);
+    }
+
+    // Permission
+
+    public function indexPermisson()
+    {
+        $data['title'] = 'Permisson';
+        $data['permissionList'] = Permission::get();
+
+        return view('system.permission-main', $data);
+    }
+
+    public function postPermisson(Request $request)
+    {
+        try {
+            $permission = Permission::create($request->all());
+
+            return redirect()->back()->with('status', ['type'=>'success', 'message'=>'OK']);
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('status', ['type'=>'error', 'message'=>$th->getMessage()]);
+        }
+    }
+
+    public function assignPermission($id)
+    {
+        $data['users'] = User::find($id);
+        $data['title'] = 'Assing Permission for ' . $data['users']->name;
+        $data['permission'] = Permission::get();
+
+        return view('system.user.assignPermission', $data);
+    }
+
+    public function assignPermissionPost($id, Request $request)
+    {
+        $user = User::findOrFail($id);
+
+        // Sinkronisasi permission berdasarkan ID atau nama
+        $user->syncPermissions($request->permissions);
+
+        // Redirect atau response JSON
+        return redirect()->back()->with('status', ['type'=>'success', 'message'=>'Permissions updated successfully!']);
     }
 
 }

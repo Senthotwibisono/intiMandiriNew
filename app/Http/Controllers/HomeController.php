@@ -16,6 +16,9 @@ use App\Models\PlacementManifest as PM;
 use App\Models\RackTier as RT;
 use App\Models\KapasitasGudang as KG;
 
+use App\Models\InvoiceHeader as Header;
+use App\Models\FCL\InvoiceHeader as HeaderFCL;
+
 
 class HomeController extends Controller
 {
@@ -81,5 +84,27 @@ class HomeController extends Controller
         // dd($data['tonase'], $data['volume']);
 
         return view('home', $data);
+    }
+
+    public function indexInvoiceLCL()
+    {
+        $data['title'] = 'Dashboard';
+
+        $data['lunas'] = Header::where('status', 'Y')->sum('grand_total');
+        $data['piutang'] = Header::where('status', 'P')->sum('grand_total');
+        $data['cancel'] = Header::where('status', 'C')->sum('grand_total');
+
+        return view('dashboard.invoiceLCL', $data);
+    }
+
+    public function indexInvoiceLFCL()
+    {
+        $data['title'] = 'Dashboard';
+
+        $data['lunas'] = HeaderFCL::where('status', 'Y')->sum('grand_total');
+        $data['piutang'] = HeaderFCL::where('status', 'P')->sum('grand_total');
+        $data['cancel'] = HeaderFCL::where('status', 'C')->sum('grand_total');
+
+        return view('dashboard.invoiceFCL', $data);
     }
 }

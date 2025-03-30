@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
  //  Api
  use App\Http\Controllers\ApiController;
  use App\Http\Controllers\Api\CFSController;
+ use App\Http\Controllers\Api\TrackingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,3 +36,8 @@ Route::controller(CFSController::class)->group(function(){
         Route::post('/gatePass', 'gatePass');
     });
 }); 
+
+Route::controller(TrackingController::class)->prefix('/tracking')->group(function() {
+    Route::post('/searchCargo', 'searchCargo');
+    Route::post('/searchContainer', 'searchContainer');
+});

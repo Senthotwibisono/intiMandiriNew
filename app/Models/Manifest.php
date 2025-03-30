@@ -176,6 +176,7 @@ class Manifest extends Model
         'id_consignee',
         'consignee',
         'npwp_consignee',
+        'jenis_spjm',
         'no_spjm',
         'tgl_spjm',
         'no_sppb',

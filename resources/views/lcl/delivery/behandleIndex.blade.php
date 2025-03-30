@@ -124,21 +124,30 @@
                     </div>
                     <div class="col-sm-6">
                         <div class="row">
-                            <div class="col-5">
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="">Jenis SPJM</label>
+                                    <select name="jenis_spjm" id="jenis_spjm" class="js-example-basic-single select2 form-select" style="width: 100%">
+                                        <option disabled selected value>Pilih Satu</option>
+                                        <option value="spjm">SPJM</option>
+                                        <option value="karantina">Karantina</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-4">
                                 <div class="form-group">
                                     <label for="">No SPJM</label>
                                     <input type="text" name="no_spjm" id="no_spjm_edit" class="form-control">
                                 </div>
                             </div>
-                            <div class="col-5">
+                            <div class="col-4">
                                 <div class="form-group">
                                     <label for="">Tgl SPJM </label>
-                                    <input type="date" name="tgl_spjm" id="tgl_spjm_edit" class="form-control">
+                                    <div class="input-group mb-3">
+                                        <input type="date" name="tgl_spjm" id="tgl_spjm_edit" class="form-control">
+                                        <button class="btn btn-outline-info CheckSPJMDok" type="button">Check</button>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-2">
-                                <br>
-                                <button class="btn btn-outline-info CheckSPJMDok" type="button">Check</button>
                             </div>
                         </div>
                         <div class="row">
@@ -273,6 +282,7 @@ $(document).ready(function() {
         $("#nohbl_edit").val(response.data.nohbl);
         $("#notally_edit").val(response.data.notally);
         $("#quantity_edit").val(response.data.quantity);
+        $("#jenis_spjm").val(response.data.jenis_spjm).trigger('change');
         $("#no_spjm_edit").val(response.data.no_spjm);
         $("#tgl_spjm_edit").val(response.data.tgl_spjm);
         $("#tglbehandle_edit").val(response.data.tglbehandle);
@@ -291,6 +301,7 @@ $(document).ready(function() {
 $(document).on('click', '.CheckSPJMDok', function() {
     var data = {
           'id' : $('#id_edit').val(),
+          'jenis_spjm' : $('#jenis_spjm').val(),
           'no_spjm' : $('#no_spjm_edit').val(),
           'tgl_spjm' : $('#tgl_spjm_edit').val(),
         }

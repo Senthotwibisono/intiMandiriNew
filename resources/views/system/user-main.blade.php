@@ -22,6 +22,7 @@
                         <td>
                             <button class="btn btn-warning formEdit" data-id="{{ $user->id }}" id="formEdit"><i class="fa fa-pen"></i></button>
                             <button class="btn btn-danger" data-id="{{ $user->id }}" id="deleteUser-{{ $user->id }}"><i class="fa fa-trash"></i></button>
+                            <a href="/user/permission-index/{{$user->id}}" class="btn btn-primary">Assign Permission</a>
                         </td>
                     </tr>
                     @endforeach

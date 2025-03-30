@@ -172,14 +172,12 @@ class DeliveryController extends Controller
 
     public function spjmBehandle(Request $request)
     {
-        $tgl = Carbon::parse($request->tgl_spjm)->format('d/m/Y');
-        // var_dump($tgl);
-        // die;
-        $spjm = SPJM::where('no_spjm', $request->no_spjm)->where('tgl_pib', $tgl)->first();
-        if ($spjm) {
+        $jenis = $request->jenis_spjm;
+        if ($jenis == 'karantina') {
             $manifest = Manifest::where('id', $request->id)->first();
             if ($manifest) {
                 $manifest->update([
+                    'jenis_spjm' => $request->jenis_spjm,
                     'no_spjm' => $request->no_spjm,
                     'tgl_spjm' => $request->tgl_spjm,
                 ]);
@@ -193,10 +191,37 @@ class DeliveryController extends Controller
                     'message' => 'Oopss, Something Wrong',
                 ]);
             }
+        }elseif ($jenis == 'spjm') {
+            $tgl = Carbon::parse($request->tgl_spjm)->format('d/m/Y');
+            $spjm = SPJM::where('no_spjm', $request->no_spjm)->where('tgl_pib', $tgl)->first();
+            if ($spjm) {
+                $manifest = Manifest::where('id', $request->id)->first();
+                if ($manifest) {
+                    $manifest->update([
+                        'jenis_spjm' => $request->jenis_spjm,
+                        'no_spjm' => $request->no_spjm,
+                        'tgl_spjm' => $request->tgl_spjm,
+                    ]);
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Data ditemukan',
+                    ]);
+                }else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Oopss, Something Wrong',
+                    ]);
+                }
+            }else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data Tidak ditemukan !!',
+                ]);
+            }
         }else {
             return response()->json([
                 'success' => false,
-                'message' => 'Data Tidak ditemukan !!',
+                'message' => 'Jenis harus di isi !!',
             ]);
         }
     }

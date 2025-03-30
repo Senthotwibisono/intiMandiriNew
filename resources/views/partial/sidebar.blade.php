@@ -1,8 +1,8 @@
 <ul class="menu">
     <li class="sidebar-title">Menu</li>
-    @if(Auth::check() && Auth::user()->hasRole('admin'))
-    <li class="sidebar-item @if(Request::is('home') || Request::is('/home')) active @endif">
-        <a href="/home" class='sidebar-link'>
+    @if(Auth::check() && Auth::user()->hasRole(['admin', 'adminLCL', 'adminFCL', 'tpsFCL', 'tpsLCL']))
+    <li class="sidebar-item @if(Request::is('home') || Request::is('/')) active @endif">
+        <a href="/" class='sidebar-link'>
             <i class="bi bi-grid-fill"></i>
             <span>Dashboard</span>
         </a>
@@ -41,6 +41,7 @@
             </li>
         </ul>
     </li>
+    @endif
 
     <li class="sidebar-item has-sub @if(Request::is('pengiriman/*')) active @endif">
         <a href="#" class="sidebar-link">
@@ -48,6 +49,7 @@
             <span>Pengiriman</span>
         </a>
         <ul class="submenu @if(Request::is('pengiriman/*')) active @endif">
+            @if(Auth::check() && Auth::user()->hasRole(['admin', 'adminLCL', 'tpsLCL']))
             <li class="sidebar-item has-sub @if(Request::is('pengiriman/coari-lcl/*') || Request::is('pengiriman/codeco-lcl/*')) active @endif">
                 <a href="#" class="sidebar-link">
                     <span>LCL</span>
@@ -81,6 +83,8 @@
                     </li>
                 </ul>
             </li>
+            @endif
+            @if(Auth::check() && Auth::user()->hasRole(['admin', 'adminFCL', 'tpsFCL']))
             <!-- FCL -->
             <li class="sidebar-item has-sub @if(Request::is('pengiriman/coari-fcl/*') || Request::is('pengiriman/codeco-fcl/*')) active @endif">
                 <a href="#" class="sidebar-link">
@@ -109,10 +113,11 @@
                     </li>
                 </ul>
             </li>
+            @endif
         </ul>
     </li>
 
-
+    @if(Auth::check() && Auth::user()->hasRole(['admin', 'adminLCL', 'tpsLCL', 'invoiceLCL']))
     <!-- LCL -->
     <li class="sidebar-item has-sub @if(Request::is('lcl/*')) active @endif">
         <a href="#" class='sidebar-link'>
@@ -200,7 +205,9 @@
             </li>
         </ul>
     </li>
+    @endif
 
+    @if(Auth::check() && Auth::user()->hasRole(['admin', 'adminFCL', 'tpsFCL', 'invoiceFCL']))
     <!-- FCL -->
     <li class="sidebar-item has-sub @if(Request::is('fcl/*')) active @endif">
         <a href="#" class='sidebar-link'>
@@ -263,6 +270,7 @@
             </li>
         </ul>
     </li>
+    @endif
 
     <!-- Photo -->
     <li class="sidebar-item has-sub @if(Request::is('photo/*')) active @endif">
@@ -293,6 +301,7 @@
         </ul>
     </li>
 
+    @if(Auth::check() && Auth::user()->hasRole(['admin', 'adminLCL', 'adminFCL']))
     <!-- Master -->
     <li class="sidebar-item  has-sub @if(Request::is('master/*')) active @endif">
         <a href="#" class='sidebar-link'>
@@ -351,7 +360,9 @@
            
         </ul>
     </li>  
-    
+    @endif
+
+    @if(Auth::check() && Auth::user()->hasRole(['admin', 'adminFCL', 'adminLCL']))
     <!-- System -->
     <li class="sidebar-item has-sub @if(Request::is('user/*') || Request::is('role/*')) active @endif">
         <a href="#" class='sidebar-link'>
@@ -368,6 +379,10 @@
         </ul>
     </li>
     <hr>
+    @endif
+
+
+    @if(Auth::check() && Auth::user()->hasRole(['admin', 'adminLCL', 'invoiceLCL']))
     <!-- Invoice LCL -->
     <li class="sidebar-item has-sub @if(Request::is('invoice/*')) active @endif">
         <a href="#" class='sidebar-link'>
@@ -433,6 +448,8 @@
             </li>
         </ul>
     </li>
+    @endif
+    @if(Auth::check() && Auth::user()->hasRole(['admin', 'adminFCL', 'invoiceFCL']))
     <!-- Invoice FCL -->
     <li class="sidebar-item has-sub @if(Request::is('invoiceFCL/*')) active @endif">
         <a href="#" class='sidebar-link'>
@@ -497,65 +514,8 @@
             </li>
         </ul>
     </li>
-    @elseif(Auth::check() && Auth::user()->hasRole('invoice'))
-    <li class="sidebar-item @if(Request::is('dashboard-invoice') || Request::is('/dashboard-invoice')) active @endif">
-        <a href="/dashboard-invoice" class='sidebar-link'>
-            <i class="bi bi-grid-fill"></i>
-            <span>Dashboard</span>
-        </a>
-    </li>
-
-    <li class="sidebar-item has-sub @if(Request::is('invoice/master/*')) active @endif">
-        <a href="#" class='sidebar-link'>
-            <span>Master</span>
-        </a>
-        <ul class="submenu @if(Request::is('invoice/master/*')) active @endif">
-            <li class="submenu-item @if(Request::is('invoice/master/tarif')) active @endif">
-                <a href="{{ url('/invoice/master/tarif')}}">Tarif</a>
-            </li>
-        </ul>
-    </li>
-    <li class="sidebar-item has-sub @if(Request::is('invoice/form/*') && !Request::is('invoice/form/perpanjangan/*')) active @endif">
-        <a href="#" class='sidebar-link'>
-            <span>Form Invoice</span>
-        </a>
-        <ul class="submenu @if(Request::is('invoice/form/*') && !Request::is('invoice/form/perpanjangan/*')) active @endif">
-            <li class="submenu-item @if(Request::is('invoice/form/index')) active @endif">
-                <a href="{{ url('/invoice/form/index')}}">Created Invoice</a>
-            </li>
-            <li class="submenu-item @if(Request::is('invoice/form/unpaid')) active @endif">
-                <a href="{{ url('/invoice/form/unpaid')}}">Unpaid Invoice</a>
-            </li>
-            <li class="submenu-item @if(Request::is('invoice/form/paid')) active @endif">
-                <a href="{{ url('/invoice/form/paid')}}">Paid Invoice</a>
-            </li>
-        </ul>
-    </li>
-    <!-- Perpanjangan -->
-    <li class="sidebar-item has-sub @if(Request::is('invoice/form/perpanjangan/*')) active @endif">
-        <a href="#" class='sidebar-link'>
-            <span>Form Invoice Perpanjangan</span>
-        </a>
-        <ul class="submenu @if(Request::is('invoice/form/perpanjangan/*')) active @endif">
-            <li class="submenu-item @if(Request::is('invoice/form/perpanjangan/index')) active @endif">
-                <a href="{{ url('/invoice/form/perpanjangan/index')}}">Created Invoice Perpanjangan</a>
-            </li>
-            <li class="submenu-item @if(Request::is('invoice/form/perpanjangan/unpaid')) active @endif">
-                <a href="{{ url('/invoice/form/perpanjangan/unpaid')}}">Unpaid Invoice Perpanjangan</a>
-            </li>
-            <li class="submenu-item @if(Request::is('invoice/form/perpanjangan/paid')) active @endif">
-                <a href="{{ url('/invoice/form/perpanjangan/paid')}}">Paid Invoice Perpanjangan</a>
-            </li>
-        </ul>
-    </li>
-    
-    <li class="sidebar-item @if(Request::is('invoice/report')) active @endif">
-        <a href="{{ url('/invoice/report')}}" class='sidebar-link'>
-            <i class="bi bi-grid-fill"></i>
-            <span>Report Invoice</span>
-        </a>
-    </li>
-    @elseif(Auth::check() && Auth::user()->hasRole('bcP2'))
+    @endif
+    @if(Auth::check() && Auth::user()->hasRole('bcP2'))
     <li class="sidebar-item @if(Request::is('bc-p2/dashboard') || Request::is('/bc-p2/dashboard')) active @endif">
         <a href="/bc-p2/dashboard" class='sidebar-link'>
             <i class="bi bi-grid-fill"></i>
@@ -624,7 +584,8 @@
             </li>
         </ul>
     </li>
-    @else
+    @endif
+    @if(Auth::check() && Auth::user()->hasRole('bc'))
     <li class="sidebar-item @if(Request::is('bc/dashboard') || Request::is('/home')) active @endif">
         <a href="/bc/dashboard" class='sidebar-link'>
             <i class="bi bi-grid-fill"></i>
