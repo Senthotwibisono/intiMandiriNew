@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use App\Models\Manifest;
 use App\Models\Item;
 use App\Models\Container;
+use App\Models\ContainerFCL;
 use App\Models\YardDesign as YD;
 use App\Models\YardDetil as RowTier;
 use App\Models\PlacementManifest as PM;
@@ -106,5 +107,17 @@ class HomeController extends Controller
         $data['cancel'] = HeaderFCL::where('status', 'C')->sum('grand_total');
 
         return view('dashboard.invoiceFCL', $data);
+    }
+
+
+    public function indexFCL()
+    {
+        $data['title'] = 'Dashboard';
+
+        $data['belumMasuk'] = ContainerFCL::whereNull('tglmasuk')->count();
+        $data['storage'] = ContainerFCL::whereNotNull('tglmasuk')->whereNull('tglkeluar')->count();
+        $data['exdepo'] = ContainerFCL::whereNotNull('tglkeluar')->count();
+
+        return view('dashboard.indexFCL', $data);
     }
 }

@@ -70,6 +70,61 @@ class TrackingController extends Controller
                 'errors'  => $validator->errors(),
             ]);
         }
+
+        // var_dump($request->all());
+        // die;
+        $manifest = Manifest::with(['job.sandar', 'cont', 'customer', 'dokumen', 'packing'])->where('nohbl', $request->no_hbl_awb)->where('tgl_hbl', $request->tgl_hbl_awb)->first();
+        try {
+            if ($manifest) {
+                $photoContainers = $photos = Photo::whereIn('type', ['lcl', 'LCL'])
+                ->where('master_id', $manifest->container_id)
+                ->get()
+                ->map(function ($photo) {
+                    return [
+                        'id' => $photo->id,
+                        'type' => $photo->type,
+                        'action' => $photo->action,
+                        'detil' => $photo->detil,
+                        'url' => asset("storage/imagesInt/{$photo->photo}") // Pastikan ada symlink ke storage
+                    ];
+                }); 
+
+                // dd($photoContainers);
+    
+                $photoManifestes = $photos = Photo::whereIn('type', ['manifest', 'Manifest'])
+                ->where('master_id', $manifest->id)
+                ->get()
+                ->map(function ($photo) {
+                    return [
+                        'id' => $photo->id,
+                        'type' => $photo->type,
+                        'action' => $photo->action,
+                        'detil' => $photo->detil,
+                        'url' => asset("storage/imagesInt/{$photo->photo}") // Pastikan ada symlink ke storage
+                    ];
+                }); 
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Data ditemukan',
+                    'data' =>[
+                        'manifest' => $manifest,
+                        'photoContainers' => $photoContainers,
+                        'photoManifestes' => $photoManifestes,
+                    ],
+                ]);
+            }else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data tidak ditemukan',
+                ]);
+            }
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Opss something wrong: ' . $th->getMessage(),
+            ]);
+        }
     }
 
     public function searchContainer(Request $request)

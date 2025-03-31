@@ -43,6 +43,11 @@ class RedirectIfAuthenticated
                     return redirect()->route('dashboard.invoiceFCL');
                 }
 
+                if ($user->hasRole(['adminFCL', 'tpsFCL'])) {
+                    return redirect()->route('dashboard.fcl');
+                }
+                
+
                 // Arahkan ke halaman home default jika pengguna tidak memiliki peran 'bc'
                 return redirect(RouteServiceProvider::HOME);
             }

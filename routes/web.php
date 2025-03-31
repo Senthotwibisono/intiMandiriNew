@@ -99,7 +99,8 @@ Route::post('/unset-session/{key}', 'SessionController@unsetSession')->name('uns
 Auth::routes();
 
 Route::middleware(['auth', 'RedirectIfAuthenticated'])->get('/', [App\Http\Controllers\HomeController::class, 'index']);
-Route::middleware(['auth', 'role:admin|adminLCL|tpsFCL'])->get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::middleware(['auth', 'role:admin|adminLCL|tpsLCL'])->get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::middleware(['auth', 'role:admin|adminFCL|tpsFCL'])->get('/dashboard-fcl', [App\Http\Controllers\HomeController::class, 'indexFCL'])->name('dashboard.fcl');
 Route::middleware(['auth', 'role:admin|adminLCL|invoiceLCL'])->get('/dashboard-invoiceLCL', [App\Http\Controllers\HomeController::class, 'indexInvoiceLCL'])->name('dashboard.invoiceLCL');
 Route::middleware(['auth', 'role:admin|adminFCL|invoiceFCL'])->get('/dashboard-invoiceFCL', [App\Http\Controllers\HomeController::class, 'indexInvoiceLFCL'])->name('dashboard.invoiceFCL');
 Route::get('/testJson', [TestJsonController::class, 'test']);
