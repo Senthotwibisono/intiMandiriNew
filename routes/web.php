@@ -776,7 +776,7 @@ Route::controller(AndroidGateController::class)->group(function(){
         });
 
         Route::prefix('/delivery')->controller(DeliveryFCLController::class)->group(function(){
-            Route::middleware('permission:behandleFCL|gateOutFCL')->group(function(){
+            Route::middleware(['permission:behandleFCL', 'permission:gateOutFCL'])->group(function(){
                 Route::get('/behandle', 'indexBehandle');
                 Route::get('/behandle-data', 'behandleData')->name('fcl.behandle.dataTable');
                 Route::get('/dataCont/{id}', 'getDataCont');
@@ -909,7 +909,7 @@ Route::controller(AndroidGateController::class)->group(function(){
 
         Route::prefix('/behandle')->group(function(){
             Route::controller(InvoiceBehandleFCLController::class)->group(function(){
-                Route::middleware('permission:invoiceFCL|formInvoiceFCL')->group(function(){
+                Route::middleware(['permission:invoiceFCL', 'permission:formInvoiceFCL'])->group(function(){
 
                     Route::get('/form-index', 'formIndex')->name('invoiceFCL.behandle.formIndex');
                     Route::get('/form-data', 'formData')->name('invoiceFCL.behandle.formData');
