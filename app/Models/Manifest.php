@@ -387,9 +387,9 @@ class Manifest extends Model
     public function lamaTimbun()
     {
         $tglStripping = Carbon::parse($this->tglstripping);
-        $tglBuangMty = $this->tglbuangmty ? Carbon::parse($this->tglbuangmty) : Carbon::now();
+        $tglrelease = $this->tglrelease ? Carbon::parse($this->tglrelease) : Carbon::now();
 
-        return $tglBuangMty->diffInDays($tglStripping);
+        return $tglrelease->diffInDays($tglStripping);
     }
 
     public function uidSegel()

@@ -127,8 +127,12 @@ class ManifestController extends Controller
             return '<a href="javascript:void(0)" onclick="openWindow(\''. $herfBarcode . $manifest->id .'\')" class="btn btn-sm btn-danger"><i class="fa fa-print"></i></a>';
         })
         ->addColumn('bonMuat', function($manifest){
-            $herfBarcode = '/lcl/manifest/bonMuat/';
-            return '<a href="javascript:void(0)" onclick="openWindow(\''. $herfBarcode . $manifest->id .'\')" class="btn btn-sm btn-danger"><i class="fa fa-print"></i></a>';
+            if ($manifest->no_dok != null) {
+                $herfBarcode = '/lcl/manifest/bonMuat/';
+                return '<a href="javascript:void(0)" onclick="openWindow(\''. $herfBarcode . $manifest->id .'\')" class="btn btn-sm btn-danger"><i class="fa fa-print"></i></a>';
+            }else {
+                return 'Manifest Belum Online';
+            }
         })
         ->addColumn('nohbl', function($manifest){
             return $manifest->nohbl ?? '-';
