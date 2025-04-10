@@ -479,7 +479,7 @@ class DeliveryController extends Controller
                     if ($dok->npwp_imp != $manifest->customer->npwp) {
                         return response()->json([
                             'success' => false,
-                            'message' => 'Nama Importir Berbeda',
+                            'message' => 'NPWP Importir Berbeda',
                         ]);
                     }
                     if ($manifest->qty == $manifest->final_qty) {
