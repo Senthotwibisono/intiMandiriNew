@@ -477,7 +477,7 @@ class DokumenController extends Controller
         SoapWrapper::override(function ($service) {
             $service
                 ->name('ReceiveSPJM_onDemand')
-                ->wsdl('https://ipccfscenter.com/TPSServices/server_plp_dev.php?wsdl')
+                ->wsdl('https://pelindo-cfscenter.com/TPSServices/server_plp.php?wsdl')
                 ->trace(true)                                                                                                                                         
                 ->options([
                     'stream_context' => stream_context_create([
@@ -634,7 +634,7 @@ class DokumenController extends Controller
         SoapWrapper::override(function ($service) {
             $service
                 ->name('ReceiveSPJM')
-                ->wsdl('https://ipccfscenter.com/TPSServices/server_plp_dev.php?wsdl')
+                ->wsdl('https://pelindo-cfscenter.com/TPSServices/server_plp.php?wsdl')
                 ->trace(true)                                                                                                                                         
                 ->options([
                     'stream_context' => stream_context_create([
@@ -885,7 +885,7 @@ class DokumenController extends Controller
         \SoapWrapper::override(function ($service) {
             $service
                 ->name('ReceiveBC23Permit_FASP')
-                ->wsdl('https://ipccfscenter.com/TPSServices/server_plp_dev.php?wsdl')
+                ->wsdl('https://pelindo-cfscenter.com/TPSServices/server_plp.php?wsdl')
                 ->trace(true)                                                                                                                                         
                 ->options([
                     'stream_context' => stream_context_create([
@@ -1127,7 +1127,7 @@ class DokumenController extends Controller
         SoapWrapper::override(function ($service) {
             $service
                 ->name('ReceiveImporPermit_FASP')
-                ->wsdl('https://ipccfscenter.com/TPSServices/server_plp_dev.php?wsdl')
+                ->wsdl('https://pelindo-cfscenter.com/TPSServices/server_plp.php?wsdl')
                 ->trace(true)                                                                                                                                         
                 ->options([
                     'stream_context' => stream_context_create([
@@ -1472,7 +1472,7 @@ class DokumenController extends Controller
         \SoapWrapper::override(function ($service) {
             $service
                 ->name('ReceiveImporPermit_FASP')
-                ->wsdl('https://ipccfscenter.com/TPSServices/server_plp_dev.php?wsdl')
+                ->wsdl('https://pelindo-cfscenter.com/TPSServices/server_plp.php?wsdl')
                 ->trace(true)                                                                                                                                         
                 ->options([
                     'stream_context' => stream_context_create([
@@ -1702,7 +1702,7 @@ class DokumenController extends Controller
         \SoapWrapper::override(function ($service) {
             $service
                 ->name('ReceiveImporPermit_FASP')
-                ->wsdl('https://ipccfscenter.com/TPSServices/server_plp_dev.php?wsdl')
+                ->wsdl('https://pelindo-cfscenter.com/TPSServices/server_plp.php?wsdl')
                 ->trace(true)                                                                                                                                         
                 ->options([
                     'stream_context' => stream_context_create([
@@ -2313,7 +2313,7 @@ class DokumenController extends Controller
         \SoapWrapper::override(function ($service) {
             $service
                 ->name('ReceiveImporPermit_Manual')
-                ->wsdl('https://ipccfscenter.com/TPSServices/server_plp_dev.php?wsdl')
+                ->wsdl('https://pelindo-cfscenter.com/TPSServices/server_plp.php?wsdl')
                 ->trace(true)                                                                                                                                         
                 ->options([
                     'stream_context' => stream_context_create([
@@ -2523,7 +2523,7 @@ class DokumenController extends Controller
         //  \SoapWrapper::override(function ($service) {
         //     $service
         //         ->name('ReceiveImporPermit_Manual')
-        //         ->wsdl('https://ipccfscenter.com/TPSServices/server_plp_dev.php?wsdl')
+        //         ->wsdl('https://pelindo-cfscenter.com/TPSServices/server_plp.php?wsdl')
         //         ->trace(true)                                                                                                                                         
         //         ->options([
         //             'stream_context' => stream_context_create([
@@ -2803,7 +2803,7 @@ class DokumenController extends Controller
         \SoapWrapper::override(function ($service) {
             $service
                 ->name('ReceiveImporPermit_Manual')
-                ->wsdl('https://ipccfscenter.com/TPSServices/server_plp_dev.php?wsdl')
+                ->wsdl('https://pelindo-cfscenter.com/TPSServices/server_plp.php?wsdl')
                 ->trace(true)                                                                                                                                         
                 ->options([
                     'stream_context' => stream_context_create([

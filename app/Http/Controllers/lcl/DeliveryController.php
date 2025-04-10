@@ -476,13 +476,8 @@ class DeliveryController extends Controller
                             'message' => 'Nama Importir Berbeda',
                         ]);
                     }
-                    if ($dok->npwp_imp != $manifest->customer->npwp) {
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'NPWP Importir Berbeda',
-                        ]);
-                    }
-                    if ($manifest->qty == $manifest->final_qty) {
+                   
+                    if ($manifest->quantity == $manifest->final_qty) {
                         $statusBC = "release";
                     }else {
                         $statusBC = "HOLD";
