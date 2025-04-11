@@ -144,19 +144,25 @@
                         <div class="row">
                             <div class="divider divider-left">
                                 <div class="divider-text">
-                                    Tarif Refeer
+                                    Tarif Refeer & Surcharge
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-4">
                                 <div class="form-group">
                                     <label for="">Refeer</label>
                                     <input type="number" name="refeer" class="form-control" step="0.001" min="0" max="9999999999.999">
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-4">
                                 <div class="form-group">
                                     <label for="">Monitoring</label>
                                     <input type="number" name="monitoring" class="form-control" step="0.001" min="0" max="9999999999.999">
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="">Shurcharge</label>
+                                    <input type="number" name="surcharge" class="form-control" step="0.001" min="0" max="9999999999.999">
                                 </div>
                             </div>
                         </div>
@@ -318,16 +324,22 @@
                                     Tarif Refeer
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-4">
                                 <div class="form-group">
                                     <label for="">Refeer</label>
                                     <input type="number" name="refeer" id="refeer_edit" class="form-control" step="0.001" min="0" max="9999999999.999">
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-4">
                                 <div class="form-group">
                                     <label for="">Monitoring</label>
                                     <input type="number" name="monitoring" id="monitoring_edit" class="form-control" step="0.001" min="0" max="9999999999.999">
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="">Surcharge</label>
+                                    <input type="number" name="surcharge" id="surcharge_edit" class="form-control" step="0.001" min="0" max="9999999999.999">
                                 </div>
                             </div>
                         </div>
@@ -517,16 +529,22 @@
                                     Tarif Refeer
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-4">
                                 <div class="form-group">
                                     <label for="">Refeer</label>
                                     <input type="number" name="refeer" class="form-control" step="0.001" min="0" max="9999999999.999">
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-4">
                                 <div class="form-group">
                                     <label for="">Monitoring</label>
                                     <input type="number" name="monitoring" class="form-control" step="0.001" min="0" max="9999999999.999">
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="">Surcharge</label>
+                                    <input type="number" name="surcharge" class="form-control" step="0.001" min="0" max="9999999999.999">
                                 </div>
                             </div>
                         </div>
@@ -670,16 +688,22 @@
                                     Tarif Refeer
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-4">
                                 <div class="form-group">
                                     <label for="">Refeer</label>
                                     <input type="number" name="refeer" id="refeer_edit" class="form-control" step="0.001" min="0" max="9999999999.999">
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-4">
                                 <div class="form-group">
                                     <label for="">Monitoring</label>
                                     <input type="number" name="monitoring" id="monitoring_edit" class="form-control" step="0.001" min="0" max="9999999999.999">
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="">Surcharge</label>
+                                    <input type="number" name="surcharge" id="surcharge_edit" class="form-control" step="0.001" min="0" max="9999999999.999">
                                 </div>
                             </div>
                         </div>
@@ -874,7 +898,7 @@
                 {data:'pelayanan_tambahan', name:'pelayanan_tambahan', className:'nowrap', render: formatRupiah},
                 {data:'refeer', name:'refeer', className:'nowrap', render: formatRupiah},
                 {data:'monitoring', name:'monitoring', className:'nowrap', render: formatRupiah},
-                {data:'surcharge', name:'surcharge', className:'nowrap', render: formatRupiah},
+                {data:'surcharge', name:'surcharge', className:'nowrap', render: formatPersen},
                 {data:'admin', name:'admin', className:'nowrap', render: formatRupiah},
                 {data:'uid', name:'uid'},
                 {data:'created_at', name:'created_at'},
@@ -943,6 +967,7 @@
                 $('#massa2_edit').val(response.data.massa2);
                 $('#massa3_edit').val(response.data.massa3);
                 $('#refeer_edit').val(response.data.refeer);
+                $('#surcharge_edit').val(response.data.surcharge);
                 $('#monitoring_edit').val(response.data.monitoring);
                 $('#lift_on_edit').val(response.data.lift_on);
                 $('#hyro_scan_edit').val(response.data.hyro_scan);
@@ -985,7 +1010,7 @@
                 {data:'gate_pass', name:'gate_pass', className:'nowrap', render: formatRupiah},
                 {data:'refeer', name:'refeer', className:'nowrap', render: formatRupiah},
                 {data:'monitoring', name:'monitoring', className:'nowrap', render: formatRupiah},
-                {data:'surcharge', name:'surcharge', className:'nowrap', render: formatRupiah},
+                {data:'surcharge', name:'surcharge', className:'nowrap', render: formatPersen},
                 {data:'admin', name:'admin', className:'nowrap', render: formatRupiah},
                 {data:'admin_behandle', name:'admin_behandle', className:'nowrap', render: formatRupiah},
                 {data:'user.name', name:'user.name'},
@@ -1021,6 +1046,7 @@
                 $('#editCustWMS #tarif_dasar_massa_edit').val(response.data.tarif_dasar_massa);
                 $('#editCustWMS #massa_edit').val(response.data.massa);
                 $('#editCustWMS #refeer_edit').val(response.data.refeer);
+                $('#editCustWMS #surcharge_edit').val(response.data.surcharge);
                 $('#editCustWMS #monitoring_edit').val(response.data.monitoring);
                 $('#editCustWMS #paket_plp_edit').val(response.data.paket_plp);
                 $('#editCustWMS #behandle_edit').val(response.data.behandle);
