@@ -44,7 +44,6 @@ class TrackingController extends Controller
 
         $rules = [
             'no_hbl_awb'      => 'required',
-            'tgl_hbl_awb'      => 'required',
             'nocontainer'        => 'required',
         ];
         
@@ -55,7 +54,6 @@ class TrackingController extends Controller
         
         $messages = [
             'no_hbl_awb.required'      => 'Nomor BL/AWB wajib diisi.',
-            'tgl_hbl_awb.required'      => 'Tanggal BL/AWB wajib diisi.',
             'nocontainer.required'        => 'Nomor kontainer wajib diisi.',
         ];
         
@@ -73,7 +71,7 @@ class TrackingController extends Controller
 
         // var_dump($request->all());
         // die;
-        $manifest = Manifest::with(['job.sandar', 'cont', 'customer', 'dokumen', 'packing'])->where('nohbl', $request->no_hbl_awb)->where('tgl_hbl', $request->tgl_hbl_awb)->first();
+        $manifest = Manifest::with(['job.sandar', 'cont', 'customer', 'dokumen', 'packing'])->where('nohbl', $request->no_hbl_awb)->first();
         try {
             if ($manifest) {
                 $photoContainers = $photos = Photo::whereIn('type', ['lcl', 'LCL'])

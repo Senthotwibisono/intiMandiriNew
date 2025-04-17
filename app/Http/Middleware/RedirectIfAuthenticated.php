@@ -28,6 +28,10 @@ class RedirectIfAuthenticated
                     return redirect()->route('bc.dashboard');
                 }
 
+                if ($user->hasRole('bcP2')) {
+                    return redirect()->route('bcP2.dashboard');
+                }
+
                 if ($user->hasRole('android')) {
                     return redirect()->route('android.dashboard');
                 }

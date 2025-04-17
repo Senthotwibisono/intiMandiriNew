@@ -120,6 +120,7 @@
                                 <th>Ukuran Asli</th>
                                 <th>Tanggal Masuk</th>
                                 <th>Tanggal Keluar</th>
+                                <th>Lama Hari</th>
                             </tr>
                         </thead>
                     </table>
@@ -180,7 +181,8 @@
                         { data: 'ukuranDok', name: 'ukuranDok' },
                         { data: 'sizeCont', name: 'sizeCont' },
                         { data: 'tglMasuk', name: 'tglMasuk' },
-                        { data: 'tglKeluar', name: 'tglKeluar' }
+                        { data: 'tglKeluar', name: 'tglKeluar' },
+                        { data: 'lamaHari', name: 'lamaHari' }
                     ]
                 });
                    

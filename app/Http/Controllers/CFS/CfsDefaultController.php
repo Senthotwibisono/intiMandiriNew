@@ -361,9 +361,9 @@ class CfsDefaultController extends Controller
                 'tgl_segel_bc' => null,
                 'no_ijin_tps' => null,
                 'tgl_ijin_tps' => null,
-                'nama_consolidator' => 'PT INTI MANDIRI UTAMA TRANS',
-                'npwp_consolidator' => '0022383483042000',
-                'alamat_consolidator' => 'Jl. Bugis Raya No. 15 Kebon Bawang Tanjung Priok',
+                'nama_consolidator' => 'PT. LOGISTIK KARYA BERMITRA',
+                'npwp_consolidator' => '0924302722427000',
+                'alamat_consolidator' => 'JL. BINTARA 9 NO. 158 RT. 001 RW. 005 BINTARA BEKASI BARAT KOTA BEKASI JAWA BARAT 97134',
             ];
 
 
@@ -526,9 +526,9 @@ class CfsDefaultController extends Controller
                 'tgl_segel_bc' => null,
                 'no_ijin_tps' => null,
                 'tgl_ijin_tps' => null,
-                'nama_consolidator' => 'PT INTI MANDIRI UTAMA TRANS',
-                'npwp_consolidator' => '0022383483042000',
-                'alamat_consolidator' => 'Jl. Bugis Raya No. 15 Kebon Bawang Tanjung Priok',
+                'nama_consolidator' => 'PT. LOGISTIK KARYA BERMITRA',
+                'npwp_consolidator' => '0924302722427000',
+                'alamat_consolidator' => 'JL. BINTARA 9 NO. 158 RT. 001 RW. 005 BINTARA BEKASI BARAT KOTA BEKASI JAWA BARAT 97134',
             ];
 
             $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><DOCUMENT></DOCUMENT>');
@@ -677,8 +677,8 @@ class CfsDefaultController extends Controller
 
             // dd($rak);
             $tglBehandle = $manifest->tglbehandle ? Carbon::parse($manifest->tglbehandle)->format('Y-m-d') : NULL;
-            $jamBehandle = $manifest->jambehandle ? Carbon::parse($manifest->jambehandle)->format('Y-m-d') : NULL;
-            $behandleAt = $tglBehandle.$jamBehandle;
+            $jamBehandle = $manifest->jambehandle ? Carbon::parse($manifest->jambehandle)->format('H:i:s') : NULL;
+            $behandleAt = $tglBehandle.' '.$jamBehandle;
             $tglSegelMerah = $manifest->tanggal_segel_merah ? Carbon::parse($manifest->tanggal_segel_merah)->format('Y-m-d H:i:s') : NULL;
             $dataDetil = [
                 'no_bl_awb' => $manifest->nohbl,
@@ -699,9 +699,9 @@ class CfsDefaultController extends Controller
                 'tgl_behandle' => $behandleAt,
                 'fl_segel_merah' => $manifest->flag_segel_merah,
                 'tgl_segel_merah' => $tglSegelMerah,
-                'nama_consolidator' => 'PT INTI MANDIRI UTAMA TRANS',
-                'npwp_consolidator' => '0022383483042000',
-                'alamat_consolidator' => 'Jl. Bugis Raya No. 15 Kebon Bawang Tanjung Priok',
+                'nama_consolidator' => 'PT. LOGISTIK KARYA BERMITRA',
+                'npwp_consolidator' => '0924302722427000',
+                'alamat_consolidator' => 'JL. BINTARA 9 NO. 158 RT. 001 RW. 005 BINTARA BEKASI BARAT KOTA BEKASI JAWA BARAT 97134',
             ];
 
             $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="utf-8" standalone="yes"?><DOCUMENT></DOCUMENT>');
@@ -720,8 +720,9 @@ class CfsDefaultController extends Controller
                 'Password' => $this->password,
                 'fStream' => $xml->asXML()
             ];
-
-            // dd($xml);
+            // return $xml;
+            // var_dump($xml);
+            // die();
             
             \SoapWrapper::service('DetailHouseBL', function ($service) use ($xml) {    
                 // dd($service);    

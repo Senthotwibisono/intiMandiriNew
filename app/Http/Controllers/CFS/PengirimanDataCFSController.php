@@ -29,7 +29,7 @@ class PengirimanDataCFSController extends Controller
 
     public function CoariCont()
     {
-        $conts = Cont::where('id', 2)->whereNotNull('tglmasuk')->where('coari_cfs_flag', 'N')->get();
+        $conts = Cont::whereNotNull('tglmasuk')->where('coari_cfs_flag', 'N')->get();
         // $cont = Cont::find(3);
 
         \SoapWrapper::override(function ($service) {
@@ -649,8 +649,8 @@ class PengirimanDataCFSController extends Controller
 
             // dd($rak);
             $tglBehandle = $manifest->tglbehandle ? Carbon::parse($manifest->tglbehandle)->format('Y-m-d') : NULL;
-            $jamBehandle = $manifest->jambehandle ? Carbon::parse($manifest->jambehandle)->format('Y-m-d') : NULL;
-            $behandleAt = $tglBehandle.$jamBehandle;
+            $jamBehandle = $manifest->jambehandle ? Carbon::parse($manifest->jambehandle)->format('H:i:s') : NULL;
+            $behandleAt = $tglBehandle.' '.$jamBehandle;
             $tglSegelMerah = $manifest->tanggal_segel_merah ? Carbon::parse($manifest->tanggal_segel_merah)->format('Y-m-d H:i:s') : NULL;
             $dataDetil = [
                 'no_bl_awb' => $manifest->nohbl,

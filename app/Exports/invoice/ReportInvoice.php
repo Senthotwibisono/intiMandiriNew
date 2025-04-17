@@ -40,7 +40,7 @@ class ReportInvoice implements FromCollection, WithMapping, WithHeadings, Should
             $header->discount ?? 0,
             $header->ppn_amount ?? 0,
             $header->grand_total ?? 0,
-            $header->customer->name,
+            $header->customer->name ?? '-',
            
         ];
     }

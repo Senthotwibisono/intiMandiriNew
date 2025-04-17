@@ -779,12 +779,25 @@ class DokumenController extends Controller
                     $tglMasuk = 'Data Container Tidak Ditemukan';
                     $tglKeluar = 'Data Container Tidak Ditemukan';
                 }
+                $lamaHari = '';
+                try {
+                    if ($tglMasuk === 'Belum Masuk' || $tglMasuk === 'Data Container Tidak Ditemukan') {
+                        $lamaHari = 'Error: Tanggal Masuk tidak tersedia';
+                    } else {
+                        $masuk = Carbon::parse($tglMasuk);
+                        $keluar = ($tglKeluar === 'Belum Masuk' || $tglKeluar === 'Data Container Tidak Ditemukan') ? now() : Carbon::parse($tglKeluar);
+                        $lamaHari = $masuk->diffInDays($keluar) . ' hari';
+                    }
+                } catch (\Exception $e) {
+                    $lamaHari = 'Error: ' . $e->getMessage();
+                }
                 return [
                     'noCont' => $item->no_cont ?? '',
                     'ukuranDok' => $item->size ?? '',
                     'sizeCont' =>  $sizeCont,
                     'tglMasuk' =>  $tglMasuk,
                     'tglKeluar' => $tglKeluar,
+                    'lamaHari' => $lamaHari,
                 ];
             });
         
@@ -1349,12 +1362,25 @@ class DokumenController extends Controller
                     $tglMasuk = 'Data Container Tidak Ditemukan';
                     $tglKeluar = 'Data Container Tidak Ditemukan';
                 }
+                $lamaHari = '';
+                try {
+                    if ($tglMasuk === 'Belum Masuk' || $tglMasuk === 'Data Container Tidak Ditemukan') {
+                        $lamaHari = 'Error: Tanggal Masuk tidak tersedia';
+                    } else {
+                        $masuk = Carbon::parse($tglMasuk);
+                        $keluar = ($tglKeluar === 'Belum Masuk' || $tglKeluar === 'Data Container Tidak Ditemukan') ? now() : Carbon::parse($tglKeluar);
+                        $lamaHari = $masuk->diffInDays($keluar) . ' hari';
+                    }
+                } catch (\Exception $e) {
+                    $lamaHari = 'Error: ' . $e->getMessage();
+                }
                 return [
                     'noCont' => $item->no_cont ?? '',
                     'ukuranDok' => $item->size ?? '',
                     'sizeCont' =>  $sizeCont,
                     'tglMasuk' =>  $tglMasuk,
                     'tglKeluar' => $tglKeluar,
+                    'lamaHari' => $lamaHari,
                 ];
             });
         
@@ -2234,12 +2260,25 @@ class DokumenController extends Controller
                     $tglMasuk = 'Data Container Tidak Ditemukan';
                     $tglKeluar = 'Data Container Tidak Ditemukan';
                 }
+                $lamaHari = '';
+                try {
+                    if ($tglMasuk === 'Belum Masuk' || $tglMasuk === 'Data Container Tidak Ditemukan') {
+                        $lamaHari = 'Error: Tanggal Masuk tidak tersedia';
+                    } else {
+                        $masuk = Carbon::parse($tglMasuk);
+                        $keluar = ($tglKeluar === 'Belum Masuk' || $tglKeluar === 'Data Container Tidak Ditemukan') ? now() : Carbon::parse($tglKeluar);
+                        $lamaHari = $masuk->diffInDays($keluar) . ' hari';
+                    }
+                } catch (\Exception $e) {
+                    $lamaHari = 'Error: ' . $e->getMessage();
+                }
                 return [
                     'noCont' => $item->no_cont ?? '',
                     'ukuranDok' => $item->size ?? '',
                     'sizeCont' =>  $sizeCont,
                     'tglMasuk' =>  $tglMasuk,
                     'tglKeluar' => $tglKeluar,
+                    'lamaHari' => $lamaHari,
                 ];
             });
         
@@ -2725,12 +2764,25 @@ class DokumenController extends Controller
                     $tglMasuk = 'Data Container Tidak Ditemukan';
                     $tglKeluar = 'Data Container Tidak Ditemukan';
                 }
+                $lamaHari = '';
+                try {
+                    if ($tglMasuk === 'Belum Masuk' || $tglMasuk === 'Data Container Tidak Ditemukan') {
+                        $lamaHari = 'Error: Tanggal Masuk tidak tersedia';
+                    } else {
+                        $masuk = Carbon::parse($tglMasuk);
+                        $keluar = ($tglKeluar === 'Belum Masuk' || $tglKeluar === 'Data Container Tidak Ditemukan') ? now() : Carbon::parse($tglKeluar);
+                        $lamaHari = $masuk->diffInDays($keluar) . ' hari';
+                    }
+                } catch (\Exception $e) {
+                    $lamaHari = 'Error: ' . $e->getMessage();
+                }
                 return [
                     'noCont' => $item->no_cont ?? '',
                     'ukuranDok' => $item->size ?? '',
                     'sizeCont' =>  $sizeCont,
                     'tglMasuk' =>  $tglMasuk,
                     'tglKeluar' => $tglKeluar,
+                    'lamaHari' => $lamaHari,
                 ];
             });
         

@@ -28,7 +28,7 @@
         .container {
             width: 50%; /* Setengah dari lebar A4 */
             height: 50%; /* Setengah dari tinggi A4 */
-            padding: 10px;
+            padding: 5px;
             box-sizing: border-box;
             page-break-inside: avoid; /* Hindari pemutusan halaman di tengah */
         }
@@ -82,12 +82,14 @@
     <div class="container">
         <div class="card">
             <div class="card-header">
-                <div class="logo">
-                    <img src="/logo/IntiMandiri.PNG" class="img-fluid" alt="">
+                <div class="d-flex justify-content-center align-items-center mb-2">
+                    <img src="/logo/IntiMandiri.png" class="img-fluid me-2" alt="Logo" style="max-height: 30px;">
+                    <h5 class="mb-0 fw-bold">PT Inti Mandiri Utama Trans</h5>
                 </div>
-                <div class="card-title">
-                    Surat Penarikan Petikemas (SP2)
-                </div>
+                <br>
+            </div>
+            <div class="card-title">
+                Surat Penarikan Petikemas (SP2)
             </div>
             <div class="row">
                 <div class="col-6">

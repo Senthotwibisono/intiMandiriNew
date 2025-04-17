@@ -117,7 +117,7 @@
               <td class="text-right">{{ number_format($header->discount, 2) }}</td>
               <td class="text-right">{{ number_format($header->pajak_amount, 2) }}</td>
               <td class="text-right">{{ number_format($header->grand_total, 2) }}</td>
-              <td>{{ $header->customer->name }}</td>
+              <td>{{ $header->customer->name ?? '-' }}</td>
             </tr>
           @endforeach
         </tbody>

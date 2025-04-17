@@ -692,7 +692,7 @@ Route::controller(AndroidGateController::class)->group(function(){
 
     // BeaCukai P2
     Route::controller(BeacukaiP2Controller::class)->group(function(){
-        Route::get('/bc-p2/dashboard', 'indexDashboard');
+        Route::get('/bc-p2/dashboard', 'indexDashboard')->name('bcP2.dashboard');
         Route::get('/bc-p2/logData', 'logData');
         Route::get('/bc-p2/logDataFCL', 'logDataFCL');
 
