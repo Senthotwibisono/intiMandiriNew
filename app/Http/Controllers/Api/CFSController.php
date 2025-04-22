@@ -393,7 +393,7 @@ class CFSController extends Controller
                     "WEIGHT" => $manifest->weight,
                     "MEASURE" => $manifest->meas,
                     "JNS_KMS" => $manifest->packing->code ?? '',
-                    "MERK_KMS" => $manifest->marking ?? '',
+                    "MERK_KMS" => isset($manifest->marking) ? preg_replace('/[^a-zA-Z0-9]/', ' ', $manifest->marking) : '',
                     "JML_KMS" => $manifest->quantity ?? 0,
                     "TARIF" => $tarif
                 ];

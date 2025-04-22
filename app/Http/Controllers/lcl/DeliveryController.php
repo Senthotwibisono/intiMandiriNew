@@ -470,12 +470,12 @@ class DeliveryController extends Controller
             $dok = SPPB::where('no_sppb', $request->no_dok)->where('tgl_sppb', $tglDok)->first();
             if ($dok) {
                 if ($dok->no_bl_awb == $manifest->nohbl) {
-                    if ($dok->nama_imp != $manifest->customer->name) {
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'Nama Importir Berbeda',
-                        ]);
-                    }
+                    // if ($dok->nama_imp != $manifest->customer->name) {
+                    //     return response()->json([
+                    //         'success' => false,
+                    //         'message' => 'Nama Importir Berbeda',
+                    //     ]);
+                    // }
                    
                     if ($manifest->quantity == $manifest->final_qty) {
                         $statusBC = "release";
@@ -509,18 +509,18 @@ class DeliveryController extends Controller
             $dok = BC23::where('no_sppb', $request->no_dok)->where('tgl_sppb', $tglDok)->first();
             if ($dok) {
                 if ($dok->no_bl_awb == $manifest->nohbl) {
-                    if ($dok->nama_imp != $manifest->customer->name) {
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'Nama Importir Berbeda',
-                        ]);
-                    }
-                    if ($dok->npwp_imp != $manifest->customer->npwp) {
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'Nama Importir Berbeda',
-                        ]);
-                    }
+                    // if ($dok->nama_imp != $manifest->customer->name) {
+                    //     return response()->json([
+                    //         'success' => false,
+                    //         'message' => 'Nama Importir Berbeda',
+                    //     ]);
+                    // }
+                    // if ($dok->npwp_imp != $manifest->customer->npwp) {
+                    //     return response()->json([
+                    //         'success' => false,
+                    //         'message' => 'Nama Importir Berbeda',
+                    //     ]);
+                    // }
                     $manifest->update([
                         'kd_dok_inout' => $kdDok,
                         'no_dok' => $request->no_dok,

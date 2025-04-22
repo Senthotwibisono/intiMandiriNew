@@ -24,7 +24,7 @@ class CfsDefaultController extends Controller
         $this->middleware('auth');
 
         // $this->wsdlProd = 'https://ipccfscenter.com/TPSServices/server_plp_dev.php?wsdl';
-        $this->wsdl = 'https://pelindo-cfscenter.com/TPSServices/server_plp.php?wsdl ';
+        $this->wsdl = 'https://pelindo-cfscenter.com/TPSServices/server_plp.php?wsdl';
         $this->user = '1MUT';
         $this->password = '1MUT';
         $this->kode = '1MUT';

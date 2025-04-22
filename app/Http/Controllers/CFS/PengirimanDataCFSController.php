@@ -20,7 +20,7 @@ class PengirimanDataCFSController extends Controller
     public function __construct() {
         // $this->middleware('auth');
 
-        $this->wsdl = 'https://ipccfscenter.com/TPSServices/server_plp_dev.php?wsdl';
+        $this->wsdl = 'https://pelindo-cfscenter.com/TPSServices/server_plp.php?wsdl';
         // $this->wsdl = 'https://pelindo-cfscenter.com/TPSServices/server_plp_dev.php?wsdl ';
         $this->user = '1MUT';
         $this->password = '1MUT';
@@ -577,7 +577,7 @@ class PengirimanDataCFSController extends Controller
     
     public function detilHouseBl() 
     {
-        $manifestes = Manifest::whereNotNull('tglstripping')->where('detil_hbl_cfs_flag', 'N')->take(5)->get();
+        $manifestes = Manifest::whereNotNull('tglstripping')->where('detil_hbl_cfs_flag', 'N')->take(100)->get();
         // $manifest = Manifest::find(8);
         \SoapWrapper::override(function ($service) {
             $service
