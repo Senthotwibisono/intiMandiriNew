@@ -21,28 +21,30 @@
 @section('content')
 <section>
     <div class="card">
-        <div class="card-body fixed-height-cardBody">
+        <div class="card-body">
             <br>
-            <table class="table table-hover table-stripped" id="tableGateOut">
-                <thead style="white-space: nowrap;">
-                    <tr>
-                        <th>Edit</th>
-                        <th>Photo</th>
-                        <th>Barcode</th>
-                        <th>Status BC</th>
-                        <th>No Job Order</th>
-                        <th>No SPK</th>
-                        <th>No Container</th>
-                        <th>No BL</th>
-                        <th>Tgl BL</th>
-                        <th>Tgl Masuk</th>
-                        <th>Jam Masuk</th>
-                        <th>Tgl Keluar</th>
-                        <th>Jam Keluar</th>
-                        <th>UID</th>
-                    </tr>
-                </thead>
-            </table>
+            <div class="table">
+                <table class="table-hover table-stripped" id="tableGateOut">
+                    <thead style="white-space: nowrap;">
+                        <tr>
+                            <th>Edit</th>
+                            <th>Photo</th>
+                            <th>Barcode</th>
+                            <th>Status BC</th>
+                            <th>No Job Order</th>
+                            <th>No SPK</th>
+                            <th>No Container</th>
+                            <th>No BL</th>
+                            <th>Tgl BL</th>
+                            <th>Tgl Masuk</th>
+                            <th>Jam Masuk</th>
+                            <th>Tgl Keluar</th>
+                            <th>Jam Keluar</th>
+                            <th>UID</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
         </div>
     </div>
 </section>

@@ -1,16 +1,20 @@
 @extends('partial.main')
 @section('custom_styles')
 <style>
-    .highlight-yellow {
-        background-color: yellow !important;
-    }
-    .highlight-blue {
-        background-color: lightblue !important;
-    }
-    .highlight-red {
-        background-color: red !important;
-        color: white !important; /* Agar teks tetap terlihat */
-    }
+.highlight-yellow {
+    background-color: #f5e642 !important;
+    color: #000 !important;
+}
+
+.highlight-blue {
+    background-color: #7ec8e3 !important;
+    color: #000 !important;
+}
+
+.highlight-red {
+    background-color: #e63946 !important;
+    color: #fff !important;
+}
 </style>
 @endsection
 @section('content')
@@ -19,7 +23,7 @@
         <div class="card-body">
             <br>
             <div class="table">
-                <table class="table table-hover table-stripped" id="tableContainer" style="white-space: nowrap;">  
+                <table class="table-hover table-stripped" id="tableContainer" style="white-space: nowrap;">  
                     <thead>
                         <tr>
                             <th class="text-center">Edit</th>
@@ -380,7 +384,7 @@
                 {className:'text-center', data:'tglDok', name:'tglDok'},
             ],
             createdRow: function (row, data, dataIndex) {
-               // console.log(data); // Cek data di console browser
+                console.log(data); // cek data yang masuk
                 if (data.flag_segel_merah === 'Y') {
                     $(row).addClass('highlight-red text-white');
                 } else if (data.status_bc === 'HOLD') {

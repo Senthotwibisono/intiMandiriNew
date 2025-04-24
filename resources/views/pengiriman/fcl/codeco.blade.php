@@ -28,6 +28,9 @@
                             <th class="text-center" style="min-width: 100px">Tgl Bl Awb</th>
                             <th class="text-center" style="min-width: 100px">No Master Bl Awb</th>
                             <th class="text-center" style="min-width: 100px">Tgl Master Bl Awb</th>
+                            <th class="text-center" style="min-width: 100px">Kode Dokumen</th>
+                            <th class="text-center" style="min-width: 100px">Nomor Dokumen</th>
+                            <th class="text-center" style="min-width: 100px">Tanggal Dokumen</th>
                             <th class="text-center" style="min-width: 100px">Response</th>
                             <th class="text-center" style="min-width: 100px">Waktu In Out</th>
                             <th class="text-center" style="min-width: 100px">Tgl Kirim</th>
@@ -213,6 +216,9 @@
                 {name: 'tgl_bl_awb', data: 'tgl_bl_awb'},
                 {name: 'no_master_bl_awb', data: 'no_master_bl_awb'},
                 {name: 'tgl_master_bl_awb', data: 'tgl_master_bl_awb'},
+                {name: 'kd_dok_inout', data: 'kd_dok_inout'},
+                {name: 'no_dok_inout', data: 'no_dok_inout'},
+                {name: 'tgl_dok_inout', data: 'tgl_dok_inout'},
                 {name: 'response', data: 'response'},
                 {name: 'wk_inout', data: 'wk_inout'},
                 {name: 'tgl_entry', data: 'tgl_entry'},

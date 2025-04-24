@@ -53,9 +53,14 @@ class CoariCodecoController extends Controller
             $bulan = Carbon::now()->format('m'); 
             $tanggal = Carbon::now()->format('d');
             
-            $lastNomor = RN::where('tahun', $tahun)->where('bulan', $bulan)->where('tanggal', $tanggal)->orderBy('nomor', 'desc')->first();
+            $lastNomor = RN::where('tahun', $tahun)
+            ->where('bulan', $bulan)
+            ->where('tanggal', $tanggal)
+            ->orderByRaw('CAST(nomor AS UNSIGNED) DESC')
+            ->first();
             if ($lastNomor) {
-                $nomor = str_pad($lastNomor->nomor + 1, 4, '0', STR_PAD_LEFT);
+                $nomorBaru = $lastNomor ? (int)$lastNomor->nomor + 1 : 1;
+                $nomor = str_pad($nomorBaru, 4, '0', STR_PAD_LEFT);
             }else {
                 $nomor = '0001';
             }
@@ -755,7 +760,7 @@ class CoariCodecoController extends Controller
                     'call_sign' => $cont->job->PLP->call_sign ?? $cont->job_callsign ?? null,
                     'tgl_tiba' => $cont->job->PLP->tgl_tiba ?? null,
                     'kd_gudang' => $cont->job->PLP->gudang_tujuan ?? 'INTI',
-                    'kd_dok_inout' => 3,
+                    'kd_dok_inout' => 40,
                     'no_dok_inout' => $cont->job->PLP->no_plp,
                     'tanggal_dok_inout' => $cont->job->PLP->tgl_plp,
                     'wk_inout' => $wk_in,
@@ -959,9 +964,9 @@ class CoariCodecoController extends Controller
                     'call_sign' => $cont->job->PLP->call_sign ?? $cont->job_callsign ?? null,
                     'tgl_tiba' => $cont->job->PLP->tgl_tiba ?? null,
                     'kd_gudang' => $cont->job->PLP->gudang_tujuan ?? 'INTI',
-                    'kd_dok_inout' => 3,
-                    'no_dok_inout' => $cont->job->PLP->no_plp,
-                    'tanggal_dok_inout' => $cont->job->PLP->tgl_plp,
+                    'kd_dok_inout' => $cont->kd_dok_inout,
+                    'no_dok_inout' => $cont->no_dok ?? null,
+                    'tanggal_dok_inout' => $cont->tgl_dok ? Carbon::createFromFormat('Y-m-d', $cont->tgl_dok)->format('Ymd') : null,
                     'wk_inout' => $wk_in,
                     'no_pol' => $cont->nopol,
                     'bruto' => $cont->weight,
@@ -982,6 +987,7 @@ class CoariCodecoController extends Controller
                         ? Carbon::createFromFormat('Y-m-d', $cont->job->ttgl_bc11)->format('Ymd') 
                         : null,
                 ];
+                // var_dump($header);
 
                 
                 $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><DOCUMENT></DOCUMENT>');

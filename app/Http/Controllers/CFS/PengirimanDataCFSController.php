@@ -622,7 +622,7 @@ class PengirimanDataCFSController extends Controller
             $tglMasterBL = $manifest->job->tgl_master_bl ? Carbon::parse($manifest->job->tgl_master_bl)->format('Y-m-d') : null;
             $tglBC11 = $manifest->job->ttgl_bc11 ? Carbon::parse($manifest->job->ttgl_bc11)->format('Y-m-d') : null;
             $tglPLP = $manifest->job->ttgl_plp ? Carbon::parse($manifest->job->ttgl_plp)->format('Y-m-d') : null;
-            $tglStripping = $manifest->tglstripping ? Carbon::now() : null;
+            $tglStripping = $manifest->tglstripping ? Carbon::parse($manifest->tglstripping) : null;
             $jamStripping = $manifest->jamstripping ? Carbon::parse($manifest->jamstripping) : null;
             $strippingAt = $tglStripping;
 
