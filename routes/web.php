@@ -638,12 +638,16 @@ Route::controller(AndroidGateController::class)->group(function(){
     Route::middleware('permission:invoiceLCL')->controller(InvoiceController::class)->group(function(){
         Route::get('/invoice/form/unpaid', 'unpaidIndex')->name('invoice.unpaid');
         Route::get('/invoice/form/unpaidData', 'unpaidData');
+        Route::get('/invoice/form/paidData', 'paidData')->name('invoice.lcl.paidData');
         Route::get('/invoice/pranota-{id?}', 'pranotaIndex');
         Route::post('/invoice/deleteHeader-{id?}', 'deleteInvoice');
         Route::get('/invoice/actionButton-{id?}', 'invoiceGetData');
         Route::post('/invoice/paid', 'invoicePaid');
         Route::get('/invoice/photoKTP-{id?}', 'photoKTP');
         
+        Route::post('invoice/searchForEdit', 'searchForEdit')->name('invoice.lcl.searchForEdit');
+        Route::post('invoice/updateTanggal', 'updateTanggal')->name('invoice.lcl.updateTanggal');
+
         Route::get('/invoice/form/paid', 'paidIndex')->name('invoice.paid');
         Route::get('/invoice/invoicePrint-{id?}', 'invoiceIndex');
         Route::get('/invoice/barcodeBarang-{id?}', 'barcodeIndex');

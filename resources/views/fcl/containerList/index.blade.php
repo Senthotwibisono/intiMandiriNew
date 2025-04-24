@@ -30,6 +30,10 @@
                             <th class="text-center">Photo</th>
                             <th class="text-center">Status Beacukai</th>
                             <th class="text-center">Segel Merah</th>
+                            <th class="text-center">Alasan Segel</th>
+                            <th class="text-center">Waktu Segel</th>
+                            <th class="text-center">Alasan Lepas Segel</th>
+                            <th class="text-center">Waktu Lepas Segel</th>
                             <th class="text-center">No Job Order</th>
                             <th class="text-center">No MBL</th>
                             <th class="text-center">No Container</th>
@@ -362,6 +366,10 @@
                 {className:'text-center', data:'photo', name:'photo'},
                 {className:'text-center', data:'status_bc', name:'status_bc'},
                 {className:'text-center', data:'flag_segel_merah', name:'flag_segel_merah'},
+                {className:'text-center', data:'alasan_segel', name:'alasan_segel'},
+                {className:'text-center', data:'tanggal_segel_merah', name:'tanggal_segel_merah'},
+                {className:'text-center', data:'alasan_lepas_segel', name:'alasan_lepas_segel'},
+                {className:'text-center', data:'tanggal_lepas_segel_merah', name:'tanggal_lepas_segel_merah'},
                 {className:'text-center', data:'nojob', name:'nojob'},
                 {className:'text-center', data:'nombl', name:'nombl'},
                 {className:'text-center', data:'nocontainer', name:'nocontainer'},

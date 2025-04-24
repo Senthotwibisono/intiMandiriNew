@@ -891,10 +891,12 @@ class DokumenController extends Controller
 
         libxml_use_internal_errors(true);
         $xml = simplexml_load_string($this->response);
+        // dd($xml);
         if(!$xml || !$xml->children()){
            return back()->with('status', ['type' => 'error', 'message' => 'Error importing data: ' .  $this->response]);
         }
-
+        $xmlCSF = $xml;
+        $xmlCSF->SPPB->HEADER->GUDANG = '1MUT';
         \SoapWrapper::override(function ($service) {
             $service
                 ->name('ReceiveBC23Permit_FASP')
@@ -911,14 +913,14 @@ class DokumenController extends Controller
                 ]);                                                   
         });
         // dd($dataCFS);
-        \SoapWrapper::service('ReceiveBC23Permit_FASP', function ($service) use ($xml) {    
+        \SoapWrapper::service('ReceiveBC23Permit_FASP', function ($service) use ($xmlCSF) {    
             // dd($service);    
             $this->responseCFS = $service->call('ReceiveBC23Permit_FASP', [
                 'Username' => '1MUT', 
                 'Kode_ASP' => '1MUT',
                 'Password' => '1MUT',
-                'fStream' => $xml->asXML()]);    
-                // dd($this->responseCFS, $service);  
+                'fStream' => $xmlCSF->asXML()]);    
+                // dd($this->responseCFS, $xmlCSF);  
                 // dd($this->responseCFS, $xml, $xml->asXML());  
         });
         
@@ -1136,7 +1138,8 @@ class DokumenController extends Controller
             'message' => 'error : ' . $this->response,
            ]);
         }
-
+        $xmlCSF = $xml;
+        $xmlCSF->SPPB->HEADER->GUDANG = '1MUT';
         SoapWrapper::override(function ($service) {
             $service
                 ->name('ReceiveImporPermit_FASP')
@@ -1153,13 +1156,13 @@ class DokumenController extends Controller
                 ]);                                                   
         });
         // dd($dataCFS);
-        \SoapWrapper::service('ReceiveImporPermit_FASP', function ($service) use ($xml) {    
+        \SoapWrapper::service('ReceiveImporPermit_FASP', function ($service) use ($xmlCSF) {    
             // dd($service);    
             $this->responseCFS = $service->call('ReceiveImporPermit_FASP', [
                 'Username' => '1MUT', 
                 'Kode_ASP' => '1MUT',
                 'Password' => '1MUT',
-                'fStream' => $xml->asXML()]);    
+                'fStream' => $xmlCSF->asXML()]);    
                 // var_dump($this->responseCFS, $service);  
         });
         
@@ -1494,7 +1497,8 @@ class DokumenController extends Controller
         if(!$xml || !$xml->children()){
             return back()->with('status', ['type' => 'error', 'message' => 'Error importing data: ' .  $this->response]);
         }
-
+        $xmlCSF = $xml;
+        $xmlCSF->SPPB->HEADER->GUDANG = '1MUT';
         \SoapWrapper::override(function ($service) {
             $service
                 ->name('ReceiveImporPermit_FASP')
@@ -1511,14 +1515,14 @@ class DokumenController extends Controller
                 ]);                                                   
         });
         // dd($dataCFS);
-        \SoapWrapper::service('ReceiveImporPermit_FASP', function ($service) use ($xml) {    
+        \SoapWrapper::service('ReceiveImporPermit_FASP', function ($service) use ($xmlCSF) {    
             // dd($service);    
             $this->responseCFS = $service->call('ReceiveImporPermit_FASP', [
                 'Username' => '1MUT', 
                 'Kode_ASP' => '1MUT',
                 'Password' => '1MUT',
-                'fStream' => $xml->asXML()]);    
-                // dd($this->responseCFS, $service); 
+                'fStream' => $xmlCSF->asXML()]);    
+                // dd($this->responseCFS, $xml); 
                 // dd($this->responseCFS, $xml, $xml->asXML());   
         });
         // $responseCFS = $this->responseCFS;
@@ -1724,7 +1728,8 @@ class DokumenController extends Controller
             'message' => 'Error : ' . $this->response,
            ]);
         }
-
+        $xmlCSF = $xml;
+        $xmlCSF->SPPB->HEADER->GUDANG = '1MUT';
         \SoapWrapper::override(function ($service) {
             $service
                 ->name('ReceiveImporPermit_FASP')
@@ -1741,13 +1746,13 @@ class DokumenController extends Controller
                 ]);                                                   
         });
         // dd($dataCFS);
-        \SoapWrapper::service('ReceiveImporPermit_FASP', function ($service) use ($xml) {    
+        \SoapWrapper::service('ReceiveImporPermit_FASP', function ($service) use ($xmlCSF) {    
             // dd($service);    
             $this->responseCFS = $service->call('ReceiveImporPermit_FASP', [
                 'Username' => '1MUT', 
                 'Kode_ASP' => '1MUT',
                 'Password' => '1MUT',
-                'fStream' => $xml->asXML()]);    
+                'fStream' => $xmlCSF->asXML()]);    
                 // dd($this->responseCFS, $service);  
         });
 
@@ -2348,6 +2353,9 @@ class DokumenController extends Controller
         if(!$xml || !$xml->children()){
             return back()->with('status', ['type' => 'error', 'message' => 'Error importing data: ' .  $this->response]);
         }
+        // dd($xml);
+        $xmlCSF = $xml;
+        $xmlCSF->MANUAL->HEADER->KD_GUDANG = '1MUT';
 
         \SoapWrapper::override(function ($service) {
             $service
@@ -2365,14 +2373,14 @@ class DokumenController extends Controller
                 ]);                                                   
         });
         // dd($dataCFS);
-        \SoapWrapper::service('ReceiveImporPermit_Manual', function ($service) use ($xml) {    
+        \SoapWrapper::service('ReceiveImporPermit_Manual', function ($service) use ($xmlCSF) {    
             // dd($service);    
             $this->responseCFS = $service->call('ReceiveImporPermit_Manual', [
                 'Username' => '1MUT', 
                 'Kode_ASP' => '1MUT',
                 'Password' => '1MUT',
-                'fStream' => $xml->asXML()]);    
-                // dd($this->responseCFS, $service);  
+                'fStream' => $xmlCSF->asXML()]);    
+                // dd($this->responseCFS, $xmlCSF);  
         });
         
         $docmanual_id = 0;
@@ -2558,32 +2566,33 @@ class DokumenController extends Controller
              'message' => 'Error : ' . $this->response,
             ]);
          }
-
-        //  \SoapWrapper::override(function ($service) {
-        //     $service
-        //         ->name('ReceiveImporPermit_Manual')
-        //         ->wsdl('https://pelindo-cfscenter.com/TPSServices/server_plp.php?wsdl')
-        //         ->trace(true)                                                                                                                                         
-        //         ->options([
-        //             'stream_context' => stream_context_create([
-        //                 'ssl' => array(
-        //                     'verify_peer' => false,
-        //                     'verify_peer_name' => false,
-        //                     'allow_self_signed' => true
-        //                 )
-        //             ])
-        //         ]);                                                   
-        // });
-        // // dd($dataCFS);
-        // \SoapWrapper::service('ReceiveImporPermit_Manual', function ($service) use ($xml) {    
-        //     // dd($service);    
-        //     $this->responseCFS = $service->call('ReceiveImporPermit_Manual', [
-        //         'Username' => '1MUT', 
-        //         'Kode_ASP' => '1MUT',
-        //         'Password' => '1MUT',
-        //         'fStream' => $xml->asXML()]);    
-        //         // dd($this->responseCFS, $service);  
-        // });
+         $xmlCSF = $xml;
+         $xmlCSF->MANUAL->HEADER->KD_GUDANG = '1MUT';
+         \SoapWrapper::override(function ($service) {
+            $service
+                ->name('ReceiveImporPermit_Manual')
+                ->wsdl('https://pelindo-cfscenter.com/TPSServices/server_plp.php?wsdl')
+                ->trace(true)                                                                                                                                         
+                ->options([
+                    'stream_context' => stream_context_create([
+                        'ssl' => array(
+                            'verify_peer' => false,
+                            'verify_peer_name' => false,
+                            'allow_self_signed' => true
+                        )
+                    ])
+                ]);                                                   
+        });
+        // dd($dataCFS);
+        \SoapWrapper::service('ReceiveImporPermit_Manual', function ($service) use ($xmlCSF) {    
+            // dd($service);    
+            $this->responseCFS = $service->call('ReceiveImporPermit_Manual', [
+                'Username' => '1MUT', 
+                'Kode_ASP' => '1MUT',
+                'Password' => '1MUT',
+                'fStream' => $xmlCSF->asXML()]);    
+                dd($this->responseCFS, $xmlCSF);  
+        });
         
          $groups = [];
          $nextGroup = [];
@@ -2851,7 +2860,8 @@ class DokumenController extends Controller
         if(!$xml || !$xml->children()){
             return back()->with('status', ['type' => 'error', 'message' => 'Error importing data: ' .  $this->response]);
         }
-
+        $xmlCSF = $xml;
+        $xmlCSF->DOKPAB->HEADER->GUDANG = '1MUT';
         \SoapWrapper::override(function ($service) {
             $service
                 ->name('ReceiveImporPermit_Manual')
@@ -2868,14 +2878,14 @@ class DokumenController extends Controller
                 ]);                                                   
         });
         // dd($dataCFS);
-        \SoapWrapper::service('ReceiveImporPermit_Manual', function ($service) use ($xml) {    
+        \SoapWrapper::service('ReceiveImporPermit_Manual', function ($service) use ($xmlCSF) {    
             // dd($service);    
             $this->responseCFS = $service->call('ReceiveImporPermit_Manual', [
                 'Username' => '1MUT', 
                 'Kode_ASP' => '1MUT',
                 'Password' => '1MUT',
-                'fStream' => $xml->asXML()]);    
-                // dd($this->responseCFS, $service);  
+                'fStream' => $xmlCSF->asXML()]);    
+                // dd($this->responseCFS, $xmlCSF);  
         });
 
         // dd($this->responseCFS);
@@ -3081,6 +3091,33 @@ class DokumenController extends Controller
             'message' => 'Error : ' . $this->response,
            ]);
         }
+        $xmlCSF = $xml;
+        $xmlCSF->DOKPAB->HEADER->GUDANG = '1MUT';
+        \SoapWrapper::override(function ($service) {
+            $service
+                ->name('ReceiveImporPermit_Manual')
+                ->wsdl('https://pelindo-cfscenter.com/TPSServices/server_plp.php?wsdl')
+                ->trace(true)                                                                                                                                         
+                ->options([
+                    'stream_context' => stream_context_create([
+                        'ssl' => array(
+                            'verify_peer' => false,
+                            'verify_peer_name' => false,
+                            'allow_self_signed' => true
+                        )
+                    ])
+                ]);                                                   
+        });
+        // dd($dataCFS);
+        \SoapWrapper::service('ReceiveImporPermit_Manual', function ($service) use ($xmlCSF) {    
+            // dd($service);    
+            $this->responseCFS = $service->call('ReceiveImporPermit_Manual', [
+                'Username' => '1MUT', 
+                'Kode_ASP' => '1MUT',
+                'Password' => '1MUT',
+                'fStream' => $xmlCSF->asXML()]);    
+                // dd($this->responseCFS, $xmlCSF);  
+        });
 
         $groups = [];
         $nextGroup = [];

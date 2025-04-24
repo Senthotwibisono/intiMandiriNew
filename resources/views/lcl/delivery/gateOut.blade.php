@@ -32,6 +32,11 @@
                             <th class="text-center">Bon Muat</th>
                             <th class="text-center">Status BC</th>
                             <th class="text-center">Alasan Hold</th>
+                            <th class="text-center">Segel Merah</th>
+                            <th class="text-center">Alasan Segel</th>
+                            <th class="text-center">Waktu Segel</th>
+                            <th class="text-center">Alasan Lepas Segel</th>
+                            <th class="text-center">Waktu Lepas Segel</th>
                             <th class="text-center">No HBL</th>
                             <th class="text-center">Tgl HBL</th>
                             <th class="text-center">No Tally</th>
@@ -177,6 +182,11 @@
                 { data: 'bonMuat', name: 'barcode', className: 'text-center' },
                 { data: 'status_bc', name: 'status_bc', className: 'text-center' },
                 { data: 'alasan_hold', name: 'alasan_hold', className: 'text-center' },
+                {className:'text-center', data:'flag_segel_merah', name:'flag_segel_merah'},
+                {className:'text-center', data:'alasan_segel', name:'alasan_segel'},
+                {className:'text-center', data:'tanggal_segel_merah', name:'tanggal_segel_merah'},
+                {className:'text-center', data:'alasan_lepas_segel', name:'alasan_lepas_segel'},
+                {className:'text-center', data:'tanggal_lepas_segel_merah', name:'tanggal_lepas_segel_merah'},
                 { data: 'nohbl', name: 'nohbl', className: 'text-center' },
                 { data: 'tgl_hbl', name: 'tgl_hbl', className: 'text-center' },
                 { data: 'notally', name: 'notally', className: 'text-center' },

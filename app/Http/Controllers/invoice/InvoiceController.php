@@ -99,6 +99,56 @@ class InvoiceController extends Controller
         ->make(true);
     }
 
+    public function paidData(Request $request)
+    {
+        $header = Header::with(['manifest', 'customer', 'kasir'])->whereNot('status', 'N')
+        ->where('type', null)
+        ->orderBy('order_at', 'desc')
+        ->get();
+
+        return DataTables::of($header)
+        ->addColumn('pranota', function($header){
+            return '<a type="button" href="/invoice/pranota-'. $header->id .'" target="_blank" class="btn btn-sm btn-warning text-white"><i class="fa fa-file"></i></a>';
+        })
+        ->addColumn('invoice', function($header){
+            return '<a type="button" href="/invoice/invoicePrint-'.$header->id.'" target="_blank" class="btn btn-sm btn-info text-white"><i class="fa fa-file"></i></a>';
+        })
+        ->addColumn('ktp', function($header){
+            $herf = '/invoice/photoKTP-' . $header->id;
+            return '<a href="javascript:void(0)" onclick="openWindow(\''.$herf.'\')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>';
+        })
+        ->addColumn('cancel', function($header){
+            return '<button class="btn btn-danger cancelInvoice" data-id="'.$header->id.'"><i class="fa fa-trash"></i></button>';
+        })
+        ->addColumn('pay', function($header){
+            return '<button type="button" id="pay" data-id="'.$header->id.'" class="btn btn-sm btn-success pay"><i class="fa fa-cogs"></i></button>';
+        })
+        ->addColumn('revisi', function($header){
+            return '<button class="btn btn-primary revisiInvoice" data-id="'.$header->form_id.'">Revisi</button>';
+        })
+        ->addColumn('dok', function($header){
+            return ' <button type="button" id="dok" data-id="'.$header->manifest_id.'" class="btn btn-sm btn-primary dok"><i class="fa fa-plus"></i></button>';
+        })
+        ->addColumn('gatePass', function($header){
+            return '<button class="btn btn-danger printBarcode" data-id="'.$header->manifest_id.'"><i class="fa fa-print"></i></button>';
+        })
+        ->addColumn('containerLocation', function($header){
+            return '<a type="button" href="/invoice/invoicePrint-'.$header->id.'" target="_blank" class="btn btn-sm btn-info text-white"><i class="fa fa-file"></i></a>';
+        })
+        ->addColumn('status', function($header){
+            if ($header->status == 'P') {
+                return '<span class="badge bg-warning text-white">Piutang</span>';
+            }else {
+                return '<span class="badge bg-info text-white">Lunas</span>';
+            }
+        })
+        ->addColumn('editTanggal', function($header){
+            return '<button type="button" class="btn btn-warning" data-id="'.$header->id.'" onClick="editTanggalInvoice(this)"><i class="fas fa-pencil"></i></button>';
+        })
+        ->rawColumns(['pranota', 'invoice', 'ktp', 'cancel', 'pay', 'revisi', 'gatePass', 'status', 'dok', 'containerLocation', 'editTanggal'])
+        ->make(true);
+    }
+
     public function pranotaIndex($id)
     {
         $data['title'] = 'Print Preinvoice';
@@ -312,7 +362,7 @@ class InvoiceController extends Controller
     public function paidIndex()
     {
         $data['title'] = 'List Invoice Paid';
-        $data['headers'] = Header::whereNot('status', '=', 'N')->where('type', null)->orderBy('order_at', 'desc')->get();
+       
         $data['doks'] = Kode::orderBy('kode', 'asc')->get();
 
         return view('invoice.paid.index', $data);
@@ -433,6 +483,44 @@ class InvoiceController extends Controller
                 return redirect()->back()->with('status', ['type' => 'success', 'error' => 'Data tidak ditemukan']);
             }
         }
+    }
+
+    public function searchForEdit(Request $request)
+    {
+        $header = Header::find($request->id);
+        try {
+            return response()->json([
+                'success' => true,
+                'data' => $header,
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => $th->getMessage(),
+            ]);
+        }
+    }
+
+    public function updateTanggal(Request $request)
+    {
+        // var_dump($request->all());
+        $header = Header::find($request->id);
+        try {
+            $header->update([
+                'order_at' => $request->order_at,
+                'lunas_at' => $request->lunas_at,
+            ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Data Berhasil Disimpan',
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => $th->getMessage(),
+            ]);
+        }
+        
     }
 
 }

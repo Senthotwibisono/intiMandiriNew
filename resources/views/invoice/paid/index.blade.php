@@ -15,9 +15,9 @@
 <section>
     <div class="card">
         <div class="card-body d-flex align-items-center">
-            <div class="table-responsive">
-                <table class="tabelCustom table-responsive">
-                    <thead>
+            <div class="table">
+                <table class="table table-hover" id="tablePaidInvoice">
+                    <thead style="white-space: nowrap;">
                         <tr>
                             <th class="text-center">Order No</th>
                             <th class="text-center">Invoice Number</th>
@@ -33,52 +33,12 @@
                             <th class="text-center">Container Location</th>
                             <th class="text-center">Pranota</th>
                             <th class="text-center">Invoice</th>
-                            <th class="text-center">Action</th>
+                            <th class="text-center">Pay</th>
+                            <th class="text-center">Dokumen</th>
+                            <th class="text-center">Revisi</th>
+                            <th class="text-center">Edit Tanggal</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach($headers as $form)
-                            <tr>
-                                <td class="text-center">{{$form->order_no}}</td>
-                                <td class="text-center">{{$form->invoice_no}}</td>
-                                <td class="text-center">{{$form->manifest->nohbl ?? ''}}</td>
-                                <td class="text-center">{{$form->manifest->tgl_hbl ?? ''}}</td>
-                                <td class="text-center">{{$form->manifest->quantity ?? ''}}</td>
-                                <td class="text-center">{{$form->customer->name ?? ''}}</td>
-                                <td class="text-center">{{$form->kasir->name ?? ''}}</td>
-                                <td class="text-center">
-                                    @if($form->status == 'P')
-                                    <span class="badge bg-warning text-white">Piutang</span>
-                                    @else
-                                    <span class="badge bg-info text-white">Lunas</span>
-                                    @endif
-                                </td>
-                                <td class="text-center">{{$form->order_at}}</td>
-                                <td class="text-center">
-                                    <a href="javascript:void(0)" onclick="openWindow('/invoice/photoKTP-{{$form->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
-                                </td>
-                                <td class="text-center">
-                                    <button class="btn btn-danger printBarcode" data-id="{{$form->manifest_id}}"><i class="fa fa-print"></i></button>
-                                </td>
-                                <td class="text-center">
-                                    <a href="javascript:void(0)" onclick="openWindow('/invoice/barcodeBarang-{{$form->manifest_id}}')" class="btn btn-sm btn-danger"><i class="fa fa-print"></i></a>
-                                </td>
-                                <td class="text-center">
-                                    <a type="button" href="/invoice/pranota-{{$form->id}}" target="_blank" class="btn btn-sm btn-warning text-white"><i class="fa fa-file"></i></a>
-                                </td>
-                                <td class="text-center">
-                                    <a type="button" href="/invoice/invoicePrint-{{$form->id}}" target="_blank" class="btn btn-sm btn-info text-white"><i class="fa fa-file"></i></a>
-                                </td>
-                                <td class="text-center">
-                                    <div class="button-container">
-                                        <button type="button" id="pay" data-id="{{$form->id}}" class="btn btn-sm btn-success pay"><i class="fa fa-cogs"></i></button>
-                                        <button type="button" id="dok" data-id="{{$form->manifest_id}}" class="btn btn-sm btn-primary dok"><i class="fa fa-plus"></i></button>
-                                        <button class="btn btn-primary revisiInvoice" data-id="{{$form->form_id}}">Revisi</button>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
                 </table>
             </div>
         </div>
@@ -120,6 +80,33 @@
                     <button type="button" id="updateButton" class="btn btn-primary ml-1" data-bs-dismiss="modal"> <i class="bx bx-check d-block d-sm-none"></i> <span class="d-none d-sm-block">Submit</span> </button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="editTanngal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-centered modal-dialog-scrollable modal-sm"role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">Edit Tanggal Form</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"> <i data-feather="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="">Order At</label>
+                    <input type="datetime-local" class="form-control" id="order_at">
+                    <input type="hidden" class="form-control" id="idEditTanggal">
+                </div>
+                <div class="form-group">
+                    <label for="">Lunas At</label>
+                    <input type="datetime-local" class="form-control" id="lunas_at">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal"> <i class="bx bx-x d-block d-sm-none"></i> <span class="d-none d-sm-block">Close</span> </button>
+                <button type="button" id="updateTanggal" class="btn btn-primary ml-1" data-bs-dismiss="modal" onClick="updateTanggal()"> <i class="bx bx-check d-block d-sm-none"></i> <span class="d-none d-sm-block">Submit</span> </button>
+            </div>
         </div>
     </div>
 </div>
@@ -170,6 +157,139 @@
 @endsection
 
 @section('custom_js')
+
+<script>
+    async function editTanggalInvoice(event) {
+        Swal.showLoading();
+        const id = event.getAttribute('data-id');
+        console.log(id);
+
+        const url = "{{route('invoice.lcl.searchForEdit')}}";
+        
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ id: id })
+        });
+        swal.hideLoading();
+        if (response.ok) {
+            const result = await response.json();
+            console.log(result);
+            if (result.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Data Ditemukan',
+                }).then(() => {
+                    $('#editTanngal').modal('show');
+                    $('#editTanngal #order_at').val(result.data.order_at);
+                    $('#editTanngal #lunas_at').val(result.data.lunas_at);
+                    $('#editTanngal #idEditTanggal').val(result.data.id);
+                })
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    text: result.message,
+                });
+            }
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: response.status,
+                text: response.statusText,
+            });
+        }
+    }
+
+    async function updateTanggal() {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Are You Sure?',
+        }).then( async(result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Updating...',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                const order_at = document.getElementById('order_at').value;
+                const lunas_at = document.getElementById('lunas_at').value;
+                const id = document.getElementById('idEditTanggal').value;
+                console.log(order_at, lunas_at);
+                const url = '{{route('invoice.lcl.updateTanggal')}}';
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ order_at : order_at, lunas_at : lunas_at, id:id})
+                });
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log(result);
+                    if (result.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Data Ditemukan',
+                        }).then(() => {
+                            location.reload();
+                        })
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            text: result.message,
+                        });
+                    }
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: response.status,
+                        text: response.statusText,
+                    });
+                }
+            }
+        });
+    }
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('#tablePaidInvoice').DataTable({
+            processing: true,
+            serverSide: true,
+            scrollX: true,
+            ajax: '{{route('invoice.lcl.paidData')}}',
+            columns: [
+                {data:'order_no', name:'order_no', className:'text-center'},
+                {data:'invoice_no', name:'invoice_no', className:'text-center'},
+                {data:'manifest.nohbl', name:'manifest.nohbl', className:'text-center'},
+                {data:'manifest.tgl_hbl', name:'manifest.tgl_hbl', className:'text-center'},
+                {data:'manifest.quantity', name:'manifest.quantity', className:'text-center'},
+                {data:'customer.name', name:'customer.name', className:'text-center'},
+                {data:'kasir.name', name:'kasir.name', className:'text-center'},
+                {data:'status', name:'status', className:'text-center'},
+                {data:'order_at', name:'order_at', className:'text-center'},
+                {data:'ktp', name:'ktp', className:'text-center'},
+                {data:'gatePass', name:'gatePass', className:'text-center'},
+                {data:'containerLocation', name:'containerLocation', className:'text-center'},
+                {data:'pranota', name:'pranota', className:'text-center'},
+                {data:'invoice', name:'invoice', className:'text-center'},
+                {data:'pay', name:'pay', className:'text-center'},
+                {data:'dok', name:'dok', className:'text-center'},
+                {data:'revisi', name:'revisi', className:'text-center'},
+                {data:'editTanggal', name:'editTanggal', className:'text-center'},
+            ],
+        });
+    })
+</script>
+
 <script>
     $(document).ready(function() {
         // Attach click event to dynamically created buttons

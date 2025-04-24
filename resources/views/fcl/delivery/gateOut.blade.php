@@ -31,6 +31,11 @@
                             <th>Photo</th>
                             <th>Barcode</th>
                             <th>Status BC</th>
+                            <th>Segel Merah</th>
+                            <th>Alasan Segel</th>
+                            <th>Waktu Segel</th>
+                            <th>Alasan Lepas Segel</th>
+                            <th>Waktu Lepas Segel</th>
                             <th>No Job Order</th>
                             <th>No SPK</th>
                             <th>No Container</th>
@@ -274,6 +279,11 @@
                 {className:'text-center', name:'detil', data:'detil', searchable:false, orderable:false},
                 {className:'text-center', name:'printBarcode', data:'printBarcode', searchable:false, orderable:false},
                 {className:'text-center', name:'status_bc', data:'status_bc'},
+                {className:'text-center', data:'flag_segel_merah', name:'flag_segel_merah'},
+                {className:'text-center', data:'alasan_segel', name:'alasan_segel'},
+                {className:'text-center', data:'tanggal_segel_merah', name:'tanggal_segel_merah'},
+                {className:'text-center', data:'alasan_lepas_segel', name:'alasan_lepas_segel'},
+                {className:'text-center', data:'tanggal_lepas_segel_merah', name:'tanggal_lepas_segel_merah'},
                 {className:'text-center', name:'job.nojoborder', data:'job.nojoborder'},
                 {className:'text-center', name:'job.nospk', data:'job.nospk'},
                 {className:'text-center', name:'nocontainer', data:'nocontainer'},
