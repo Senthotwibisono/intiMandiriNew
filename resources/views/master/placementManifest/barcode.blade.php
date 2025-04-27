@@ -178,9 +178,9 @@
                     <br>
                     <div class="text-center">
                         <tr>
-                            <td>No Rack || Tier</td>
-                            <td> : </td>
-                            <td>{{$item->name}} || {{$tier->tier}}</td>
+                            <td>No Rack  : {{$item->name}}</td>
+                            <td> || </td>
+                            <td>Tier : {{$tier->tier}}</td>
                         </tr>
                         <br>
                         <tr>
