@@ -162,7 +162,7 @@
     }
 </style>
 
-@foreach($items as $item)
+<!-- @foreach($items as $item)
     @foreach($tiers as $tier)
         @if($tier->rack_id == $item->id)
         <div class="container">
@@ -206,6 +206,64 @@
         </div>
         @endif
     @endforeach
+@endforeach -->
+
+@foreach($items as $item)
+    @php
+        $itemTiers = $tiers->where('rack_id', $item->id)->sortBy('tier')->values();
+    @endphp
+
+    @if($itemTiers->count())
+    <div class="container mb-4" style="border: 1px solid black; padding: 15px; border-radius: 8px;">
+        <div class="card">
+            <div class="card-header">
+                <h1>{{$item->name}}</h1>
+            </div>
+            <div class="card-body">
+                {{-- Tampilkan Tier Dua-Dua --}}
+                @foreach($itemTiers->chunk(2) as $chunk)
+                    <div class="d-flex justify-content-center mb-3">
+                        @foreach($chunk as $tier)
+                            <div class="text-center mx-2" style="border: 1px solid black; padding: 15px; border-radius: 8px;">>
+                                <div class="text-center mb-3">
+                                    <table style="margin: 0 auto;">
+                                        <tr>
+                                            <td><b>Code</b></td>
+                                            <td>&nbsp;&nbsp;:&nbsp;&nbsp;</td>
+                                            <td>{{ $tier->barcode }}</td>
+                                        </tr>
+                                    </table>
+                                    <br>
+                                </div>
+                                {!! QrCode::margin(0)->size(500)->generate($tier->barcode) !!}
+                                <div class="mt-2">
+                                    <div>No Rack: {{ $item->name }}</div>
+                                    <div>Tier: {{ $tier->tier }}</div>
+                                    <div>
+                                        Fungsi Rack: 
+                                        @if($item->use_for == 'M')
+                                            Multi use
+                                        @elseif($item->use_for == 'D')
+                                            Danger Item
+                                        @elseif($item->use_for == 'B')
+                                            Behandle Rack
+                                        @elseif($item->use_for == 'L')
+                                            Long Stay
+                                        @else
+                                            -
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endforeach
+
+            </div>
+        </div>
+    </div>
+    @endif
 @endforeach
+
 
 </html>

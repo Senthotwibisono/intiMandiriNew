@@ -3,7 +3,7 @@
 @section('content')
 <section>
     <div class="card">
-        <form action="{{ route('photo.lcl.storeContainer')}}" method="post" enctype="multipart/form-data">
+        <form action="{{ route('photo.lcl.storeContainer')}}" method="post" enctype="multipart/form-data" id="createForm">
             @csrf
             <div class="card-body">
                 <div class="col-sm-12">
@@ -18,6 +18,18 @@
                     <div class="form-group">
                         <label for="">Nopol Masuk</label>
                         <input type="text" name="nopol" id="nopol" value="{{$cont->nopol ?? '-'}}"class="form-control">
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="form-group">
+                        <label for="">Tanggal Masuk</label>
+                        <input type="date" name="tglmasuk" id="tglmasuk" value="{{$cont->tglmasuk ?? '-'}}" class="form-control">
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="form-group">
+                        <label for="">Jam Masuk</label>
+                        <input type="time" name="jammasuk" id="jammasuk" value="{{$cont->jammasuk ?? '-'}}" class="form-control">
                     </div>
                 </div>
                 @endif
@@ -87,7 +99,7 @@
             </div>
             <div class="card-footer">
                 <div class="button-container">
-                    <button class="btn btn-success submit" type="submit">Submit</button>
+                    <button class="btn btn-success submit" type="button" id="submitButton">Submit</button>
                     <!-- <a href="javascript:void(0)" class="btn btn-sm btn-info photo"><i class="fa fa-eye"></i></a> -->
                 </div>
             </div>
@@ -96,21 +108,39 @@
 </section>
 @endsection
 @section('custom_js')
-
 <script>
-    $(document).on('click', '.submit', function(){
-        swal.fire({
-            title: 'Processing...',
-            text: 'Please wait',
-            icon: 'info',
-            allowOutsideClick: false,
-            showConfirmButton: false,
-                willOpen: () => {
-                    Swal.showLoading();
+    document.addEventListener('DOMContentLoaded', function () {
+        // Attach event listener to the update button
+        document.getElementById('submitButton').addEventListener('click', function (e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            // Show SweetAlert confirmation dialog
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to update this record?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, update it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Processing...',
+                        text: 'Please wait while the update is being processed.',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    // Submit the form programmatically if confirmed
+                    document.getElementById('createForm').submit();
                 }
+            });
         });
-    })
+    });
 </script>
+
 <script>
 $(document).ready(function(){
     $('#kegiatan').on('change', function(){

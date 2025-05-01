@@ -16,9 +16,9 @@
                         <label for="">No HBL</label>
                         <input type="text" name="nohbl" value="{{$manifest->nohbl}}" id="nohbl_edit" class="form-control" readonly>
                     </div>
-                    <div class="form-group">
-                        <label for="">Quantity</label>
-                        <input type="text" name="quantity" value="{{$manifest->quantity}}" id="quantity_edit" class="form-control" readonly>
+                    <div class="form-group" id="qtyInput" style="">
+                        <label for="">Quantity Real</label>
+                        <input type="text" name="final_qty" value="{{$manifest->final_qty}}" id="final_qty_edit" class="form-control">
                     </div>
                     <div class="form-group">
                         <label for="">Danger Label</label>

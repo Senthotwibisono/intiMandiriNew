@@ -32,6 +32,7 @@ class ReportCont implements FromCollection, WithMapping, WithHeadings, ShouldAut
         return [
             $cont->job->nojoborder ?? '-',
             $cont->job->PLP->nm_angkut ?? '-',
+            $cont->job->voy ?? '-',
             $cont->nocontainer ?? '-',
             $cont->size ?? '-',
             $cont->job->eta ?? '-',
@@ -47,8 +48,8 @@ class ReportCont implements FromCollection, WithMapping, WithHeadings, ShouldAut
             $cont->nopol ?? 'Belum Masuk',
             $cont->tglstripping ?? 'Belum Stripping',
             $cont->jamstripping ?? 'Belum Stripping',
-            $cont->tglbuangmty ?? 'Belum Keluar',
-            $cont->jambuangmty ?? 'Belum Keluar', 
+            $cont->tglkeluar ?? 'Belum Keluar',
+            $cont->jamkeluar ?? 'Belum Keluar', 
             $cont->nopol_mty ?? 'Belum Keluar', 
         ];
     }
@@ -58,6 +59,7 @@ class ReportCont implements FromCollection, WithMapping, WithHeadings, ShouldAut
         return [
             'No Job Order',
             'Nama Angkut',
+            'No Voy',
             'No Container',
             'Size',
             'ETA',

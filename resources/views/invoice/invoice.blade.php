@@ -205,7 +205,7 @@
           </div>
         </div>
         <hr>
-        <h4 style="text-align:left;">Terbilang: {{$terbilang}}</h4>
+        <h4 style="text-align:left;">Terbilang: {{$terbilang}} Rupiah</h4>
       </div>
       <div class="card-footer item-align-right">
             <div class="divider divider-left">

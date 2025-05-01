@@ -56,6 +56,24 @@ class PhotoController extends Controller
                 'nopol_release' => $request->nopol_release,
                 'dg_label' => $request->dg_label,
         ]);
+
+        if ($request->has('final_qty')) {
+            // dd($manifest->quantity, $request->final_qty);
+            if ($manifest->quantity != $request->final_qty) {
+                $statusBC = 'HOLD';
+                $alasan = $manifest->alasan_hold . ', Jumlah Quantity Real Berbeda';
+            }else {
+                $statusBC = $manifest->status_bc;
+                $alasan = $manifest->alasan_hold;
+            }
+
+            $manifest->update([
+                'final_qty' => $request->final_qty,
+                'status_bc' => $statusBC,
+                'alasan_hold' => $alasan,
+            ]); 
+        }
+
         try {
             if ($request->hasFile('photos')) {
                 foreach ($request->file('photos') as $photo) {
@@ -100,6 +118,25 @@ class PhotoController extends Controller
                     ]);
                 }
             }
+
+            if ($request->has('tglmasuk')) {
+                if ($request->tglmasuk != null) {
+                    $cont->update([
+                        'tglmasuk' => $request->tglmasuk,
+                        'jammasuk' => $request->jammasuk,
+                    ]);
+
+                    $manifests = Manifest::where('container_id', $cont->id)->get();
+                    if ($manifests->isNotEmpty()) {
+                        foreach ($manifests as $manifest) {
+                            $manifest->update([
+                                'tglmasuk' => $request->tglmasuk,
+                                'jammasuk' => $request->jammasuk,
+                            ]);
+                        }
+                    }
+                }
+            }
             return redirect()->back()->with('status', ['type'=>'success', 'message'=>'Data Berhasil di Update']);
             
         } catch (\Throwable $e) {
@@ -129,6 +166,15 @@ class PhotoController extends Controller
                         'action' => $request->action,
                         'photo' => $fileName,
                         'detil'=> $request->detil,
+                    ]);
+                }
+            }
+
+            if ($request->has('tglmasuk')) {
+                if ($request->tglmasuk != null) {
+                    $cont->update([
+                        'tglmasuk' => $request->tglmasuk,
+                        'jammasuk' => $request->jammasuk,
                     ]);
                 }
             }

@@ -209,7 +209,7 @@
           </div>
         </div>
         <hr>
-        <h4 style="text-align:left;">Terbilang: {{$terbilang}}</h4>
+        <h4 style="text-align:left;">Terbilang: {{$terbilang}} Rupiah</h4>
       </div>
     </div>
   </div>

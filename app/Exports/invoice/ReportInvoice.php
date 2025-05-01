@@ -30,10 +30,10 @@ class ReportInvoice implements FromCollection, WithMapping, WithHeadings, Should
         return [
             $header->invoice_no,
             $header->lunas_at ?? $header->piutang_at,
-            $header->manifest->cont->nocontainer,
-            $header->manifest->nohbl,
+            $header->manifest->cont->nocontainer ?? '-',
+            $header->manifest->nohbl ?? '-',
             $header->Form->cbm,
-            $header->manifest->quantity,
+            $header->manifest->quantity ?? '-',
             $header->form->jumlah_hari,
             $header->total ?? 0,
             $header->admin ?? 0,
@@ -41,6 +41,9 @@ class ReportInvoice implements FromCollection, WithMapping, WithHeadings, Should
             $header->ppn_amount ?? 0,
             $header->grand_total ?? 0,
             $header->customer->name ?? '-',
+            $header->expired_date ?? '-',
+            $header->manifest?->tglrelease ?? 'Belum Keluar',
+            $header->manifest?->jamrelease ?? '-',
            
         ];
     }
@@ -61,6 +64,9 @@ class ReportInvoice implements FromCollection, WithMapping, WithHeadings, Should
             'PPN',
             'Grand Total',
             'Customer',
+            'Rencan Keluar',
+            'Tanggal Release Manifest',
+            'Jam Release Manifest'
         ];
     }
 }

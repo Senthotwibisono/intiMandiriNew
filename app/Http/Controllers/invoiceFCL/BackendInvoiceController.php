@@ -413,9 +413,9 @@ class BackendInvoiceController extends Controller
     public function updateInvoice(Request $request)
     {
         $header = Header::find($request->id);
-
         try {
             $header->update([
+                'invoice_no' => ($header->flag_hidden == 'Y') ? ($request->invoice_no ? $request->invoice_no : $header->Invoice_no) : $header->invoice_no,
                 'created_at' => $request->created_at,
                 'lunas_at' => $request->lunas_at,
                 'cust_name' => $request->cust_name,

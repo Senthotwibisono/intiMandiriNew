@@ -39,10 +39,17 @@
                 </div>
                 <div class="row">
                     <div class="col-6">
+                    @if($header->flag_hidden == 'Y')
+                        <div class="form-group">
+                            <label for="">Invoice No</label>
+                            <input type="text" name="invoice_no" class="form-control" value="{{$header->invoice_no ?? '-'}}">
+                        </div>
+                    @else
                         <div class="form-group">
                             <label for="">Invoice No</label>
                             <input type="text" class="form-control" value="{{$header->invoice_no ?? '-'}}" readonly>
                         </div>
+                    @endif
                     </div>
                     <div class="col-6">
                         <div class="form-group">

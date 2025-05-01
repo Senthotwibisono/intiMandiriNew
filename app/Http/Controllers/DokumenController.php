@@ -1078,6 +1078,9 @@ class DokumenController extends Controller
                                     'alamat' => $bc23->alamat_imp,
                                 ]);
                             }
+                            $flagTglBl = !empty(trim($bc23->tgl_bl_awb ?? '')) ? $bc23->tgl_bl_awb : (!empty(trim($bc23->tgl_master_bl_awb ?? '')) ? $bc23->tgl_master_bl_awb : null);
+                            $flagNoBl = !empty(trim($bc23->no_bl_awb ?? '')) ? $bc23->no_bl_awb : (!empty(trim($bc23->no_master_bl_awb ?? '')) ? $bc23->no_master_bl_awb : null);
+                            // dd($flagTglBl);
                             $contF->update([
                                 'kd_dok_inout' => 2,
                                 'no_dok' => $bc23->no_sppb,
@@ -1085,8 +1088,8 @@ class DokumenController extends Controller
                                 'status_bc' => 'HOLD',
                                 'alasan_hold' => $alasanFinal,
                                 'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
-                                'nobl' => $bc23->no_bl_awb,
-                                'tgl_bl_awb' => $bc23->tgl_bl_awb ? Carbon::createFromFormat('m/d/Y', $bc23->tgl_bl_awb)->format('Y-m-d') : null,
+                                'nobl' => $flagNoBl,
+                                'tgl_bl_awb' => $flagTglBl ? Carbon::createFromFormat('m/d/Y', $flagTglBl)->format('Y-m-d') : null,
                             ]);
                         }
                     }
@@ -1247,6 +1250,8 @@ class DokumenController extends Controller
                                     'alamat' => $bc23->alamat_imp,
                                 ]);
                             }
+                            $flagTglBl = !empty(trim($bc23->tgl_bl_awb ?? '')) ? $bc23->tgl_bl_awb : (!empty(trim($bc23->tgl_master_bl_awb ?? '')) ? $bc23->tgl_master_bl_awb : null);
+                            $flagNoBl = !empty(trim($bc23->no_bl_awb ?? '')) ? $bc23->no_bl_awb : (!empty(trim($bc23->no_master_bl_awb ?? '')) ? $bc23->no_master_bl_awb : null);
                             $contF->update([
                                'kd_dok_inout' => 2,
                                 'no_dok' => $bc23->no_sppb,
@@ -1254,8 +1259,8 @@ class DokumenController extends Controller
                                 'status_bc' => 'HOLD',
                                 'alasan_hold' => $alasanFinal,
                                 'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
-                                'nobl' => $bc23->no_bl_awb,
-                                'tgl_bl_awb' => $bc23->tgl_bl_awb ? Carbon::createFromFormat('m/d/Y', $bc23->tgl_bl_awb)->format('Y-m-d') : null,
+                                'nobl' => $flagNoBl,
+                                'tgl_bl_awb' => $flagTglBl ? Carbon::createFromFormat('m/d/Y', $flagTglBl)->format('Y-m-d') : null,
                             ]);
                         }
                     }
@@ -1671,6 +1676,8 @@ class DokumenController extends Controller
                                     'alamat' => $sppb->alamat_imp,
                                 ]);
                             }
+                            $flagTglBl = !empty(trim($sppb->tgl_bl_awb ?? '')) ? $sppb->tgl_bl_awb : (!empty(trim($sppb->tgl_master_bl_awb ?? '')) ? $sppb->tgl_master_bl_awb : null);
+                            $flagNoBl = !empty(trim($sppb->no_bl_awb ?? '')) ? $sppb->no_bl_awb : (!empty(trim($sppb->no_master_bl_awb ?? '')) ? $sppb->no_master_bl_awb : null);
                             $contF->update([
                                 'kd_dok_inout' => 1,
                                  'no_dok' => $sppb->no_sppb,
@@ -1678,8 +1685,8 @@ class DokumenController extends Controller
                                  'status_bc' => $statusBC,
                                  'alasan_hold' => $alasanSize,
                                  'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
-                                 'nobl' => $sppb->no_bl_awb,
-                                 'tgl_bl_awb' => $sppb->tgl_bl_awb ? Carbon::createFromFormat('m/d/Y', $sppb->tgl_bl_awb)->format('Y-m-d') : null,
+                                 'nobl' => $flagNoBl,
+                                 'tgl_bl_awb' => $flagTglBl ? Carbon::createFromFormat('m/d/Y', $flagTglBl)->format('Y-m-d') : null,
  
                              ]);
                         }
@@ -1838,6 +1845,8 @@ class DokumenController extends Controller
                                     'alamat' => $sppb->alamat_imp,
                                 ]);
                             }
+                            $flagTglBl = !empty(trim($sppb->tgl_bl_awb ?? '')) ? $sppb->tgl_bl_awb : (!empty(trim($sppb->tgl_master_bl_awb ?? '')) ? $sppb->tgl_master_bl_awb : null);
+                            $flagNoBl = !empty(trim($sppb->no_bl_awb ?? '')) ? $sppb->no_bl_awb : (!empty(trim($sppb->no_master_bl_awb ?? '')) ? $sppb->no_master_bl_awb : null);
                             $contF->update([
                                  'kd_dok_inout' => 1,
                                  'no_dok' => $sppb->no_sppb,
@@ -1845,8 +1854,8 @@ class DokumenController extends Controller
                                  'status_bc' => $statusBC,
                                  'alasan_hold' => $alasanSize,
                                  'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
-                                 'nobl' => $sppb->no_bl_awb,
-                                 'tgl_bl_awb' => $sppb->tgl_bl_awb ? Carbon::createFromFormat('m/d/Y', $sppb->tgl_bl_awb)->format('Y-m-d') : null,
+                                 'nobl' => $flagNoBl,
+                                 'tgl_bl_awb' => $flagTglBl ? Carbon::createFromFormat('m/d/Y', $flagTglBl)->format('Y-m-d') : null,
                              ]);
                         }
                     }
@@ -3030,6 +3039,8 @@ class DokumenController extends Controller
                                     'alamat' => $pabean->al_imp,
                                 ]);
                             }
+                            $flagTglBl = !empty(trim($pabean->tgl_bl_awb ?? '')) ? $pabean->tgl_bl_awb : (!empty(trim($pabean->tgl_master_bl_awb ?? '')) ? $pabean->tgl_master_bl_awb : null);
+                            $flagNoBl = !empty(trim($pabean->no_bl_awb ?? '')) ? $pabean->no_bl_awb : (!empty(trim($pabean->no_master_bl_awb ?? '')) ? $pabean->no_master_bl_awb : null);
                             $contF->update([
                                 'kd_dok_inout' => $pabean->kd_dok_inout,
                                 'no_dok' => $pabean->no_dok_inout,
@@ -3037,8 +3048,8 @@ class DokumenController extends Controller
                                 'status_bc' => 'HOLD',
                                 'alasan_hold' => $alasanFinal,
                                 'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
-                                'nobl' => $pabean->no_bl_awb,
-                              
+                                'nobl' => $flagNoBl,
+                                'tgl_bl_awb' => $flagTglBl ? Carbon::createFromFormat('m/d/Y', $flagTglBl)->format('Y-m-d') : null,
                             ]);
                         }
                     }
@@ -3205,6 +3216,8 @@ class DokumenController extends Controller
                                     'alamat' => $pabean->al_imp,
                                 ]);
                             }
+                            $flagTglBl = !empty(trim($pabean->tgl_bl_awb ?? '')) ? $pabean->tgl_bl_awb : (!empty(trim($pabean->tgl_master_bl_awb ?? '')) ? $pabean->tgl_master_bl_awb : null);
+                            $flagNoBl = !empty(trim($pabean->no_bl_awb ?? '')) ? $pabean->no_bl_awb : (!empty(trim($pabean->no_master_bl_awb ?? '')) ? $pabean->no_master_bl_awb : null);
                             $contF->update([
                                 'kd_dok_inout' => $pabean->kd_dok_inout,
                                 'no_dok' => $pabean->no_dok_inout,
@@ -3212,7 +3225,8 @@ class DokumenController extends Controller
                                 'status_bc' => 'HOLD',
                                 'alasan_hold' => $alasanFinal,
                                 'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
-                                'nobl' => $pabean->no_bl_awb,
+                                'nobl' => $flagNoBl,
+                                'tgl_bl_awb' => $flagTglBl ? Carbon::createFromFormat('m/d/Y', $flagTglBl)->format('Y-m-d') : null,
                             ]);
                         }
                     }
