@@ -777,7 +777,7 @@ class FormFCLController extends Controller
         $query = Header::where('status', 'Y');
 
         if ($search) {
-            $query->where('nobl', 'like', "%{$search}%");
+            $query->where('invoice_no', 'like', "%{$search}%");
         }
 
         $cont = $query->paginate(10);

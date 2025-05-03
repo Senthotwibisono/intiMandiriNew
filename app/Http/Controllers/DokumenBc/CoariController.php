@@ -77,7 +77,7 @@ class CoariController extends Controller
 
     public function dataContLCL(Request $request)
     {
-        $cont = CD::where('jns_cont', 'L')->get();
+        $cont = CD::where('jns_cont', 'L')->orderBy('tgl_entry', 'desc')->orderBy('jam_entry', 'desc')->get()->unique('no_cont');
         return DataTables::of($cont)
         ->addColumn('action', function($cont){
             return '<button class="btn btn-outline-success kirimUlang" id="kirimUlang" data-id="'.$cont->cont_id.'">Kirim Ulang</button>';
@@ -318,7 +318,15 @@ class CoariController extends Controller
 
     public function dataManifestLCL(Request $request)
     {
-        $manifest = KD::get();
+        $manifest = KD::select('tpscoarikmsdetailxml.*')
+            ->join(DB::raw('(SELECT no_bl_awb, MAX(CONCAT(tgl_entry, " ", jam_entry)) as max_entry FROM tpscoarikmsdetailxml GROUP BY no_bl_awb) as latest'), function($join) {
+                $join->on('tpscoarikmsdetailxml.no_bl_awb', '=', 'latest.no_bl_awb')
+                     ->whereRaw('CONCAT(tpscoarikmsdetailxml.tgl_entry, " ", tpscoarikmsdetailxml.jam_entry) = latest.max_entry');
+            })
+            ->orderBy('tgl_entry', 'desc')
+            ->orderBy('jam_entry', 'desc')
+            ->get();
+
         return DataTables::of($manifest)
         ->addColumn('action', function($manifest){
             return '<button class="btn btn-outline-success kirimUlangCoari" id="kirimUlangCoari" data-id="'.$manifest->manifest_id.'">Kirim Ulang</button>';
@@ -551,7 +559,7 @@ class CoariController extends Controller
 
     public function dataContFCL(Request $request)
     {
-        $cont = CD::where('jns_cont', 'F')->get();
+        $cont = CD::where('jns_cont', 'F')->orderBy('tgl_entry', 'desc')->orderBy('jam_entry', 'desc')->get()->unique('no_cont');
         return DataTables::of($cont)
         ->addColumn('action', function($cont){
             return '<button class="btn btn-outline-success kirimUlang" id="kirimUlang" data-id="'.$cont->cont_id.'">Kirim Ulang</button>';

@@ -560,7 +560,7 @@ class CodecoController extends Controller
 
     public function dataContFCL(Request $request)
     {
-        $cont = CodecoContDetil::where('jns_cont', 'F')->get();
+        $cont = CodecoContDetil::where('jns_cont', 'F')->orderBy('tgl_entry', 'desc')->orderBy('jam_entry', 'desc')->get()->unique('no_cont');
         return DataTables::of($cont)
         ->addColumn('action', function($cont){
             return '<button class="btn btn-outline-success kirimUlang" id="kirimUlang" data-id="'.$cont->cont_id.'">Kirim Ulang</button>';

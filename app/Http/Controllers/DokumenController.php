@@ -1019,15 +1019,21 @@ class DokumenController extends Controller
                             }
     
                             // Alasan Kemas
+                            $alasanKemas = null;
                             if ($manifest->packing->code != $bcKMS->jns_kms) {
                                 $alasanKemas = "Jenis Kemas Berbeda";
                             }
-    
+                            $alasanJml = null;
                             if ($manifest->quantity != $bcKMS->jml_kms) {
                                 $alasanJml = "Quantity Berbeda";
                             }
+
+                            $alsasanQTY = null;
+                            if ($manifest->final_qty != $manifest->quantity) {
+                                $alsasanQTY = 'Jumalh QTY Fisik Berbeda';
+                            }
     
-                            $alasanFinal = 'Bukan Dokumen SPPB, ' . $alasanCust . ', ';
+                            $alasanFinal = 'Bukan Dokumen SPPB, ' . $alasanCust . ', ' . ', ' . $alasanJml . ', ' . $alasanJml . ', ' . $alsasanQTY;
     
                             $manifest->update([
                                 'kd_dok_inout' => 2,
@@ -1297,16 +1303,22 @@ class DokumenController extends Controller
                                 ]);
                             }
     
-                            // Alasan Kemas
+                             // Alasan Kemas
+                            $alasanKemas = null;
                             if ($manifest->packing->code != $bcKMS->jns_kms) {
                                 $alasanKemas = "Jenis Kemas Berbeda";
                             }
-    
+                            $alasanJml = null;
                             if ($manifest->quantity != $bcKMS->jml_kms) {
                                 $alasanJml = "Quantity Berbeda";
                             }
+
+                            $alsasanQTY = null;
+                            if ($manifest->final_qty != $manifest->quantity) {
+                                $alsasanQTY = 'Jumalh QTY Fisik Berbeda';
+                            }
     
-                            $alasanFinal = 'Bukan Dokume SPPB, ' . $alasanCust . ', ';
+                            $alasanFinal = 'Bukan Dokumen SPPB, ' . $alasanCust . ', ' . ', ' . $alasanJml . ', ' . $alasanJml . ', ' . $alsasanQTY;
     
                             $manifest->update([
                                 'kd_dok_inout' => 2,
@@ -1625,7 +1637,13 @@ class DokumenController extends Controller
                                 ]);
                             }
     
-                            $alasanFinal =  $alasanCust . ', ';
+                            $alsasanQTY = null;
+                            if ($manifest->quantity != $manifest->final_qty) {
+                                $alsasanQTY = 'Jumlah QTY Real Berbeda';
+                                $statusBC = 'HOLD';
+                            }
+
+                            $alasanFinal =  $alasanCust . ', ' . $alsasanQTY;
     
                             $manifest->update([
                                 'kd_dok_inout' => 1,
@@ -1892,7 +1910,13 @@ class DokumenController extends Controller
                                 ]);
                             }
     
-                            $alasanFinal = $alasanCust . ', ';
+                            $alsasanQTY = null;
+                            if ($manifest->quantity != $manifest->final_qty) {
+                                $alsasanQTY = 'Jumlah QTY Real Berbeda';
+                                $statusBC = 'HOLD';
+                            }
+
+                            $alasanFinal =  $alasanCust . ', ' . $alsasanQTY;
     
                             $manifest->update([
                                 'kd_dok_inout' => 1,

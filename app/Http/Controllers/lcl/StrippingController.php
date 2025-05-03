@@ -247,11 +247,21 @@ class StrippingController extends Controller
             try {
                 if ($manifest->ijin_stripping == 'Y') {
                     if ($request->final_qty == $manifest->quantity) {
-                        $statusBc = $manifest->status_bc;
-                        $alasanHold = $manifest->alasan_hold;
+                        if ($manifest->kd_dok_inout == 1) {
+                            $statusBc = 'release';
+                            $alasanHold = $manifest->alasan_hold;
+                        }else {
+                            if ($manifest->release_bc_uid != null) {
+                                $statusBc = 'release';
+                                $alasanHold = $manifest->alasan_hold;
+                            }else {
+                                $statusBc = $manifest->status_bc;
+                                $alasanHold = $manifest->alasan_hold;
+                            }
+                        }
                     }else {
                         $statusBc = 'HOLD';
-                        $alasanHold = trim(($manifest->alasan_hold ? $manifest->alasan_hold . ', ' : '') . 'Quantity Berbeda');
+                        $alasanHold = trim(($manifest->alasan_hold ? $manifest->alasan_hold . ', ' : '') . 'Quantity Real Berbeda');
                     }
                     // dd($statusBc);
                     $manifest->update([

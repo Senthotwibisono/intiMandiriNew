@@ -59,12 +59,28 @@ class PhotoController extends Controller
 
         if ($request->has('final_qty')) {
             // dd($manifest->quantity, $request->final_qty);
-            if ($manifest->quantity != $request->final_qty) {
-                $statusBC = 'HOLD';
-                $alasan = $manifest->alasan_hold . ', Jumlah Quantity Real Berbeda';
+            if ($manifest->quantity == $request->final_qty) {
+                if ($manifest->kd_dok_inout == 1) {
+                    $statusBC = 'release';
+                    $alasan = $manifest->alasan_hold;
+                }else {
+                    if ($manifest->release_bc_uid != null) {
+                        $statusBC = 'release';
+                        $alasan = $manifest->alasan_hold;
+                    }else {
+                        $statusBC = $manifest->status_bc;
+                        $alasan = $manifest->alasan_hold;
+                    }
+                }
+                
             }else {
-                $statusBC = $manifest->status_bc;
-                $alasan = $manifest->alasan_hold;
+                if ($manifest->status_bc == 'release') {
+                    $statusBC = 'HOLD';
+                    $alasan = $manifest->alasan_hold . ', Jumlah Quantity Real Berbeda';
+                }else {
+                    $statusBC = $manifest->status_bc;
+                    $alasan = $manifest->alasan_hold . ', Jumlah Quantity Real Berbeda';
+                }
             }
 
             $manifest->update([
