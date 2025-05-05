@@ -62,7 +62,7 @@ class CFSController extends Controller
             'consignee'      => 'required',
             'npwp_consignee' => 'required',
             // 'no_pol'         => 'required',
-            'jns_kms'        => 'required',
+            // 'jns_kms'        => 'required',
             // 'merk_kms'       => 'required',
             'jml_kms'        => 'required|integer',
             // 'user'           => 'required',
@@ -88,7 +88,7 @@ class CFSController extends Controller
             'consignee.required'      => 'Consignee wajib diisi.',
             'npwp_consignee.required' => 'NPWP Consignee wajib diisi.',
             // 'no_pol.required'         => 'Nomor polisi wajib diisi.',
-            'jns_kms.required'        => 'Jenis kemasan wajib diisi.',
+            // 'jns_kms.required'        => 'Jenis kemasan wajib diisi.',
             // 'merk_kms.required'       => 'Merk kemasan wajib diisi.',
             'jml_kms.required'        => 'Jumlah kemasan wajib diisi.',
             'jml_kms.integer'         => 'Jumlah kemasan harus berupa angka.',
@@ -135,13 +135,13 @@ class CFSController extends Controller
                 //         'message' => 'NPWP Consignee berbeda',
                 //     ]);
                 // }
-                if ($manifest->packing->code != $request->jns_kms ) {
-                    return response()->json([
-                        'status' => false,
-                        'success' => false,
-                        'message' => 'Jenis Kemasan Berbeda',
-                    ]);
-                }
+                // if ($manifest->packing->code != $request->jns_kms ) {
+                //     return response()->json([
+                //         'status' => false,
+                //         'success' => false,
+                //         'message' => 'Jenis Kemasan Berbeda',
+                //     ]);
+                // }
     
                 if ($manifest->quantity != $request->jml_kms ) {
                     return response()->json([

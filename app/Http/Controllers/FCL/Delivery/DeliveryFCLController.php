@@ -582,10 +582,12 @@ class DeliveryFCLController extends Controller
     {
         $cont = Cont::where('id', $request->id)->first();
         if ($cont->active_to == null) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Harap melunasi invoice terlebih dahulu',
-            ]);
+            if ($cont->lokasisandar_id != 6) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Harap melunasi invoice terlebih dahulu',
+                ]);
+            }
         }
         
         if ($cont->flag_segel_merah == 'Y') {
@@ -604,7 +606,7 @@ class DeliveryFCLController extends Controller
                 if ($barcode->status == 'inactive' || $barcode->expired <= $now) {
                     $barcode->update([
                         'status'=> $action,
-                        'expired'=> $cont->active_to,
+                        'expired'=> ($cont->lokasisandar_id != 6) ? $cont->active_to : Carbon::now(),
                     ]);
                     return response()->json([
                         'success' => true,
@@ -629,7 +631,7 @@ class DeliveryFCLController extends Controller
                 'ref_number'=>$cont->nocontainer,
                 'barcode'=> $uniqueBarcode,
                 'status'=> $action,
-                'expired'=> $cont->active_to,
+                'expired'=> ($cont->lokasisandar_id != 6) ? $cont->active_to : Carbon::now(),
                 'uid'=> Auth::user()->id,
                 'created_at'=> Carbon::now(),
             ]);

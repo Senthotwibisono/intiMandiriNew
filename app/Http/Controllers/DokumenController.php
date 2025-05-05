@@ -1095,7 +1095,6 @@ class DokumenController extends Controller
                                 'alasan_hold' => $alasanFinal,
                                 'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
                                 'nobl' => $flagNoBl,
-                                'tgl_bl_awb' => $flagTglBl ? Carbon::createFromFormat('m/d/Y', $flagTglBl)->format('Y-m-d') : null,
                             ]);
                         }
                     }
@@ -1266,7 +1265,6 @@ class DokumenController extends Controller
                                 'alasan_hold' => $alasanFinal,
                                 'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
                                 'nobl' => $flagNoBl,
-                                'tgl_bl_awb' => $flagTglBl ? Carbon::createFromFormat('m/d/Y', $flagTglBl)->format('Y-m-d') : null,
                             ]);
                         }
                     }
@@ -1704,7 +1702,6 @@ class DokumenController extends Controller
                                  'alasan_hold' => $alasanSize,
                                  'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
                                  'nobl' => $flagNoBl,
-                                 'tgl_bl_awb' => $flagTglBl ? Carbon::createFromFormat('m/d/Y', $flagTglBl)->format('Y-m-d') : null,
  
                              ]);
                         }
@@ -1873,7 +1870,6 @@ class DokumenController extends Controller
                                  'alasan_hold' => $alasanSize,
                                  'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
                                  'nobl' => $flagNoBl,
-                                 'tgl_bl_awb' => $flagTglBl ? Carbon::createFromFormat('m/d/Y', $flagTglBl)->format('Y-m-d') : null,
                              ]);
                         }
                     }
@@ -3073,7 +3069,6 @@ class DokumenController extends Controller
                                 'alasan_hold' => $alasanFinal,
                                 'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
                                 'nobl' => $flagNoBl,
-                                'tgl_bl_awb' => $flagTglBl ? Carbon::createFromFormat('m/d/Y', $flagTglBl)->format('Y-m-d') : null,
                             ]);
                         }
                     }
@@ -3250,7 +3245,6 @@ class DokumenController extends Controller
                                 'alasan_hold' => $alasanFinal,
                                 'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
                                 'nobl' => $flagNoBl,
-                                'tgl_bl_awb' => $flagTglBl ? Carbon::createFromFormat('m/d/Y', $flagTglBl)->format('Y-m-d') : null,
                             ]);
                         }
                     }

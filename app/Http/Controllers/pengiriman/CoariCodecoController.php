@@ -924,7 +924,7 @@ class CoariCodecoController extends Controller
 
     public function CodecoContFCL()
     {
-        $conts = ContF::whereNotNull('tglkeluar')->where('coari_flag', '=', 'Y')->where('codeco_flag', '=', 'N')->get();
+        $conts = ContF::whereNotNull('tglkeluar')->where('coari_flag', '=', 'Y')->where('codeco_flag', '=', 'N')->whereNotNull('kd_dok_inout')->whereNotNull('no_dok')->whereNotNull('tgl_dok')->get();
         if (!empty($conts)) {
             \SoapWrapper::override(function ($service) {
                 $service

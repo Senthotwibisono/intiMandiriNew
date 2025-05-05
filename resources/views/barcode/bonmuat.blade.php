@@ -177,7 +177,7 @@
                             </div>
                         </div>
                     </div>
-                    {{strtoupper($barcode->ref_type).' - '.strtoupper($barcode->ref_action)}}
+                    {{strtoupper($barcode->ref_type).' - '.strtoupper($barcode->ref_action) . ' - (' .($barcode->status) . ')' }}
                     <small class="pull-right"><strong>Expired Date:</strong> {{ date('d F, Y', strtotime($barcode->expired)) }}</small>
                 </div>
                 <div class="card-body">

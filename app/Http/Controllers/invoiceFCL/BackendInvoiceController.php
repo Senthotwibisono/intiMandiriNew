@@ -99,7 +99,11 @@ class BackendInvoiceController extends Controller
             }elseif ($header->status == 'C') {
                 return '<span class="badge bg-danger text-white">Canceled</span>';
             } else {
-                return '<span class="badge bg-warning text-white">Belum Lunas</span>';
+                if ($header->kd_tps_asal == 'PLDC') {
+                    return '<a href="/invoiceFCL/invoice/edit/'.$header->id.'" class="btn btn-info editInvoice"><i class="fa fa-pencil"></i></a>';
+                } else {
+                    return '<span class="badge bg-warning text-white">Belum Lunas</span>';
+                }
             }
         })
         ->rawColumns(['invoiceNo', 'pranota', 'invoice', 'action', 'deleteOrCancel', 'edit', 'tranparansi'])
