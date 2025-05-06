@@ -253,6 +253,16 @@ Route::middleware('permission:dataMaster')->controller(MasterController::class)-
     Route::get('/master/photoData{id?}', 'photoData');
     Route::post('/master/photo-post', 'photoPost');
     Route::delete('/master/photo-delete{id?}', 'photoDelete');
+
+    // Driver
+
+    Route::prefix('/master/driver')->group(function(){
+        Route::get('/index', 'DriverIndex')->name('master.driver.index');
+        Route::get('/data', 'DriverData')->name('master.driver.data');
+        Route::get('/getData-{id?}', 'DriverGetData')->name('master.driver.getData');
+        Route::post('/post', 'DriverPost')->name('master.driver.post');
+        Route::post('/delete', 'DriverDelete')->name('master.driver.delete');
+    });
 });
 
 Route::middleware('permission:tpsOnline')->controller(DokumenController::class)->group(function (){

@@ -218,6 +218,85 @@
     });
     </script>
 
+    <script>
+        function createLoading() {
+            let loadingOverlay = document.createElement("div");
+            loadingOverlay.id = "loadingOverlay";
+            loadingOverlay.style.position = "fixed";
+            loadingOverlay.style.top = "0";
+            loadingOverlay.style.left = "0";
+            loadingOverlay.style.width = "100%";
+            loadingOverlay.style.height = "100%";
+            loadingOverlay.style.background = "rgba(0, 0, 0, 0.5)";
+            loadingOverlay.style.display = "flex";
+            loadingOverlay.style.justifyContent = "center";
+            loadingOverlay.style.alignItems = "center";
+            loadingOverlay.style.zIndex = "9999";
+            let spinner = document.createElement("div");
+            spinner.style.width = "50px";
+            spinner.style.height = "50px";
+            spinner.style.border = "5px solid #f3f3f3";
+            spinner.style.borderTop = "5px solid #3498db";
+            spinner.style.borderRadius = "50%";
+            spinner.style.animation = "spin 1s linear infinite";
+            // Tambahkan animasi CSS ke dalam JavaScript
+            let style = document.createElement("style");
+            style.innerHTML = `
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `;
+            document.head.appendChild(style);
+            loadingOverlay.appendChild(spinner);
+            document.body.appendChild(loadingOverlay);
+        }
+        function showLoading() {
+            if (!document.getElementById("loadingOverlay")) {
+                createLoading();
+            }
+        }
+        function hideLoading() {
+            let loadingOverlay = document.getElementById("loadingOverlay");
+            if (loadingOverlay) {
+                loadingOverlay.remove();
+            }
+        }
+    </script>
+
+    <script>
+        async function errorResponse(response) {
+            Swal.fire({
+                icon: 'error',
+                title: response.status,
+                text: response.statusText,
+            }).then(() => {
+                showLoading();
+                location.reload();
+            });
+        }
+        async function errorHasil(hasil) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: hasil.message,
+            }).then(() => {
+                showLoading();
+                location.reload();
+            });
+        }
+        async function successHasil(hasil) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Sukses',
+                text: hasil.message,
+            }).then(() => {
+                showLoading();
+                location.reload();
+            });
+        }
+    </script>
+
     <!-- <script src="{{ asset('query-ui/jquery-ui.js') }}"></script>
     <script src="{{ asset('query-ui/jquery-ui.min.js') }}" type="text/javascript"></script>
     <script src="{{asset('jquery-3.6.4.min.js')}}" type="text/javascript"></script> -->

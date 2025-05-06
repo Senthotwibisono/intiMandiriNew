@@ -16,6 +16,7 @@ use App\Models\User;
 use App\Models\Photo;
 use App\Models\BarcodeGate as Barcode;
 use App\Models\YardDetil as RowTier;
+use App\Models\MasterDriver as Driver;
 
 use App\Models\KeteranganPhoto as KP;
 
@@ -136,6 +137,7 @@ class GateInFCLCotroller extends Controller
         $data['user'] = Auth::user()->name;
         $data['seals'] = Eseal::get();
         $data['now'] = Carbon::now();
+        $data['drivers'] = Driver::get();
         
         return view('fcl.realisasi.sealIndex', $data);
     }
@@ -150,6 +152,7 @@ class GateInFCLCotroller extends Controller
                     'no_seal' => $request->no_seal,
                     'size' => $request->size,
                     'weight' => $request->weight,
+                    'driver_id' => $request->driver_id,
                 ]);
                 return redirect()->back()->with('status', ['type' => 'success', 'message' => 'Data Berhasil di Update']);
             }
@@ -281,41 +284,42 @@ class GateInFCLCotroller extends Controller
                         "esealCode"=> $cont->seal->code,
                         "containerNumber"=> $cont->nocontainer,
                     ];
-
-                    try {
-                        $responseEnvilog = $this->client->post($this->urlEnvilog, [
-                            'headers' => [
-                                'Authorization' => 'Bearer ' . $this->tokenEnvilog, // Tambahkan spasi setelah 'Bearer'
-                                'Accept' => 'application/json', // Perbaiki key header
-                                'Content-Type' => 'application/json',
-                            ],
-                            'json' => $dataEnvilog, // Mengirim data dalam format JSON
-                        ]);
-
-                        // var_dump($responseEnvilog->getStatusCode());
-                        // die();
-
-                        if ($responseEnvilog->getStatusCode() == 200) {
-                            $responseDataEnvilog = json_decode($responseEnvilog->getBody(), true);
-                            if ($responseDataEnvilog['isSuccess'] == 1) {
-                                return response()->json([
-                                    'success' => true,
-                                    'message' => 'dispatche successfully!',
-                                ]);
-                            }else {
-                                return response()->json([
-                                    'success' => false,
-                                    'message' => 'Dispatche Eseal Go berhasil, Envilog Gagagl: ' . $responseDataEnvilog['data'] . '!!',
-                                ]);
+                    if ($cont->lokasisandar_id == 5) {
+                        try {
+                            $responseEnvilog = $this->client->post($this->urlEnvilog, [
+                                'headers' => [
+                                    'Authorization' => 'Bearer ' . $this->tokenEnvilog, // Tambahkan spasi setelah 'Bearer'
+                                    'Accept' => 'application/json', // Perbaiki key header
+                                    'Content-Type' => 'application/json',
+                                ],
+                                'json' => $dataEnvilog, // Mengirim data dalam format JSON
+                            ]);
+    
+                            // var_dump($responseEnvilog->getStatusCode());
+                            // die();
+    
+                            if ($responseEnvilog->getStatusCode() == 200) {
+                                $responseDataEnvilog = json_decode($responseEnvilog->getBody(), true);
+                                if ($responseDataEnvilog['isSuccess'] == 1) {
+                                    return response()->json([
+                                        'success' => true,
+                                        'message' => 'dispatche successfully!',
+                                    ]);
+                                }else {
+                                    return response()->json([
+                                        'success' => false,
+                                        'message' => 'Dispatche Eseal Go berhasil, Envilog Gagagl: ' . $responseDataEnvilog['data'] . '!!',
+                                    ]);
+                                }
+                                // var_dump($responseDataEnvilog);
                             }
-                            // var_dump($responseDataEnvilog);
+    
+                        } catch (\Throwable $th) {
+                            return response()->json([
+                                'success' => false,
+                                'message' => 'Dispatche Eseal Go berhasil, Envilog Gagagl: !!!' . $th->getMessage(),
+                            ]);
                         }
-
-                    } catch (\Throwable $th) {
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'Dispatche Eseal Go berhasil, Envilog Gagagl: !!!' . $th->getMessage(),
-                        ]);
                     }
                     return response()->json([
                         'success' => true,

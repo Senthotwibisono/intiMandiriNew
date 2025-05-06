@@ -217,6 +217,7 @@ class ContainerFCL extends Model
         'jenis_spjm',
         'no_spjm',
         'tgl_spjm',
+        'driver_id',
     ];
 
     public function user()
@@ -266,5 +267,10 @@ class ContainerFCL extends Model
     public function DetilYard()
     {
         return $this->belongsTo(YardDetil::class, 'yard_detil_id', 'id');
+    }
+
+    public function Driver()
+    {
+        return $this->belongsTo(MasterDriver::class, 'driver_id', 'id');
     }
 }

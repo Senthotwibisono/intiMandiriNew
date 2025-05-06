@@ -77,7 +77,7 @@ class CodecoController extends Controller
 
     public function dataContLCL(Request $request)
     {
-        $cont = CodecoContDetil::where('jns_cont', 'L')->get();
+        $cont = CodecoContDetil::where('jns_cont', 'L')->orderBy('tgl_entry', 'desc')->orderBy('jam_entry', 'desc')->get()->unique('no_cont');
         return DataTables::of($cont)
         ->addColumn('action', function($cont){
             return '<button class="btn btn-outline-success kirimUlang" id="kirimUlang" data-id="'.$cont->cont_id.'">Kirim Ulang</button>';
@@ -148,20 +148,20 @@ class CodecoController extends Controller
             'bruto' => $cont->weight,
             'no_master_bl_awb' => $cont->job->nombl ?? '',
             'tgl_master_bl_awb' => $cont->job->tgl_master_bl 
-               ? Carbon::createFromFormat('Y-m-d', $cont->job->tgl_master_bl)->format('Ymd') 
-               : null,
+                    ? Carbon::parse($cont->job->tgl_master_bl)->format('Ymd') 
+                    : null,
             'no_bl_awb' => $cont->nobl ?? '',
             'tgl_bl_awb' => $cont->tgl_bl_awb 
-               ? Carbon::createFromFormat('Y-m-d', $cont->tgl_bl_awb)->format('Ymd') 
-               : null,
+                    ? Carbon::parse($cont->tgl_bl_awb)->format('Ymd') 
+                    : null,
             'no_cont' => $cont->nocontainer,
             'uk_cont' => $cont->size,
             'no_segel' => $cont->seal->code ?? ' ',
             'jns_cont' => $typeCont,
             'no_bc11' => $cont->job->tno_bc11 ?? '',
             'tgl_bc11' => $cont->job->ttgl_bc11 
-                ? Carbon::createFromFormat('Y-m-d', $cont->job->ttgl_bc11)->format('Ymd') 
-                : null,
+                    ? Carbon::parse($cont->job->ttgl_bc11)->format('Ymd') 
+                    : null,
         ];
         
         $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><DOCUMENT></DOCUMENT>');
@@ -368,16 +368,16 @@ class CodecoController extends Controller
             'kd_gudang' => $cont->job->PLP->gudang_tujuan ?? 'INTI',
             'no_master_bl_awb' => $cont->job->nombl,
             'tgl_master_bl_awb' => $cont->job->tgl_master_bl 
-               ? Carbon::createFromFormat('Y-m-d', $cont->job->tgl_master_bl)->format('Ymd') 
-               : null,
+                    ? Carbon::parse($cont->job->tgl_master_bl)->format('Ymd') 
+                    : null,
             'no_cont' => $cont->nocontainer,
             'uk_cont' => $cont->size,
             'no_segel' => $cont->seal->code ?? ' ',
             'jns_cont' => 'F',
             'no_bc11' => $cont->job->tno_bc11 ?? '',
-            'tgl_bc11' => $cont->job->ttgl_bc11 
-                ? Carbon::createFromFormat('Y-m-d', $cont->job->ttgl_bc11)->format('Ymd') 
-                : null,
+           'tgl_bc11' => $cont->job->ttgl_bc11 
+                    ? Carbon::parse($cont->job->ttgl_bc11)->format('Ymd') 
+                    : null,
         ];
         $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><DOCUMENT></DOCUMENT>');       
         

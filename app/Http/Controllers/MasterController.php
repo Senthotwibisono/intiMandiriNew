@@ -13,6 +13,7 @@ use App\Imports\ppjkExcel;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\DB;
 
 use App\Models\Customer;
 use App\Models\Consolidator;
@@ -34,9 +35,11 @@ use App\Models\YardDetil as RowTier;
 use App\Models\JobOrder as Job;
 use App\Models\KapasitasGudang as KG;
 use App\Models\KeteranganPhoto as Photo;
+use App\Models\MasterDriver as Driver;
 
 use Auth;
 use Carbon\Carbon;
+use DataTables;
 
 class MasterController extends Controller
 {
@@ -1478,4 +1481,120 @@ class MasterController extends Controller
             ]);
         }
     }
+
+    // Driver
+    public function DriverIndex()
+    {
+        $data['title'] = 'Master Driver';
+
+        return view('master.driver.index', $data);
+    }
+
+    public function DriverData(Request $request)
+    {
+        $driver = Driver::get();
+
+        return DataTables::of($driver)
+        ->addColumn('name', function($driver){
+            return $driver->name ?? '-';
+        })
+        ->addColumn('code', function($driver){
+            return $driver->code ?? '-';
+        })
+        ->addColumn('phone', function($driver){
+            return $driver->phone ?? '-';
+        })
+        ->addColumn('edit', function($driver){
+            return '<button type="button" class="btn btn-warning" data-id="'.$driver->id.'" onClick="getDataDriver(this)"><i class="fas fa-pencil"></i></button>';
+        })
+        ->addColumn('delete', function($driver){
+            return '<button type="button" class="btn btn-danger" data-id="'.$driver->id.'" onClick="deleteDriver(this)"><i class="fas fa-trash"></i></button>';
+        })
+        ->rawColumns(['edit', 'delete'])
+        ->make(true);
+    }
+
+    public function DriverPost(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+        
+            $data = [
+                'name' => $request->data['name'],
+                'code' => $request->data['code'],
+                'phone' => $request->data['phone'],
+            ];
+
+            // var_dump($data, $request->all());
+            // die();
+            $oldDriver = Driver::where('code', $request->data['code'])->first();
+            if ($oldDriver) {
+                if ($oldDriver->id != $request->data['id']) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Data sudah ada pada driver : ' . $oldDriver->name,
+                    ]);
+                }
+            }
+        
+            if ($request->data['id']) {
+                // Update
+                $driver = Driver::findOrFail($request->data['id']);
+                $driver->update($data);
+            } else {
+                // Create
+                $driver = Driver::create($data);
+            }
+        
+            DB::commit();
+        
+            return response()->json([
+                'success' => true,
+                'message' => 'Data driver berhasil disimpan',
+                'data' => $driver
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+        
+            return response()->json([
+                'success' => false,
+                'message' => 'Opps, something went wrong',
+                'error' => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    public function DriverDelete(Request $request)
+    {
+        $driver = Driver::find($request->id);
+        try {
+            $driver->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'Data berhasil dihapus',
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Something wrong in ' . $th->getMessage(),
+            ]);
+        }       
+    }
+
+    public function DriverGetData($id)
+    {
+        $driver = Driver::find($id);
+        if ($driver) {
+            return response()->json([
+                'success' => true,
+                'data' => $driver,
+            ]);  
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak ditemukan'
+            ]);
+        }
+    }
+
 }

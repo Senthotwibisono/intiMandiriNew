@@ -357,6 +357,9 @@
             <li class="submenu-item @if((Request::is('master/yard') || Request::is('master/yard*'))) active @endif">
                 <a href="{{ route('master.yard.index')}}">Yard</a>
             </li>
+            <li class="submenu-item @if((Request::is('master/driver') || Request::is('master/driver*'))) active @endif">
+                <a href="{{ route('master.driver.index')}}">Driver</a>
+            </li>
            
         </ul>
     </li>  
