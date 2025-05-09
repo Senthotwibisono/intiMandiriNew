@@ -98,7 +98,7 @@
       <div class="grid-body">
         <div class="row">
             <div class="col-xs-12 col-8 my-auto">
-                <span class="small">Proforma No. # {{$header->order_no}}</span><br>
+                <!-- <span class="small">Proforma No. # {{$header->order_no}}</span><br> -->
                 <span class="small">Invoice No. # {{$header->invoice_no}}</span><br>
             </div>
             <div class="col-xs-12 col-4 text-center">

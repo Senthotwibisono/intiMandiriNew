@@ -31,7 +31,7 @@
                             <th class="text-center">Photo KTP</th>
                             <th class="text-center">Gate Pass</th>
                             <th class="text-center">Container Location</th>
-                            <th class="text-center">Pranota</th>
+                            <!-- <th class="text-center">Pranota</th> -->
                             <th class="text-center">Invoice</th>
                             <th class="text-center">Pay</th>
                             <th class="text-center">Dokumen</th>
@@ -279,7 +279,7 @@
                 {data:'ktp', name:'ktp', className:'text-center'},
                 {data:'gatePass', name:'gatePass', className:'text-center'},
                 {data:'containerLocation', name:'containerLocation', className:'text-center'},
-                {data:'pranota', name:'pranota', className:'text-center'},
+                // {data:'pranota', name:'pranota', className:'text-center'},
                 {data:'invoice', name:'invoice', className:'text-center'},
                 {data:'pay', name:'pay', className:'text-center'},
                 {data:'dok', name:'dok', className:'text-center'},

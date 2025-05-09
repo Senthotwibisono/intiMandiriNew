@@ -106,6 +106,17 @@ class BackendInvoiceController extends Controller
                 }
             }
         })
+        ->addColumn('flagSP2', function($header){
+            $formC = FormC::where('form_id', $header->form_id)->get();
+            $conts = ContF::whereIn('id', $formC->pluck('container_id'))->get();
+            $countSP2 = $conts->where('flag_sp2', 'N')->count();
+            if ($countSP2 > 0) {
+                $flagSP2 = 'N';
+            } else {
+                $flagSP2 = 'Y';
+            }
+            return $flagSP2;
+        })
         ->rawColumns(['invoiceNo', 'pranota', 'invoice', 'action', 'deleteOrCancel', 'edit', 'tranparansi'])
         ->make(true);
     }

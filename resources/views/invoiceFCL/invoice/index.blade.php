@@ -1,7 +1,12 @@
 @extends('partial.main')
 
 @section('custom_styles')
-
+<style>
+    .highlight-blue {
+        background-color: #7ec8e3 !important;
+        color: #000 !important;
+    }
+</style>
 @endsection
 
 @section('content')
@@ -240,7 +245,13 @@
                 {data:'action', name:'action'},
                 {data:'deleteOrCancel', name:'deleteOrCancel'},
                 {data:'edit', name:'edit'},
-            ]
+            ],
+            createdRow: function (row, data, dataIndex) {
+                console.log(data); // cek data yang masuk
+                if (data.flagSP2 === 'Y') {
+                    $(row).addClass('highlight-blue');
+                } 
+            },
         })
     })
 </script>
