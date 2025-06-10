@@ -168,6 +168,10 @@ body {
                         <div class="col-8">: {{$header->cust_name ?? '-'}}</div>
                     </div>
                     <div class="row">
+                        <div class="col-3"><strong>NPWP</strong></div>
+                        <div class="col-8">: {{$header->cust_npwp ?? '-'}}</div>
+                    </div>
+                    <div class="row">
                         <div class="col-3"><strong>Alamat</strong></div>
                         <div class="col-8">: {{$header->cust_alamat ?? '-'}}</div>
                     </div>

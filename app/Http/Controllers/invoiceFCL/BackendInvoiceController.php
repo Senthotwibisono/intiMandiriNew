@@ -148,7 +148,7 @@ class BackendInvoiceController extends Controller
         ELSE 5
         END")->orderBy('keterangan', 'desc')->get();
 
-        $data['terbilang'] = $this->terbilang($data['header']->grand_total);
+        $data['terbilang'] = $this->terbilang(ceil($data['header']->grand_total));
         // dd($data['terbilang']);
 
         if ($data['header']->type == 'EXTEND') {
@@ -189,7 +189,7 @@ class BackendInvoiceController extends Controller
         ELSE 5
         END")->orderBy('keterangan', 'desc')->get();
 
-        $data['terbilang'] = $this->terbilang($data['header']->grand_total);
+        $data['terbilang'] = $this->terbilang(ceil($data['header']->grand_total));
         // dd($data['terbilang']);
         if ($data['header']->type == 'EXTEND') {
             return view('invoiceFCL.invoice.invoiceExtend', $data);

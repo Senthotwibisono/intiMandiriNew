@@ -150,7 +150,7 @@
         <hr>
         <div class="row mt-3 d-flex align-items-center justify-content-center">
           <div class="col-md-12 text-center">
-            <h6>PRANOTA SUMMARY</h6>
+            <h6>DETIL SUMMARY</h6>
             <div class="table table-responsive">
               <table class="tabel-stripped mx-auto">
                 <thead>

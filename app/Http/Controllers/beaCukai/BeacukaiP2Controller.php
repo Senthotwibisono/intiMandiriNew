@@ -14,6 +14,8 @@ use App\Models\ContainerFCL as ContF;
 use Auth;
 use carbon\Carbon;
 use DataTables;
+use Illuminate\Support\Facades\DB;
+
 class BeacukaiP2Controller extends Controller
 {
     public function __construct()
@@ -83,7 +85,7 @@ class BeacukaiP2Controller extends Controller
 
     public function listManifestData(Request $request)
     {
-        $manifest = Manifest::with(['user', 'cont', 'shipperM', 'packing', 'dokumen'])->whereNull('tglbuangmty')->where(function ($query) {
+        $manifest = Manifest::with(['user', 'cont', 'shipperM', 'packing', 'dokumen'])->whereNull('tglrelease')->where(function ($query) {
             $query->where('status_bc', '!=', 'HOLDP2')
                   ->orWhereNull('status_bc');
         })->get();
@@ -140,6 +142,9 @@ class BeacukaiP2Controller extends Controller
     public function lockSubmit(Request $request)
     {
         $manifest = Manifest::find($request->id);
+        if ($manifest->tglrelease != null) {
+           return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Opsss, manifest ini sudah keluar']);
+        }
         // dd($request->hasFile('photos'));
         try {
             $log = Log::create([
@@ -234,34 +239,36 @@ class BeacukaiP2Controller extends Controller
         $manifest = Manifest::find($request->id);
         // dd($request->hasFile('photos'));
         try {
-            $log = Log::create([
-                'ref_id'=> $manifest->id,
-                'ref_type'=> 'LCL',
-                'no_segel'=> $request->no_segel,
-                'alasan'=> $request->alasan_lepas_segel,
-                'keterangan'=>$request->keterangan,
-                'action'=> 'unlock',
-                'created_at'=> Carbon::now(),
-                'updated_at'=> Carbon::now(),
-                'uid'=> Auth::user()->id,
-            ]);
-            if ($request->hasFile('photos')) {
-                foreach ($request->file('photos') as $photo) {
-                    $fileName = $photo->getClientOriginalName();
-                    $photo->storeAs('imageP2', $fileName, 'public'); 
-                    $newPhoto = Photo::create([
-                        'log_id' => $log->id,
-                        'photo' => $fileName,
-                    ]);
+            DB::transaction(function() use ($manifest, $request)  {
+                $log = Log::create([
+                    'ref_id'=> $manifest->id,
+                    'ref_type'=> 'LCL',
+                    'no_segel'=> $request->no_segel,
+                    'alasan'=> $request->alasan_lepas_segel,
+                    'keterangan'=>$request->keterangan,
+                    'action'=> 'unlock',
+                    'created_at'=> Carbon::now(),
+                    'updated_at'=> Carbon::now(),
+                    'uid'=> Auth::user()->id,
+                ]);
+                if ($request->hasFile('photos')) {
+                    foreach ($request->file('photos') as $photo) {
+                        $fileName = $photo->getClientOriginalName();
+                        $photo->storeAs('imageP2', $fileName, 'public'); 
+                        $newPhoto = Photo::create([
+                            'log_id' => $log->id,
+                            'photo' => $fileName,
+                        ]);
+                    }
                 }
-            }
-
-            $manifest->update([
-                'alasan_lepas_segel' => $request->alasan_lepas_segel,
-                'flag_segel_merah' => 'N',
-                'tanggal_lepas_segel'=> Carbon::now(),
-                'uid_lepas_segel'=> Auth::user()->id,
-            ]);
+    
+                $manifest->update([
+                    'alasan_lepas_segel' => $request->alasan_lepas_segel,
+                    'flag_segel_merah' => 'N',
+                    'tanggal_lepas_segel'=> Carbon::now(),
+                    'uid_lepas_segel'=> Auth::user()->id,
+                ]);
+            });
             
             return redirect()->back()->with('status', ['type'=>'success', 'message'=>'Data berhasil di buat']);
         } catch (\Throwable $th) {
@@ -386,36 +393,41 @@ class BeacukaiP2Controller extends Controller
     {
         $cont = ContF::find($request->id);
         // dd($request->hasFile('photos'));
+        if ($cont->tglkeluar != null) {
+            return redirect()->back()->with('status', ['type'=>'error', 'message'=>'!!']);
+        }
         try {
-            $log = Log::create([
-                'ref_id'=> $cont->id,
-                'ref_type'=> 'FCL',
-                'no_segel'=> $request->no_segel,
-                'alasan'=> $request->alasan_segel,
-                'keterangan'=>$request->keterangan,
-                'action'=> 'lock',
-                'created_at'=> Carbon::now(),
-                'updated_at'=> Carbon::now(),
-                'uid'=> Auth::user()->id,
-            ]);
-            if ($request->hasFile('photos')) {
-                foreach ($request->file('photos') as $photo) {
-                    $fileName = $photo->getClientOriginalName();
-                    $photo->storeAs('imageP2', $fileName, 'public'); 
-                    $newPhoto = Photo::create([
-                        'log_id' => $log->id,
-                        'photo' => $fileName,
-                    ]);
+            DB::transaction(function() use($request, $manifest) {
+                $log = Log::create([
+                    'ref_id'=> $cont->id,
+                    'ref_type'=> 'FCL',
+                    'no_segel'=> $request->no_segel,
+                    'alasan'=> $request->alasan_segel,
+                    'keterangan'=>$request->keterangan,
+                    'action'=> 'lock',
+                    'created_at'=> Carbon::now(),
+                    'updated_at'=> Carbon::now(),
+                    'uid'=> Auth::user()->id,
+                ]);
+                if ($request->hasFile('photos')) {
+                    foreach ($request->file('photos') as $photo) {
+                        $fileName = $photo->getClientOriginalName();
+                        $photo->storeAs('imageP2', $fileName, 'public'); 
+                        $newPhoto = Photo::create([
+                            'log_id' => $log->id,
+                            'photo' => $fileName,
+                        ]);
+                    }
                 }
-            }
-
-            $cont->update([
-                'alasan_segel' => $request->alasan_segel,
-                'nosegel' => $request->no_segel,
-                'flag_segel_merah'=>'Y',
-                'uid_segel' => Auth::user()->id,
-                'tanggal_segel_merah' => Carbon::now(),
-            ]);
+    
+                $cont->update([
+                    'alasan_segel' => $request->alasan_segel,
+                    'nosegel' => $request->no_segel,
+                    'flag_segel_merah'=>'Y',
+                    'uid_segel' => Auth::user()->id,
+                    'tanggal_segel_merah' => Carbon::now(),
+                ]);
+            });
             
             return redirect()->back()->with('status', ['type'=>'success', 'message'=>'Data berhasil di buat']);
         } catch (\Throwable $th) {

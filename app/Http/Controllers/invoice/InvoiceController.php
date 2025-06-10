@@ -163,7 +163,7 @@ class InvoiceController extends Controller
         }else {
             $data['tarifs'] = FormT::where('form_id', $form->id)->where('mekanik_y_n', '=', 'Y')->get();
         }
-        $data['terbilang'] = $this->terbilang($header->grand_total);
+        $data['terbilang'] = $this->terbilang(ceil($header->grand_total));
 
         return view('invoice.pranota', $data);
     }
@@ -354,7 +354,7 @@ class InvoiceController extends Controller
 
         // dd($header);
         $data['tarifs'] = FormT::where('form_id', $form->id)->get();
-        $data['terbilang'] = $this->terbilang($header->grand_total);
+        $data['terbilang'] = $this->terbilang(ceil($header->grand_total));
 
         return view('invoice.invoice', $data);
     }

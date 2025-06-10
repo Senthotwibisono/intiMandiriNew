@@ -541,7 +541,7 @@ class DeliveryFCLController extends Controller
         }else {
             $manual = Manual::where('kd_dok_inout', $kode)->where('no_dok_inout', $request->noDok)->first();
             if ($manual) {
-                $tglManual = Carbon::parse($manual->tgl_dok_inout)->format('Y-m-d');
+                $tglManual = Carbon::createFromFormat('d/m/Y', $manual->tgl_dok_inout)->format('Y-m-d');
                 if ($tglManual != $request->tglDok) {
                     return response()->json([
                         'success' => false,
@@ -561,7 +561,7 @@ class DeliveryFCLController extends Controller
                     'tgl_dok' => $request->tglDok,
                 ]);
                 return response()->json([
-                    'success' => false,
+                    'success' => true,
                     'message' => 'Behasil disimpan!!',
                 ]);
             }else {

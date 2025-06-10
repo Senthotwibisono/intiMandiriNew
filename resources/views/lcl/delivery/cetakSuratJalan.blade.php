@@ -142,8 +142,11 @@
                             <span>Eks Kapal</span><br>
                             <span>Tgl Tiba</span><br>
                             <span>No Pol</span><br>
+                            <span>Tgl Keluar</span><br>
+                            <span>Jam Keluar</span><br>
+                            <span>No Pol Keluar</span><br>
                             <span>Pemilik Angkutan</span><br>
-                            <span>No BL. AWB</span><br>
+                            <span>No MBL. AWB</span><br>
                             <span>Bea dan Cukai</span><br>
                         </div>
                         <div class="col-7">
@@ -151,8 +154,11 @@
                             <span>: {{$manifest->cont->job->Kapal->name}}</span><br>
                             <span>: {{$manifest->cont->job->eta ?? '-'}}</span><br>
                             <span>: {{$manifest->cont->nopol_release ?? '-'}}</span><br>
+                            <span>: {{$manifest->tglrelease ?? '-'}}</span><br>
+                            <span>: {{$manifest->jamrelease ?? '-'}}</span><br>
+                            <span>: {{$manifest->nopol_release ?? '-'}}</span><br>
                             <span>: LKB</span><br>
-                            <span>: {{$manifest->cont->nobl ?? '-'}}</span><br>
+                            <span>: {{$manifest->job->nombl ?? '-'}}</span><br>
                             <span>: -</span><br>
                         </div>
                     </div>
