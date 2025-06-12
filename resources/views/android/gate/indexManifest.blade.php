@@ -23,19 +23,19 @@
                 <div class="col-12">
                     <div class="form-group">
                         <label for="">Nopol Keluar</label>
-                        <input type="text" name="nopol_release" value="{{$manifest->nopol_release ?? '-'}}" id="nopol_release" class="form-control">
+                        <input type="text" name="nopol_release" value="{{$manifest->nopol_release}}" id="nopol_release" class="form-control" required>
                     </div>
                 </div>
                 <div class="col-12">
                     <div class="form-group">
                         <label for="">Tanggal Keluar</label>
-                        <input type="date" name="tglrelease" value="{{$manifest->tglrelease ?? '-'}}" id="tglrelease" class="form-control">
+                        <input type="date" name="tglrelease" value="{{$manifest->tglrelease}}" id="tglrelease" class="form-control" required>
                     </div>
                 </div>
                 <div class="col-12">
                     <div class="form-group">
                         <label for="">Jam Keluar</label>
-                        <input type="time" name="jamrelease" value="{{$manifest->jamrelease ?? '-'}}" id="jamrelease" class="form-control">
+                        <input type="time" name="jamrelease" value="{{$manifest->jamrelease}}" id="jamrelease" class="form-control" required> 
                     </div>
                 </div>
               

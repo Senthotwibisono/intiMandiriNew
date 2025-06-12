@@ -43,19 +43,19 @@
                 <div class="col-12">
                     <div class="form-group">
                         <label for="">Nopol Keluar</label>
-                        <input type="text" name="nopol_mty" value="{{$cont->nopol_mty ?? '-'}}" id="nopol_mty" class="form-control">
+                        <input type="text" name="nopol_mty" value="{{$cont->nopol_mty}}" id="nopol_mty" class="form-control" required>
                     </div>
                 </div>
                 <div class="col-12">
                     <div class="form-group">
                         <label for="">Tanggal Keluar</label>
-                        <input type="date" name="tglkeluar" value="{{$cont->tglkeluar ?? '-'}}" id="tglkeluar" class="form-control">
+                        <input type="date" name="tglkeluar" value="{{$cont->tglkeluar}}" id="tglkeluar" class="form-control" required>
                     </div>
                 </div>
                 <div class="col-12">
                     <div class="form-group">
                         <label for="">Jam Keluar</label>
-                        <input type="time" name="jamkeluar" value="{{$cont->jamkeluar ?? '-'}}" id="jamkeluar" class="form-control">
+                        <input type="time" name="jamkeluar" value="{{$cont->jamkeluar}}" id="jamkeluar" class="form-control" required>
                     </div>
                 </div>
                 @endif
