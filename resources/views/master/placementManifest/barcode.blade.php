@@ -214,7 +214,7 @@
     @endphp
 
     @if($itemTiers->count())
-    <div class="container mb-4" style="border: 1px solid black; padding: 15px; border-radius: 8px;">
+    <div class="container mb-4">
         <div class="card">
             <div class="card-header">
                 <h1>{{$item->name}}</h1>
@@ -263,6 +263,7 @@
         </div>
     </div>
     @endif
+    <div class="page-break"></div>
 @endforeach
 
 
