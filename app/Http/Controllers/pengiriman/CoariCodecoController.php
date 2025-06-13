@@ -943,8 +943,8 @@ class CoariCodecoController extends Controller
                     ]);                                                   
             });
             foreach ($conts as $cont) {
-                $tanggal = Carbon::createFromFormat('Y-m-d', $cont->tglkeluar)->format('Ymd');
-                $jam = Carbon::createFromFormat('H:i:s', $cont->jamkeluar)->format('His');
+                $tanggal = Carbon::parse($cont->tglkeluar)->format('Ymd');
+                $jam = Carbon::parse($cont->jamkeluar)->format('His');
                 $wk_in = $tanggal . $jam;
                 $header = [
                     'nojoborder' => $cont->job->nojoborder,
@@ -966,7 +966,7 @@ class CoariCodecoController extends Controller
                     'kd_gudang' => $cont->job->PLP->gudang_tujuan ?? 'INTI',
                     'kd_dok_inout' => $cont->kd_dok_inout,
                     'no_dok_inout' => $cont->no_dok ?? null,
-                    'tanggal_dok_inout' => $cont->tgl_dok ? Carbon::createFromFormat('Y-m-d', $cont->tgl_dok)->format('Ymd') : null,
+                    'tanggal_dok_inout' => $cont->tgl_dok ? Carbon::parse($cont->tgl_dok)->format('Ymd') : null,
                     'wk_inout' => $wk_in,
                     'no_pol' => $cont->nopol,
                     'bruto' => $cont->weight,
@@ -1129,7 +1129,7 @@ class CoariCodecoController extends Controller
 
     public function CodecoKms()
     {
-        $mansifestMaster = Manifest::whereNotNull('tglmasuk')->where('coari_flag', '=', 'Y')->whereNotNull('tglrelease')->where('codeco_flag', '=', 'N')->orWhere('codeco_flag', null)->take(50)->get();
+        $mansifestMaster = Manifest::where('coari_flag', '=', 'Y')->whereNotNull('tglrelease')->where('codeco_flag', '=', 'N')->orWhere('codeco_flag', null)->get();
 
         if ($mansifestMaster->isEmpty())
         {
@@ -1161,7 +1161,7 @@ class CoariCodecoController extends Controller
             $header = [
                 'nojoborder' => $cont->job->nojoborder,
                 'ref_number' => $this->RefNumber(),
-                'tgl_entry' => Carbon::now()->format('YYYY-MM-DD'),
+                'tgl_entry' => Carbon::now()->format('Y-m-d'),
                 'jam_entry' => Carbon::now()->format('H:i:s'),
                 'uid' => 'Auto',
                 'nomor' => null,
@@ -1178,17 +1178,19 @@ class CoariCodecoController extends Controller
                 'kd_gudang' => $cont->job->PLP->gudang_tujuan ?? 'INTI',
                 'no_master_bl_awb' => $cont->job->nombl,
                 'tgl_master_bl_awb' => $cont->job->tgl_master_bl 
-                   ? Carbon::createFromFormat('Y-m-d', $cont->job->tgl_master_bl)->format('Ymd') 
-                   : null,
+                    ? Carbon::parse($cont->job->tgl_master_bl)->format('Ymd') 
+                    : null,
                 'no_cont' => $cont->nocontainer,
                 'uk_cont' => $cont->size,
                 'no_segel' => $cont->seal->code ?? ' ',
                 'jns_cont' => 'F',
                 'no_bc11' => $cont->job->tno_bc11 ?? '',
                 'tgl_bc11' => $cont->job->ttgl_bc11 
-                    ? Carbon::createFromFormat('Y-m-d', $cont->job->ttgl_bc11)->format('Ymd') 
+                    ? Carbon::parse($cont->job->ttgl_bc11)->format('Ymd') 
                     : null,
             ];
+            // var_dump($header);
+            // die();
 
             $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><DOCUMENT></DOCUMENT>');       
             
@@ -1206,9 +1208,9 @@ class CoariCodecoController extends Controller
             $headerXml->addChild('KD_GUDANG', !empty($header['kd_gudang']) ? $header['kd_gudang'] : '');
             $headerXml->addChild('REF_NUMBER', !empty($header['ref_number']) ? $header['ref_number'] : '');
             $dataDetailkms = $manifest;
-            $tgl_dok = $dataDetailkms->tgl_dok ? Carbon::createFromFormat('Y-m-d', $dataDetailkms->tgl_dok)->format('Ymd') : null;
-            $tanggal = Carbon::createFromFormat('Y-m-d', $dataDetailkms->tglrelease)->format('Ymd');
-            $jam = Carbon::createFromFormat('H:i:s', $dataDetailkms->jamrelease)->format('His');
+            $tgl_dok = $dataDetailkms->tgl_dok ? Carbon::parse($dataDetailkms->tgl_dok)->format('Ymd') : null;
+            $tanggal = Carbon::parse($dataDetailkms->tglrelease)->format('Ymd');
+            $jam = Carbon::parse($dataDetailkms->jamrelease)->format('His');
             $wk_in = $tanggal . $jam;
             $detilData = [
                 'tanggal_dok_inout'=> $tgl_dok,
@@ -1221,7 +1223,7 @@ class CoariCodecoController extends Controller
     
             $kms->addChild('NO_BL_AWB', $dataDetailkms->nohbl);
             $kms->addChild('TGL_BL_AWB', $dataDetailkms->tgl_hbl 
-            ? Carbon::createFromFormat('Y-m-d', $dataDetailkms->tgl_hbl)->format('Ymd') 
+            ? Carbon::parse($dataDetailkms->tgl_hbl)->format('Ymd') 
             : null,); 
             $kms->addChild('NO_MASTER_BL_AWB', $dataDetailkms->cont->job->nombl); 
             $kms->addChild('TGL_MASTER_BL_AWB', $header['tgl_master_bl_awb']); 
@@ -1287,9 +1289,9 @@ class CoariCodecoController extends Controller
             ]);
 
             $data = $manifest;
-            $tgl_dok = $data->tgl_dok ? Carbon::createFromFormat('Y-m-d', $data->tgl_dok)->format('Ymd') : null;
-            $tanggal = Carbon::createFromFormat('Y-m-d', $data->tglrelease)->format('Ymd');
-            $jam = Carbon::createFromFormat('H:i:s', $data->jamrelease)->format('His');
+            $tgl_dok = $data->tgl_dok ? Carbon::parse($data->tgl_dok)->format('Ymd') : null;
+            $tanggal = Carbon::parse($data->tglrelease)->format('Ymd');
+            $jam = Carbon::parse($data->jamrelease)->format('His');
             $wk_in = $tanggal . $jam;
             $detilData = [
                 'tanggal_dok_inout'=> $tgl_dok,

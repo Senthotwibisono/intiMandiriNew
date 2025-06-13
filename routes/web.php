@@ -1007,6 +1007,7 @@ Route::prefix('/pengiriman')->group(function(){
 });
 
 Route::post('/testCoari', [CoariCodecoController::class, 'CoariKms']);
+Route::post('/testCodeco', [CoariCodecoController::class, 'CodecoKms']);
 Route::post('/testCoariContLCL', [CoariCodecoController::class, 'coariCont']);
 Route::post('/testCoariContFCL', [CoariCodecoController::class, 'coariContFCL']);
 

@@ -32,6 +32,9 @@
                             <th class="text-center" style="min-width: 100px">No Master Bl Awb</th>
                             <th class="text-center" style="min-width: 100px">Tgl Master Bl Awb</th>
                             <th class="text-center" style="min-width: 100px">Response</th>
+                            <th class="text-center" style="min-width: 100px">Jenis Dok</th>
+                            <th class="text-center" style="min-width: 100px">No Dok</th>
+                            <th class="text-center" style="min-width: 100px">Tgl Dok</th>
                             <th class="text-center" style="min-width: 100px">Waktu In Out</th>
                             <th class="text-center" style="min-width: 100px">Tgl Kirim</th>
                             <th class="text-center" style="min-width: 100px">Jam Kirim</th>
@@ -99,7 +102,7 @@
                     });
 
                     $.ajax({
-                        url: '/testCoari',
+                        url: '/testCodeco',
                         type: 'POST',
                         data : {
                             _token: "{{ csrf_token() }}",
@@ -316,6 +319,9 @@
                 {name: 'no_master_bl_awb', data: 'no_master_bl_awb'},
                 {name: 'tgl_master_bl_awb', data: 'tgl_master_bl_awb'},
                 {name: 'response', data: 'response'},
+                {name: 'jenisDok', data: 'jenisDok'},
+                {name: 'nodok', data: 'nodok'},
+                {name: 'tglDok', data: 'tglDok'},
                 {name: 'wk_inout', data: 'wk_inout'},
                 {name: 'tgl_entry', data: 'tgl_entry'},
                 {name: 'jam_entry', data: 'jam_entry'},

@@ -224,7 +224,7 @@
                 @foreach($itemTiers->chunk(2) as $chunk)
                     <div class="d-flex justify-content-center mb-3">
                         @foreach($chunk as $tier)
-                            <div class="text-center mx-2" style="border: 1px solid black; padding: 15px; border-radius: 8px;">>
+                            <div class="text-center mx-2" style="border: 1px solid black; padding: 15px; border-radius: 8px;">
                                 <div class="text-center mb-3">
                                     <table style="margin: 0 auto;">
                                         <tr>

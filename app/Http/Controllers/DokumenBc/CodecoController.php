@@ -331,6 +331,18 @@ class CodecoController extends Controller
         ->addColumn('size', function($manifest){
             return $manifest->manifest->cont->size;
         })
+        ->addColumn('nodok', function($manifest){
+            return $manifest->manifest->no_dok ?? null;
+        })
+        ->addColumn('tglDok', function($manifest){
+            return $manifest->manifest->tgl_dok ?? null;
+        })
+        ->addColumn('jenisDok', function($manifest){
+            return $manifest->manifest->dokumen->name ?? null;
+        })
+        ->addColumn('wk_inout', function($manifest){
+            return Carbon::parse($manifest->wk_inout)->format('Y-m-d H:i:s') ?? null;
+        })
         ->rawColumns(['action', 'cfs'])
         ->make(true);
     }
@@ -357,7 +369,7 @@ class CodecoController extends Controller
                 ]);                                                    
         });
 
-        $cont = Cont::findOrFail($manifest->id);
+        $cont = Cont::findOrFail($manifest->container_id);
         $header = [
             'nojoborder' => $cont->job->nojoborder,
             'ref_number' => $this->RefNumber(),
