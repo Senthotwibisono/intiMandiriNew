@@ -264,8 +264,8 @@ class BarcodeAutoGateController extends Controller
                     }
                 }elseif ($tipe == 'out' || $tipe == 'Out' || $tipe == 'OUT') {
                     $manifest->update([
-                        'tglbuangmty'=> date('Y-m-d', strtotime($dataBarcode->time_out)),
-                        'jambuangmty'=> date('H:i:s', strtotime($dataBarcode->time_out)),
+                        'tglrelease'=> date('Y-m-d', strtotime($dataBarcode->time_out)),
+                        'jamrelease'=> date('H:i:s', strtotime($dataBarcode->time_out)),
                         'uidrelease' => 'Autogate',
                     ]);
                     if ($request->hasFile('fileKamera')) {
