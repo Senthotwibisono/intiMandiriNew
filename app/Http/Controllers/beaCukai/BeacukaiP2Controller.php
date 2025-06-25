@@ -397,7 +397,7 @@ class BeacukaiP2Controller extends Controller
             return redirect()->back()->with('status', ['type'=>'error', 'message'=>'!!']);
         }
         try {
-            DB::transaction(function() use($request, $manifest) {
+            DB::transaction(function() use($request, $cont) {
                 $log = Log::create([
                     'ref_id'=> $cont->id,
                     'ref_type'=> 'FCL',

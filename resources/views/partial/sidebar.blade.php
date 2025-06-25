@@ -301,7 +301,7 @@
         </ul>
     </li>
 
-    @if(Auth::check() && Auth::user()->hasRole(['admin', 'adminLCL', 'adminFCL']))
+    @if(Auth::check() && Auth::user()->hasRole(['admin', 'adminLCL', 'adminFCL', 'invoiceLCL']))
     <!-- Master -->
     <li class="sidebar-item  has-sub @if(Request::is('master/*')) active @endif">
         <a href="#" class='sidebar-link'>

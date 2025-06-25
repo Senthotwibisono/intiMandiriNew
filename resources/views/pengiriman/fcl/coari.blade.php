@@ -203,10 +203,10 @@
             responsive: true,
             columns: [
                 {name: 'action', data: 'action'},
+                {name: 'ref_number', data: 'ref_number'},
                 {name: 'nm_angkut', data: 'nm_angkut'},
                 {name: 'no_voy_flight', data: 'no_voy_flight'},
                 {name: 'call_sign', data: 'call_sign'},
-                {name: 'ref_number', data: 'ref_number'},
                 {name: 'no_cont', data: 'no_cont'},
                 {name: 'uk_cont', data: 'uk_cont'},
                 {name: 'no_bl_awb', data: 'no_bl_awb'},

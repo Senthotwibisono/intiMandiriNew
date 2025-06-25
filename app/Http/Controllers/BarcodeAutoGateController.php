@@ -220,8 +220,8 @@ class BarcodeAutoGateController extends Controller
                     }
                 }elseif ($tipe == 'out' || $tipe == 'Out' || $tipe == 'OUT') {
                     $cont->update([
-                        'tglkeluar'=> date('Y-m-d', strtotime($dataBarcode->time_out)),
-                        'jamkeluar'=> date('H:i:s', strtotime($dataBarcode->time_out)),
+                        'tglkeluar'=> Carbon::now()->toDateString(),
+                        'jamkeluar'=> Carbon::now()->toTimeString(),
                         'uidmty'=>'Autogate',
                     ]);
                     if ($request->hasFile('fileKamera')) {
@@ -264,8 +264,8 @@ class BarcodeAutoGateController extends Controller
                     }
                 }elseif ($tipe == 'out' || $tipe == 'Out' || $tipe == 'OUT') {
                     $manifest->update([
-                        'tglrelease'=> date('Y-m-d', strtotime($dataBarcode->time_out)),
-                        'jamrelease'=> date('H:i:s', strtotime($dataBarcode->time_out)),
+                        'tglrelease'=> Carbon::now()->toDateString(),
+                        'jamrelease'=> Carbon::now()->toTimeString(),
                         'uidrelease' => 'Autogate',
                     ]);
                     if ($request->hasFile('fileKamera')) {
@@ -290,8 +290,8 @@ class BarcodeAutoGateController extends Controller
             if ($dataBarcode->ref_action == 'get') {
                 if ($tipe == 'in' || $tipe == 'In' || $tipe == 'IN') {
                     $cont->update([
-                        'tglmasuk'=> carbon::now(),
-                        'jammasuk'=> carbon::now(),
+                        'tglmasuk'=> Carbon::now()->toDateString(),
+                        'jammasuk'=> Carbon::now()->toTimeString(),
                         'uidmasuk'=> 'Autogate',
                     ]);
                     if ($request->hasFile('fileKamera')) {
@@ -345,8 +345,8 @@ class BarcodeAutoGateController extends Controller
                     }
                 }elseif ($tipe == 'out' || $tipe == 'Out' || $tipe == 'OUT') {
                     $cont->update([
-                        'tglkeluar'=> date('Y-m-d', strtotime($dataBarcode->time_out)),
-                        'jamkeluar'=> date('H:i:s', strtotime($dataBarcode->time_out)),
+                        'tglkeluar'=> Carbon::now()->toDateString(),
+                        'jamkeluar'=> Carbon::now()->toTimeString(),
                         'uidmty'=>'Autogate',
                     ]);
                     if ($request->hasFile('fileKamera')) {
@@ -394,5 +394,10 @@ class BarcodeAutoGateController extends Controller
         $data['cont'] = $cont;
 
         return view('barcode.sp2', $data);
+    }
+
+    public function checkTanggal()
+    {
+        return Carbon::now();
     }
 }
