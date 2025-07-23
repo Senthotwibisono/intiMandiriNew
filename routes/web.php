@@ -510,6 +510,7 @@ Route::controller(BeaCukaiController::class)->group(function(){
     Route::get('/bc/lcl/realisasi/stripping/detilData-{id?}', 'strippingDetailData');
     Route::post('/bc/lcl/realisasi/stripping/manifest/approve', 'approveStrippingManifest');
     Route::post('/bc/lcl/realisasi/stripping/manifest/Batalapprove', 'BatalapproveStrippingManifest');
+    Route::post('/bc/lcl/realisasi/stripping/manifest/aproveContainerHouseBl', 'aproveContainerHouseBl');
 
     Route::post('/bc/lcl/realisasi/stripping-approveAll', 'strippingApproveAll');
     

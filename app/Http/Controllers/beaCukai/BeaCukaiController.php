@@ -224,6 +224,9 @@ class BeaCukaiController extends Controller
         ->addColumn('action', function($cont){
             return '<a href="/bc/lcl/realisasi/stripping/detil-' . $cont->id . '" class="btn btn-warning"><i class="fa fa-pen"></i></a>';
         })
+        ->addColumn('photo', function($cont){
+            return '<a href="javascript:void(0)" onclick="openWindow(\'/lcl/realisasi/stripping-photoCont' . $cont->id . '\')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>';
+        })
         ->addColumn('detil', function($cont){
             if ($cont->status_ijin == 'Y') {
                 return '<span class="badge bg-light-success">Approved</span>';
@@ -274,7 +277,7 @@ class BeaCukaiController extends Controller
         ->addColumn('tgl_bc11', function($cont){
             return $cont->job->PLP->tgl_bc11 ?? '-';
         })
-        ->rawColumns(['check', 'action', 'detil', 'status'])
+        ->rawColumns(['check', 'action', 'detil', 'status', 'photo'])
         ->make(true);
     }
 
@@ -486,6 +489,46 @@ class BeaCukaiController extends Controller
             ]);
         }
         return redirect()->back()->with('status', ['type'=>'success', 'message'=>'Data Berhasil di Update']);
+    }
+
+    public function aproveContainerHouseBl(Request $request)
+    {
+        $ids = $request->input('ids');
+        // var_dump($ids);
+        // die;
+        try {
+            $conts = Cont::whereIn('id', $ids)->get();
+            foreach ($conts as $cont) {
+                if ($cont->status_ijin != 'Y') {
+                    $cont->update([
+                        'status_ijin' => 'Y',
+                        'tgl_ijin_stripping' => Carbon::now()->format('Y-m-d'),
+                        'jam_ijin_stripping' => Carbon::now()->format('H:i:s'),
+                        'ijin_stripping_by' => Auth::user()->id,
+                    ]);
+
+                    $manifest = Manifest::where('container_id', $cont->id)->get();
+                    foreach ($manifest as $man) {
+                        if ($man->ijin_stripping != 'Y') {
+                            $man->update([
+                                'ijin_stripping' => 'Y',
+                                'ijin_stripping_at' => Carbon::now(),
+                                'ijin_stripping_by' => Auth::user()->id,
+                            ]);
+                        }
+                    }
+                }
+            }
+            return response()->json([
+                 'success' => true,
+                 'message' => 'Data success updated',
+            ]);
+        } catch (\Throwable $th) {
+           return response()->json([
+                'success' => false,
+                'message' => 'Something Wrong' . $th->getMessage(),
+           ]);
+        }
     }
 
     public function HoldContainerIndex()

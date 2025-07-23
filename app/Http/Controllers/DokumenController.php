@@ -1565,9 +1565,9 @@ class DokumenController extends Controller
         }
         if ($header) {
             $oldSPPB = SPPB::where('car', $header->CAR)->first();
-            if ($oldSPPB) {
-                return back()->with('status', ['type' => 'error', 'message' => 'Data sudah tersedia']);
-            }
+            // if ($oldSPPB) {
+            //     return back()->with('status', ['type' => 'error', 'message' => 'Data sudah tersedia']);
+            // }
 
             $sppb = SPPB::create([
                 'car' =>$header->CAR ?? null,

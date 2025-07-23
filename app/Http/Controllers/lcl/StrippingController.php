@@ -233,7 +233,7 @@ class StrippingController extends Controller
     public function photoCont($id)
     {
         $cont = Cont::where('id', $id)->first();
-        $data['title'] = "Photo Gate In Container - " . $cont->nocontainer;
+        $data['title'] = "Photo Stripping - " . $cont->nocontainer;
         $data['item'] = $cont;
         $data['photos'] = Photo::where('master_id', $id)->where('type', '=', 'lcl')->where('action', '=', 'stripping')->get();
         // dd($data['photos']);

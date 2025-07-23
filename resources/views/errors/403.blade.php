@@ -21,7 +21,7 @@
         <div class="text-center">
             <img class="img-error" src="{{ asset('dist/assets/images/samples/error-403.svg')}}" alt="Not Found">
             <h1 class="error-title">Forbidden</h1>
-            <p class="fs-5 text-gray-600">Anda ditolak mengakses halaman ini, <b>Hubungi Mas Longki</b>.</p>
+            <p class="fs-5 text-gray-600">Anda ditolak mengakses halaman ini, <b>Hubungi Admin untuk meminta akses</b>.</p>
             <a href="\" class="btn btn-lg btn-outline-primary mt-3">Go Home</a>
         </div>
     </div>

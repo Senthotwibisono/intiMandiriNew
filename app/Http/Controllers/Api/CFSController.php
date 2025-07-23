@@ -90,8 +90,8 @@ class CFSController extends Controller
             // 'no_pol.required'         => 'Nomor polisi wajib diisi.',
             // 'jns_kms.required'        => 'Jenis kemasan wajib diisi.',
             // 'merk_kms.required'       => 'Merk kemasan wajib diisi.',
-            'jml_kms.required'        => 'Jumlah kemasan wajib diisi.',
-            'jml_kms.integer'         => 'Jumlah kemasan harus berupa angka.',
+            // 'jml_kms.required'        => 'Jumlah kemasan wajib diisi.',
+            // 'jml_kms.integer'         => 'Jumlah kemasan harus berupa angka.',
             // 'user.required'           => 'User wajib diisi.',
             // 'warehouse.required'      => 'Warehouse wajib diisi.',
         ];
@@ -143,13 +143,13 @@ class CFSController extends Controller
                 //     ]);
                 // }
     
-                if ($manifest->quantity != $request->jml_kms ) {
-                    return response()->json([
-                        'status' => false,
-                        'success' => false,
-                        'message' => 'Jumlah Kemasan Berbeda',
-                    ]);
-                }
+                // if ($manifest->quantity != $request->jml_kms ) {
+                //     return response()->json([
+                //         'status' => false,
+                //         'success' => false,
+                //         'message' => 'Jumlah Kemasan Berbeda',
+                //     ]);
+                // }
     
                 if ($manifest->tglstripping == null) {
                     return response()->json([
