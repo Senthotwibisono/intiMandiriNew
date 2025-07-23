@@ -239,6 +239,7 @@ Route::middleware('permission:dataMaster')->controller(MasterController::class)-
      Route::post('/master/placementManifest/barcodeCreate', 'pmCreateBarcode');
      Route::get('/master/placementManifest/barcodeView', 'pmViewBarcode');
      Route::get('/master/placementManifest/tierView', 'tierView');
+     Route::get('/master/placement/barcodeAll', 'barcodeAll');
 
     //  Yard
      Route::get('/master/yard', 'yardIndex')->name('master.yard.index');

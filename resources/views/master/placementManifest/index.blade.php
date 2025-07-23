@@ -60,6 +60,7 @@
             <i class="fa fa-plus"></i>Buat Layout
         </a>
         <button class="btn btn-sm btn-warning printBarcode">Cetak Barcode</button>
+        <a href="/master/placement/barcodeAll" target="blank" class="btn btn-warning">Print Barcode All</a>
         <button class="btn btn-sm btn-primary tierView">Tier View</button>
     </div>
     

@@ -1299,6 +1299,15 @@ class MasterController extends Controller
         return view('master.placementManifest.barcode', $data);
     }
 
+    public function barcodeAll()
+    {
+        $data['title'] = 'Print Barcode All';
+        $items = PM::whereNotNull('name')->orderBy('name')->get();
+        $data['items'] = $items;
+        $data['tiers'] = RT::whereIn('rack_id', $items->pluck('id'))->orderBy('rack_id', 'asc')->orderBy('tier', 'desc')->get();
+        return view('master.placementManifest.barcode-all', $data);
+    }
+
     public function tierView(Request $request)
     {
         $data['title'] = 'Rack Tier';
