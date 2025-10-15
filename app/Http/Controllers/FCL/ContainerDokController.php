@@ -74,7 +74,7 @@ class ContainerDokController extends Controller
 
     public function dataTable(Request $request)
     {
-        $cont = Cont::get();
+        $cont = Cont::query();
 
         return DataTables::of($cont)
         ->addColumn('edit', function($cont){
@@ -89,12 +89,12 @@ class ContainerDokController extends Controller
         ->addColumn('nombl', function($cont){
             return $cont->job->nombl ?? '-';
         })
-        ->addColumn('nocontainer', function($cont){
-            return $cont->nocontainer ?? '-';
-        })
-        ->addColumn('nobl', function($cont){
-            return $cont->nobl ?? '-';
-        })
+        // ->addColumn('nocontainer', function($cont){
+        //     return $cont->nocontainer ?? '-';
+        // })
+        // ->addColumn('nobl', function($cont){
+        //     return $cont->nobl ?? '-';
+        // })
         ->addColumn('tglBL', function($cont){
             return $cont->tgl_bl_awb ?? '-';
         })
@@ -107,24 +107,24 @@ class ContainerDokController extends Controller
         ->addColumn('email', function($cont){
             return $cont->Customer->email ?? '-';
         })
-        ->addColumn('nopol', function($cont){
-            return $cont->nopol ?? '-';
-        })
-        ->addColumn('tglmasuk', function($cont){
-            return $cont->tglmasuk ?? 'Belum Masuk';
-        })
-        ->addColumn('jammasuk', function($cont){
-            return $cont->jammasuk ?? 'Belum Masuk';
-        })
-        ->addColumn('nopol_mty', function($cont){
-            return $cont->nopol_mty ?? '-';
-        })
-        ->addColumn('tglkeluar', function($cont){
-            return $cont->tglkeluar ?? 'Belum keluar';
-        })
-        ->addColumn('jamkeluar', function($cont){
-            return $cont->jamkeluar ?? 'Belum keluar';
-        })
+        // ->addColumn('nopol', function($cont){
+        //     return $cont->nopol ?? '-';
+        // })
+        // ->addColumn('tglmasuk', function($cont){
+        //     return $cont->tglmasuk ?? 'Belum Masuk';
+        // })
+        // ->addColumn('jammasuk', function($cont){
+        //     return $cont->jammasuk ?? 'Belum Masuk';
+        // })
+        // ->addColumn('nopol_mty', function($cont){
+        //     return $cont->nopol_mty ?? '-';
+        // })
+        // ->addColumn('tglkeluar', function($cont){
+        //     return $cont->tglkeluar ?? 'Belum keluar';
+        // })
+        // ->addColumn('jamkeluar', function($cont){
+        //     return $cont->jamkeluar ?? 'Belum keluar';
+        // })
         ->addColumn('kodeDok', function($cont){
             return $cont->dokumen->name ?? '-';
         })

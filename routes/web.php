@@ -631,6 +631,7 @@ Route::controller(AndroidGateController::class)->group(function(){
     // Form
     Route::middleware('permission:formInvoiceLCL')->controller(FormController::class)->group(function(){
         Route::get('/invoice/form/index', 'index')->name('form.index');
+        Route::get('/invoice/form/data', 'data')->name('form.data');
         Route::post('/invoice/form/create', 'create');
         Route::delete('/invoice/form/delete-{id?}', 'delete');
         Route::get('/get-manifest-data/{id}', 'getManifestData');
@@ -806,6 +807,7 @@ Route::controller(AndroidGateController::class)->group(function(){
                 Route::post('/gateOutFCL', 'gateOutFCL')->name('fcl.delivery.gateOutFCL');
     
                 Route::get('/behandleDetil{id}', 'detailBehandle');
+                Route::get('/gateOutDetil/{id}', 'detailGateOut');
     
                 Route::get('/gateOut', 'indexGateOut');
                 Route::get('/dataGateOutFCL', 'dataGateOutFCL')->name('fcl.delivery.dataGateOutFCL');

@@ -40,7 +40,7 @@
                             <select name="manifest_id" id="manifest_id" style="width:100%;" class="js-example-basic-single select2 form-select">
                                 <option disabled selected value>Pilih Satu !</option>
                                 @foreach($manifest as $mans)
-                                    <option value="{{$mans->id}}" {{$form->manifest_id == $mans->id ? 'selected' : ''}}>{{$mans->nohbl}}</option>
+                                    <option value="{{$mans->id}}" {{ optional($form)->manifest_id == $mans->id ? 'selected' : '' }}>{{$mans->nohbl}}</option>
                                 @endforeach
                             </select>
                         </div>

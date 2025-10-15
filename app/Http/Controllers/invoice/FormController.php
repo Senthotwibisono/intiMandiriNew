@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Auth;
 use Carbon\Carbon;
+use DataTables;
 use Illuminate\Support\Str;
 
 use App\Models\MasterTarif as MT;
@@ -31,6 +32,24 @@ class FormController extends Controller
         })->orderBy('created_at', 'desc')->get();
 
         return view('invoice.form.index', $data);
+    }
+
+    public function data(Request $request)
+    {
+        $data =  Form::with(['manifest', 'customer', 'user'])->where('status', '=', 'N')->where(function ($query) {
+            $query->where('type', '!=', 'P')
+                  ->orWhereNull('type');
+        });
+
+        return DataTables::of($data)
+        ->addColumn('action', function ($data) {
+            return '<a href="/invoice/form/formStep1/'.$data->id.'" class="btn btn-warning"><i class="fa fa-pencil"></i></a>';
+        })
+        ->addColumn('deleteInvoice', function ($data) {
+            return '<a class="btn btn-danger deleteInvoice" data-id="'.$data->id.'" type="button"><i class="fa fa-trash"></i></a>';
+        })
+        ->rawColumns(['action', 'deleteInvoice']) // biar HTML tidak di-escape
+        ->make(true);
     }
 
     public function create(Request $request)
@@ -79,6 +98,7 @@ class FormController extends Controller
     {
         $data['title'] = 'Create Form || Step 1';
         $data['form'] = Form::find($id);
+        // dd($data['form']);
         $data['manifest'] = Manifest::get();
         $data['customer'] = Customer::all();
 

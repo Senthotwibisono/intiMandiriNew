@@ -115,7 +115,7 @@ class PhotoController extends Controller
     {
         $cont = Cont::where('id', $request->id)->first();
         $cont->update([
-            'nopol' => $request->nopol,
+            'nopol' => $request->nopol ?? $cont->nopol,
             'nopol_mty' => $request->nopol_mty,
             'tglkeluar' => $request->tglkeluar,
             'jamkeluar' => $request->jamkeluar,
@@ -166,7 +166,7 @@ class PhotoController extends Controller
         try {
             if ($cont) {
                 $cont->update([
-                    'nopol' => $request->nopol,
+                    'nopol' => $request->nopol ?? $cont->nopol,
                     'nopol_mty' => $request->nopol_mty,
                     'tglkeluar' => $request->tglkeluar,
                     'jamkeluar' => $request->jamkeluar,

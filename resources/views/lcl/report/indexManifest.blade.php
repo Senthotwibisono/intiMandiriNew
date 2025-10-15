@@ -265,6 +265,7 @@
                     d.container_id = $('#container_id').val();
                 }
             },
+            order: [[39, 'desc']],
             columns : [
                 { className:'text-center', data:'detil', name:'detil'},
                 { className:'text-center', data:'flag_segel_merah', name:'flag_segel_merah'},
@@ -305,8 +306,21 @@
                 { className:'text-center', data:'no_dok', name:'no_dok'},
                 { className:'text-center', data:'tglDok', name:'tglDok'},
                 { className:'text-center', data:'location', name:'location'},
-                { className:'text-center', data:'lamaTimbun', name:'lamaTimbun'},
+               {
+  data: 'lamaTimbun',
+  name: 'lamaTimbun',
+  type: 'num',
+  render: function (data, type, row) {
+      if (type === 'display') {
+          return data + ' days';   // tampilkan untuk user
+      }
+      return data; // untuk sort dan search tetap angka
+  }
+}
             ],
+            columnDefs: [
+        { targets: 39, type: 'num' } // paksa kolom ke-39 dianggap numeric
+    ],
             createdRow: function (row, data, dataIndex) {
                 if (data.flag_segel_merah === 'Y') {
                     $(row).addClass('highlight-red text-white');

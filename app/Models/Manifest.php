@@ -385,12 +385,18 @@ class Manifest extends Model
     }
     
     public function lamaTimbun()
-    {
-        $tglStripping = Carbon::parse($this->tglstripping);
-        $tglrelease = $this->tglrelease ? Carbon::parse($this->tglrelease) : Carbon::now();
+{
+    $tglStripping = $this->tglstripping ? Carbon::parse($this->tglstripping) : null;
 
-        return $tglrelease->diffInDays($tglStripping);
+    if (!$tglStripping) {
+        return 0;
     }
+
+    $tglrelease = $this->tglrelease ? Carbon::parse($this->tglrelease) : Carbon::now();
+
+    // pastikan hasilnya integer
+    return (int) $tglrelease->diffInDays($tglStripping);
+}
 
     public function uidSegel()
     {

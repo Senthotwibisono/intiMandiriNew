@@ -2944,9 +2944,9 @@ class DokumenController extends Controller
         //  dd($header, $kms, $cont);
          if ($header) {
             $oldPabean = Pabean::where('car', $header->CAR)->first();
-            if ($oldPabean) {
-                return back()->with('status', ['type' => 'error', 'message' => 'Data sudah tersedia']);
-            }
+            // if ($oldPabean) {
+            //     return back()->with('status', ['type' => 'error', 'message' => 'Data sudah tersedia']);
+            // }
 
             $pabean = Pabean::create([
                 'kd_dok_inout' => $header->KD_DOK_INOUT,

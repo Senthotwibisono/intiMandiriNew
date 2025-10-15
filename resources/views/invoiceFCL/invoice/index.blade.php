@@ -229,6 +229,7 @@
             serverSide: true,
             ajax: '/invoiceFCL/invoice/dataTable',
             scrollX: true,
+            order: [[1, 'asc']], // kolom ketiga (index 2), default ASC
             columns:[
                 {data:'proforma_no', name:'proforma_no'},
                 {data:'invoiceNo', name:'invoiceNo'},

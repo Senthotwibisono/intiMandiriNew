@@ -254,7 +254,7 @@ body {
                         @endforeach
                         <tr>
                             <td>Total</td>
-                            <td colspan="4">Rp. {{ number_format($header->total_tps, 0)}}</td>
+                            <td colspan="4">Rp. {{ number_format(ceil($header->total_tps), 0)}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -288,18 +288,18 @@ body {
                         @endforeach
                         <tr>
                             <td>Total</td>
-                            <td colspan="4">Rp. {{ number_format($header->total_wms, 0)}}</td>
+                            <td colspan="4">Rp. {{ number_format(ceil($header->total_wms), 0)}}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
             <div class="row text-right p-2">
                 <div class="col-12 text-right">
-                    <p class=""><strong>Admin</strong> : {{ number_format($header->admin, 0) }}</p>
-                    <p class=""><strong>Total</strong> : {{ number_format($header->total, 0) }}</p>
+                    <p class=""><strong>Admin</strong> : {{ number_format(ceil($header->admin), 0) }}</p>
+                    <p class=""><strong>Total</strong> : {{ number_format(ceil($header->total), 0) }}</p>
                     <hr>
-                    <p class=""><strong>PPN (11%)</strong> : {{ number_format($header->ppn, 0) }}</p>
-                    @if($header->grand_total >= 5000000)
+                    <p class=""><strong>PPN (11%)</strong> : {{ number_format(ceil($header->ppn), 0) }}</p>
+                    @if(ceil($header->grand_total) >= 5000000)
                     <p class=""><strong>Materai</strong> : 10.000</p>
                     @endif
                     <hr>
@@ -308,7 +308,7 @@ body {
                             <p class=""><strong>Terbilang</strong> : {{ $terbilang }}</p>
                         </div>
                         <div class="col-4 text-right">
-                            <p class=""><strong>Grand Total</strong> : {{ number_format($header->grand_total, 0) }}</p>
+                            <p class=""><strong>Grand Total</strong> : {{ number_format(ceil($header->grand_total), 0) }}</p>
                         </div>
                     </div>
                 </div>

@@ -15,6 +15,8 @@ use App\Exports\lcl\ReportCont;
 use App\Exports\lcl\ReportContJICT;
 use App\Exports\lcl\ReportManifest;
 use App\Exports\lcl\ReportManifestBeaCukaiNew;
+use Illuminate\Support\Facades\DB;
+
 
 use DataTables;
 
@@ -35,153 +37,199 @@ class ReportController extends Controller
 
     public function dataCont(Request $request)
     {
-        $cont = Cont::orderBy('joborder_id', 'desc');
+        $data = Cont::query()
+        ->select(
+            'tcontainer.*',
+            'j.nojoborder',
+            'j.noplp',
+            'j.ttgl_plp',
+            'j.tno_bc11',
+            'j.ttgl_bc11',
+            DB::raw('p.nm_angkut as plp_nm_angkut'),
+            DB::raw('p.kd_tps_asal as plp_kd_tps_asal'),
+            DB::raw('p.namaconsolidator as plp_namaconsolidator')
+        )
+        ->leftJoin('tjoborder as j', 'j.id', '=', 'tcontainer.joborder_id')
+        ->leftJoin('tps_responplptujuanxml as p', 'p.id', '=', 'j.plp_id');
+
+        // filtering by date (optional)
+        $cont = $data;
         if ($request->has('filter') && $request->filter) {
             if ($request->filter == 'Tgl PLP') {
-                $cont = Cont::whereHas('job', function ($query) use ($request) {
-                    $query->whereBetween('ttgl_plp', [$request->start_date, $request->end_date])->orderBy('ttgl_plp', 'asc');
-                });
+                $cont->whereBetween('j.ttgl_plp', [$request->start_date, $request->end_date])
+                     ->orderBy('j.ttgl_plp', 'asc');
             } elseif ($request->filter == 'Tgl Gate In') {
-                $cont = Cont::whereBetween('tglmasuk', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc');
+                $cont->whereBetween('tcontainer.tglmasuk', [$request->start_date, $request->end_date])
+                     ->orderBy('tcontainer.tglmasuk', 'asc');
             } elseif ($request->filter == 'Tgl Gate Out') {
-                $cont = Cont::whereBetween('tglbuangmty', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc');
+                $cont->whereBetween('tcontainer.tglbuangmty', [$request->start_date, $request->end_date])
+                     ->orderBy('tcontainer.tglmasuk', 'asc');
             } elseif ($request->filter == 'Tgl BC 1.1') {
-                $cont = Cont::whereHas('job', function ($query) use ($request) {
-                    $query->whereBetween('ttgl_bc11', [$request->start_date, $request->end_date])->orderBy('ttgl_bc11', 'asc');
-                });
+                $cont->whereBetween('j.ttgl_bc11', [$request->start_date, $request->end_date])
+                     ->orderBy('j.ttgl_bc11', 'asc');
             }
         }
 
-        if ($request->has('noplp') && $request->noplp) {
-            $cont = Cont::whereHas('job', function ($query) use ($request) {
-                $query->where('noplp', 'LIKE', "%{$request->noplp}%");
-            });
-        }
-    
-        if ($request->has('nobc_11') && $request->nobc_11) {
-            $cont = Cont::whereHas('job', function ($query) use ($request) {
-                $query->where('tno_bc11', 'LIKE', "%{$request->nobc_11}%");
-            });
+        if ($request->filled('noplp')) {
+            $cont->where('j.noplp', 'like', "%{$request->noplp}%");
         }
 
-        $cont = $cont->get();
-        
+        if ($request->filled('nobc_11')) {
+            $cont->where('j.tno_bc11', 'like', "%{$request->nobc_11}%");
+        }
+
         return DataTables::of($cont)
-        ->addColumn('detil', function($cont){
-            $herf = '/lcl/report/contPhoto';
-            return '<a href="javascript:void(0)" onclick="openWindow(\''.$herf.$cont->id.'\')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>';
-        })
-        ->addColumn('jobordr', function($cont){
-            return $cont->job->nojoborder ?? '-';
-        })
-        ->addColumn('nm_angkut', function($cont){
-            return $cont->job->PLP->nm_angkut ?? '-';
-        })
-        ->addColumn('nocontainer', function($cont){
-            return $cont->nocontainer ?? '-';
-        })
-        ->addColumn('ctrType', function($cont){
-            $color = $cont->ctr_type == 'BB' ? 'background-color:rgb(167, 40, 40); color: white;' : '';
+            ->addColumn('detil', function($cont){
+                $herf = '/lcl/report/contPhoto';
+                return '<a href="javascript:void(0)" onclick="openWindow(\''.$herf.$cont->id.'\')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>';
+            })
 
-            return '<span style="'.$color.'; padding: 5px; border-radius: 5px;">'.$cont->ctr_type.'</span>';
-        })
-        ->addColumn('classType', function($cont){
-            $color = $cont->ctr_type == 'BB' ? 'background-color:rgb(167, 40, 40); color: white;' : '';
+            // joborder
+            ->editColumn('jobordr', fn($cont) => $cont->nojoborder ?? '-')
+            ->filterColumn('jobordr', fn($q, $k) => $q->where('j.nojoborder', 'like', "%{$k}%"))
+            ->orderColumn('jobordr', 'j.nojoborder $1')
 
-            return '<span style="'.$color.'; padding: 5px; border-radius: 5px;">'.$cont->type_class.'</span>';
-        })
-        ->addColumn('size', function($cont){
-            return $cont->size ?? '-';
-        })
-        ->addColumn('eta', function($cont){
-            return $cont->job->eta ?? '-';
-        })
-        ->addColumn('kd_tps_asal', function($cont){
-            return $cont->job->PLP->kd_tps_asal ?? '-';
-        })
-        ->addColumn('namaconsolidator', function($cont){
-            return $cont->job->PLP->namaconsolidator ?? '-';
-        })
-        ->addColumn('noplp', function($cont){
-            return $cont->job->noplp ?? '-';
-        })
-        ->addColumn('tglPLP', function($cont){
-            return $cont->job->ttgl_plp ?? '-';
-        })
-        ->addColumn('no_bc11', function($cont){
-            return $cont->job->tno_bc11 ?? '-';
-        })
-        ->addColumn('tgl_bc11', function($cont){
-            return $cont->job->ttgl_bc11 ?? '';
-        })
-        ->addColumn('nobl', function($cont){
-            return $cont->nobl ?? '-';
-        })
-        ->addColumn('tglBL', function($cont){
-            return $cont->tgl_bl_awb ?? '-';
-        })
-        ->addColumn('customer', function($cont){
-            return $cont->Customer->name ?? '-';
-        })
-        ->addColumn('npwp', function($cont){
-            return $cont->Customer->npwp ?? '-';
-        })
-        ->addColumn('email', function($cont){
-            return $cont->Customer->email ?? '-';
-        })
-        ->addColumn('nopol', function($cont){
-            return $cont->nopol ?? '-';
-        })
-        ->addColumn('tglmasuk', function($cont){
-            return $cont->tglmasuk ?? 'Belum Masuk';
-        })
-        ->addColumn('jammasuk', function($cont){
-            return $cont->jammasuk ?? 'Belum Masuk';
-        })
-        ->addColumn('tglstripping', function($cont){
-            return $cont->tglstripping ?? 'Belum Stripping';
-        })
-        ->addColumn('jamstripping', function($cont){
-            return $cont->jamstripping ?? 'Belum Stripping';
-        })
-        ->addColumn('nopol_mty', function($cont){
-            return $cont->nopol_mty ?? '-';
-        })
-        ->addColumn('tglkeluar', function($cont){
-            return $cont->tglkeluar ?? 'Belum keluar';
-        })
-        ->addColumn('jamkeluar', function($cont){
-            return $cont->jamkeluar ?? 'Belum keluar';
-        })
-        ->addColumn('lamaHari', function($cont){
-            if (!$cont->tglmasuk) {
-                $lamaHari = 'Belum Masuk';
-                $longStay = 'N';
-            } else {
-                $lamaHari = Carbon::parse($cont->tglmasuk)->diffInDays($cont->tglbuangmty ?? now()) . ' hari';
-    
-                if (Carbon::parse($cont->tglmasuk)->diffInDays($cont->tglbuangmty ?? now()) >= 25 ) {
-                    $longStay = 'Y';
-                }else {
+            // nm_angkut (plp)
+            ->editColumn('nm_angkut', fn($cont) => $cont->nm_angkut ?? '-')
+            ->filterColumn('nm_angkut', fn($q, $k) => $q->where('p.nm_angkut', 'like', "%{$k}%"))
+            ->orderColumn('nm_angkut', 'p.nm_angkut $1')
+
+            // nocontainer
+            ->editColumn('nocontainer', fn($cont) => $cont->nocontainer ?? '-')
+            ->filterColumn('nocontainer', fn($q, $k) => $q->where('tcontainer.nocontainer', 'like', "%{$k}%"))
+            ->orderColumn('nocontainer', 'tcontainer.nocontainer $1')
+
+            // ctrType (dengan warna)
+            ->addColumn('ctrType', function($cont){
+                $color = $cont->ctr_type == 'BB' ? 'background-color:rgb(167, 40, 40); color: white;' : '';
+                return '<span style="'.$color.'; padding: 5px; border-radius: 5px;">'.$cont->ctr_type.'</span>';
+            })
+            ->filterColumn('ctrType', fn($q, $k) => $q->where('tcontainer.ctr_type', 'like', "%{$k}%"))
+            ->orderColumn('ctrType', 'tcontainer.ctr_type $1')
+
+            // classType
+            ->addColumn('classType', function($cont){
+                $color = $cont->ctr_type == 'BB' ? 'background-color:rgb(167, 40, 40); color: white;' : '';
+                return '<span style="'.$color.'; padding: 5px; border-radius: 5px;">'.$cont->type_class.'</span>';
+            })
+            ->filterColumn('classType', fn($q, $k) => $q->where('tcontainer.type_class', 'like', "%{$k}%"))
+            ->orderColumn('classType', 'tcontainer.type_class $1')
+
+            // size
+            ->editColumn('size', fn($cont) => $cont->size ?? '-')
+            ->filterColumn('size', fn($q, $k) => $q->where('tcontainer.size', 'like', "%{$k}%"))
+            ->orderColumn('size', 'tcontainer.size $1')
+
+            // eta
+            ->editColumn('eta', fn($cont) => $cont->eta ?? '-')
+            ->filterColumn('eta', fn($q, $k) => $q->where('tcontainer.eta', 'like', "%{$k}%"))
+            ->orderColumn('eta', 'tcontainer.eta $1')
+
+            // kd_tps_asal (plp)
+            ->addColumn('kd_tps_asal', fn($cont) => $cont->plp_kd_tps_asal ?? '-')
+            ->filterColumn('kd_tps_asal', function($query, $keyword) {
+                $query->where('p.kd_tps_asal', 'like', "%{$keyword}%");
+            })
+            ->orderColumn('kd_tps_asal', 'p.kd_tps_asal $1')
+
+            // namaconsolidator (plp)
+            ->addColumn('namaconsolidator', fn($cont) => $cont->plp_namaconsolidator ?? '-')
+            ->filterColumn('namaconsolidator', function($query, $keyword) {
+                $query->where('p.namaconsolidator', 'like', "%{$keyword}%");
+            })
+            ->orderColumn('namaconsolidator', 'p.namaconsolidator $1')
+
+            // noplp
+            ->editColumn('noplp', fn($cont) => $cont->noplp ?? '-')
+            ->filterColumn('noplp', fn($q, $k) => $q->where('j.noplp', 'like', "%{$k}%"))
+            ->orderColumn('noplp', 'j.noplp $1')
+
+            // tglPLP
+            ->editColumn('tglPLP', fn($cont) => $cont->ttgl_plp ?? '-')
+            ->filterColumn('tglPLP', fn($q, $k) => $q->where('j.ttgl_plp', 'like', "%{$k}%"))
+            ->orderColumn('tglPLP', 'j.ttgl_plp $1')
+
+            // no_bc11
+            ->editColumn('no_bc11', fn($cont) => $cont->tno_bc11 ?? '-')
+            ->filterColumn('no_bc11', fn($q, $k) => $q->where('j.tno_bc11', 'like', "%{$k}%"))
+            ->orderColumn('no_bc11', 'j.tno_bc11 $1')
+
+            // tgl_bc11
+            ->editColumn('tgl_bc11', fn($cont) => $cont->ttgl_bc11 ?? '-')
+            ->filterColumn('tgl_bc11', fn($q, $k) => $q->where('j.ttgl_bc11', 'like', "%{$k}%"))
+            ->orderColumn('tgl_bc11', 'j.ttgl_bc11 $1')
+
+            // nobl
+            ->editColumn('nobl', fn($cont) => $cont->nobl ?? '-')
+            ->filterColumn('nobl', fn($q, $k) => $q->where('tcontainer.nobl', 'like', "%{$k}%"))
+            ->orderColumn('nobl', 'tcontainer.nobl $1')
+
+            // tglBL
+            ->editColumn('tglBL', fn($cont) => $cont->tgl_bl_awb ?? '-')
+            ->filterColumn('tglBL', fn($q, $k) => $q->where('tcontainer.tgl_bl_awb', 'like', "%{$k}%"))
+            ->orderColumn('tglBL', 'tcontainer.tgl_bl_awb $1')
+
+            // nopol
+            ->editColumn('nopol', fn($cont) => $cont->nopol ?? '-')
+            ->filterColumn('nopol', fn($q, $k) => $q->where('tcontainer.nopol', 'like', "%{$k}%"))
+            ->orderColumn('nopol', 'tcontainer.nopol $1')
+
+            // tglmasuk
+            ->editColumn('tglmasuk', fn($cont) => $cont->tglmasuk ?? 'Belum Masuk')
+            ->filterColumn('tglmasuk', fn($q, $k) => $q->where('tcontainer.tglmasuk', 'like', "%{$k}%"))
+            ->orderColumn('tglmasuk', 'tcontainer.tglmasuk $1')
+
+            // jammasuk
+            ->editColumn('jammasuk', fn($cont) => $cont->jammasuk ?? 'Belum Masuk')
+            ->filterColumn('jammasuk', fn($q, $k) => $q->where('tcontainer.jammasuk', 'like', "%{$k}%"))
+            ->orderColumn('jammasuk', 'tcontainer.jammasuk $1')
+
+            // tglstripping
+            ->editColumn('tglstripping', fn($cont) => $cont->tglstripping ?? 'Belum Stripping')
+            ->filterColumn('tglstripping', fn($q, $k) => $q->where('tcontainer.tglstripping', 'like', "%{$k}%"))
+            ->orderColumn('tglstripping', 'tcontainer.tglstripping $1')
+
+            // jamstripping
+            ->editColumn('jamstripping', fn($cont) => $cont->jamstripping ?? 'Belum Stripping')
+            ->filterColumn('jamstripping', fn($q, $k) => $q->where('tcontainer.jamstripping', 'like', "%{$k}%"))
+            ->orderColumn('jamstripping', 'tcontainer.jamstripping $1')
+
+            // nopol_mty
+            ->editColumn('nopol_mty', fn($cont) => $cont->nopol_mty ?? '-')
+            ->filterColumn('nopol_mty', fn($q, $k) => $q->where('tcontainer.nopol_mty', 'like', "%{$k}%"))
+            ->orderColumn('nopol_mty', 'tcontainer.nopol_mty $1')
+
+            // tglkeluar
+            ->editColumn('tglkeluar', fn($cont) => $cont->tglkeluar ?? 'Belum keluar')
+            ->filterColumn('tglkeluar', fn($q, $k) => $q->where('tcontainer.tglkeluar', 'like', "%{$k}%"))
+            ->orderColumn('tglkeluar', 'tcontainer.tglkeluar $1')
+
+            // jamkeluar
+            ->editColumn('jamkeluar', fn($cont) => $cont->jamkeluar ?? 'Belum keluar')
+            ->filterColumn('jamkeluar', fn($q, $k) => $q->where('tcontainer.jamkeluar', 'like', "%{$k}%"))
+            ->orderColumn('jamkeluar', 'tcontainer.jamkeluar $1')
+
+            // lamaHari (hitung manual)
+            ->addColumn('lamaHari', function($cont){
+                if (!$cont->tglmasuk) return 'Belum Masuk';
+                return Carbon::parse($cont->tglmasuk)->diffInDays($cont->tglbuangmty ?? now()) . ' hari';
+            })
+
+            // longStay
+            ->addColumn('longStay', function($cont){
+                if (!$cont->tglmasuk) {
                     $longStay = 'N';
+                } else {
+                    $longStay = Carbon::parse($cont->tglmasuk)->diffInDays($cont->tglbuangmty ?? now()) >= 25 ? 'Y' : 'N';
                 }
-            }
-            return $lamaHari;
-        })
-        ->addColumn('longStay', function($cont){
-            if (!$cont->tglmasuk) {
-                $longStay = 'N';
-            } else {
-                $longStay = Carbon::parse($cont->tglmasuk)->diffInDays($cont->tglbuangmty ?? now()) >= 25 ? 'Y' : 'N';
-            }
-        
-            $color = $longStay == 'Y' ? 'background-color: #28a745; color: white;' : '';
-        
-            return '<span style="'.$color.'; padding: 5px; border-radius: 5px;">'.$longStay.'</span>';
-        })
-        ->rawColumns(['detil', 'longStay', 'ctrType', 'classType'])
-        ->make(true);
+                $color = $longStay == 'Y' ? 'background-color: #28a745; color: white;' : '';
+                return '<span style="'.$color.'; padding: 5px; border-radius: 5px;">'.$longStay.'</span>';
+            })
+
+            ->rawColumns(['detil','ctrType','classType','longStay'])
+            ->make(true);
     }
+
 
     public function photoCont($id)
     {
@@ -324,149 +372,166 @@ class ReportController extends Controller
 
     public function manifestDataTable(Request $request)
     {
-        // dd($request->all());
-      $mans = Manifest::orderBy('joborder_id', 'asc');
-
-      if ($request->has('filter') && $request->filter) {
-        if ($request->filter == 'Tgl PLP') {
-            $mans = Manifest::whereHas('job', function ($query) use ($request) {
-                $query->whereBetween('ttgl_plp', [$request->start_date, $request->end_date])->orderBy('ttgl_plp', 'asc');
-            });
-        } elseif ($request->filter == 'Tgl Gate In') {
-            $mans = Manifest::whereBetween('tglmasuk', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc');
-        } elseif ($request->filter == 'Tgl Release') {
-            $mans = Manifest::whereBetween('tglrelease', [$request->start_date, $request->end_date])->orderBy('tglrelease', 'asc');
-        } elseif ($request->filter == 'Tgl BC 1.1') {
-            $mans = Manifest::whereHas('job', function ($query) use ($request) {
-                $query->whereBetween('ttgl_bc11', [$request->start_date, $request->end_date])->orderBy('ttgl_bc11', 'asc');
-            });
-        } elseif ($request->filter == 'ETA') {
-            $mans = Manifest::whereHas('job', function ($query) use ($request) {
-                $query->whereBetween('eta', [$request->start_date, $request->end_date])->orderBy('eta', 'asc');
-            });
-        }elseif ($request->filter == 'masuk') {
-            $mans = Manifest::whereBetween('tglmasuk', [$request->start_date, $request->end_date])->orderBy('tglmasuk', 'asc');
-        }elseif ($request->filter == 'keluar') {
-            $mans = Manifest::whereBetween('tglrelease', [$request->start_date, $request->end_date])->orderBy('tglrelease', 'asc');
-        }elseif ($request->filter == 'akhir') {
-            $mans = Manifest::whereDate('tglmasuk', '<=', $request->end_date)->whereNull('tglrelease')->orWhereDate('tglrelease', '>', $request->end_date);
+        $mans = Manifest::query()
+            ->select(['tmanifest.*',
+                 DB::raw("DATEDIFF(COALESCE(tmanifest.tglrelease, NOW()), tmanifest.tglstripping) as lamaTimbun")
+            ])
+            ->with(['cont.job.PLP', 'customer', 'packing', 'packingTally', 'dokumen'])
+            ->leftJoin('tcontainer as c', 'c.id', '=', 'tmanifest.container_id')
+            ->leftJoin('tjoborder as j', 'j.id', '=', 'c.joborder_id')
+            ->leftJoin('tps_responplptujuanxml as p', 'p.id', '=', 'j.plp_id')
+            ->leftJoin('customer as cust', 'cust.id', '=', 'tmanifest.customer_id')
+            ->leftJoin('tpacking as pk', 'pk.id', '=', 'tmanifest.packing_id')
+            ->leftJoin('tpacking as pkt', 'pkt.id', '=', 'tmanifest.packing_tally')
+            ->leftJoin('kode_dok as d', 'd.id', '=', 'tmanifest.kd_dok_inout')
+            ->orderBy('j.id', 'asc');
+    
+        // 🔎 Filtering by date types
+        if ($request->has('filter') && $request->filter) {
+            if ($request->filter == 'Tgl PLP') {
+                $mans->whereBetween('j.ttgl_plp', [$request->start_date, $request->end_date]);
+            } elseif ($request->filter == 'Tgl Gate In') {
+                $mans->whereBetween('c.tglmasuk', [$request->start_date, $request->end_date]);
+            } elseif ($request->filter == 'Tgl Release') {
+                $mans->whereBetween('tmanifest.tglrelease', [$request->start_date, $request->end_date]);
+            } elseif ($request->filter == 'Tgl BC 1.1') {
+                $mans->whereBetween('j.ttgl_bc11', [$request->start_date, $request->end_date]);
+            } elseif ($request->filter == 'ETA') {
+                $mans->whereBetween('j.eta', [$request->start_date, $request->end_date]);
+            } elseif ($request->filter == 'masuk') {
+                $mans->whereBetween('c.tglmasuk', [$request->start_date, $request->end_date]);
+            } elseif ($request->filter == 'keluar') {
+                $mans->whereBetween('tmanifest.tglrelease', [$request->start_date, $request->end_date]);
+            } elseif ($request->filter == 'akhir') {
+                $mans->whereDate('c.tglmasuk', '<=', $request->end_date)
+                     ->where(function($q) use ($request){
+                         $q->whereNull('tmanifest.tglrelease')
+                           ->orWhereDate('tmanifest.tglrelease', '>', $request->end_date);
+                     });
+            }
         }
-      }
-
-      if ($request->has('container_id') && $request->container_id) {
-        $mans->where('container_id', $request->container_id);
-      }
-
-      $mans = $mans->get();
-
-        // var_dump($mans, $start, $end);
-       
-
+    
+        // 🔎 Filter by container id
+        if ($request->has('container_id') && $request->container_id) {
+            $mans->where('tmanifest.container_id', $request->container_id);
+        }
+    
         return DataTables::of($mans)
-        ->addColumn('detil', function($mans){
-            $herf = '/lcl/report/manifestPhoto';
-            return '<a href="javascript:void(0)" onclick="openWindow(\''.$herf.$mans->id.'\')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>';
-        })
-        ->addColumn('joborder', function($mans){
-            return $mans->cont->job->nojoborder ?? '-';
-        })
-        ->addColumn('nm_angkut', function($mans){
-            return $mans->cont->job->PLP->nm_angkut ?? '-';
-        })
-        ->addColumn('nocontainer', function($mans){
-            return $mans->cont->nocontainer ?? '-';
-        })
-        ->addColumn('size', function($mans){
-            return $mans->cont->size ?? '-';
-        })
-        ->addColumn('eta', function($mans){
-            return $mans->cont->job->eta ?? '-';
-        })
-        ->addColumn('kd_tps_asal', function($mans){
-            return $mans->cont->job->PLP->kd_tps_asal ?? '-';
-        })
-        ->addColumn('namaconsolidator', function($mans){
-            return $mans->cont->job->PLP->namaconsolidator ?? '-';
-        })
-        ->addColumn('nohbl', function($mans){
-            return $mans->nohbl ?? '-';
-        })
-        ->addColumn('tgl_hbl', function($mans){
-            return $mans->tgl_hbl ?? '-';
-        })
-        ->addColumn('notally', function($mans){
-            return $mans->notally ?? '-';
-        })
-        ->addColumn('customer', function($mans){
-            return $mans->customer->name ?? '-';
-        })
-        ->addColumn('quantity', function($mans){
-            return $mans->quantity ?? '-';
-        })
-        ->addColumn('final_qty', function($mans){
-            return $mans->final_qty ?? '-';
-        })
-        ->addColumn('packingName', function($mans){
-            return $mans->packing->name ?? '-';
-        })
-        ->addColumn('packingCode', function($mans){
-            return $mans->packing->code ?? '-';
-        })
-        ->addColumn('desc', function($mans){
-            $desc = $mans->descofgoods ?? '-';
-            return '<textarea class="form-control" cols="3" readonly>'. $desc .'</textarea>';
-        })
-        ->addColumn('weight', function($mans){
-            return $mans->weight ?? '';
-        })
-        ->addColumn('meas', function($mans){
-            return $mans->meas ?? '-';
-        })
-        ->addColumn('packingTally', function($mans){
-            return $mans->packingTally->name ?? '-';
-        })
-        ->addColumn('noplp', function($mans){
-            return $mans->cont->job->noplp ?? '-';
-        })
-        ->addColumn('tglPLP', function($mans){
-            return $mans->cont->job->ttgl_plp ?? '-';
-        })
-        ->addColumn('no_bc11', function($mans){
-            return $mans->cont->job->PLP->no_bc11 ?? '-';
-        })
-        ->addColumn('tgl_bc11', function($mans){
-            return $mans->cont->job->PLP->tgl_bc11 ?? '';
-        })
-        ->addColumn('tglmasuk', function($mans){
-            return $mans->cont->tglmasuk ?? 'Belum Masuk';
-        })
-        ->addColumn('jammasuk', function($mans){
-            return $mans->cont->jammasuk ?? 'Belum Masuk';
-        })
-        ->addColumn('startstripping', function ($mans) {
-            return $mans->startstripping ?? '-'; // Replace with proper column name
-        })
-        ->addColumn('endstripping', function ($mans) {
-            return $mans->endstripping ?? '-'; // Replace with proper column name
-        })
-        ->addColumn('dokumen', function($mans){
-            return $mans->dokumen->name ?? '-';
-        })
-        ->addColumn('no_dok', function($mans){
-            return $mans->no_dok ?? '-';
-        })
-        ->addColumn('tglDok', function($mans){
-            return $mans->tgl_dok ?? '-';
-        })
-        ->addColumn('location', function($mans){
-            return $mans->mostItemsLocation()->Rack->name ?? 'Location not found';
-        })
-        ->addColumn('lamaTimbun', function($mans){
-            return ($mans->lamaTimbun() ?? '0') . 'days';
-        })
-        ->rawColumns(['detil', 'desc'])
-        ->make(true);
+            // detil button
+            ->addColumn('detil', function($mans){
+                $herf = '/lcl/report/manifestPhoto';
+                return '<a href="javascript:void(0)" onclick="openWindow(\''.$herf.$mans->id.'\')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>';
+            })
+        
+            // joborder
+            ->addColumn('joborder', fn($m) => $m->cont->job->nojoborder ?? '-')
+            ->filterColumn('joborder', fn($q, $kw) => $q->where('j.nojoborder', 'like', "%$kw%"))
+            ->orderColumn('joborder', fn($q, $order) => $q->orderBy('j.nojoborder', $order))
+        
+            // nm_angkut
+            ->addColumn('nm_angkut', fn($m) => $m->cont->job->PLP->nm_angkut ?? '-')
+            ->filterColumn('nm_angkut', fn($q, $kw) => $q->where('p.nm_angkut', 'like', "%$kw%"))
+            ->orderColumn('nm_angkut', fn($q, $order) => $q->orderBy('p.nm_angkut', $order))
+        
+            // nocontainer
+            ->addColumn('nocontainer', fn($m) => $m->cont->nocontainer ?? '-')
+            ->filterColumn('nocontainer', fn($q, $kw) => $q->where('c.nocontainer', 'like', "%$kw%"))
+            ->orderColumn('nocontainer', fn($q, $order) => $q->orderBy('c.nocontainer', $order))
+        
+            // size
+            ->addColumn('size', fn($m) => $m->cont->size ?? '-')
+            ->filterColumn('size', fn($q, $kw) => $q->where('c.size', 'like', "%$kw%"))
+            ->orderColumn('size', fn($q, $order) => $q->orderBy('c.size', $order))
+        
+            // eta
+            ->addColumn('eta', fn($m) => $m->cont->job->eta ?? '-')
+            ->filterColumn('eta', fn($q, $kw) => $q->where('j.eta', 'like', "%$kw%"))
+            ->orderColumn('eta', fn($q, $order) => $q->orderBy('j.eta', $order))
+        
+            // kd_tps_asal
+            ->addColumn('kd_tps_asal', fn($m) => $m->cont->job->PLP->kd_tps_asal ?? '-')
+            ->filterColumn('kd_tps_asal', fn($q, $kw) => $q->where('p.kd_tps_asal', 'like', "%$kw%"))
+            ->orderColumn('kd_tps_asal', fn($q, $order) => $q->orderBy('p.kd_tps_asal', $order))
+        
+            // namaconsolidator
+            ->addColumn('namaconsolidator', fn($m) => $m->cont->job->PLP->namaconsolidator ?? '-')
+            ->filterColumn('namaconsolidator', fn($q, $kw) => $q->where('p.namaconsolidator', 'like', "%$kw%"))
+            ->orderColumn('namaconsolidator', fn($q, $order) => $q->orderBy('p.namaconsolidator', $order))
+        
+            // nohbl
+            ->addColumn('nohbl', fn($m) => $m->nohbl ?? '-')
+            ->filterColumn('nohbl', fn($q, $kw) => $q->where('tmanifest.nohbl', 'like', "%$kw%"))
+            ->orderColumn('nohbl', fn($q, $order) => $q->orderBy('tmanifest.nohbl', $order))
+        
+            // tgl_hbl
+            ->addColumn('tgl_hbl', fn($m) => $m->tgl_hbl ?? '-')
+            ->filterColumn('tgl_hbl', fn($q, $kw) => $q->where('tmanifest.tgl_hbl', 'like', "%$kw%"))
+            ->orderColumn('tgl_hbl', fn($q, $order) => $q->orderBy('tmanifest.tgl_hbl', $order))
+        
+            // notally
+            ->addColumn('notally', fn($m) => $m->notally ?? '-')
+            ->filterColumn('notally', fn($q, $kw) => $q->where('tmanifest.notally', 'like', "%$kw%"))
+            ->orderColumn('notally', fn($q, $order) => $q->orderBy('tmanifest.notally', $order))
+        
+            // customer
+            ->addColumn('customer', fn($m) => $m->customer->name ?? '-')
+            ->filterColumn('customer', fn($q, $kw) => $q->where('cust.name', 'like', "%$kw%"))
+            ->orderColumn('customer', fn($q, $order) => $q->orderBy('cust.name', $order))
+        
+            // quantity
+            ->addColumn('quantity', fn($m) => $m->quantity ?? '-')
+            ->filterColumn('quantity', fn($q, $kw) => $q->where('tmanifest.quantity', 'like', "%$kw%"))
+            ->orderColumn('quantity', fn($q, $order) => $q->orderBy('tmanifest.quantity', $order))
+        
+            // final_qty
+            ->addColumn('final_qty', fn($m) => $m->final_qty ?? '-')
+            ->filterColumn('final_qty', fn($q, $kw) => $q->where('tmanifest.final_qty', 'like', "%$kw%"))
+            ->orderColumn('final_qty', fn($q, $order) => $q->orderBy('tmanifest.final_qty', $order))
+        
+            // packing
+            ->addColumn('packingName', fn($m) => $m->packing->name ?? '-')
+            ->addColumn('packingCode', fn($m) => $m->packing->code ?? '-')
+        
+            // desc
+            ->addColumn('desc', fn($m) => '<textarea class="form-control" cols="3" readonly>'.($m->descofgoods ?? '-').'</textarea>')
+        
+            // weight, meas
+            ->addColumn('weight', fn($m) => $m->weight ?? '-')
+            ->addColumn('meas', fn($m) => $m->meas ?? '-')
+        
+            // packingTally
+            ->addColumn('packingTally', fn($m) => $m->packingTally->name ?? '-')
+        
+            // noplp
+            ->addColumn('noplp', fn($m) => $m->cont->job->noplp ?? '-')
+            ->orderColumn('noplp', fn($q, $order) => $q->orderBy('j.noplp', $order))
+        
+            // tglPLP
+            ->addColumn('tglPLP', fn($m) => $m->cont->job->ttgl_plp ?? '-')
+        
+            // no_bc11, tgl_bc11
+            ->addColumn('no_bc11', fn($m) => $m->cont->job->tno_bc11 ?? '-')
+            ->addColumn('tgl_bc11', fn($m) => $m->cont->job->ttgl_bc11 ?? '-')
+        
+            // tglmasuk, jammasuk
+            ->addColumn('tglmasuk', fn($m) => $m->cont->tglmasuk ?? 'Belum Masuk')
+            ->addColumn('jammasuk', fn($m) => $m->cont->jammasuk ?? 'Belum Masuk')
+        
+            // stripping
+            ->addColumn('startstripping', fn($m) => $m->startstripping ?? '-')
+            ->addColumn('endstripping', fn($m) => $m->endstripping ?? '-')
+        
+            // dokumen
+            ->addColumn('dokumen', fn($m) => $m->dokumen->name ?? '-')
+            ->addColumn('no_dok', fn($m) => $m->no_dok ?? '-')
+            ->addColumn('tglDok', fn($m) => $m->tgl_dok ?? '-')
+        
+            // location
+            ->addColumn('location', fn($m) => $m->mostItemsLocation()->Rack->name ?? 'Location not found')
+            ->rawColumns(['detil', 'desc'])
+            ->make(true);
     }
+
 
     public function photoManifest($id)
     {

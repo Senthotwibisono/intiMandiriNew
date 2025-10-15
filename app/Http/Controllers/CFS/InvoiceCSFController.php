@@ -35,7 +35,7 @@ class InvoiceCSFController extends Controller
 
     public function data(Request $request)
     {
-        $header = Header::with(['manifest'])->get();
+        $header = Header::with(['manifest']);
 
         return DataTables::of($header)
         ->addColumn('print', function($header){

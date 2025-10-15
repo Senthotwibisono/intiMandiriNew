@@ -13,8 +13,10 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         // $schedule->command('inspire')->hourly();
-        $schedule->command('functions:daily')->everyMinute();
-        $schedule->command('functions:cfsScheduler')->everyMinute();
+        // $schedule->command('functions:daily')->everyMinute();
+        // $schedule->command('functions:cfsScheduler')->everyMinute();
+        $schedule->command('functions:daily')->everyThreeMinutes();
+        $schedule->command('functions:cfsScheduler')->everyThreeMinutes();
     }
 
     /**

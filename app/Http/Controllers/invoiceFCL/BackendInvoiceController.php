@@ -37,7 +37,11 @@ class BackendInvoiceController extends Controller
 
     public function dataTable(Request $request)
     {
-        $header = Header::orderBy('created_at', 'desc')->orderBy('proforma_no', 'desc')->orderBy('invoice_no', 'desc')->get();
+        $header = Header::whereNot('flag_hidden', 'Y');
+        
+        if (Auth::user()->can('hiddenInvoiceFCL')) {
+           $header = Header::query();
+        }
 
         return DataTables::of($header)
         ->addColumn('invoiceNo', function($header){
@@ -66,6 +70,39 @@ class BackendInvoiceController extends Controller
                 # code...
                 return '<a type="button" href="/invoiceFCL/invoice/invoice-'.$header->id.'" target="_blank" class="btn btn-sm btn-info text-white"><i class="fa fa-file"></i></a>';
             }
+        })
+        ->filterColumn('invoiceNo', function($query, $keyword) {
+            $query->where('invoice_no', 'like', "%{$keyword}%")
+                  ->orWhere('status', 'like', "%{$keyword}%");
+        })
+        // 🔹 supaya bisa sort kolom invoiceNo
+        ->orderColumn('invoiceNo', function($query, $order) {
+            $query->orderBy('invoice_no', $order);
+        })
+
+        // 🔹 relasi (createdBy)
+        ->filterColumn('createdBy', function($query, $keyword) {
+            $query->whereHas('userCreate', function($q) use ($keyword) {
+                $q->where('name', 'like', "%{$keyword}%");
+            });
+        })
+        ->orderColumn('createdBy', function ($query, $order) {
+            $query->join('users', 'users.id', '=', 'headers.created_by')
+                  ->orderBy('users.name', $order);
+        })
+
+        // 🔹 karena pranota & invoice pakai tombol, biar tetap bisa di-search pakai id
+        ->filterColumn('pranota', function($query, $keyword) {
+            $query->where('id', 'like', "%{$keyword}%");
+        })
+        ->orderColumn('pranota', function ($query, $order) {
+            $query->orderBy('id', $order);
+        })
+        ->filterColumn('invoice', function($query, $keyword) {
+            $query->where('id', 'like', "%{$keyword}%");
+        })
+        ->orderColumn('invoice', function ($query, $order) {
+            $query->orderBy('id', $order);
         })
         ->addColumn('tranparansi', function($header){
             if ($header->status == 'C') {

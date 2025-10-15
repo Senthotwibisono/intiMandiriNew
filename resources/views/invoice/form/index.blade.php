@@ -11,39 +11,23 @@
             <a href="javascript:void(0);" class="btn btn-success" id="createForm"><i class="fa fa-plus"></i></a>
         </div>
         <div class="card-body">
-            <table class="tabelCustom">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>No HBL</th>
-                        <th>Tgl. HBL</th>
-                        <th>Quantity</th>
-                        <th>Customer</th>
-                        <th>Kasir</th>
-                        <th>Created At</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($forms as $form)
+            <div class="table">
+                <table class="table-hover table-striped" id="tableForm">
+                    <thead>
                         <tr>
-                            <td>{{$loop->iteration}}</td>
-                            <td>{{$form->manifest->nohbl ?? ''}}</td>
-                            <td>{{$form->manifest->tgl_hbl ?? ''}}</td>
-                            <td>{{$form->manifest->quantity ?? ''}}</td>
-                            <td>{{$form->customer->name ?? ''}}</td>
-                            <td>{{$form->user->name ?? ''}}</td>
-                            <td>{{$form->created_at}}</td>
-                            <td>
-                                <div class="button-container">
-                                    <a href="/invoice/form/formStep1/{{$form->id}}" class="btn btn-warning"><i class="fa fa-pencil"></i></a>
-                                    <a class="btn btn-danger Delete" data-id="{{$form->id}}" type="button"><i class="fa fa-trash"></i></a>
-                                </div>
-                            </td>
+                            <th>No HBL</th>
+                            <th>Tgl. HBL</th>
+                            <th>Quantity</th>
+                            <th>Customer</th>
+                            <th>Kasir</th>
+                            <th>Created At</th>
+                            <th>Action</th>
+                            <th>Delete</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                   
+                </table>
+            </div>
         </div>
     </div>
 </section>
@@ -51,6 +35,28 @@
 @endsection
 
 @section('custom_js')
+<script>
+    $(document).ready(function() {
+        $('#tableForm').DataTable({
+            processing: true,
+            serverSide: true,
+            scrollX: true,
+            scrollY: '50vh',
+            ajax: '{{route('form.data')}}',
+            order: [[5, 'desc']],
+            columns: [
+                {data: 'manifest.nohbl', name: 'manifest.nohbl', className: 'text-center'},
+                {data: 'manifest.tgl_hbl', name: 'manifest.tgl_hbl', className: 'text-center'},
+                {data: 'manifest.quantity', name: 'manifest.quantity', className: 'text-center'},
+                {data: 'customer.name', name: 'customer.name', className: 'text-center'},
+                {data: 'user.name', name: 'user.name', className: 'text-center'},
+                {data: 'created_at', name: 'created_at', className: 'text-center'},
+                {data: 'action', name: 'action', className: 'text-center'},
+                {data: 'deleteInvoice', name: 'deleteInvoice', className: 'text-center'},
+            ]
+        })
+    });
+</script>
 <script>
     document.getElementById('createForm').addEventListener('click', function() {
         fetch('/invoice/form/create', {
@@ -72,8 +78,10 @@
 
 <script>
 $(document).ready(function() {
-    $('.Delete').on('click', function() {
-        var formId = $(this).data('id'); // Ambil ID dari data-id atribut
+    // Gunakan event delegation
+    $(document).on('click', '.deleteInvoice', function() {
+        var formId = $(this).data('id');
+        console.log(formId);
 
         Swal.fire({
             title: 'Apakah Anda yakin?',
@@ -87,10 +95,10 @@ $(document).ready(function() {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: '/invoice/form/delete-' + formId, // Ganti dengan endpoint penghapusan Anda
+                    url: '/invoice/form/delete-' + formId,
                     type: 'DELETE',
                     data: {
-                        _token: '{{ csrf_token() }}' // Sertakan token CSRF untuk keamanan
+                        _token: '{{ csrf_token() }}'
                     },
                     success: function(response) {
                         Swal.fire(
@@ -98,7 +106,8 @@ $(document).ready(function() {
                             'Data berhasil dihapus.',
                             'success'
                         ).then(() => {
-                            window.location.href = '/invoice/form/index'; // Arahkan ke halaman beranda setelah penghapusan sukses
+                            // reload DataTable agar data terupdate
+                            $('#tableForm').DataTable().ajax.reload();
                         });
                     },
                     error: function(xhr) {

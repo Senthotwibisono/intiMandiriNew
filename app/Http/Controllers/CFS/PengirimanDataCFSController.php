@@ -330,6 +330,7 @@ class PengirimanDataCFSController extends Controller
             $pelMuat = ($manifest->cont->job && $manifest->cont->job->muat && $manifest->cont->job->muat->kode) ? $manifest->cont->job->muat->kode : '';
             $pelTransit = ($manifest->cont->transit && $manifest->cont->transit->kode) ? $manifest->cont->job->transit->kode : '';
             $pelBongkar = ($manifest->cont->bongkar && $manifest->cont->bongkar->kode) ? $manifest->cont->job->bongkar->kode : '';
+            $isDaunMas = in_array($manifest->job->forwarding_id, [9273, 9269, 9214]);
             $dataDetil = [
                 'no_bl_awb' => $manifest->nohbl,
                 'tgl_bl_awb' => $tglBLawb,
@@ -363,9 +364,11 @@ class PengirimanDataCFSController extends Controller
                 'tgl_segel_bc' => null,
                 'no_ijin_tps' => null,
                 'tgl_ijin_tps' => null,
-                'nama_consolidator' => 'PT INTI MANDIRI UTAMA TRANS',
-                'npwp_consolidator' => '0022383483042000',
-                'alamat_consolidator' => 'Jl. Bugis Raya No. 15 Kebon Bawang Tanjung Priok',
+                'nama_consolidator' => $isDaunMas ? 'CV. DAUN MAS MULIA' : 'PT. LOGISTIK KARYA BERMITRA',
+                'npwp_consolidator' => $isDaunMas ? '0270758527042000' : '0924302722427000',
+                'alamat_consolidator' => $isDaunMas
+                    ? 'JLN. YOS SUDARSO KEBON BAWANG FORT BARAT NO. 16 KEBON BAWANG TANJUNG PRIOK'
+                    : 'JL. BINTARA 9 NO. 158 RT. 001 RW. 005 BINTARA BEKASI BARAT KOTA BEKASI JAWA BARAT 97134',
             ];
 
 
@@ -480,6 +483,7 @@ class PengirimanDataCFSController extends Controller
             $pelMuat = ($manifest->cont->job && $manifest->cont->job->muat && $manifest->cont->job->muat->kode) ? $manifest->cont->job->muat->kode : '';
             $pelTransit = ($manifest->cont->transit && $manifest->cont->transit->kode) ? $manifest->cont->job->transit->kode : '';
             $pelBongkar = ($manifest->cont->bongkar && $manifest->cont->bongkar->kode) ? $manifest->cont->job->bongkar->kode : '';
+            $isDaunMas = in_array($manifest->job->forwarding_id, [9273, 9269, 9214]);
             $dataDetil = [
                 'no_bl_awb' => $manifest->nohbl,
                 'tgl_bl_awb' => $tglBLawb,
@@ -513,9 +517,11 @@ class PengirimanDataCFSController extends Controller
                 'tgl_segel_bc' => null,
                 'no_ijin_tps' => null,
                 'tgl_ijin_tps' => null,
-                'nama_consolidator' => 'PT. LOGISTIK KARYA BERMITRA',
-                'npwp_consolidator' => '0924302722427000',
-                'alamat_consolidator' => 'JL. BINTARA 9 NO. 158 RT. 001 RW. 005 BINTARA BEKASI BARAT KOTA BEKASI JAWA BARAT 97134',
+                'nama_consolidator' => $isDaunMas ? 'CV. DAUN MAS MULIA' : 'PT. LOGISTIK KARYA BERMITRA',
+                'npwp_consolidator' => $isDaunMas ? '0270758527042000' : '0924302722427000',
+                'alamat_consolidator' => $isDaunMas
+                    ? 'JLN. YOS SUDARSO KEBON BAWANG FORT BARAT NO. 16 KEBON BAWANG TANJUNG PRIOK'
+                    : 'JL. BINTARA 9 NO. 158 RT. 001 RW. 005 BINTARA BEKASI BARAT KOTA BEKASI JAWA BARAT 97134',
             ];
 
             $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><DOCUMENT></DOCUMENT>');
@@ -652,6 +658,7 @@ class PengirimanDataCFSController extends Controller
             $jamBehandle = $manifest->jambehandle ? Carbon::parse($manifest->jambehandle)->format('H:i:s') : NULL;
             $behandleAt = $tglBehandle.' '.$jamBehandle;
             $tglSegelMerah = $manifest->tanggal_segel_merah ? Carbon::parse($manifest->tanggal_segel_merah)->format('Y-m-d H:i:s') : NULL;
+            $isDaunMas = in_array($manifest->job->forwarding_id, [9273, 9269, 9214]);
             $dataDetil = [
                 'no_bl_awb' => $manifest->nohbl,
                 'tgl_bl_awb' => $tglBLawb,
@@ -671,9 +678,11 @@ class PengirimanDataCFSController extends Controller
                 'tgl_behandle' => $behandleAt,
                 'fl_segel_merah' => $manifest->flag_segel_merah,
                 'tgl_segel_merah' => $tglSegelMerah,
-                'nama_consolidator' => 'PT. LOGISTIK KARYA BERMITRA',
-                'npwp_consolidator' => '0924302722427000',
-                'alamat_consolidator' => 'JL. BINTARA 9 NO. 158 RT. 001 RW. 005 BINTARA BEKASI BARAT KOTA BEKASI JAWA BARAT 97134',
+                'nama_consolidator' => $isDaunMas ? 'CV. DAUN MAS MULIA' : 'PT. LOGISTIK KARYA BERMITRA',
+                'npwp_consolidator' => $isDaunMas ? '0270758527042000' : '0924302722427000',
+                'alamat_consolidator' => $isDaunMas
+                    ? 'JLN. YOS SUDARSO KEBON BAWANG FORT BARAT NO. 16 KEBON BAWANG TANJUNG PRIOK'
+                    : 'JL. BINTARA 9 NO. 158 RT. 001 RW. 005 BINTARA BEKASI BARAT KOTA BEKASI JAWA BARAT 97134',
             ];
 
             $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="utf-8" standalone="yes"?><DOCUMENT></DOCUMENT>');

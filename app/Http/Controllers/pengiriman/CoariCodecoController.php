@@ -47,40 +47,32 @@ class CoariCodecoController extends Controller
     }
 
     private function RefNumber()
-    {
-        return DB::transaction(function(){
-            $tahun = Carbon::now()->format('y'); 
-            $bulan = Carbon::now()->format('m'); 
-            $tanggal = Carbon::now()->format('d');
-            
-            $lastNomor = RN::where('tahun', $tahun)
-            ->where('bulan', $bulan)
-            ->where('tanggal', $tanggal)
-            ->orderByRaw('CAST(nomor AS UNSIGNED) DESC')
-            ->first();
-            if ($lastNomor) {
-                $nomorBaru = $lastNomor ? (int)$lastNomor->nomor + 1 : 1;
-                $nomor = str_pad($nomorBaru, 4, '0', STR_PAD_LEFT);
-            }else {
-                $nomor = '0001';
-            }
-    
-            $ref = RN::create([
-                'tahun' => $tahun,
-                'bulan' => $bulan,
-                'tanggal' => $tanggal,
-                'nomor' => $nomor,
-            ]);
-    
-            $refNumber = $ref->main . $ref->tahun . $ref->bulan . $ref->tanggal . $ref->nomor;
-    
-            return $refNumber;
-        });
-    }
+{
+    return DB::transaction(function () {
+        $tahun = Carbon::now()->format('y');
+        $bulan = Carbon::now()->format('m');
+        $tanggal = Carbon::now()->format('d');
+
+        // ambil row hari ini atau buat baru
+        $row = RN::lockForUpdate()->firstOrCreate(
+            ['tahun' => $tahun, 'bulan' => $bulan, 'tanggal' => $tanggal],
+            ['nomor' => 0]
+        );
+
+        // increment nomor
+        $row->nomor++;
+        $row->save();
+
+        $nomor = str_pad($row->nomor, 4, '0', STR_PAD_LEFT);
+
+        return $row->main . $tahun . $bulan . $tanggal . $nomor;
+    });
+}
+
 
     public function coariCont()
     {
-        $conts = Cont::whereNotNull('tglmasuk')->where('coari_flag', '=', 'N')->get();
+        $conts = Cont::whereNotNull('tglmasuk')->where('coari_flag', '=', 'N')->take(5);
         if (!empty($conts)) {
             \SoapWrapper::override(function ($service) {
                 $service
@@ -292,7 +284,7 @@ class CoariCodecoController extends Controller
 
     public function coariContFCL()
     {
-        $conts = ContF::whereNotNull('tglmasuk')->where('coari_flag', '=', 'N')->get();
+        $conts = ContF::where('flag_segel_merah', 'N')->whereNotNull('tglmasuk')->where('coari_flag', '=', 'N')->take(10)->get();
         if (!empty($conts)) {
             \SoapWrapper::override(function ($service) {
                 $service
@@ -478,10 +470,10 @@ class CoariCodecoController extends Controller
                     'uid' => 'Auto',
                     'response' => $response,
                     'kode_kantor' => $cont->job->PLP->kd_kantor ?? '0403000',
-                    'noplp' => $cont->job->PLP->no_plp,
-                    'tglplp' => $cont->job->PLP->tgl_plp,
-                    'tgl_entry' => $coariCont->tgl_entry,
-                    'jam_entry' => $coariCont->jam_entry,
+                    'noplp' => $cont->job->PLP->no_plp ?? '-',
+                    'tglplp' => $cont->job->PLP->tgl_plp ?? NULL,
+                    'tgl_entry' => $coariCont->tgl_entry ?? NULL,
+                    'jam_entry' => $coariCont->jam_entry ?? NULL,
                 ]);
 
                 $cont->update([
@@ -503,7 +495,7 @@ class CoariCodecoController extends Controller
 
     public function CoariKms()
     {
-        $mansifestMaster = Manifest::whereNotNull('tglmasuk')->where('coari_flag', 'N')->get();
+        $mansifestMaster = Manifest::whereNotNull('tglmasuk')->where('coari_flag', 'N')->take(10)->get();
         // dd($mansifestMaster);
 
         if ($mansifestMaster->isEmpty())
@@ -720,7 +712,7 @@ class CoariCodecoController extends Controller
 
     public function CodecoCont()
     {
-        $conts = Cont::whereNotNull('tglkeluar')->where('coari_flag', 'Y')->where('codeco_flag', 'N')->get();
+        $conts = Cont::whereNotNull('tglkeluar')->where('coari_flag', 'Y')->where('codeco_flag', 'N')->take(10)->get();
         if (!empty($conts)) {
             \SoapWrapper::override(function ($service) {
                 $service
@@ -924,7 +916,7 @@ class CoariCodecoController extends Controller
 
     public function CodecoContFCL()
     {
-        $conts = ContF::whereNotNull('tglkeluar')->where('coari_flag', '=', 'Y')->where('codeco_flag', '=', 'N')->whereNotNull('kd_dok_inout')->whereNotNull('no_dok')->whereNotNull('tgl_dok')->get();
+        $conts = ContF::whereNotNull('tglkeluar')->where('coari_flag', '=', 'Y')->where('codeco_flag', '=', 'N')->whereNotNull('kd_dok_inout')->whereNotNull('no_dok')->whereNotNull('tgl_dok')->take(10)->get();
         if (!empty($conts)) {
             \SoapWrapper::override(function ($service) {
                 $service
@@ -1129,7 +1121,7 @@ class CoariCodecoController extends Controller
 
     public function CodecoKms()
     {
-        $mansifestMaster = Manifest::where('coari_flag', '=', 'Y')->whereNotNull('tglrelease')->where('codeco_flag', '=', 'N')->orWhere('codeco_flag', null)->get();
+        $mansifestMaster = Manifest::where('coari_flag', '=', 'Y')->whereNotNull('tglrelease')->where('codeco_flag', '=', 'N')->orWhere('codeco_flag', null)->take(10)->get();
 
         if ($mansifestMaster->isEmpty())
         {

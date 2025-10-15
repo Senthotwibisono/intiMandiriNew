@@ -231,7 +231,7 @@
                                 <select name="packing_id" style="width: 100%;" class="customSelect form-select select2">
                                     <option value disabled selected>Pilih Satu</option>
                                     @foreach($packs as $pack)
-                                        <option value="{{$pack->id}}">{{$pack->name}}</option>
+                                        <option value="{{$pack->id}}">{{$pack->code}}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -248,7 +248,7 @@
                                 <select name="packing_tally" style="width: 100%;" class="customSelect form-select selec2">
                                     <option value disabled selected>Pilih Satu</option>
                                     @foreach($packs as $pack)
-                                        <option value="{{$pack->id}}">{{$pack->name}}</option>
+                                        <option value="{{$pack->id}}">{{$pack->code}}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -366,7 +366,7 @@
                                 <select name="packing_id" id="packing_id_edit"  style="width: 100%;" class="editSelect form-select select2">
                                     <option value disabled selected>Pilih Satu</option>
                                     @foreach($packs as $pack)
-                                        <option value="{{$pack->id}}">{{$pack->name}}</option>
+                                        <option value="{{$pack->id}}">{{$pack->code}}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -383,7 +383,7 @@
                                 <select name="packing_tally" id="packing_tally_edit" style="width: 100%;" class="editSelect form-select selec2">
                                     <option value disabled selected>Pilih Satu</option>
                                     @foreach($packs as $pack)
-                                        <option value="{{$pack->id}}">{{$pack->name}}</option>
+                                        <option value="{{$pack->id}}">{{$pack->code}}</option>
                                     @endforeach
                                 </select>
                             </div>

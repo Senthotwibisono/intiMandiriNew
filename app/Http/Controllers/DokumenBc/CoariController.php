@@ -77,13 +77,20 @@ class CoariController extends Controller
 
     public function dataContLCL(Request $request)
     {
-        $cont = CD::where('jns_cont', 'L')->orderBy('tgl_entry', 'desc')->orderBy('jam_entry', 'desc')->get()->unique('no_cont');
-        return DataTables::of($cont)
-        ->addColumn('action', function($cont){
-            return '<button class="btn btn-outline-success kirimUlang" id="kirimUlang" data-id="'.$cont->cont_id.'">Kirim Ulang</button>';
-        })
-        ->rawColumns(['action'])
-        ->make(true);
+        $sub = CD::selectRaw('MAX(id) as id')
+            ->where('jns_cont', 'L')
+            ->groupBy('no_cont');
+            
+        $cont = CD::whereIn('id', $sub)
+            ->orderBy('tgl_entry', 'desc')
+            ->orderBy('jam_entry', 'desc');
+            
+        return DataTables::eloquent($cont)
+            ->addColumn('action', function($cont){
+                return '<button class="btn btn-outline-success kirimUlang" data-id="'.$cont->cont_id.'">Kirim Ulang</button>';
+            })
+            ->rawColumns(['action'])
+            ->make(true);
     }
 
     public function sendContLCL(Request $request)
@@ -559,14 +566,20 @@ class CoariController extends Controller
 
     public function dataContFCL(Request $request)
     {
-        $cont = CD::where('jns_cont', 'F')->orderBy('tgl_entry', 'desc')->orderBy('jam_entry', 'desc')->get()->unique('no_cont');
+        $cont = CD::select('tpscoaricontdetailxml.*')
+            ->where('jns_cont', 'F')
+            ->orderBy('tgl_entry', 'desc')
+            ->orderBy('jam_entry', 'desc')
+            ->distinct('no_cont'); // distinct langsung di DB
+
         return DataTables::of($cont)
-        ->addColumn('action', function($cont){
-            return '<button class="btn btn-outline-success kirimUlang" id="kirimUlang" data-id="'.$cont->cont_id.'">Kirim Ulang</button>';
-        })
-        ->rawColumns(['action'])
-        ->make(true);
+            ->addColumn('action', function ($cont) {
+                return '<button class="btn btn-outline-success kirimUlang" id="kirimUlang" data-id="'.$cont->cont_id.'">Kirim Ulang</button>';
+            })
+            ->rawColumns(['action'])
+            ->make(true);
     }
+
 
     public function coariContFCLExBak()
     {
@@ -606,7 +619,7 @@ class CoariController extends Controller
                     'no_voy_flight' => $cont->job->PLP->no_voy_flight ?? $cont->job->voy ?? null,
                     'call_sign' => $cont->job->PLP->call_sign ?? $cont->job_callsign ?? null,
                     'tgl_tiba' => $cont->job->PLP->tgl_tiba ?? null,
-                    'kd_gudang' => $cont->job->PLP->gudang_tujuan ?? 'INTI',
+                    'kd_gudang' => 'INTI',
                     'kd_dok_inout' => 99,
                     'no_dok_inout' => 'S-960/KPU.1/KPU.104/2025' ?? '',
                     'tanggal_dok_inout' => '20250610' ?? '',
@@ -688,7 +701,7 @@ class CoariController extends Controller
                 $contXml->addChild('NO_IJIN_TPS', ($cont->no_ijin_tps != '') ? $cont->no_ijin_tps : '');
                 $contXml->addChild('TGL_IJIN_TPS', ($cont->tgl_ijin_tps != '') ? $cont->tgl_ijin_tps : '');
 
-                // dd($xml);
+                // dd($xml->asXML());
                 
                 
                 $datas = [

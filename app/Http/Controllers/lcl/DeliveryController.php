@@ -61,22 +61,22 @@ class DeliveryController extends Controller
         // die;
         switch ($request->filter) {
             case 'all':
-                $manifest = Manifest::with(['shipperM', 'customer', 'packing', 'packingTally'])->whereNotNull('tglmasuk')->whereNull('tglbuangmty')->get();
+                $manifest = Manifest::with(['shipperM', 'customer', 'packing', 'packingTally'])->whereNotNull('tglmasuk')->whereNull('tglbuangmty');
                 break;
             case 'behandled':
-                $manifest = Manifest::with(['shipperM', 'customer', 'packing', 'packingTally'])->whereNotNull('status_behandle')->get();
+                $manifest = Manifest::with(['shipperM', 'customer', 'packing', 'packingTally'])->whereNotNull('status_behandle');
                 break;
             case 'ready':
-                $manifest = Manifest::with(['shipperM', 'customer', 'packing', 'packingTally'])->where('status_behandle', '2')->get();
+                $manifest = Manifest::with(['shipperM', 'customer', 'packing', 'packingTally'])->where('status_behandle', '2');
                 break;
             case 'finish':
-                $manifest = Manifest::with(['shipperM', 'customer', 'packing', 'packingTally'])->where('status_behandle', '3')->get();
+                $manifest = Manifest::with(['shipperM', 'customer', 'packing', 'packingTally'])->where('status_behandle', '3');
                 break;
             case 'proses':
-                $manifest = Manifest::with(['shipperM', 'customer', 'packing', 'packingTally'])->where('status_behandle', '1')->get();
+                $manifest = Manifest::with(['shipperM', 'customer', 'packing', 'packingTally'])->where('status_behandle', '1');
                 break;
             default:
-                $manifest = Manifest::with(['shipperM', 'customer', 'packing', 'packingTally'])->whereNotNull('tglmasuk')->whereNull('tglbuangmty')->get();
+                $manifest = Manifest::with(['shipperM', 'customer', 'packing', 'packingTally'])->whereNotNull('tglmasuk')->whereNull('tglbuangmty');
                 break;
         }
         
@@ -111,27 +111,27 @@ class DeliveryController extends Controller
                 return '-';
             }
         })
-        ->addColumn('nohbl', function($manifest){
-            return $manifest->nohbl ?? '-';
-        })
-        ->addColumn('tgl_hbl', function($manifest){
-            return $manifest->tgl_hbl ?? '-';
-        })
-        ->addColumn('notally', function($manifest){
-            return $manifest->notally ?? '-';
-        })
+        // ->addColumn('nohbl', function($manifest){
+        //     return $manifest->nohbl ?? '-';
+        // })
+        // ->addColumn('tgl_hbl', function($manifest){
+        //     return $manifest->tgl_hbl ?? '-';
+        // })
+        // ->addColumn('notally', function($manifest){
+        //     return $manifest->notally ?? '-';
+        // })
         ->addColumn('shipper', function($manifest){
             return $manifest->shipperM->name ?? '-';
         })
         ->addColumn('customer', function($manifest){
             return $manifest->customer->name ?? '-';
         })
-        ->addColumn('quantity', function($manifest){
-            return $manifest->quantity ?? '-';
-        })
-        ->addColumn('final_qty', function($manifest){
-            return $manifest->final_qty ?? '-';
-        })
+        // ->addColumn('quantity', function($manifest){
+        //     return $manifest->quantity ?? '-';
+        // })
+        // ->addColumn('final_qty', function($manifest){
+        //     return $manifest->final_qty ?? '-';
+        // })
         ->addColumn('packingName', function($manifest){
             return $manifest->packing->name ?? '-';
         })
@@ -142,12 +142,12 @@ class DeliveryController extends Controller
             $desc = $manifest->descofgoods ?? '-';
             return '<textarea class="form-control" cols="3" readonly>'. $desc .'</textarea>';
         })
-        ->addColumn('weight', function($manifest){
-            return $manifest->weight ?? '';
-        })
-        ->addColumn('meas', function($manifest){
-            return $manifest->meas ?? '-';
-        })
+        // ->addColumn('weight', function($manifest){
+        //     return $manifest->weight ?? '';
+        // })
+        // ->addColumn('meas', function($manifest){
+        //     return $manifest->meas ?? '-';
+        // })
         ->addColumn('packingTally', function($manifest){
             return $manifest->packingTally->name ?? '-';
         })
@@ -380,7 +380,7 @@ class DeliveryController extends Controller
 
     public function dataGateOut(Request $request)
     {
-        $manifest = Manifest::whereNotNull('tglstripping')->get();
+        $manifest = Manifest::whereNotNull('tglstripping');
 
         return DataTables::of($manifest)
         ->addColumn('edit', function($manifest){
@@ -400,18 +400,18 @@ class DeliveryController extends Controller
         ->addColumn('bonMuat', function($manifest){
             return '<button class="btn btn-danger printBonmuat" data-id="'.$manifest->id.'"><i class="fa fa-print"></i></button>';
         })
-        ->addColumn('status_bc', function($manifest){
-            return $manifest->status_bc ?? '-';
-        })
-        ->addColumn('nohbl', function($manifest){
-            return $manifest->nohbl ?? '-';
-        })
-        ->addColumn('tgl_hbl', function($manifest){
-            return $manifest->tgl_hbl ?? '-';
-        })
-        ->addColumn('notally', function($manifest){
-            return $manifest->notally ?? '-';
-        })
+        // ->addColumn('status_bc', function($manifest){
+        //     return $manifest->status_bc ?? '-';
+        // })
+        // ->addColumn('nohbl', function($manifest){
+        //     return $manifest->nohbl ?? '-';
+        // })
+        // ->addColumn('tgl_hbl', function($manifest){
+        //     return $manifest->tgl_hbl ?? '-';
+        // })
+        // ->addColumn('notally', function($manifest){
+        //     return $manifest->notally ?? '-';
+        // })
         ->addColumn('shipper', function($manifest){
             return $manifest->shipperM->name ?? '-';
         })
@@ -434,21 +434,21 @@ class DeliveryController extends Controller
             $desc = $manifest->descofgoods ?? '-';
             return '<textarea class="form-control custom-textarea" cols="30" readonly>'. $desc .'</textarea>';
         })
-        ->addColumn('weight', function($manifest){
-            return $manifest->weight ?? '';
-        })
-        ->addColumn('meas', function($manifest){
-            return $manifest->meas ?? '-';
-        })
+        // ->addColumn('weight', function($manifest){
+        //     return $manifest->weight ?? '';
+        // })
+        // ->addColumn('meas', function($manifest){
+        //     return $manifest->meas ?? '-';
+        // })
         ->addColumn('packingTally', function($manifest){
             return $manifest->packingTally->name ?? '-';
         })
         ->addColumn('dokumen', function($manifest){
             return $manifest->dokumen->name ?? '-';
         })
-        ->addColumn('no_dok', function($manifest){
-            return $manifest->no_dok ?? '-';
-        })
+        // ->addColumn('no_dok', function($manifest){
+        //     return $manifest->no_dok ?? '-';
+        // })
         ->addColumn('tglDok', function($manifest){
             return $manifest->tgl_dok ?? '-';
         })
@@ -544,14 +544,16 @@ class DeliveryController extends Controller
                     'message' => 'Data tidak di temukan',
                 ]);
             }
-        }elseif (in_array($kdDok, [41, 44])) {
+        }elseif (in_array($kdDok, [6, 41, 44])) {
             $dok = Pabean::where('kd_dok_inout', $kdDok)->where('no_dok_inout', $request->no_dok)->where('tgl_dok_inout', $tglDokPabean)->first();
             if ($dok) {
-                if ($dok->no_bl_awb != $manifest->nohbl) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'No HBL Berbeda',
-                    ]);
+                if ($kdDok != 6) {
+                    if ($dok->no_bl_awb != $manifest->nohbl) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'No HBL Berbeda',
+                        ]);
+                    }
                 }
                 $manifest->update([
                     'kd_dok_inout' => $kdDok,

@@ -507,15 +507,17 @@ class BeaCukaiController extends Controller
                         'ijin_stripping_by' => Auth::user()->id,
                     ]);
 
-                    $manifest = Manifest::where('container_id', $cont->id)->get();
-                    foreach ($manifest as $man) {
-                        if ($man->ijin_stripping != 'Y') {
-                            $man->update([
-                                'ijin_stripping' => 'Y',
-                                'ijin_stripping_at' => Carbon::now(),
-                                'ijin_stripping_by' => Auth::user()->id,
-                            ]);
-                        }
+                }
+                $manifest = Manifest::where('container_id', $cont->id)->whereNot('flag_segel_merah', 'Y')->get();
+                // var_dump($manifest);
+                // die();
+                foreach ($manifest as $man) {
+                    if ($man->ijin_stripping != 'Y') {
+                        $man->update([
+                            'ijin_stripping' => 'Y',
+                            'ijin_stripping_at' => Carbon::now(),
+                            'ijin_stripping_by' => Auth::user()->id,
+                        ]);
                     }
                 }
             }

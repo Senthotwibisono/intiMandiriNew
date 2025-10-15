@@ -58,7 +58,7 @@ class DeliveryFCLController extends Controller
 
     public function behandleData(Request $request)
     {
-        $cont = Cont::with(['job'])->get();
+        $cont = Cont::with(['job']);
 
         return DataTables::of($cont)
         ->addColumn('action', function($cont){
@@ -394,9 +394,19 @@ class DeliveryFCLController extends Controller
     public function detailBehandle($id)
     {
         $manifest = Cont::where('id', $id)->first();
-        $data['title'] = "Photo Behandle Manifest - " . $manifest->notally;
+        $data['title'] = "Photo Behandle Container - " . $manifest->notally;
         $data['item'] = $manifest;
         $data['photos'] = Photo::where('master_id', $id)->where('type', '=', 'fcl')->where('action', '=', 'behandle')->get();
+        // dd($data['photos']);
+        return view('photo.index', $data);
+    }
+    
+    public function detailGateOut($id)
+    {
+        $manifest = Cont::where('id', $id)->first();
+        $data['title'] = "Photo Gate Out Container - " . $manifest->notally;
+        $data['item'] = $manifest;
+        $data['photos'] = Photo::where('master_id', $id)->where('type', '=', 'fcl')->where('action', '=', 'gate-out')->get();
         // dd($data['photos']);
         return view('photo.index', $data);
     }
@@ -412,14 +422,14 @@ class DeliveryFCLController extends Controller
 
     public function dataGateOutFCL(Request $request)
     {
-        $conts = Cont::with(['job', 'user'])->whereNotNull('tglmasuk')->get();
+        $conts = Cont::with(['job', 'user'])->whereNotNull('tglmasuk');
 
         return DataTables::of($conts)
         ->addColumn('edit', function ($conts){
             return '<buttpn class="btn btn-outline-warning editButton" data-id="'.$conts->id.'"><i class="fa fa-pen"></i></buttpn>';
         })
         ->addColumn('detil', function($conts){
-            return '<a href="javascript:void(0)" onclick="openWindow(\'/lcl/realisasi/mty-detail'.$conts->id.'\')" class="btn btn-sm btn-info">
+            return '<a href="javascript:void(0)" onclick="openWindow(\'/fcl/delivery/gateOutDetil/'.$conts->id.'\')" class="btn btn-sm btn-info">
                 <i class="fa fa-eye"></i>
             </a>';
         })
@@ -649,7 +659,6 @@ class DeliveryFCLController extends Controller
         try {
             if ($cont) {
                 $cont->update([
-                    'nopol' => $request->nopol,
                     'nopol_mty' => $request->nopol_mty,
                     'tglkeluar' => $request->tglkeluar,
                     'jamkeluar' => $request->jamkeluar,

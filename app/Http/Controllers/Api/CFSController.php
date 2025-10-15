@@ -64,7 +64,7 @@ class CFSController extends Controller
             // 'no_pol'         => 'required',
             // 'jns_kms'        => 'required',
             // 'merk_kms'       => 'required',
-            'jml_kms'        => 'required|integer',
+            // 'jml_kms'        => 'required|integer',
             // 'user'           => 'required',
             // 'warehouse'      => 'required',
         ];

@@ -53,9 +53,7 @@ class InvoiceController extends Controller
     public function unpaidData(Request $request)
     {
         $header = Header::with(['manifest', 'customer', 'kasir'])->where('status', 'N')
-        ->where('type', null)
-        ->orderBy('order_at', 'desc')
-        ->get();
+        ->where('type', null);
 
         return DataTables::of($header)
         ->addColumn('order_no', function($header){
@@ -102,9 +100,7 @@ class InvoiceController extends Controller
     public function paidData(Request $request)
     {
         $header = Header::with(['manifest', 'customer', 'kasir'])->whereNot('status', 'N')
-        ->where('type', null)
-        ->orderBy('order_at', 'desc')
-        ->get();
+        ->where('type', null);
 
         return DataTables::of($header)
         ->addColumn('pranota', function($header){
