@@ -139,6 +139,7 @@ class Container extends Model
         'coari_cfs_response',
         'coari_cfs_at',
         'driver_id',
+        'flag_jict',
     ];
 
     public function DepoMty()
