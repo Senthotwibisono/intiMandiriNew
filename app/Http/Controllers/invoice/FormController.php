@@ -77,8 +77,10 @@ class FormController extends Controller
             'meas'     => $manifest->meas,
             'tglmasuk'     => $manifest->cont->job->eta,
             'cbm'      => $cbm,
-            'forwarding'      => $forwarding,
+            'forwarding_id'      => $manifest->cont->job->Forwarding->id,
+            'forwarding_name'      => $manifest->cont->job->Forwarding->name,
             'cust' => $manifest->customer_id,
+            'customer_name' => optional($manifest->customer)->name,
             'dg_label' => $manifest->dg_label,
         ]);
     }
@@ -100,7 +102,7 @@ class FormController extends Controller
         $data['form'] = Form::find($id);
         // dd($data['form']);
         $data['manifest'] = Manifest::get();
-        $data['customer'] = Customer::all();
+       
 
         $data['masterTarif'] = MT::all();
         $data['masterTarifMekanik'] = MT::where(function ($query) {
@@ -110,6 +112,26 @@ class FormController extends Controller
         $data['selectedTarif'] = FormT::where('form_id', $id)->get();
 
         return view('invoice.form.formIndex', $data);
+    }
+
+    public function customerAjax(Request $request)
+    {
+        $search = $request->q;  
+
+        $customers = Customer::when($search, function ($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%");
+            })
+            ->limit(20)
+            ->get();    
+
+        return response()->json(
+            $customers->map(function ($item) {
+                return [
+                    'id'   => $item->id,
+                    'text' => $item->name
+                ];
+            })
+        );
     }
 
     public function delete($id)
@@ -246,7 +268,7 @@ class FormController extends Controller
         $form = Form::find($id);
         $data['form'] = Form::find($id);
         $data['manifest'] = Manifest::whereNull('tglrelease')->get();
-        $data['customer'] = Customer::all();
+        $data['customer'] = Customer::select('id', 'name')->get();
 
         $data['masterTarif'] = MT::all();
         $data['selectedTarif'] = FormT::where('form_id', $id)->where('mekanik_y_n', '=', 'N')->get();
@@ -423,7 +445,7 @@ class FormController extends Controller
         $form = Form::find($id);
         $data['form'] = Form::find($id);
         $data['manifest'] = Manifest::whereNull('tglrelease')->get();
-        $data['customer'] = Customer::all();
+        $data['customer'] = Customer::select('id', 'name')->get();
 
         $data['masterTarif'] = MT::all();
         $data['tarifs'] = FormT::where('form_id', $id)->where('mekanik_y_n', '=', 'N')->get();

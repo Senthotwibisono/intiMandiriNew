@@ -115,12 +115,12 @@ class FormFCLController extends Controller
                 ]);
             }
 
-            $contBB = $cont->where('ctr_type', 'BB');
-            if ($contBB->isNotEmpty()) {
-                if ($request->type != 'STANDART') {
-                    return redirect()->back()->with('status', ['type'=>'error', 'message' => 'Container BB tidak boleh selain standart']);
-                }
-            }
+            // $contBB = $cont->where('ctr_type', 'BB');
+            // if ($contBB->isNotEmpty()) {
+            //     if ($request->type != 'STANDART') {
+            //         return redirect()->back()->with('status', ['type'=>'error', 'message' => 'Container BB tidak boleh selain standart']);
+            //     }
+            // }
 
             $etaValues = $cont->pluck('eta')->unique();
             if ($etaValues->count() > 1) {
@@ -698,10 +698,10 @@ class FormFCLController extends Controller
                         ]);
                     }
     
-                    if ($form->type == 'STANDART') {
+                    if ($form->type == 'STANDART' || $form->type == 'TPP') {
                         if ($tarifWMS->surcharge != null || $tarifWMS->surcharge != 0) {
                             // lift surcharge
-                            $totalSurcharge = (($totalPLP + $totalLiftOffWMS + $totalLiftOnWMS + $totalMassaWMS)*$tarifWMS->surcharge)/100;
+                            $totalSurcharge = ((($totalPLP ?? 0) + ($totalLiftOffWMS ?? 0) + ($totalLiftOnWMS ?? 0) + ($totalMassaWMS ?? 0)) * ($tarifWMS->surcharge ?? 0)) / 100;
                             Detil::create([
                                 'form_id' => $form->id,
                                 'invoice_id' => $header->id,

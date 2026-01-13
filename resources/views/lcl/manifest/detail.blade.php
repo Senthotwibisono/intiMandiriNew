@@ -189,27 +189,27 @@
                                 <label for="">Shipper</label>
                                 <select name="shipper_id" style="width: 100%;" class="customSelect form-select select2">
                                     <option value disabled selected>Pilih Satu!</option>
-                                    @foreach($custs as $cust)
-                                        <option value="{{$cust->id}}">{{$cust->name}}</option>
-                                    @endforeach
+                                   @foreach ($custs as $id => $name)
+    <option value="{{ $id }}">{{ $name }}</option>
+@endforeach
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label for="">Customer</label>
                                 <select name="customer_id" style="width: 100%;" class="customSelect form-select select2">
                                     <option value disabled selected>Pilih Satu!</option>
-                                    @foreach($custs as $cust)
-                                        <option value="{{$cust->id}}">{{$cust->name}}</option>
-                                    @endforeach
+                                   @foreach ($custs as $id => $name)
+    <option value="{{ $id }}">{{ $name }}</option>
+@endforeach
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label for="">Notify Party</label>
                                 <select name="notifyparty_id" style="width: 100%;" class="customSelect form-select select2">
                                     <option value disabled selected>Pilih Satu!</option>
-                                    @foreach($custs as $cust)
-                                        <option value="{{$cust->id}}">{{$cust->name}}</option>
-                                    @endforeach
+                                   @foreach ($custs as $id => $name)
+    <option value="{{ $id }}">{{ $name }}</option>
+@endforeach
                                 </select>
                             </div>
                             <div class="form-group">
@@ -320,27 +320,27 @@
                                 <label for="">Shipper</label>
                                 <select name="shipper_id" id="shipper_id_edit" style="width: 100%;" class="editSelect form-select select2">
                                     <option value disabled selected>Pilih Satu!</option>
-                                    @foreach($custs as $cust)
-                                        <option value="{{$cust->id}}">{{$cust->name}}</option>
-                                    @endforeach
+                                    @foreach ($custs as $id => $name)
+    <option value="{{ $id }}">{{ $name }}</option>
+@endforeach
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label for="">Customer</label>
                                 <select name="customer_id" id="customer_id_edit" style="width: 100%;" class="editSelect form-select select2">
                                     <option value disabled selected>Pilih Satu!</option>
-                                    @foreach($custs as $cust)
-                                        <option value="{{$cust->id}}">{{$cust->name}}</option>
-                                    @endforeach
+                                    @foreach ($custs as $id => $name)
+    <option value="{{ $id }}">{{ $name }}</option>
+@endforeach
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label for="">Notify Party</label>
                                 <select name="notifyparty_id" id="notifyparty_id_edit" style="width: 100%;" class="editSelect form-select select2">
                                     <option value disabled selected>Pilih Satu!</option>
-                                    @foreach($custs as $cust)
-                                        <option value="{{$cust->id}}">{{$cust->name}}</option>
-                                    @endforeach
+                                   @foreach ($custs as $id => $name)
+    <option value="{{ $id }}">{{ $name }}</option>
+@endforeach
                                 </select>
                             </div>
                             <div class="form-group">

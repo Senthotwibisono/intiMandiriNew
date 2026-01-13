@@ -138,6 +138,7 @@ class Container extends Model
         'coari_cfs_flag',
         'coari_cfs_response',
         'coari_cfs_at',
+        'driver_id',
     ];
 
     public function DepoMty()
@@ -173,4 +174,10 @@ class Container extends Model
     {
         return $this->belongsTo(YardDetil::class, 'yard_detil_id', 'id');
     }
+    
+    public function Driver()
+    {
+        return $this->belongsTo(MasterDriver::class, 'driver_id', 'id');
+    }
+
 }

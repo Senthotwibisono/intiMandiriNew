@@ -20,6 +20,7 @@
                                 <th>Dirver Name</th>
                                 <th>Dirver Code</th>
                                 <th>Dirver Phone</th>
+                                <th>No KTP</th>
                                 <th>Edit</th>
                                 <th>Delete</th>
                             </tr>
@@ -53,6 +54,10 @@
                         <input type="text" name="phone" id="phone" class="form-control">
                         <input type="hidden" name="id" id="id" class="form-control">
                     </div>
+                    <div class="col-12">
+                        <label for="">No KTP</label>
+                        <input type="text" name="no_ktp" id="no_ktp" class="form-control">
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -69,14 +74,45 @@
 
 <script>
     $(document).ready(function(){
+        let excel = {
+                        extend: 'excelHtml5',
+                        autoFilter: true,
+                        sheetName: 'Exported data',
+                        className: 'btn btn-outline-success',
+                    };
+        let pdf = {
+                    extend: 'pdfHtml5',
+                    text: 'Ekspor PDF',
+                    className: 'btn btn-outline-danger',
+                    orientation: 'landscape', // Mode lanskap untuk tampilan lebih luas
+                    pageSize: 'A1', // Pilihan ukuran kertas (bisa A3, A4, A5, dll.)
+                    download: 'open', // Membuka file langsung tanpa mendownload
+                    exportOptions: {
+                        columns: function (idx, data, node) {
+                            return true; // Semua kolom akan diekspor, termasuk yang tersembunyi
+                        }
+                    },
+                    customize: function (doc) {
+                        doc.defaultStyle.fontSize = 8; // Mengatur ukuran font agar semua data muat
+                        doc.styles.tableHeader.fontSize = 8; // Mengatur ukuran header tabel
+                        doc.styles.title.fontSize = 12; // Ukuran font judul
+                        doc.pageMargins = [2, 2, 2, 2]; // Mengatur margin halaman
+                        doc.content[1].table.widths = Array(doc.content[1].table.body[0].length + 1).join('*').split(''); 
+                    }
+                };
         $('#tableDriver').dataTable({
             processing: true,
             serverSide: true,
+            dom: 'lBfrtip', // Pastikan ada 'B' untuk menampilkan tombol
+            buttons: [
+                'copy', 'csv', excel , pdf, 'print'
+            ],
             ajax: '{{route('master.driver.data')}}',
             columns:[
                 {name:'name', data:'name', className:'text-center'},
                 {name:'code', data:'code', className:'text-center'},
                 {name:'phone', data:'phone', className:'text-center'},
+                {name:'no_ktp', data:'no_ktp', className:'text-center'},
                 {name:'edit', data:'edit', className:'text-center'},
                 {name:'delete', data:'delete', className:'text-center'},
             ],
@@ -107,6 +143,7 @@
                 $('#addManual #name').val(hasil.data.name);
                 $('#addManual #code').val(hasil.data.code);
                 $('#addManual #phone').val(hasil.data.phone);
+                $('#addManual #no_ktp').val(hasil.data.no_ktp);
                 $('#addManual #id').val(hasil.data.id);
             } else {
                 await errorHasil(hasil);
@@ -133,6 +170,7 @@
                     name:name,
                     code:code,
                     phone:phone,
+                    no_ktp : document.getElementById('no_ktp').value,
                     id:id,
                 };
 

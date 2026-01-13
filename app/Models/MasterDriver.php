@@ -16,5 +16,6 @@ class MasterDriver extends Model
         'name',
         'code',
         'phone',
+        'no_ktp'
     ];
 }

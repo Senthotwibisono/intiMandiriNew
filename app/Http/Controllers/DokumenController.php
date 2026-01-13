@@ -2437,9 +2437,9 @@ class DokumenController extends Controller
         // dd($header, $kms, $cont);
         if ($header) {
            $oldManual = Manual::where('id', $header->ID)->first();
-           if ($oldManual) {
-                return back()->with('status', ['type' => 'error', 'message' => 'Data sudah tersedia']);
-           }
+        //    if ($oldManual) {
+        //         return back()->with('status', ['type' => 'error', 'message' => 'Data sudah tersedia']);
+        //    }
 
            $manual = Manual::create([
                 'id'=>$header->ID,

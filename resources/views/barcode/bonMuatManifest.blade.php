@@ -179,6 +179,7 @@
                     </div>
                     {{strtoupper($manifest->nohbl).' - Ex. Container : '.strtoupper($manifest->cont->nocontainer)}}
                     <small class="pull-right"><strong>Stripping Date:</strong> {{ date('d F, Y', strtotime($manifest->tglstripping)) }}</small>
+                    <small class="pull-right"><strong>Expired:</strong> {{ date('d F, Y', strtotime($manifest->active_to)) }}</small>
                 </div>
                 <div class="card-body">
                     <div class="text-center">

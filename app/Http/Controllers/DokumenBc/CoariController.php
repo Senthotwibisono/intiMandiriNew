@@ -325,14 +325,7 @@ class CoariController extends Controller
 
     public function dataManifestLCL(Request $request)
     {
-        $manifest = KD::select('tpscoarikmsdetailxml.*')
-            ->join(DB::raw('(SELECT no_bl_awb, MAX(CONCAT(tgl_entry, " ", jam_entry)) as max_entry FROM tpscoarikmsdetailxml GROUP BY no_bl_awb) as latest'), function($join) {
-                $join->on('tpscoarikmsdetailxml.no_bl_awb', '=', 'latest.no_bl_awb')
-                     ->whereRaw('CONCAT(tpscoarikmsdetailxml.tgl_entry, " ", tpscoarikmsdetailxml.jam_entry) = latest.max_entry');
-            })
-            ->orderBy('tgl_entry', 'desc')
-            ->orderBy('jam_entry', 'desc')
-            ->get();
+        $manifest = KD::query();
 
         return DataTables::of($manifest)
         ->addColumn('action', function($manifest){

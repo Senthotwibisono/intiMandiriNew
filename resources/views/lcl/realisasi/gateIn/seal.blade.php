@@ -88,6 +88,15 @@
                             <input type="text" name="nopol" id="nopol" class="form-control">
                         </div>
                         <div class="form-group">
+                            <label for="">Drivers</label>
+                            <select name="driver_id" id="driver_id"  class="js-example-basic-single form-select select2" style="width: 100%;">
+                                <option value disabled selected>Pilih Satu</option>
+                                @foreach($drivers as $driver)
+                                    <option value="{{$driver->id}}">{{$driver->code}} -- {{$driver->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label for="">Seal</label>
                             <select name="no_seal" id="no_seal"  class="js-example-basic-single form-select select2" style="width: 100%;">
                                 <option value disabled selected>Pilih Satu</option>
@@ -274,6 +283,7 @@ $(document).ready(function() {
         $("#jammasuk").val(response.data.jammasuk);
         $("#nopol").val(response.data.nopol);
         $("#no_seal").val(response.data.no_seal).trigger('change');
+        $("#driver_id").val(response.data.driver_id).trigger('change');
         $("#uidmasuk").val(response.data.uid.id ?? response.userId);
         $("#nameUid").val(response.data.uid.name ?? response.user);
       },

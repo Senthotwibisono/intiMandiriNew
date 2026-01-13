@@ -188,6 +188,9 @@
                     <li class="submenu-item @if(Request::is('lcl/report/daily*')) active @endif">
                         <a href="{{ route('report.lcl.daily')}}">Daily</a>
                     </li>
+                    <li class="submenu-item @if(Request::is('lcl/report/opname*')) active @endif">
+                        <a href="{{ route('report.lcl.opname')}}">Opname</a>
+                    </li>
                 </ul>
             </li>
             <li class="sidebar-item has-sub @if(Request::is('lcl/cfs/*')) active @endif">

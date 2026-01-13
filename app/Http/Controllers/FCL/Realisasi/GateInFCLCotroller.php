@@ -171,8 +171,8 @@ class GateInFCLCotroller extends Controller
             "no_plp" => $cont->job->PLP->no_plp,
             "no_sj" => $request->no_sj ?? "",  // Use an empty string if null
             "no_eseal" => $cont->seal->code,
-            "tgl_plp"=> Carbon::parse($cont->job->PLP->tgl_plp)->format('Y/m/d'),
-            "nopol"=> "",
+            "tgl_plp"=> Carbon::now(),
+            "nopol"=> $cont->nopol,
             "maxtime_delivery"=> 0,
             "maxtime_checking"=> 0,
             "alert_telegram"=> [],
@@ -192,7 +192,7 @@ class GateInFCLCotroller extends Controller
             "driver_code"=> "",
             "asal" => [
                 [
-                    "geo_code"=> $cont->job->sandar->kd_tps_asal,
+                    "geo_code" => ($cont->job->sandar->kd_tps_asal ?? '-') === 'PLDC' ? 'TER3' : ($cont->job->sandar->kd_tps_asal ?? '-'),
                     "plan_loading_time"=> "",
                     "description"=> "",
                     "lon"=> null,
@@ -227,7 +227,7 @@ class GateInFCLCotroller extends Controller
                 "down_payment"=> null,
                 "truck_id"=> "",
                 "no_container"=> $cont->nocontainer,
-                "jns_cont_id"=> $cont->type,
+                "jns_cont_id" => ($cont->type == 'OH') ? 'Flat Rack' : 'General / Dry Cargo',
                 "size_cont_id"=> $cont->size,
                 "driver_name_2"=> "",
                 "driver_phone_2"=> "",
@@ -280,11 +280,11 @@ class GateInFCLCotroller extends Controller
                         "noHp"=> $cont->Driver->phone ?? '-',
                         "vehicleNumber"=> $cont->nopol ?? null,
                         "stid"=> null,
-                        "providerEseal"=> $cont->seal->code,
+                        "providerEseal"=> 'EASYGO',
                         "esealCode"=> $cont->seal->code,
                         "containerNumber"=> $cont->nocontainer,
                     ];
-                    if ($cont->lokasisandar_id == 5) {
+                    if ($cont->lokasisandar_id !== 3) {
                         try {
                             $responseEnvilog = $this->client->post($this->urlEnvilog, [
                                 'headers' => [

@@ -1513,6 +1513,9 @@ class MasterController extends Controller
         ->addColumn('phone', function($driver){
             return $driver->phone ?? '-';
         })
+        ->addColumn('no_ktp', function($driver){
+            return $driver->no_ktp ?? '-';
+        })
         ->addColumn('edit', function($driver){
             return '<button type="button" class="btn btn-warning" data-id="'.$driver->id.'" onClick="getDataDriver(this)"><i class="fas fa-pencil"></i></button>';
         })
@@ -1532,6 +1535,7 @@ class MasterController extends Controller
                 'name' => $request->data['name'],
                 'code' => $request->data['code'],
                 'phone' => $request->data['phone'],
+                'no_ktp' => $request->data['no_ktp'],
             ];
 
             // var_dump($data, $request->all());

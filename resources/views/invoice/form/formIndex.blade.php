@@ -81,11 +81,10 @@
                     <div class="col-sm-4">
                         <div class="form-group">
                             <label for="">Customer Name</label>
-                            <select name="customer_id" id="customer_id" class="js-example-basic-single select2 form-select" style="width:100%;">
-                                <option disabled selected value>Pilih Satu!</option>
-                                @foreach($customer as $cus)
-                                    <option value="{{$cus->id}}" {{$form->customer_id == $cus->id ? 'selected' : ''}}>{{$cus->name}}</option>
-                                @endforeach
+                            <select name="customer_id"
+                                    id="customer_id"
+                                    class="js-example-basic-single form-select"
+                                    style="width:100%;">
                             </select>
                         </div>
                     </div>
@@ -107,11 +106,10 @@
                     <div class="col-sm-4">
                         <div class="form-group">
                             <label for="">Forwarding</label>
-                            <select name="forwarding_id" id="forwarding_id" class="js-example-basic-single select2 form-select" style="width:100%;">
-                                <option disabled selected value>Pilih Satu!</option>
-                                @foreach($customer as $cus)
-                                    <option value="{{$cus->id}}" {{$form->forwarding_id == $cus->id ? 'selected' : ''}}>{{$cus->name}}</option>
-                                @endforeach
+                            <select name="forwarding_id"
+                                    id="forwarding_id"
+                                    class="js-example-basic-single form-select"
+                                    style="width:100%;">
                             </select>
                         </div>
                     </div>
@@ -232,54 +230,50 @@
     });
 </script>
 <script>
-    $(document).ready(function() {
-        
-        $('#manifest_id').on('change', function() {
-            var manifestId = $(this).val();
-            swal.fire({
-                title: 'Processing...',
-                text: 'Please wait',
-                icon: 'info',
-                allowOutsideClick: false,
-                showConfirmButton: false,
-                    willOpen: () => {
-                        Swal.showLoading();
-                    }
-            });
-            if (manifestId) {
-                $.ajax({
-                    url: '/get-manifest-data/' + manifestId,
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function(data) {
-                        Swal.close();
-                        Swal.fire({
-                            title: 'success!',
-                            text: 'Data di Temukan',
-                            icon: 'success',
-                            confirmButton: 'Ok',
-                        })
-                        // Populate the form fields with the returned data
-                        $('#dg_label').val(data.dg_label);
-                        $('#quantity').val(data.quantity);
-                        $('#weight').val(data.weight);
-                        $('#meas').val(data.meas);
-                        $('#cbm').val(data.cbm);
-                        $('#forwarding').val(data.forwarding).trigger('change');
-                        $('#time_in').val(data.tglmasuk);
-                        $('#customer_id').val(data.cust).trigger('change');
-                    }
-                });
-            } else {
-                // Clear the fields if no manifest is selected
-                $('#dg_label').val('');
-                $('#quantity').val('');
-                $('#weight').val('');
-                $('#meas').val('');
-                $('#cbm').val('');
-                $('#time_in').val('');
-                $('#customer_id').val('').trigger('change');
-                $('#forwarding_id').val('').trigger('change');
+    $('#manifest_id').on('change', function () {
+        var manifestId = $(this).val(); 
+
+        Swal.fire({
+            title: 'Processing...',
+            text: 'Please wait',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
+        }); 
+
+        if (!manifestId) return;    
+
+        $.getJSON('/get-manifest-data/' + manifestId, function (data) {
+            Swal.close();   
+
+            Swal.fire({
+                title: 'Success!',
+                text: 'Data ditemukan',
+                icon: 'success'
+            }); 
+
+            $('#dg_label').val(data.dg_label);
+            $('#quantity').val(data.quantity);
+            $('#weight').val(data.weight);
+            $('#meas').val(data.meas);
+            $('#cbm').val(data.cbm);
+            $('#time_in').val(data.tglmasuk);   
+
+            // CUSTOMER
+            if (data.cust) {
+                var option = new Option(data.customer_name, data.cust, true, true);
+                $('#customer_id').append(option).trigger('change');
+            }   
+
+            // FORWARDING
+            if (data.forwarding_id) {
+                $('#forwarding_id').empty();
+                var forwardingOption = new Option(
+                    data.forwarding_name,
+                    data.forwarding_id,
+                    true,
+                    true
+                );
+                $('#forwarding_id').append(forwardingOption).trigger('change');
             }
         });
     });
@@ -378,6 +372,51 @@ $(document).ready(function() {
             }
         });
     });
+});
+</script>
+
+<script>
+$(document).ready(function () {
+    $('#customer_id, #forwarding_id').select2({
+        placeholder: 'Pilih Satu!',
+        allowClear: true,
+        ajax: {
+            url: "{{ route('customer.ajax') }}",
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    q: params.term // keyword search
+                };
+            },
+            processResults: function (data) {
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        }
+    });
+
+    // Untuk edit form (set value lama)
+    @if(isset($form->customer_id))
+        var customerId   = "{{ $form->customer_id }}";
+        var customerName = "{{ $form->customer->name ?? '' }}";
+
+        if (customerId) {
+            var option = new Option(customerName, customerId, true, true);
+            $('#customer_id').append(option).trigger('change');
+        }
+    @endif
+    @if(isset($form->forwarding_id))
+        var customerId   = "{{ $form->forwarding_id }}";
+        var customerName = "{{ $form->Forwarding->name ?? '' }}";
+
+        if (customerId) {
+            var option = new Option(customerName, customerId, true, true);
+            $('#forwarding_id').append(option).trigger('change');
+        }
+    @endif
 });
 </script>
 @endsection

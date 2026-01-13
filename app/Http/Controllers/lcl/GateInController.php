@@ -21,6 +21,7 @@ use App\Models\BarcodeGate as Barcode;
 use App\Models\YardDetil as RowTier;
 
 use App\Models\KeteranganPhoto as KP;
+use App\Models\MasterDriver as Driver;
 
 use GuzzleHttp\Client;
 class GateInController extends Controller
@@ -35,6 +36,8 @@ class GateInController extends Controller
 
         $this->url = 'https://vtsapi.easygo-gps.co.id/api/eseal/newDoPLP';
         $this->token = '5C66E78BC581410BA2A7B896B25BEDFB';
+        $this->urlEnvilog = 'https://plporder.envilog.co.id/api/v1/dispatchOrder';
+        $this->tokenEnvilog = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMDI1MDIxODAwMSIsImNsaWVudElkIjoiOCIsImNsaWVudE5hbWUiOiJUUFMxTVVUIiwiZW52IjoibGl2ZSJ9.4fmbJR4nj0p43gVqh-NqA4yFf52binShbP-JuXbO1kM';
         $this->client = new Client(); // Inisialisasi Guzzle Client
     }
 
@@ -109,7 +112,7 @@ class GateInController extends Controller
         $cont = Cont::where('id', $id)->first();
         $data['title'] = "Photo Gate In Container - " . $cont->nocontainer;
         $data['item'] = $cont;
-        $data['photos'] = Photo::where('master_id', $id)->where('action', '=', 'gate-in')->get();
+        $data['photos'] = Photo::where('master_id', $id)->where('action', '=', 'gate-in')->where('type', '=', 'lcl')->get();
         // dd($data['photos']);
         return view('photo.index', $data);
     }
@@ -138,6 +141,7 @@ class GateInController extends Controller
         $data['user'] = Auth::user()->name;
         $data['seals'] = Eseal::get();
         $data['now'] = Carbon::now();
+         $data['drivers'] = Driver::get();
         
         return view('lcl.realisasi.gateIn.seal', $data);
     }
@@ -151,7 +155,7 @@ class GateInController extends Controller
             return '<buttpn class="btn btn-outline-warning editButton" data-id="'.$cont->id.'"><i class="fa fa-pen"></i></buttpn>';
         })
         ->addColumn('detil', function($cont){
-            return "<a href=\"javascript:void(0)\" onclick=\"openWindow('/lcl/realisasi/gateIn-detail{$cont->id}')\" class=\"btn btn-sm btn-info\"><i class=\"fa fa-eye\"></i></a>";
+            return "<a href=\"javascript:void(0)\" onclick=\"openWindow('/lcl/realisasi/gateIn-detail/{$cont->id}')\" class=\"btn btn-sm btn-info\"><i class=\"fa fa-eye\"></i></a>";
         })
         ->addColumn('dispatcheButton', function ($cont) {
             if ($cont->no_seal != null) {
@@ -206,6 +210,7 @@ class GateInController extends Controller
                 $cont->update([
                     'nopol' => $request->nopol,
                     'no_seal' => $request->no_seal,
+                    'driver_id' => $request->driver_id
                 ]);
                 return redirect()->back()->with('status', ['type' => 'success', 'message' => 'Data Berhasil di Update']);
             }
@@ -396,8 +401,8 @@ class GateInController extends Controller
             "no_plp" => $cont->job->PLP->no_plp,
             "no_sj" => $request->no_sj ?? "",  // Use an empty string if null
             "no_eseal" => $cont->seal->code,
-            "tgl_plp"=> Carbon::parse($cont->job->PLP->tgl_plp)->format('Y/m/d'),
-            "nopol"=> "",
+            "tgl_plp"=> Carbon::now(),
+            "nopol"=> $cont->nopol,
             "maxtime_delivery"=> 0,
             "maxtime_checking"=> 0,
             "alert_telegram"=> [],
@@ -417,7 +422,7 @@ class GateInController extends Controller
             "driver_code"=> "",
             "asal" => [
                 [
-                    "geo_code"=> $cont->job->PLP->kd_tps_asal,
+                    "geo_code" => ($cont->job->sandar->kd_tps_asal ?? '-') === 'PLDC' ? 'TER3' : ($cont->job->sandar->kd_tps_asal ?? '-'),
                     "plan_loading_time"=> "",
                     "description"=> "",
                     "lon"=> null,
@@ -452,7 +457,7 @@ class GateInController extends Controller
                 "down_payment"=> null,
                 "truck_id"=> "",
                 "no_container"=> $cont->nocontainer,
-                "jns_cont_id"=> $cont->type,
+                "jns_cont_id"=> "General / Dry Cargo",
                 "size_cont_id"=> $cont->size,
                 "driver_name_2"=> "",
                 "driver_phone_2"=> "",
@@ -467,8 +472,12 @@ class GateInController extends Controller
                 "tipe"=> ""
             ]
         ];
+//         echo "<pre>";
+// var_dump($data);
+// echo "</pre>";
+// die();
+        // dd($data)
         
-    
         try {
             // Mengirim permintaan ke API eksternal menggunakan Guzzle
             $response = $this->client->post($this->url, [
@@ -491,6 +500,56 @@ class GateInController extends Controller
                         'jam_dispatche' => Carbon::now(),
                         'response_dispatche' => '1',
                     ]);
+                    $dataEnvilog = [
+                        "plpNumber"=> $cont->job->noplp,
+                        "plpDate"=> Carbon::parse($cont->job->ttgl_plp)->format('Y-m-d'),
+                        "depoCode"=> 'INTI',
+                        "driverCode"=> $cont->Driver->code ?? '-',
+                        "driverName"=> $cont->Driver->name ?? '-',
+                        "noHp"=> $cont->Driver->phone ?? '-',
+                        "vehicleNumber"=> $cont->nopol ?? null,
+                        "stid"=> null,
+                        "providerEseal"=> 'EASYGO',
+                        "esealCode"=> $cont->seal->code,
+                        "containerNumber"=> $cont->nocontainer,
+                    ];
+                    if ($cont->lokasisandar_id !== 3) {
+                        try {
+                            $responseEnvilog = $this->client->post($this->urlEnvilog, [
+                                'headers' => [
+                                    'Authorization' => 'Bearer ' . $this->tokenEnvilog, // Tambahkan spasi setelah 'Bearer'
+                                    'Accept' => 'application/json', // Perbaiki key header
+                                    'Content-Type' => 'application/json',
+                                ],
+                                'json' => $dataEnvilog, // Mengirim data dalam format JSON
+                            ]);
+    
+                            // var_dump($responseEnvilog->getStatusCode());
+                            // die();
+    
+                            if ($responseEnvilog->getStatusCode() == 200) {
+                                $responseDataEnvilog = json_decode($responseEnvilog->getBody(), true);
+                                if ($responseDataEnvilog['isSuccess'] == 1) {
+                                    return response()->json([
+                                        'success' => true,
+                                        'message' => 'dispatche successfully!',
+                                    ]);
+                                }else {
+                                    return response()->json([
+                                        'success' => false,
+                                        'message' => 'Dispatche Eseal Go berhasil, Envilog Gagagl: ' . $responseDataEnvilog['data'] . '!!',
+                                    ]);
+                                }
+                                // var_dump($responseDataEnvilog);
+                            }
+    
+                        } catch (\Throwable $th) {
+                            return response()->json([
+                                'success' => false,
+                                'message' => 'Dispatche Eseal Go berhasil, Envilog Gagagl: !!!' . $th->getMessage(),
+                            ]);
+                        }
+                    }
                     return response()->json([
                         'success' => true,
                         'message' => 'dispatche successfully!',

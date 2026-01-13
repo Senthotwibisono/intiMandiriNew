@@ -245,6 +245,11 @@ class CfsDefaultController extends Controller
 
     public function dataManifest(Request $request)
     {
+        set_time_limit(0);
+        ini_set('max_execution_time', 0);
+        
+        // Perbesar memory
+        ini_set('memory_limit', '-1');
         $manifest = Manifest::with(['job', 'cont'])->where('coari_cfs_flag' ,'Y')->orWhere('codeco_cfs_flag', 'Y')->orWhere('detil_hbl_cfs_flag', 'Y')->get();
 
         return DataTables::of($manifest)

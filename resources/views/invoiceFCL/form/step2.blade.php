@@ -462,7 +462,7 @@
                                                 </tr>
                                             </tbody>
                                             @endif
-                                            @if($form->type == 'STANDART')
+                                            @if($form->type == 'STANDART' || $form->type == 'TPP')
                                             <tbody>
                                                 <tr>
                                                     <td>Surcharge</td>
@@ -470,6 +470,10 @@
                                                     <td>{{$jumlahCont}}</td>
                                                     <td>0</td>
                                                     @php
+                                                        $total = $total ?? 0;
+                                                        $totalPenumpukan = $totalPenumpukan ?? 0;
+                                                        $totalLiftOn = $totalLiftOn ?? 0;
+                                                        $totalLiftOff = $totalLiftOff ?? 0;
                                                         $totalSurcharge = (($total + $totalPenumpukan + $totalLiftOn + $totalLiftOff)*$tarif->surcharge)/100;
                                                         $totalWMS += $totalSurcharge;
                                                     @endphp

@@ -133,7 +133,7 @@
             <div class="col-8" style="border-right: 1px solid black;">
                 <div class="row">
                     <div class="col-12 text-center">
-                        <p style="font-size: 20px;"><strong>{{$item->manifest->cont->nocontainer ?? ''}} || {{$item->manifest->cont->size ?? ''}} || {{$item->manifest->cont->nobl ?? ''}}</strong></p>
+                        <p style="font-size: 20px;"><strong>{{$item->manifest->cont->nocontainer ?? ''}} || {{$item->manifest->cont->size ?? ''}}</strong></p>
                     </div>
                 </div>
                 <div class="col-12">
@@ -203,7 +203,7 @@
                                 <p style="font-size: 20px;"><strong>{{$item->manifest->cont->job->Kapal->name ?? ''}}</strong></p>
                             </div>
                             <div class="col-6 text-center">
-                                <p style="font-size: 20px;"><strong>{{$item->manifest->nohbl ?? ''}} - {{$item->nomor}}</strong></p>
+                                <p style="font-size: 20px;"><strong>{{$item->manifest->nohbl ?? ''}}</strong></p>
                             </div>
                         </div>
                     </div>

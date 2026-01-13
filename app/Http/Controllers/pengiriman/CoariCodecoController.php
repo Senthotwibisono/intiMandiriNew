@@ -72,7 +72,7 @@ class CoariCodecoController extends Controller
 
     public function coariCont()
     {
-        $conts = Cont::whereNotNull('tglmasuk')->where('coari_flag', '=', 'N')->take(5);
+        $conts = Cont::whereNotNull('tglmasuk')->where('coari_flag', '=', 'N')->take(15)->get();
         if (!empty($conts)) {
             \SoapWrapper::override(function ($service) {
                 $service

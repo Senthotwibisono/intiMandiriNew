@@ -428,7 +428,7 @@ Route::middleware('permission:tpsOnline')->controller(DokumenController::class)-
             Route::get('/lcl/realisasi/gateIn', 'index')->name('lcl.gateIn.index');
             Route::get('/lcl/realisasi/gateIn-edt{id?}', 'edit')->name('lcl.gateIn.edit');
             Route::post('/lcl/realisasi/gateIn-update', 'update')->name('lcl.gateIn.update');
-            Route::get('/lcl/realisasi/gateIn-detail{id?}', 'detail')->name('lcl.gateIn.detail');
+            Route::get('/lcl/realisasi/gateIn-detail/{id?}', 'detail')->name('lcl.gateIn.detail');
             Route::post('/lcl/realisasi/gateIn-detailDelete', 'detailDelete')->name('lcl.gateIn.delete.detail');
         });
         Route::middleware('permission:sealLCL')->group(function(){
@@ -547,7 +547,7 @@ Route::controller(ReportController::class)->group(function(){
     // Container
     Route::get('/lcl/report/cont', 'indexCont')->name('report.lcl.cont');
     Route::get('/lcl/report/dataCont', 'dataCont');
-    Route::get('/lcl/report/contPhoto{id?}', 'photoCont')->name('report.lcl.photoCont');
+    Route::get('/lcl/report/contPhoto/{id?}', 'photoCont')->name('report.lcl.photoCont');
     Route::get('/lcl/report/contGenerate', 'generateCont')->name('report.lcl.generateCont');
     Route::get('/lcl/report/contGenerateJICT', 'contGenerateJICT')->name('report.lcl.contGenerateJICT');
 
@@ -560,6 +560,9 @@ Route::controller(ReportController::class)->group(function(){
 
     // Daily
     Route::get('/lcl/report/daily', 'indexDaily')->name('report.lcl.daily');
+
+    Route::get('/lcl/report/opname', 'indexOpname')->name('report.lcl.opname');
+    Route::get('/lcl/report/opnameDataTable', 'opnameDataTable');
 });
 
 // Android
@@ -637,6 +640,8 @@ Route::controller(AndroidGateController::class)->group(function(){
         Route::get('/get-manifest-data/{id}', 'getManifestData');
         Route::get('/get-customer-data/{id}', 'getCustomerData');
         // Step1
+
+        Route::get('/invoice/form/customer/ajax', 'customerAjax')->name('customer.ajax');     
         Route::get('/invoice/form/formStep1/{id?}', 'formIndex')->name('invoice.step1');     
         Route::post('/invoice/form/submitStep1', 'step1Post');     
         // Step2

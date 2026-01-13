@@ -95,7 +95,7 @@ class ManifestController extends Controller
         $data['title'] = 'Manifest ' .$cont->nocontainer;
         $data['cont'] = $cont;
         $data['manifest'] = Manifest::where('container_id', $id)->get();
-        $data['custs'] = Customer::get();
+        $data['custs'] = Customer::pluck('name', 'id');
         $data['packs'] = Packing::get();
 
         return view('lcl.manifest.detail', $data);
@@ -128,8 +128,12 @@ class ManifestController extends Controller
         })
         ->addColumn('bonMuat', function($manifest){
             if ($manifest->no_dok != null) {
-                $herfBarcode = '/lcl/manifest/bonMuat/';
-                return '<a href="javascript:void(0)" onclick="openWindow(\''. $herfBarcode . $manifest->id .'\')" class="btn btn-sm btn-danger"><i class="fa fa-print"></i></a>';
+                if ($manifest->tglstripping === null) {
+                    return 'Belum Selesai Stripping';
+                }else{
+                    $herfBarcode = '/lcl/manifest/bonMuat/';
+                    return '<a href="javascript:void(0)" onclick="openWindow(\''. $herfBarcode . $manifest->id .'\')" class="btn btn-sm btn-danger"><i class="fa fa-print"></i></a>';
+                }
             }else {
                 return 'Manifest Belum Online';
             }
@@ -589,9 +593,10 @@ class ManifestController extends Controller
                 ]);
             }
             $detils = TempManifest::get();
-            // dd($detils);
+            // dd($detils, $containerPluck);
             foreach ($detils as $detil) {
                  $tempCont = TempCont::where('detil_id', $detil->detil_id)->first();
+                //  dd($tempCont);
                  $cont = Cont::where('joborder_id', $jobId)->where('nocontainer', $tempCont->nocontainer)->first();
                  $oldManifest = Manifest::where('nohbl', $detil->nohbl)->where('container_id', $cont->id)->first();
                 //  dd($oldManifest, $cont->id);
