@@ -96,11 +96,11 @@ class GateInController extends Controller
 
          try {
             $response = Http::withHeaders([
-                'Content-Type'     => 'application/json',
+                // 'Content-Type'     => 'application/json',
                 // 'Accept'           => 'application/json',
-                'X-Partner-Id'     => '263386',
-                'X-Request-Id'     => (string) Str::uuid(),
-                'Idempotency-Key'  => $container->nocontainer,
+                // 'X-Partner-Id'     => '263386',
+                // 'X-Request-Id'     => (string) Str::uuid(),
+                // 'Idempotency-Key'  => $container->nocontainer,
             ])->post(
                 'https://ws.jict.co.id/antareja-api/pub/eseal/gatein/depo',
                 $payload
@@ -180,10 +180,7 @@ class GateInController extends Controller
          try {
             $response = Http::withHeaders([
                 'Content-Type'     => 'application/json',
-                'Accept'           => 'application/json',
                 'X-Partner-Id'     => '263386',
-                'X-Request-Id'     => (string) Str::uuid(),
-                'Idempotency-Key'  => $container->nocontainer,
             ])->post(
                 'https://ws.jict.co.id/antareja-api/pub/eseal/gatein/depo',
                 $payload
