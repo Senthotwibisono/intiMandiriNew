@@ -17,6 +17,7 @@ class Kernel extends ConsoleKernel
         // $schedule->command('functions:cfsScheduler')->everyMinute();
         $schedule->command('functions:daily')->everyThreeMinutes();
         $schedule->command('functions:cfsScheduler')->everyThreeMinutes();
+        $schedule->command('functions:gateInJict')->everyThreeMinutes();
     }
 
     /**
