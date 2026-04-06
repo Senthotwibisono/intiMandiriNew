@@ -54,6 +54,8 @@
                                     <th class="text-center" style="min-width: 100px;">ETA</th>
                                     <th class="text-center" style="min-width: 100px;">TPS Asal</th>
                                     <th class="text-center" style="min-width: 100px;">Consolidator</th>
+                                    <th class="text-center" style="min-width: 100px;">Forwarder Name</th>
+                                    <th class="text-center" style="min-width: 100px;">Forwarder Code</th>
                                     <th class="text-center" style="min-width: 100px;">No HBL</th>
                                     <th class="text-center" style="min-width: 100px;">Tgl HBL</th>
                                     <th class="text-center" style="min-width: 100px;">NO Tally</th>
@@ -132,6 +134,8 @@
                                     <th class="text-center" style="min-width: 100px;">ETA</th>
                                     <th class="text-center" style="min-width: 100px;">TPS Asal</th>
                                     <th class="text-center" style="min-width: 100px;">Consolidator</th>
+                                    <th class="text-center" style="min-width: 100px;">Forwarder Name</th>
+                                    <th class="text-center" style="min-width: 100px;">Forwarder Code</th>
                                     <th class="text-center" style="min-width: 100px;">No HBL</th>
                                     <th class="text-center" style="min-width: 100px;">Tgl HBL</th>
                                     <th class="text-center" style="min-width: 100px;">NO Tally</th>
@@ -261,6 +265,8 @@
                                         <th class="text-center" style="min-width: 100px;">ETA</th>
                                         <th class="text-center" style="min-width: 100px;">TPS Asal</th>
                                         <th class="text-center" style="min-width: 100px;">Consolidator</th>
+                                        <th class="text-center" style="min-width: 100px;">Forwarder Name</th>
+                                        <th class="text-center" style="min-width: 100px;">Forwarder Code</th>
                                         <th class="text-center" style="min-width: 100px;">No HBL</th>
                                         <th class="text-center" style="min-width: 100px;">Tgl HBL</th>
                                         <th class="text-center" style="min-width: 100px;">NO Tally</th>
@@ -372,6 +378,8 @@
                 { className:'tex-center', data:'eta', name:'eta'},
                 { className:'tex-center', data:'kd_tps_asal', name:'kd_tps_asal'},
                 { className:'tex-center', data:'namaconsolidator', name:'namaconsolidator'},
+                { className:'tex-center', data:'forwarder_name', name:'forwarder_name'},
+                { className:'tex-center', data:'forwarder_code', name:'forwarder_code'},
                 { className:'tex-center', data:'nohbl', name:'nohbl'},
                 { className:'tex-center', data:'tgl_hbl', name:'tgl_hbl'},
                 { className:'tex-center', data:'notally', name:'notally'},
@@ -459,6 +467,8 @@
                 { className:'text-center', data:'eta', name:'eta'},
                 { className:'text-center', data:'kd_tps_asal', name:'kd_tps_asal'},
                 { className:'text-center', data:'namaconsolidator', name:'namaconsolidator'},
+                { className:'tex-center', data:'forwarder_name', name:'forwarder_name'},
+                { className:'tex-center', data:'forwarder_code', name:'forwarder_code'},
                 { className:'text-center', data:'nohbl', name:'nohbl'},
                 { className:'text-center', data:'tgl_hbl', name:'tgl_hbl'},
                 { className:'text-center', data:'notally', name:'notally'},
@@ -546,6 +556,8 @@
                 { className:'text-center', data:'eta', name:'eta'},
                 { className:'text-center', data:'kd_tps_asal', name:'kd_tps_asal'},
                 { className:'text-center', data:'namaconsolidator', name:'namaconsolidator'},
+                { className:'tex-center', data:'forwarder_name', name:'forwarder_name'},
+                { className:'tex-center', data:'forwarder_code', name:'forwarder_code'},
                 { className:'text-center', data:'nohbl', name:'nohbl'},
                 { className:'text-center', data:'tgl_hbl', name:'tgl_hbl'},
                 { className:'text-center', data:'notally', name:'notally'},

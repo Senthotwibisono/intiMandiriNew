@@ -325,4 +325,26 @@ class LclController extends Controller
             ]);
         }
     }
+
+    public function indexPhoto()
+    {
+        $data['title'] = 'Photo Index';
+
+        return view('android.lcl.photo.index', $data);
+    }
+
+    public function detilPhoto($barcode)
+    {
+        $manifest = Manifest::where('barcode', $barcode)->first();
+        if (!$manifest) {
+            return redirect()->back()->with('status', ['type' => 'error', 'message' =>'Data tidak ditemukan']);
+        }
+        $data['title'] = 'Muat Manifest: ' . $manifest->nohbl;
+
+       
+        $data['manifest'] = $manifest;
+        $data['photos'] = Photo::where('master_id', $manifest->id)->where('type', '=', 'manifest')->get();
+
+        return view('android.lcl.photo.detil', $data)->with('status', ['type'=>'success', 'message'=>'Data Ditemukan']);
+    }
 }

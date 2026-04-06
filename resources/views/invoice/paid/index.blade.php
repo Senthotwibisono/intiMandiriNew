@@ -33,6 +33,7 @@
                             <th class="text-center">Container Location</th>
                             <!-- <th class="text-center">Pranota</th> -->
                             <th class="text-center">Invoice</th>
+                            <th class="text-center">Invoice Barimetrik</th>
                             <th class="text-center">Pay</th>
                             <th class="text-center">Dokumen</th>
                             <th class="text-center">Revisi</th>
@@ -281,6 +282,7 @@
                 {data:'containerLocation', name:'containerLocation', className:'text-center'},
                 // {data:'pranota', name:'pranota', className:'text-center'},
                 {data:'invoice', name:'invoice', className:'text-center'},
+                {data:'invoiceBarimetrik', name:'invoiceBarimetrik', className:'text-center'},
                 {data:'pay', name:'pay', className:'text-center'},
                 {data:'dok', name:'dok', className:'text-center'},
                 {data:'revisi', name:'revisi', className:'text-center'},

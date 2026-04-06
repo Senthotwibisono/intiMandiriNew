@@ -72,7 +72,7 @@ class CoariCodecoController extends Controller
 
     public function coariCont()
     {
-        $conts = Cont::whereNotNull('tglmasuk')->where('coari_flag', '=', 'N')->take(15)->get();
+        $conts = Cont::whereNotNull('tglmasuk')->where('coari_flag', '=', 'N')->take(20)->get();
         if (!empty($conts)) {
             \SoapWrapper::override(function ($service) {
                 $service
@@ -112,8 +112,8 @@ class CoariCodecoController extends Controller
                     'tgl_tiba' => $cont->job->PLP->tgl_tiba ?? null,
                     'kd_gudang' => $cont->job->PLP->gudang_tujuan ?? 'INTI',
                     'kd_dok_inout' => 3,
-                    'no_dok_inout' => $cont->job->PLP->no_plp,
-                    'tanggal_dok_inout' => $cont->job->PLP->tgl_plp,
+                    'no_dok_inout' => $cont->job->PLP->no_plp ?? '',
+                    'tanggal_dok_inout' => $cont->job->PLP->tgl_plp ?? '',
                     'wk_inout' => $wk_in,
                     'no_pol' => $cont->nopol,
                     'bruto' => $cont->weight ?? 0,
@@ -258,12 +258,12 @@ class CoariCodecoController extends Controller
                     'pel_muat' => $pelMuat,
                     'pel_transit' => $pelTransit,
                     'pel_bongkar' => $pelBongkar,
-                    'gudang_tujuan' => $cont->job->PLP->gudang_tujuan,
+                    'gudang_tujuan' => $cont->job->PLP->gudang_tujuan ?? '',
                     'uid' => 'Auto',
                     'response' => $response,
-                    'kode_kantor' => $cont->job->PLP->kd_kantor,
-                    'noplp' => $cont->job->PLP->no_plp,
-                    'tglplp' => $cont->job->PLP->tgl_plp,
+                    'kode_kantor' => $cont->job->PLP->kd_kantor ?? '',
+                    'noplp' => $cont->job->PLP->no_plp ?? '',
+                    'tglplp' => $cont->job->PLP->tgl_plp ?? '',
                     'tgl_entry' => $coariCont->tgl_entry,
                     'jam_entry' => $coariCont->jam_entry,
                 ]);
@@ -488,14 +488,14 @@ class CoariCodecoController extends Controller
         }else {
             return response()->json([
                 'success' => false,
-                'message' => 'Belul ada data yang perlu di kirim',
+                'message' => 'Belum ada data yang perlu di kirim',
             ]);
         }
     }
 
     public function CoariKms()
     {
-        $mansifestMaster = Manifest::whereNotNull('tglmasuk')->where('coari_flag', 'N')->take(10)->get();
+        $mansifestMaster = Manifest::whereNotNull('tglstripping')->where('coari_flag', 'N')->take(50)->get();
         // dd($mansifestMaster);
 
         if ($mansifestMaster->isEmpty())
@@ -527,7 +527,7 @@ class CoariCodecoController extends Controller
             $wk_in = $tanggal . $jam;
             $header = [
                 'ref_number' => $this->RefNumber(),
-                'tgl_entry' => Carbon::now()->format('YYYY-MM-DD'),
+                'tgl_entry' => Carbon::now()->format('Y-m-d'),
                 'jam_entry' => Carbon::now()->format('H:i:s'),
                 'uid' => 'Auto',
                 'nomor' => null,
@@ -543,8 +543,8 @@ class CoariCodecoController extends Controller
                 'tgl_tiba' => $cont->job->PLP->tgl_tiba ?? null,
                 'kd_gudang' => $cont->job->PLP->gudang_tujuan ?? 'INTI',
                 'kd_dok_inout' => 3,
-                'no_dok_inout' => $cont->job->PLP->no_plp,
-                'tanggal_dok_inout' => $cont->job->PLP->tgl_plp,
+                'no_dok_inout' => $cont->job->PLP->no_plp ?? '',
+                'tanggal_dok_inout' => $cont->job->PLP->tgl_plp ?? '',
                 'wk_inout' => $wk_in,
                 'no_pol' => $cont->nopol,
                 'bruto' => $cont->weight,
@@ -688,14 +688,14 @@ class CoariCodecoController extends Controller
                     'tgl_dok_inout' => $header['tanggal_dok_inout'],
                     'wk_inout' => $header['wk_inout'],
                     'no_pol' => $header['no_pol'],
-                    'pel_muat' => $data->cont->job->muat->kode,
-                    'pel_transit' => $data->cont->job->transit->kode,
-                    'pel_bongkar' => $data->cont->job->bongkar->kode,
+                    'pel_muat' => $data->cont->job->muat->kode ?? '',
+                    'pel_transit' => $data->cont->job->transit->kode ?? '',
+                    'pel_bongkar' => $data->cont->job->bongkar->kode ?? '',
                     'gudang_tujuan' => $data->gudang_tujuan ?? null,
                     'uid' => 'Auto',
                     'response' => $response,
-                    'kode_kantor' => $data->cont->job->PLP->kode_kantor,
-                    'kd_tps_asal' => $data->cont->job->PLP->kd_tps_asal,
+                    'kode_kantor' => $data->cont->job->PLP->kode_kantor ?? '',
+                    'kd_tps_asal' => $data->cont->job->PLP->kd_tps_asal ?? '',
                     'tgl_entry' => $coariKms->tgl_entry,
                     'jam_entry' => $coariKms->jam_entry,
                 ]);

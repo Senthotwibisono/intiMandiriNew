@@ -602,6 +602,11 @@ Route::controller(LclController::class)->group(function(){
         Route::post('/selesaiMuat', 'selesaiMuat');
         Route::post('/muatItem', 'muatItem');
     });
+
+    Route::prefix('/android/photo')->group(function(){
+        Route::get('/index', 'indexPhoto');
+        Route::get('/detil/{barcode?}', 'detilPhoto');
+    });
 });
 
     Route::controller(FCLAndroidController::class)->group(function(){
@@ -668,6 +673,7 @@ Route::controller(AndroidGateController::class)->group(function(){
 
         Route::get('/invoice/form/paid', 'paidIndex')->name('invoice.paid');
         Route::get('/invoice/invoicePrint-{id?}', 'invoiceIndex');
+        Route::get('/invoiceBarimetrik/invoicePrint-{id?}', 'invoiceBarimetrik');
         Route::get('/invoice/barcodeBarang-{id?}', 'barcodeIndex');
         Route::get('/invoice/dokButton-{id?}', 'invoiceGetManifestData');
         Route::post('/invoice/updateDokumen', 'invoiceUpdateDokumen');
@@ -701,6 +707,7 @@ Route::controller(AndroidGateController::class)->group(function(){
         
         Route::get('/invoice/form/perpanjangan/paid', 'paidIndex')->name('invoice.paid');
         Route::get('/invoice/perpanjangan/invoicePrint-{id?}', 'invoiceIndex');
+        Route::get('/invoice/perpanjangan/invoicePrintBarimetrik-{id?}', 'invoiceBarimetrik');
         Route::get('/invoice/perpanjangan/barcodeBarang-{id?}', 'barcodeIndex');
         Route::get('/invoice/perpanjangan/dokButton-{id?}', 'invoiceGetManifestData');
         Route::post('/invoice/perpanjangan/updateDokumen', 'invoiceUpdateDokumen');

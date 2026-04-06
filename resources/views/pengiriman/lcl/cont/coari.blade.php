@@ -112,7 +112,7 @@
         });
 </script>
 <script>
-        $(document).on('click', '#kirimUlang', function(){
+        $(document).on('click', '.kirimUlang', function(){
             let id = $(this).data('id');
             console.log('Data Id :' + id);
             Swal.fire({

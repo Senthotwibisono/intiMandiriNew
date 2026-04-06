@@ -245,6 +245,21 @@ class InvoicePerpanjanganController extends Controller
         return view('invoice.invoice', $data);
     }
 
+    public function invoiceBarimetrik($id)
+    {
+        $data['title'] = 'Print Invoice';
+        $header = Header::find($id);
+        $form = Form::where('id', $header->form_id)->first();
+        $data['header'] = $header;
+        $data['form'] = $form;
+
+        // dd($header);
+        $data['tarifs'] = FormT::where('form_id', $form->id)->get();
+        $data['terbilang'] = $this->terbilang(ceil($header->grand_total));
+
+        return view('invoice.invoiceBarimetrik', $data);
+    }
+
     public function paidIndex()
     {
         $data['title'] = 'List Invoice Paid';

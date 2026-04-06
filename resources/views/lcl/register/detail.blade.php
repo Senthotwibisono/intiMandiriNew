@@ -336,7 +336,7 @@
                             </td>
                             <td>{{$mans->validasi}}</td>
                             <td>{{$mans->validasiBc ?? 'N'}}</td> -->
-                            <td>{{$mans->cont->nocontainer}}</td>
+                            <td>{{$mans->cont->nocontainer ?? ''}}</td>
                             <td>{{$mans->nohbl}}</td>
                             <td>{{$mans->tgl_hbl}}</td>
                             <td>{{$mans->notally}}</td>

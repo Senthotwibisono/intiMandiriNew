@@ -376,11 +376,12 @@ class ReportController extends Controller
             ->select(['tmanifest.*',
                  DB::raw("DATEDIFF(COALESCE(tmanifest.tglrelease, NOW()), tmanifest.tglstripping) as lamaTimbun")
             ])
-            ->with(['cont.job.PLP', 'customer', 'packing', 'packingTally', 'dokumen'])
+            ->with(['cont.job.PLP', 'customer', 'packing', 'packingTally', 'dokumen', 'cont.job.Forwarding'])
             ->leftJoin('tcontainer as c', 'c.id', '=', 'tmanifest.container_id')
             ->leftJoin('tjoborder as j', 'j.id', '=', 'c.joborder_id')
             ->leftJoin('tps_responplptujuanxml as p', 'p.id', '=', 'j.plp_id')
             ->leftJoin('customer as cust', 'cust.id', '=', 'tmanifest.customer_id')
+            ->leftJoin('customer as forwarder', 'forwarder.id', '=', 'j.forwarding_id')
             ->leftJoin('tpacking as pk', 'pk.id', '=', 'tmanifest.packing_id')
             ->leftJoin('tpacking as pkt', 'pkt.id', '=', 'tmanifest.packing_tally')
             ->leftJoin('kode_dok as d', 'd.id', '=', 'tmanifest.kd_dok_inout')
@@ -427,6 +428,15 @@ class ReportController extends Controller
             ->addColumn('joborder', fn($m) => $m->cont->job->nojoborder ?? '-')
             ->filterColumn('joborder', fn($q, $kw) => $q->where('j.nojoborder', 'like', "%$kw%"))
             ->orderColumn('joborder', fn($q, $order) => $q->orderBy('j.nojoborder', $order))
+
+            // forwarding
+            ->addColumn('forwarder_name', fn($m) => $m->cont->job->Forwarding->name ?? '-')
+            ->filterColumn('forwarder_name', fn($q, $kw) => $q->where('forwarder.name', 'like', "%$kw%"))
+            ->orderColumn('forwarder_name', fn($q, $order) => $q->orderBy('forwarder.name', $order))
+            
+            ->addColumn('forwarder_code', fn($m) => $m->cont->job->Forwarding->code ?? '-')
+            ->filterColumn('forwarder_code', fn($q, $kw) => $q->where('forwarder.code', 'like', "%$kw%"))
+            ->orderColumn('forwarder_code', fn($q, $order) => $q->orderBy('forwarder.code', $order))
         
             // nm_angkut
             ->addColumn('nm_angkut', fn($m) => $m->cont->job->PLP->nm_angkut ?? '-')

@@ -33,6 +33,7 @@
                             <th class="text-center">Container Location</th>
                             <th class="text-center">Pranota</th>
                             <th class="text-center">Invoice</th>
+                            <th class="text-center">Invoice Barimetrik</th>
                             <th class="text-center">Action</th>
                             <th class="text-center">Revisi</th>
                         </tr>
@@ -69,6 +70,9 @@
                                 </td>
                                 <td class="text-center">
                                     <a type="button" href="/invoice/perpanjangan/invoicePrint-{{$form->id}}" target="_blank" class="btn btn-sm btn-info text-white"><i class="fa fa-file"></i></a>
+                                </td>
+                                <td class="text-center">
+                                    <a type="button" href="/invoice/perpanjangan/invoicePrintBarimetrik-{{$form->id}}" target="_blank" class="btn btn-sm btn-info text-white"><i class="fa fa-file"></i>| Barimetrik</a>
                                 </td>
                                 <td class="text-center">
                                     <div class="button-container">

@@ -38,6 +38,9 @@
             <li class="submenu-item @if(Request::is('android/muat/index') || Request::is('android/muat/index/*')) active @endif">
                 <a href="{{ url('/android/muat/index')}}">Muat</a>
             </li>
+            <li class="submenu-item @if(Request::is('android/photo/index') || Request::is('android/photo/index/*')) active @endif">
+                <a href="{{ url('/android/photo/index')}}">Cari Photo</a>
+            </li>
             <li class="submenu-item @if(Request::is('android/lcl/behandle') || Request::is('android/lcl/behandle/*')) active @endif">
                 <a href="{{ url('/android/lcl/behandle')}}">Behandle</a>
             </li>

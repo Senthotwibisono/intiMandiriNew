@@ -109,6 +109,9 @@ class InvoiceController extends Controller
         ->addColumn('invoice', function($header){
             return '<a type="button" href="/invoice/invoicePrint-'.$header->id.'" target="_blank" class="btn btn-sm btn-info text-white"><i class="fa fa-file"></i></a>';
         })
+        ->addColumn('invoiceBarimetrik', function($header){
+            return '<a type="button" href="/invoiceBarimetrik/invoicePrint-'.$header->id.'" target="_blank" class="btn btn-sm btn-info text-white"><i class="fa fa-file"></i> | Barimetrik</a>';
+        })
         ->addColumn('ktp', function($header){
             $herf = '/invoice/photoKTP-' . $header->id;
             return '<a href="javascript:void(0)" onclick="openWindow(\''.$herf.'\')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>';
@@ -141,7 +144,7 @@ class InvoiceController extends Controller
         ->addColumn('editTanggal', function($header){
             return '<button type="button" class="btn btn-warning" data-id="'.$header->id.'" onClick="editTanggalInvoice(this)"><i class="fas fa-pencil"></i></button>';
         })
-        ->rawColumns(['pranota', 'invoice', 'ktp', 'cancel', 'pay', 'revisi', 'gatePass', 'status', 'dok', 'containerLocation', 'editTanggal'])
+        ->rawColumns(['pranota', 'invoice', 'invoiceBarimetrik', 'ktp', 'cancel', 'pay', 'revisi', 'gatePass', 'status', 'dok', 'containerLocation', 'editTanggal'])
         ->make(true);
     }
 
@@ -353,6 +356,21 @@ class InvoiceController extends Controller
         $data['terbilang'] = $this->terbilang(ceil($header->grand_total));
 
         return view('invoice.invoice', $data);
+    }
+
+    public function invoiceBarimetrik($id)
+    {
+        $data['title'] = 'Print Invoice';
+        $header = Header::find($id);
+        $form = Form::where('id', $header->form_id)->first();
+        $data['header'] = $header;
+        $data['form'] = $form;
+
+        // dd($header);
+        $data['tarifs'] = FormT::where('form_id', $form->id)->get();
+        $data['terbilang'] = $this->terbilang(ceil($header->grand_total));
+
+        return view('invoice.invoiceBarimetrik', $data);
     }
 
     public function paidIndex()
