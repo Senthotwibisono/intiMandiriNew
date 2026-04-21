@@ -73,6 +73,10 @@ use App\Http\Controllers\CFS\InvoiceCSFController;
 // User Profile
 use App\Http\Controllers\Auth\ProfileController;
 
+// NPCT
+use App\Http\Controllers\NpctController;
+
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -1060,4 +1064,10 @@ Route::prefix('/user-profile')->group(function(){
         Route::get('/index', 'index')->name('user.profile.index');
         Route::post('/update', 'update')->name('user.profile.update');
     });
+});
+
+Route::prefix('/npct')->controller(NpctController::class)->group(function() {
+    Route::get('/index', 'index')->name('npct.index');
+    Route::get('/data', 'data')->name('npct.data');
+    Route::post('/post', 'post')->name('npct.post');
 });

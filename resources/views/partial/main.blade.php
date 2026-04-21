@@ -295,6 +295,29 @@
                 location.reload();
             });
         }
+
+        async function confirmation() {
+            return Swal.fire({
+                icon: 'warning',
+                title: 'Are you sure?',
+                text: 'Apakah anda yakin melakukan aksi berikut?',
+                showCancelButton: true,
+            });
+        }
+
+        async function globalResponse(data, url) {
+            console.log(data, url);
+            return response = await fetch(url, {
+                method: "POST",
+                headers: {
+                  "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
+        }
+
+        
     </script>
 
     <!-- <script src="{{ asset('query-ui/jquery-ui.js') }}"></script>

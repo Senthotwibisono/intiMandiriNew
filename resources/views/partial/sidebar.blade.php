@@ -13,6 +13,11 @@
         <a href="/autoGate-barcode" class='sidebar-link'><i class="fa-solid fa-barcode"></i><span>Barcode</span></a>
     </li>
 
+    <!-- NPCT -->
+    <li class="sidebar-item @if(Request::is('npct/*')) active @endif">
+        <a href="/npct/index" class='sidebar-link'><i class="fa-solid fa-door-closed"></i><span>NPCT</span></a>
+    </li>
+
     <!-- Dokumen -->
 
     <li class="sidebar-item has-sub @if(Request::is('dokumen/*')) active @endif">
