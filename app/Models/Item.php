@@ -36,12 +36,12 @@ class Item extends Model
     {
         return $this->belongsTo(Manifest::class, 'manifest_id', 'id');
     }
-    public function Rack()
+    public function rack()
     {
         return $this->belongsTo(PlacementManifest::class, 'lokasi_id', 'id');
     }
 
-    public function Tier()
+    public function tier()
     {
         return $this->belongsTo(RackTier::class, 'tier', 'id');
     }

@@ -12,6 +12,7 @@ use App\Exports\fcl\plpCont;
 use App\Exports\fcl\ReportBulanan;
 use App\Exports\fcl\FormatJICT;
 use App\Exports\fcl\ReportBeaCukaiNew;
+use App\Exports\fcl\LongStay;
 
 use DataTables;
 use App\Models\ContainerFCL as Cont;
@@ -358,6 +359,29 @@ class ReportFCLController extends Controller
 
         $fileName = 'ReportContainer-beacukai'.$start_date.'-'.$end_date.'.xlsx' ;
         return Excel::download(new ReportBeaCukaiNew($conts, $judul), $fileName);
+    }
+
+    public function longstay(Request $request)
+    {
+        $today = Carbon::today();
+        $limitDate = $today->copy()->subDays(25);       
+
+        $conts = Cont::query()
+            ->whereNull('tglkeluar') // belum keluar
+            ->whereDate('tglmasuk', '<=', $limitDate) // lebih dari 25 hari
+            ->orderBy('joborder_id', 'desc')
+            ->get();
+
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+        $tanggalJudul =  $this->formatDateRange($start_date, $end_date);
+
+        // dd($tanggalJudul);
+
+        $judul = 'Laporan Longstay '. $tanggalJudul;
+
+        $fileName = 'ReportContainer-Longstay'.$start_date.'-'.$end_date.'.xlsx' ;
+        return Excel::download(new LongStay($conts, $judul), $fileName);
     }
 
     public function formatJict(Request $request)

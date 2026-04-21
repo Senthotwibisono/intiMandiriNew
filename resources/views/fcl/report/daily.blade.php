@@ -343,6 +343,9 @@
                                 <button class="btn btn-success formatBeacukai"><i class="fa fa-download"></i> Format Beacukai</button>
                             </div>
                             <div class="col-auto">
+                                <button class="btn btn-success formatBeacukaiNew"><i class="fa fa-download"></i> Long Stay</button>
+                            </div>
+                            <div class="col-auto">
                                 <button class="btn btn-success formatStandar"><i class="fa fa-download"></i> Format Standar</button>
                             </div>
                         </div>
@@ -358,6 +361,34 @@
 @endsection
 
 @section('custom_js')
+<script>
+    $(document).on('click', '.formatBeacukaiNew', function(){
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Apakah anda yakin menerapkan filter ini?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, update it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.showLoading();
+                let filterBy = $('#filter').val();
+                let startDate = $('#start_date').val();
+                let endDate = $('#end_date').val();
+                let noPlp = $('#noplp').val();
+                let noBc11 = $('#nobc_11').val();
+
+                // Redirect user to download link
+                let url = `/fcl/report/longstay`;
+                window.location.href = url;
+                Swal.close();
+            }
+        });
+    });
+</script>
+
 <script>
     $(document).ready(function(){
         var start = "{{ $start }}";

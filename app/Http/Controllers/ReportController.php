@@ -15,6 +15,7 @@ use App\Exports\lcl\ReportCont;
 use App\Exports\lcl\ReportContJICT;
 use App\Exports\lcl\ReportManifest;
 use App\Exports\lcl\ReportManifestBeaCukaiNew;
+use App\Exports\lcl\LongStay;
 use Illuminate\Support\Facades\DB;
 
 
@@ -870,5 +871,28 @@ class ReportController extends Controller
             ->addColumn('location', fn($m) => $m->mostItemsLocation()->Rack->name ?? 'Location not found')
             ->rawColumns(['detil', 'desc'])
             ->make(true);
+    }
+
+    public function longStay(Request $request)
+    {
+        $today = Carbon::today();
+        $limitDate = $today->copy()->subDays(25);       
+
+        $conts = Manifest::query()
+            ->whereNull('tglrelease') // belum keluar
+            ->whereDate('tglstripping', '<=', $limitDate) // lebih dari 25 hari
+            ->orderBy('joborder_id', 'desc')
+            ->get();
+
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+        $tanggalJudul =  $this->formatDateRange($start_date, $end_date);
+
+        // dd($tanggalJudul);
+
+        $judul = 'Laporan Longstay '. $tanggalJudul;
+
+        $fileName = 'ReportContainer-Longstay'.$start_date.'-'.$end_date.'.xlsx' ;
+        return Excel::download(new LongStay($conts, $judul), $fileName);
     }
 }

@@ -563,6 +563,8 @@ Route::controller(ReportController::class)->group(function(){
 
     Route::get('/lcl/report/opname', 'indexOpname')->name('report.lcl.opname');
     Route::get('/lcl/report/opnameDataTable', 'opnameDataTable');
+
+    Route::get('/lcl/report/longStay', 'longStay')->name('report.lcl.longStay');
 });
 
 // Android
@@ -843,6 +845,7 @@ Route::controller(AndroidGateController::class)->group(function(){
             Route::get('/formatJict', 'formatJict');
             Route::get('/formatBeacukai', 'formatBeacukai');
             Route::get('/formatBeacukaiNew', 'formatBeacukaiNew');
+            Route::get('/longstay', 'longstay');
             Route::get('/formatStandarAkhir', 'formatStandarAkhir');
             Route::get('/formatBeacukaiAkhir', 'formatBeacukaiAkhir');
             

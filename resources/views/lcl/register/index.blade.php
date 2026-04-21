@@ -7,7 +7,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-auto ms-2">
-                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addManual">Add Data</button>
+                    <!-- <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addManual">Add Data</button> -->
                 </div>
             </div>
             <br>

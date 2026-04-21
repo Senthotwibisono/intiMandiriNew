@@ -325,23 +325,27 @@ class CoariController extends Controller
 
     public function dataManifestLCL(Request $request)
     {
-        $manifest = KD::query();
+        $manifest = KD::query()
+            ->orderByDesc('tgl_entry')
+            ->orderByDesc('jam_entry');
 
         return DataTables::of($manifest)
-        ->addColumn('action', function($manifest){
-            return '<button class="btn btn-outline-success kirimUlangCoari" id="kirimUlangCoari" data-id="'.$manifest->manifest_id.'">Kirim Ulang</button>';
-        })
-        ->addColumn('cfs', function($manifest){
-            return '<button class="btn btn-outline-warning sendCFS" id="sendCFS" data-id="'.$manifest->manifest_id.'">Kirim Ulang</button>';
-        })
-        ->addColumn('cont', function($manifest){
-            return $manifest->manifest->cont->nocontainer;
-        })
-        ->addColumn('size', function($manifest){
-            return $manifest->manifest->cont->size;
-        })
-        ->rawColumns(['action', 'cfs'])
-        ->make(true);
+            ->addColumn('action', function($manifest){
+                return '<button class="btn btn-outline-success kirimUlangCoari"
+                    data-id="'.$manifest->manifest_id.'">Kirim Ulang</button>';
+            })
+            ->addColumn('cfs', function($manifest){
+                return '<button class="btn btn-outline-warning sendCFS"
+                    data-id="'.$manifest->manifest_id.'">Kirim Ulang</button>';
+            })
+            ->addColumn('cont', function($manifest){
+                return $manifest->manifest->cont->nocontainer ?? '-';
+            })
+            ->addColumn('size', function($manifest){
+                return $manifest->manifest->cont->size ?? '-';
+            })
+            ->rawColumns(['action','cfs'])
+            ->make(true);
     }
 
     public function kirimManualManifest(Request $request)

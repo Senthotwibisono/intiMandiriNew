@@ -1121,7 +1121,7 @@ class CoariCodecoController extends Controller
 
     public function CodecoKms()
     {
-        $mansifestMaster = Manifest::where('coari_flag', '=', 'Y')->whereNotNull('tglrelease')->where('codeco_flag', '=', 'N')->orWhere('codeco_flag', null)->take(10)->get();
+        $mansifestMaster = Manifest::where('coari_flag', '=', 'Y')->whereNotNull('tglrelease')->where('codeco_flag', '=', 'N')->orWhere('codeco_flag', null)->take(50)->get();
 
         if ($mansifestMaster->isEmpty())
         {

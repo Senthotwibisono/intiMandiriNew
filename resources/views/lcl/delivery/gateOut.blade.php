@@ -343,8 +343,8 @@ $(document).ready(function() {
         $("#no_dok_edit").val(response.data.no_dok);
         $("#tgl_dok_edit").val(response.data.tgl_dok);
         $("#kd_dok_edit").val(response.data.kd_dok_inout).trigger('change');
-        $("#tglbuangmty_edit").val(response.data.tglbuangmty);
-        $("#jambuangmty_edit").val(response.data.jambuangmty);
+        $("#tglbuangmty_edit").val(response.data.tglrelease);
+        $("#jambuangmty_edit").val(response.data.jamrelease);
         $("#nopol_release_edit").val(response.data.nopol_release);
       },
       error: function(data) {

@@ -408,4 +408,15 @@ class Manifest extends Model
         return $this->belongsTo(User::class, 'uid_lepas_segel', 'id');
     }
 
+    public function allItemsLocations()
+    {
+        return $this->items()
+            ->with('rack') // relasi ke PlacementManifest
+            ->get()
+            ->pluck('rack.name') // ambil nama rack
+            ->filter()           // buang null
+            ->unique()           // ambil yang unik saja
+            ->values();          // rapikan index
+    }
+
 }
