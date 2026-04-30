@@ -29,6 +29,7 @@
                             <th>Created By</th>
                             <th>Pranota</th>
                             <th>Invoice</th>
+                            <th>Invoice Decimal</th>
                             <th>Cetak Transparansi</th>
                             <th>Action</th>
                             <th>Delete or Cancel</th>
@@ -242,6 +243,7 @@
                 {data:'createdBy', name:'createdBy'},
                 {data:'pranota', name:'pranota'},
                 {data:'invoice', name:'invoice'},
+                {data:'invoiceDecimal', name:'invoiceDecimal'},
                 {data:'tranparansi', name:'tranparansi'},
                 {data:'action', name:'action'},
                 {data:'deleteOrCancel', name:'deleteOrCancel'},

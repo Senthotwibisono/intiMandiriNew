@@ -54,8 +54,8 @@ class ManifestHeader implements ToCollection,  WithHeadingRow
         $jobId = $this->jobId;
         $job = Job::find($jobId);
         $job->update([
-            'tno_bc11' => $no_bc_11 ?? null,
-            'ttgl_bc11' => $tgl_bc_11 ?? null,
+            // 'tno_bc11' => $no_bc_11 ?? null,
+            // 'ttgl_bc11' => $tgl_bc_11 ?? null,
             'voy' => trim($firstRow['no_voyage_arrival']) ?? null,
             'vessel' => $ves->id ?? null,
             'callsign' => $call_sign ?? null,

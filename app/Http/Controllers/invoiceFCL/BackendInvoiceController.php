@@ -71,6 +71,14 @@ class BackendInvoiceController extends Controller
                 return '<a type="button" href="/invoiceFCL/invoice/invoice-'.$header->id.'" target="_blank" class="btn btn-sm btn-info text-white"><i class="fa fa-file"></i></a>';
             }
         })
+        ->addColumn('invoiceDecimal', function($header){
+            if ($header->status == 'C') {
+                return '<span class="badge bg-danger text-white">Canceled</span>';
+            }else {
+                # code...
+                return '<a type="button" href="/invoiceFCL/invoice/invoiceDecimal-'.$header->id.'" target="_blank" class="btn btn-sm btn-info text-white"><i class="fa fa-file"></i></a>';
+            }
+        })
         ->filterColumn('invoiceNo', function($query, $keyword) {
             $query->where('invoice_no', 'like', "%{$keyword}%")
                   ->orWhere('status', 'like', "%{$keyword}%");
@@ -154,7 +162,7 @@ class BackendInvoiceController extends Controller
             }
             return $flagSP2;
         })
-        ->rawColumns(['invoiceNo', 'pranota', 'invoice', 'action', 'deleteOrCancel', 'edit', 'tranparansi'])
+        ->rawColumns(['invoiceNo', 'pranota', 'invoice', 'invoiceDecimal', 'action', 'deleteOrCancel', 'edit', 'tranparansi'])
         ->make(true);
     }
 
@@ -741,6 +749,71 @@ class BackendInvoiceController extends Controller
             # code...
             return view('invoiceFCL.invoice.tranparansi', $data);
         }
+    }
+
+    public function InvoiceDecimal($id)
+    {
+        $data['title'] = 'Invoice FCL';
+        $data['header'] = Header::find($id);
+
+        if ($data['header']->status != 'Y') {
+            return redirect()->back()->with('status', ['type'=> 'error', 'message' => 'Invoice belum di lunasi, anda di larang membuka halaman ini']);
+        }
+        
+        $container = FormC::where('form_id', $data['header']->form_id)->get();
+        $data['jenisContainer'] = $container->pluck('size')->unique()->implode(', ');
+        $data['typeContainer'] = $container->pluck('ctr_type')->unique()->implode(', ');
+
+        $data['size'] = $container->pluck('size')->unique();
+        $data['type'] = $container->pluck('ctr_type')->unique();
+        $data['nocontainer'] = $container->pluck('cont.nocontainer')->implode(', ');
+
+        $data['detilTPS'] = Detil::where('invoice_id', $id)->whereNot('tps', '=', 'Depo')->orderByRaw("CASE 
+        WHEN keterangan LIKE 'Penumpukkan Massa 1%' THEN 1
+        WHEN keterangan LIKE 'Penumpukkan Massa 2%' THEN 2
+        WHEN keterangan LIKE 'Penumpukkan Massa 3%' THEN 3
+        ELSE 4 
+        END")->orderBy('keterangan', 'desc')->get();
+        $data['detilWMS'] = Detil::where('invoice_id', $id)->where('tps', '=', 'Depo')->orderByRaw("CASE 
+        WHEN keterangan LIKE 'Penumpukan %' THEN 1
+        WHEN keterangan LIKE 'Paket PLP %' THEN 2
+        WHEN keterangan LIKE 'Lift On %' THEN 3
+        WHEN keterangan LIKE 'Lift Off %' THEN 4
+        ELSE 5
+        END")->orderBy('keterangan', 'desc')->get();
+
+        $data['terbilang'] = $this->terbilangDesimal($data['header']->grand_total);
+        // dd($data['terbilang']);
+        if ($data['header']->type == 'EXTEND') {
+            return view('invoiceFCL.invoice.invoiceExtendDecimal', $data);
+        }else {
+            return view('invoiceFCL.invoice.invoiceDecimal', $data);
+        }
+        
+    }
+
+    private function terbilangDesimal($number)
+    {
+        $number = str_replace(',', '.', $number); // jaga jika input pakai koma
+
+        if (strpos($number, '.') !== false) {
+
+            $explode = explode('.', $number);
+
+            $depan = trim($this->terbilang($explode[0]));
+
+            $angka = ["Nol","Satu","Dua","Tiga","Empat","Lima","Enam","Tujuh","Delapan","Sembilan"];
+
+            $belakang = " Koma";
+
+            foreach (str_split($explode[1]) as $digit) {
+                $belakang .= " " . $angka[$digit];
+            }
+
+            return $depan . $belakang;
+        }
+
+        return trim($this->terbilang($number));
     }
     
 }

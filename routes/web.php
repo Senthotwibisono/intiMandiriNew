@@ -923,6 +923,7 @@ Route::controller(AndroidGateController::class)->group(function(){
                     Route::get('/dataTable', 'dataTable');
                     Route::get('/pranota-{id?}', 'pranota');
                     Route::get('/invoice-{id?}', 'Invoice');
+                    Route::get('/invoiceDecimal-{id?}', 'InvoiceDecimal');
                     Route::get('/tranparansi-{id?}', 'Tranparansi');
                     Route::get('/getDataInvoice-{id?}', 'getDataInvoice');
                     Route::post('/paidInvoice', 'paidInvoice');
