@@ -219,6 +219,12 @@ class ContainerFCL extends Model
         'tgl_spjm',
         'driver_id',
         'flag_jict',
+        'npct_in_flag',
+        'npct_in_time',
+        'npct_in_status',
+        'npct_out_flag',
+        'npct_out_time',
+        'npct_out_status',
     ];
 
     public function user()
