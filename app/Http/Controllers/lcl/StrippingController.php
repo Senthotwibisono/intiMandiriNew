@@ -192,7 +192,7 @@ class StrippingController extends Controller
                 'uidstripping' => Auth::user()->id,
                ]);
 
-               $manifest = Manifest::where('container_id', $cont->id)->get();
+               $manifest = Manifest::where('container_id', $cont->id)->whereNot('flag_segel_merah', 'Y')->orWhere('flag_segel_merah', null)->get();
                foreach ($manifest as $mans) {
                 $mans->update([
                     'startstripping' => $cont->startstripping,
