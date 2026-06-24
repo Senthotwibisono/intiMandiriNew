@@ -267,55 +267,63 @@ class InvoiceController extends Controller
                 $noInvoice = $header->invoice_no;
             }else {
                 // dd($header->Form->Forwarding->code);
-                $forwardingCode = substr($header->Form->Forwarding->code, 0, 3);
-                if (!$forwardingCode) {
-                    return redirect()->back()->with('status', ['type' => 'error', 'message' => 'Forwarding belum memiliki code, harap lengkapi terlebih dahulu']);
+                if ($header->mekanik_y_n == 'Y') {
+                    // $noInvoice = Header::where('form_id', $header->form_id)->pluck('invoice_no') . '-F';
+                    $invoice = Header::where('form_id', $header->form_id)->first();
+
+                    $noInvoice = $invoice ? $invoice->invoice_no . '-F' : null;
+                }else {
+                    # code...
+                    $forwardingCode = substr($header->Form->Forwarding->code, 0, 3);
+                    if (!$forwardingCode) {
+                        return redirect()->back()->with('status', ['type' => 'error', 'message' => 'Forwarding belum memiliki code, harap lengkapi terlebih dahulu']);
+                    }
+    
+                    // Get the last two digits of the current year
+                    $year = Carbon::now()->format('y'); // '24' for 2024
+    
+                    // Get the last inserted sequential number from the Header table
+                   // Ambil invoice terakhir berdasarkan tahun order
+                    $lastInvoice = Header::whereYear('order_at', Carbon::now()->year)
+                    ->whereNotNull('invoice_no')
+                    ->orderByRaw("CAST(RIGHT(invoice_no, LOCATE('/', REVERSE(invoice_no)) - 1) AS UNSIGNED) DESC")
+                    ->first();
+    
+    
+                    // dd($lastInvoice);
+                                
+                    if ($lastInvoice) {
+                    // Hapus '-P' jika ada
+                    $invoiceNumber = str_replace(' -P', '', $lastInvoice->invoice_no);
+    
+                    // dd($invoiceNumber);
+                    
+                    // Ambil angka terakhir dari invoice
+                    if (preg_match('/(\d+)$/', $invoiceNumber, $matches)) {
+                        $lastSequence = (int)$matches[0];
+                    } else {
+                        $lastSequence = 0; // Jika tidak ditemukan angka, mulai dari 0
+                    }
+                    // dd($invoiceNumber,$lastSequence, preg_match('/(\d+)$/', $invoiceNumber, $matches));
+                    } else {
+                    $lastSequence = 0; // Jika belum ada invoice, mulai dari 0
+                    }
+                    
+                    // Tambah 1 ke sequence terakhir dan format menjadi 6 digit angka
+                    $newSequence = str_pad($lastSequence + 1, 6, '0', STR_PAD_LEFT);
+                    
+                    // Ambil kode forwarding (pastikan tidak null)
+                    $forwardingCode = substr($header->Form->Forwarding->code ?? 'XXX', 0, 3);
+                    if (!$forwardingCode) {
+                    return redirect()->back()->with('status', ['type' => 'error', 'message' => 'Forwarding belum memiliki kode!']);
+                    }
+                    
+                    // Ambil 2 digit terakhir dari tahun saat ini
+                    $year = Carbon::now()->format('y');
+                    
+                    // Buat nomor invoice baru
+                    $noInvoice = "LKB-$forwardingCode/IGM/$year/$newSequence";
                 }
-
-                // Get the last two digits of the current year
-                $year = Carbon::now()->format('y'); // '24' for 2024
-
-                // Get the last inserted sequential number from the Header table
-               // Ambil invoice terakhir berdasarkan tahun order
-                $lastInvoice = Header::whereYear('order_at', Carbon::now()->year)
-                ->whereNotNull('invoice_no')
-                ->orderByRaw("CAST(RIGHT(invoice_no, LOCATE('/', REVERSE(invoice_no)) - 1) AS UNSIGNED) DESC")
-                ->first();
-
-
-                // dd($lastInvoice);
-                            
-                if ($lastInvoice) {
-                // Hapus '-P' jika ada
-                $invoiceNumber = str_replace(' -P', '', $lastInvoice->invoice_no);
-
-                // dd($invoiceNumber);
-                
-                // Ambil angka terakhir dari invoice
-                if (preg_match('/(\d+)$/', $invoiceNumber, $matches)) {
-                    $lastSequence = (int)$matches[0];
-                } else {
-                    $lastSequence = 0; // Jika tidak ditemukan angka, mulai dari 0
-                }
-                // dd($invoiceNumber,$lastSequence, preg_match('/(\d+)$/', $invoiceNumber, $matches));
-                } else {
-                $lastSequence = 0; // Jika belum ada invoice, mulai dari 0
-                }
-                
-                // Tambah 1 ke sequence terakhir dan format menjadi 6 digit angka
-                $newSequence = str_pad($lastSequence + 1, 6, '0', STR_PAD_LEFT);
-                
-                // Ambil kode forwarding (pastikan tidak null)
-                $forwardingCode = substr($header->Form->Forwarding->code ?? 'XXX', 0, 3);
-                if (!$forwardingCode) {
-                return redirect()->back()->with('status', ['type' => 'error', 'message' => 'Forwarding belum memiliki kode!']);
-                }
-                
-                // Ambil 2 digit terakhir dari tahun saat ini
-                $year = Carbon::now()->format('y');
-                
-                // Buat nomor invoice baru
-                $noInvoice = "LKB-$forwardingCode/IGM/$year/$newSequence";
             }
         }
         // dd($noInvoice);
@@ -352,7 +360,12 @@ class InvoiceController extends Controller
         $data['form'] = $form;
 
         // dd($header);
-        $data['tarifs'] = FormT::where('form_id', $form->id)->get();
+        // $data['tarifs'] = FormT::where('form_id', $form->id)->get();
+        $mekanik = str_ends_with($header->invoice_no, '-F') ? 'Y' : 'N';
+
+        $data['tarifs'] = FormT::where('form_id', $form->id)
+            ->where('mekanik_y_n', $mekanik)
+            ->get();
         $data['terbilang'] = $this->terbilang(ceil($header->grand_total));
 
         return view('invoice.invoice', $data);

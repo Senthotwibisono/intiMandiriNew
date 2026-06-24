@@ -101,14 +101,11 @@ class FormController extends Controller
         $data['title'] = 'Create Form || Step 1';
         $data['form'] = Form::find($id);
         // dd($data['form']);
-        $data['manifest'] = Manifest::get();
+        $data['manifest'] = Manifest::orderBy('id', 'desc')->get();
        
 
         $data['masterTarif'] = MT::all();
-        $data['masterTarifMekanik'] = MT::where(function ($query) {
-            $query->where('day', '!=', 'Y')
-                  ->orWhereNull('day');
-        })->get();
+        $data['masterTarifMekanik'] = MT::all();
         $data['selectedTarif'] = FormT::where('form_id', $id)->get();
 
         return view('invoice.form.formIndex', $data);
@@ -351,11 +348,15 @@ class FormController extends Controller
             if ($form->mekanik_y_n === 'Y') {
                 $jumlahHariMekanik = $request->input('jumlah_hari_mekanik', []);
                 $totalHariMekanik = array_sum($jumlahHariMekanik);
+                // dd($jumlahHariMekanik, $totalHariMekanik, $form->jumlah_hari, ($totalHari + $totalHariMekanik));
             }
 
-            if (($totalHari + $totalHariMekanik) != $form->jumlah_hari) {
+            if (($totalHari) != $form->jumlah_hari) {
                 return redirect()->back()->with('status', ['type' => 'error', 'message' => 'Jumlah Hari berbeda dengan interval expired date']);
             }
+            // if (($totalHariMekanik) != $form->jumlah_hari) {
+            //     return redirect()->back()->with('status', ['type' => 'error', 'message' => 'Jumlah Hari berbeda dengan interval expired date']);
+            // }
 
             foreach ($tarifIds as $index => $tarifId) {
                 $formTarif = FormT::where('form_id', $request->id)->where('tarif_id', $tarifId)->where('mekanik_y_n', '=', 'N')->first();
@@ -493,7 +494,7 @@ class FormController extends Controller
             'form_id' => $form->id,
             'manifest_id' => $form->manifest_id,
             'customer_id' => $form->customer_id,
-            'judul_invoice' => $isMekanik ? 'Mekanik ' . $request->judul_invoice : $request->judul_invoice,
+            'judul_invoice' => $request->judul_invoice,
             'order_no' => $oldHeader->order_no ?? $this->getNextOrderNo(),
             'time_in' => $form->time_in,
             'expired_date' => $form->expired_date,

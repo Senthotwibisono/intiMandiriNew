@@ -433,8 +433,23 @@ class DokumenController extends Controller
 
     public function spjmData(Request $request)
     {
-        $dokumen = SPJM::get();
-        return DataTables::of($dokumen)->make(true);
+        $dokumen = SPJM::orderBy('tgl_upload', 'desc')->orderBy('jam_upload', 'desc')->get();
+        return DataTables::of($dokumen)
+        ->addColumn('detil', function($dokumen){
+            return '<a href="/dokumen/spjm/detail/'.$dokumen->id.'" class="btn btn-warning">Detail</a>';
+        })
+        ->rawColumns(['detil'])
+        ->make(true);
+    }
+
+    public function spjmDetail($id)
+    {
+        $data['dokumen'] = SPJM::find($id);
+        $data['title'] = 'SPJM : ' . $data['dokumen']->no_spjm;
+        $data['containers'] = SPJMcont::where('spjm_id', $id)->get();
+        $data['kemasans'] = SPJMkms::where('spjm_id', $id)->get();
+
+        return view('dokumen.spjm.detil', $data);
     }
 
     public function GetSPJM_onDemand(Request $request)
@@ -1150,7 +1165,7 @@ class DokumenController extends Controller
         $xmlCSF->SPPB->HEADER->GUDANG = '1MUT';
         SoapWrapper::override(function ($service) {
             $service
-                ->name('ReceiveImporPermit_FASP')
+                ->name('ReceiveBC23Permit_FASP')
                 ->wsdl('https://pelindo-cfscenter.com/TPSServices/server_plp.php?wsdl')
                 ->trace(true)                                                                                                                                         
                 ->options([
@@ -1164,9 +1179,9 @@ class DokumenController extends Controller
                 ]);                                                   
         });
         // dd($dataCFS);
-        \SoapWrapper::service('ReceiveImporPermit_FASP', function ($service) use ($xmlCSF) {    
+        \SoapWrapper::service('ReceiveBC23Permit_FASP', function ($service) use ($xmlCSF) {    
             // dd($service);    
-            $this->responseCFS = $service->call('ReceiveImporPermit_FASP', [
+            $this->responseCFS = $service->call('ReceiveBC23Permit_FASP', [
                 'Username' => '1MUT', 
                 'Kode_ASP' => '1MUT',
                 'Password' => '1MUT',
@@ -1506,9 +1521,18 @@ class DokumenController extends Controller
         \SoapWrapper::service('TpsOnline', function ($service) use ($data) {        
             $this->response = $service->call('GetImpor_Sppb', [$data])->GetImpor_SppbResult;      
         }); 
-        
+        $this->response = str_replace(
+            ['<TENTAC>', '</TENTAC>'],
+            '',
+            $this->response
+        );
         libxml_use_internal_errors(true);
         $xml = simplexml_load_string($this->response);
+//         dd(
+//     $xml,
+//     $xml->children(),
+//     $xml->getName()
+// );
         if(!$xml || !$xml->children()){
             return back()->with('status', ['type' => 'error', 'message' => 'Error importing data: ' .  $this->response]);
         }

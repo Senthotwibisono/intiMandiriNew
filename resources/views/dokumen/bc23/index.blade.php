@@ -408,6 +408,7 @@
             processing: true,
             serverSide: true,
             scrollX: true,
+            scrollY: '75vh',
             ajax: '/dokumen/bc23Data',
             columns: [
                 {

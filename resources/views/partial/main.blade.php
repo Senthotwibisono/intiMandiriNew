@@ -196,6 +196,11 @@
             dateFormat: 'd-m-Y H:i',
             minDate: "today"  // Set minimum date to today
         });
+        flatpickr('#reportTime', {
+            enableTime: false,
+            dateFormat: 'Y-m-d',
+            // minDate: "today"  // Set minimum date to today
+        });
       });
     </script>
 

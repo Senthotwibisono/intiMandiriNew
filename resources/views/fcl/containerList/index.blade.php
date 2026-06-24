@@ -93,6 +93,33 @@
                                 </div>
                             </div>
                         </div>
+                        @if(Auth::user()->hasAnyRole([
+                            'admin',
+                            'adminFCL',
+                            'adminLCL',
+                            'android',
+                            'bc',
+                            'bcP2',
+                            'invoiceFCL',
+                            'invoiceLCL',
+                            'lapangan'
+                        ]))
+                        <div class="form-group"><label for="">Customer Name</label>
+                            <select name="cust_id" id="customer_id_edit" class=" form-select" style="width:100%;">
+
+                            </select>
+                        </div>
+                        @else
+                        <div class="form-group">
+                            <label for="">Customer</label>
+                            <select name="cust_id" id="customerEdit" class="js-example-basic-single form-select selcet2" style="width: 100%;">
+                                <option disabled selected value>Pilih Satu!</option>
+                                @foreach($customer as $cust)
+                                    <option value="{{$cust->id}}">{{$cust->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @endif
                     </div>
                     <div class="col-6">
                         <div class="row">
@@ -360,6 +387,7 @@
             processing: true,
             serverSide: true,
             scrollX: true,
+            scrollY: '75vh',
             ajax: '/fcl/containerList/dataTable',
             columns: [
                 {className:'text-center', data:'edit', name:'edit'},
@@ -433,6 +461,28 @@ $(document).ready(function() {
         location.reload();
     });
 });
+
+$('#customer_id_edit').select2({
+    placeholder: 'Pilih Satu!',
+    allowClear: true,
+    // dropdownParent: $('#editCust'),
+    ajax: {
+        url: "{{ route('customer.ajax') }}",
+        dataType: 'json',
+        delay: 250,
+        data: function (params) {
+            return {
+                q: params.term
+            };
+        },
+        processResults: function (data) {
+            return {
+                results: data
+            };
+        },
+        cache: true
+    }
+});
 </script>
 
 <script>
@@ -457,6 +507,29 @@ $(document).ready(function() {
         $("#weight").val(response.data.weight);
         $("#tglmasuk").val(response.data.tglmasuk);
         $("#jammasuk").val(response.data.jammasuk);
+        @if(Auth::user()->hasAnyRole([
+            'admin',
+            'adminFCL',
+            'adminLCL',
+            'android',
+            'bc',
+            'bcP2',
+            'invoiceFCL',
+            'invoiceLCL',
+            'lapangan'
+        ]))
+            var customerOption = new Option(
+            response.customer_name,
+            response.data.cust_id,
+            true,
+            true
+        );
+            $('#customer_id_edit')
+                .append(customerOption)
+                .trigger('change');
+        @else
+            $("#customerEdit").val(response.data.cust_id).trigger('change');
+        @endif
         $("#ctr_type_edit").val(response.data.ctr_type).trigger('change');
         $("#type_class_edit").val(response.data.type_class).trigger('change');
         $("#kd_dok").val(response.data.kd_dok_inout).trigger('change');

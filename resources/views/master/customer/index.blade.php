@@ -13,7 +13,7 @@
                 </div>
             </div>
             <br>
-            <table class="tabelCustom table table-bordered table-striped">
+            <table class="table table-bordered table-striped" id="tableDetil">
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -21,24 +21,10 @@
                         <th>Phone</th>
                         <th>Alamat</th>
                         <th>Fax</th>
-                        <th>Action</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
                     </tr>
                 </thead>
-                <tbody>
-                    @foreach($customers as $customer)
-                    <tr>
-                        <td>{{$customer->name ?? ' '}}</td>
-                        <td>{{$customer->email ?? ' '}}</td>
-                        <td>{{$customer->phone ?? ' '}}</td>
-                        <td><textarea class="form-control" id="exampleFormControlTextarea1" name="alamat" rows="3" readonly>{{$customer->alamat ?? ''}}</textarea></td>
-                        <td>{{$customer->fax ?? ' '}}</td>
-                        <td>
-                            <button class="btn btn-warning formEdit" data-id="{{ $customer->id }}" id="formEdit"><i class="fa fa-pen"></i></button>
-                            <button class="btn btn-danger" data-id="{{ $customer->id }}" id="deleteUser-{{ $customer->id }}"><i class="fa fa-trash"></i></button>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
             </table>
         </div>
     </div>
@@ -283,58 +269,59 @@
     });
 </script>
 <script>
-    document.querySelectorAll('[id^="deleteUser-"]').forEach(button => {
-    button.addEventListener('click', function() {
-        var userId = this.getAttribute('data-id');
+$(document).on('click', '[id^="deleteUser-"]', function () {
 
-        Swal.fire({
-            title: 'Apakah Anda yakin?',
-            text: "Anda tidak akan dapat mengembalikan ini!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Ya, hapus!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                fetch(`/master/customer-delete${userId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    }
-                }).then(response => {
-                    if (response.ok) {
-                        Swal.fire(
-                            'Dihapus!',
-                            'Data pengguna telah dihapus.',
-                            'success'
-                        ).then(() => {
-                            location.reload();
-                        });
-                    } else {
-                        Swal.fire(
-                            'Gagal!',
-                            'Data pengguna tidak dapat dihapus.',
-                            'error'
-                        );
-                    }
-                }).catch(error => {
-                    Swal.fire(
-                        'Gagal!',
-                        'Terjadi kesalahan saat menghapus data pengguna.',
-                        'error'
-                    );
-                });
-            }
-        });
+    let userId = $(this).data('id');
+
+    Swal.fire({
+        title: 'Apakah Anda yakin?',
+        text: "Anda tidak akan dapat mengembalikan ini!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+
+        if (result.isConfirmed) {
+
+            fetch(`/master/customer-delete${userId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+
+                Swal.fire(
+                    'Dihapus!',
+                    'Data customer berhasil dihapus.',
+                    'success'
+                );
+
+                $('#tableCustomer').DataTable().ajax.reload(null, false);
+
+            })
+            .catch(error => {
+
+                Swal.fire(
+                    'Gagal!',
+                    'Terjadi kesalahan saat menghapus data.',
+                    'error'
+                );
+
+                console.log(error);
+            });
+        }
     });
 });
 </script>
 
 <script>
-   $(document).on('click', '.formEdit', function() {
+   $(document).on('click', '#formEdit', function() {
     let id = $(this).data('id');
     $.ajax({
       type: 'GET',
@@ -386,6 +373,49 @@
                 }
             });
         });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('#tableDetil').DataTable({
+            processing: true,
+            serverSide: true,
+            scrollX: true,
+            scrollCollapse: true,
+            scrollY: '50vh',
+            ajax: "{{ route('master.customer.data') }}",
+            columns: [
+                { data: 'name', name: 'name', className: 'text-center', orderable: true }, // Define the column
+                { data: 'email', name: 'email', className: 'text-center', orderable: true }, // Define the column
+                { data: 'phone', name: 'phone', className: 'text-center', orderable: true }, // Define the column
+                { data: 'alamat', name: 'alamat', className: 'text-center', orderable: true }, // Define the column
+                { data: 'fax', name: 'fax', className: 'text-center', orderable: true }, // Define the column
+                { data: 'edit', name: 'edit', className: 'text-center', orderable: true }, // Define the column
+                { data: 'delete', name: 'delete', className: 'text-center', orderable: true }, // Define the column
+                // { data: 'packingTally', name: 'packingTally', className: 'text-center', orderable: true }, // Define the column
+             
+            ],
+            initComplete: function () {
+                var api = this.api();
+                
+                api.columns().every(function (index) {
+                    var column = this;
+                    var excludedColumns = [5, 6]; // Kolom yang tidak ingin difilter (detil, flag_segel_merah, lamaHari)
+                    
+                    if (excludedColumns.includes(index)) {
+                        $('<th></th>').appendTo(column.header()); // Kosongkan header pencarian untuk kolom yang dikecualikan
+                        return;
+                    }
+
+                    var $th = $(column.header());
+                    var $input = $('<input type="text" class="form-control form-control-sm" placeholder="Search ' + $th.text() + '">')
+                        .appendTo($('<th class="text-center"></th>').appendTo($th))
+                        .on('keyup change', function () {
+                            column.search($(this).val()).draw();
+                        });
+                });
+            }
+        })
     });
 </script>
 @endsection

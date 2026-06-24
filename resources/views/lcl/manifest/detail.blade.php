@@ -1,6 +1,26 @@
 @extends('partial.main')
 @section('custom_styles')
+<style>
+    .draggable-item {
+        cursor: pointer;
+        margin: 5px 0;
+        padding: 10px;
+        border: 1px solid #ccc;
+    }
 
+    .draggable-item.selected {
+        background-color: #d9edf7;
+    }
+
+    .dropzone {
+        min-height: 200px;
+        border: 2px dashed #ccc;
+        padding: 10px;
+    }
+    tr.selected {
+        background-color: #d9edf7;
+    }
+</style>
 @endsection
 @section('content')
 <section>
@@ -185,7 +205,7 @@
                                 <label for="">Tgl HBL</label>
                                 <input type="date" class="form-control" name="tgl_hbl">
                             </div>
-                            <div class="form-group">
+                            <!-- <div class="form-group">
                                 <label for="">Shipper</label>
                                 <select name="shipper_id" style="width: 100%;" class="customSelect form-select select2">
                                     <option value disabled selected>Pilih Satu!</option>
@@ -193,23 +213,47 @@
     <option value="{{ $id }}">{{ $name }}</option>
 @endforeach
                                 </select>
-                            </div>
+                            </div> -->
                             <div class="form-group">
+                                <label for="">Shipper Name</label>
+                                <select name="shipper_id"
+                                        id="shipper_id"
+                                        class=" form-select"
+                                        style="width:100%;">
+                                </select>
+                            </div>
+                            
+                            <!-- <div class="form-group">
                                 <label for="">Customer</label>
                                 <select name="customer_id" style="width: 100%;" class="customSelect form-select select2">
                                     <option value disabled selected>Pilih Satu!</option>
                                    @foreach ($custs as $id => $name)
     <option value="{{ $id }}">{{ $name }}</option>
 @endforeach
-                                </select>
-                            </div>
-                            <div class="form-group">
+                                </select> -->
+                                <div class="form-group">
+                                    <label for="">Customer Name</label>
+                                    <select name="customer_id"
+                                            id="customer_id"
+                                            class=" form-select"
+                                            style="width:100%;">
+                                    </select>
+                                </div>
+                            <!-- <div class="form-group">
                                 <label for="">Notify Party</label>
                                 <select name="notifyparty_id" style="width: 100%;" class="customSelect form-select select2">
                                     <option value disabled selected>Pilih Satu!</option>
                                    @foreach ($custs as $id => $name)
     <option value="{{ $id }}">{{ $name }}</option>
 @endforeach
+                                </select>
+                            </div> -->
+                            <div class="form-group">
+                                <label for="">Notify Party</label>
+                                <select name="notifyparty_id"
+                                        id="notifyparty_id"
+                                        class=" form-select"
+                                        style="width:100%;">
                                 </select>
                             </div>
                             <div class="form-group">
@@ -316,31 +360,55 @@
                                 <label for="">Tgl HBL</label>
                                 <input type="date" class="form-control" name="tgl_hbl" id="tgl_hbl_edit">
                             </div>
-                            <div class="form-group">
+                            <!-- <div class="form-group">
                                 <label for="">Shipper</label>
-                                <select name="shipper_id" id="shipper_id_edit" style="width: 100%;" class="editSelect form-select select2">
-                                    <option value disabled selected>Pilih Satu!</option>
-                                    @foreach ($custs as $id => $name)
-    <option value="{{ $id }}">{{ $name }}</option>
-@endforeach
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="">Customer</label>
-                                <select name="customer_id" id="customer_id_edit" style="width: 100%;" class="editSelect form-select select2">
-                                    <option value disabled selected>Pilih Satu!</option>
-                                    @foreach ($custs as $id => $name)
-    <option value="{{ $id }}">{{ $name }}</option>
-@endforeach
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="">Notify Party</label>
-                                <select name="notifyparty_id" id="notifyparty_id_edit" style="width: 100%;" class="editSelect form-select select2">
+                                <select name="shipper_id" style="width: 100%;" class="customSelect form-select select2">
                                     <option value disabled selected>Pilih Satu!</option>
                                    @foreach ($custs as $id => $name)
     <option value="{{ $id }}">{{ $name }}</option>
 @endforeach
+                                </select>
+                            </div> -->
+                            <div class="form-group">
+                                <label for="">Shipper Name</label>
+                                <select name="shipper_id"
+                                        id="shipper_id_edit"
+                                        class=" form-select"
+                                        style="width:100%;">
+                                </select>
+                            </div>
+                            
+                            <!-- <div class="form-group">
+                                <label for="">Customer</label>
+                                <select name="customer_id" style="width: 100%;" class="customSelect form-select select2">
+                                    <option value disabled selected>Pilih Satu!</option>
+                                   @foreach ($custs as $id => $name)
+    <option value="{{ $id }}">{{ $name }}</option>
+@endforeach
+                                </select> -->
+                                <div class="form-group">
+                                    <label for="">Customer Name</label>
+                                    <select name="customer_id"
+                                            id="customer_id_edit"
+                                            class=" form-select"
+                                            style="width:100%;">
+                                    </select>
+                                </div>
+                            <!-- <div class="form-group">
+                                <label for="">Notify Party</label>
+                                <select name="notifyparty_id" style="width: 100%;" class="customSelect form-select select2">
+                                    <option value disabled selected>Pilih Satu!</option>
+                                   @foreach ($custs as $id => $name)
+    <option value="{{ $id }}">{{ $name }}</option>
+@endforeach
+                                </select>
+                            </div> -->
+                            <div class="form-group">
+                                <label for="">Notify Party</label>
+                                <select name="notifyparty_id"
+                                        id="notifyparty_id_edit"
+                                        class=" form-select"
+                                        style="width:100%;">
                                 </select>
                             </div>
                             <div class="form-group">
@@ -401,6 +469,50 @@
 @endsection
 
 @section('custom_js')
+<script>
+$('#customer_id, #notifyparty_id, #shipper_id').select2({
+    placeholder: 'Pilih Satu!',
+    allowClear: true,
+    dropdownParent: $('#addManual'),
+    ajax: {
+        url: "{{ route('customer.ajax') }}",
+        dataType: 'json',
+        delay: 250,
+        data: function (params) {
+            return {
+                q: params.term
+            };
+        },
+        processResults: function (data) {
+            return {
+                results: data
+            };
+        },
+        cache: true
+    }
+});
+$('#customer_id_edit, #notifyparty_id_edit, #shipper_id_edit').select2({
+    placeholder: 'Pilih Satu!',
+    allowClear: true,
+    dropdownParent: $('#editCust'),
+    ajax: {
+        url: "{{ route('customer.ajax') }}",
+        dataType: 'json',
+        delay: 250,
+        data: function (params) {
+            return {
+                q: params.term
+            };
+        },
+        processResults: function (data) {
+            return {
+                results: data
+            };
+        },
+        cache: true
+    }
+});
+</script>
 <script>
     $(document).ready(function () {
         var Id = {{ $cont->id }}; 
@@ -476,9 +588,40 @@
         $("#editCust #nohbl_edit").val(response.data.nohbl);
         $("#editCust #container_id_edit").val(response.data.container_id);
         $("#editCust #tgl_hbl_edit").val(response.data.tgl_hbl);
-        $("#editCust #shipper_id_edit").val(response.data.shipper_id).trigger('change');
-        $("#editCust #customer_id_edit").val(response.data.customer_id).trigger('change');
-        $("#editCust #notifyparty_id_edit").val(response.data.notifyparty_id).trigger('change');
+            // $("#editCust #shipper_id_edit").val(response.data.shipper_id).trigger('change');
+            // $("#editCust #customer_id_edit").val(response.data.customer_id).trigger('change');
+            // $("#editCust #notifyparty_id_edit").val(response.data.notifyparty_id).trigger('change');
+        var shipperOption = new Option(
+            response.shipper_name,
+            response.data.shipper_id,
+            true,
+            true
+        );
+        $('#shipper_id_edit')
+            .append(shipperOption)
+            .trigger('change');
+    
+        // Customer
+        var customerOption = new Option(
+            response.customer_name,
+            response.data.customer_id,
+            true,
+            true
+        );
+        $('#customer_id_edit')
+            .append(customerOption)
+            .trigger('change');
+    
+        // Notify Party
+        var notifyOption = new Option(
+            response.notifyparty_name,
+            response.data.notifyparty_id,
+            true,
+            true
+        );
+        $('#notifyparty_id_edit')
+            .append(notifyOption)
+            .trigger('change');
         $("#editCust #marking_edit").val(response.data.marking);
         $("#editCust #descofgoods_edit").val(response.data.descofgoods);
         $("#editCust #quantity_edit").val(response.data.quantity);

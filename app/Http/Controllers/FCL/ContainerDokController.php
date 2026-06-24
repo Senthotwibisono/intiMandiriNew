@@ -68,7 +68,7 @@ class ContainerDokController extends Controller
 
         $data['conts'] = Cont::get();
         $data['doks'] = Kode::orderBy('kode', 'asc')->get();
-
+        $data['customer'] = Customer::get();
         return view('fcl.containerList.index', $data);
     }
 
@@ -243,6 +243,7 @@ class ContainerDokController extends Controller
                 'kd_dok' => $request->kd_dok,
                 'no_dok' => $request->no_dok,
                 'tgl_dok' => $request->tgl_dok,
+                'cust_id' => $request->cust_id,
             ]);
 
             return redirect()->back()->with('status', ['type'=>'success', 'message'=>'Data Berhasil di simpan']);

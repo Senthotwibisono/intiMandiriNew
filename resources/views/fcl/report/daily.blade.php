@@ -430,6 +430,7 @@
             processing: true,
             serverSide: true,
             scrollX: true,
+            scrollY: '75vh',
             ajax: {
                 url: '/fcl/report/dataContDaily',
                 type: 'GET',
@@ -540,6 +541,7 @@
             processing: true,
             serverSide: true,
             scrollX: true,
+            scrollY: '75vh',
             ajax: {
                 url: '/fcl/report/dataContDaily',
                 type: 'GET',
@@ -650,6 +652,7 @@
             processing: true,
             serverSide: true,
             scrollX: true,
+            scrollY: '75vh',
             ajax: {
                 url: '/fcl/report/dataContDaily',
                 type: 'GET',

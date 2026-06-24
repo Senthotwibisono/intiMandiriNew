@@ -198,6 +198,7 @@ class PlacementContainerController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => $cont,
+                'customer_name' => $cont->customer->name,
                 'job' =>$job,
                 'user' => $user,
                 'userId' => $userId,

@@ -52,9 +52,24 @@ class MasterController extends Controller
     public function CustomerIndex()
     {
         $data['title'] = 'Master Customer';
-        $data['customers'] = Customer::get();
+        // $data['customers'] = Customer::get();
 
         return view('master.customer.index', $data);
+    }
+
+    public function customerData(Request $request)
+    {
+        $driver = Customer::get();
+
+        return DataTables::of($driver)
+        ->addColumn('edit', function($driver){
+            return '<button type="button" class="btn btn-warning" data-id="'.$driver->id.'" onClick="getDataDriver(this)" id="formEdit"><i class="fas fa-pencil"></i></button>';
+        })
+        ->addColumn('delete', function($driver){
+            return '<button type="button" class="btn btn-danger" data-id="'.$driver->id.'" onClick="deleteDriver(this)" id="deleteUser-'.$driver->id.'"><i class="fas fa-trash"></i></button>';
+        })
+        ->rawColumns(['edit', 'delete'])
+        ->make(true);
     }
 
     public function CustomerExcel(Request $request)

@@ -340,6 +340,10 @@ class Manifest extends Model
     {
         return $this->belongsTo(Customer::class, 'shipper_id', 'id');
     }
+    public function notify()
+    {
+        return $this->belongsTo(Customer::class, 'notifyparty_id', 'id');
+    }
 
     public function packing()
     {

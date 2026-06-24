@@ -18,6 +18,10 @@ class Kernel extends ConsoleKernel
         $schedule->command('functions:daily')->everyThreeMinutes();
         $schedule->command('functions:cfsScheduler')->everyThreeMinutes();
         $schedule->command('functions:gateInJict')->everyMinute();
+        $schedule->command('functions:movementNPCT')->everyMinute();
+        $schedule->command('sppb:otomatis')
+             ->timezone('Asia/Jakarta')
+             ->dailyAt('07:59');
     }
 
     /**

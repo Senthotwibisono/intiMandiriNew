@@ -543,6 +543,7 @@
             processing: true,
             serverSide: true,
             scrollX: true,
+            scrollY: '75vh',
             ajax : '/fcl/register/detailDataContainer-' + id,
             columns : [
                 {data: 'edit', name: 'edit'},

@@ -282,7 +282,10 @@ class CfsDefaultController extends Controller
         }
 
         $manifestes = Manifest::whereIn('id', $request->ids)->get();
-        $notAllowed = $manifestes->whereNull('tglmasuk');
+        // $notAllowed = $manifestes->whereNull('tglmasuk');
+        $notAllowed = $manifestes->filter(function ($item) {
+            return optional($item->cont)->tglmasuk === null;
+        });
         if ($notAllowed->isNotEmpty()) {
             $noHbl = $notAllowed->pluck('nohbl')->implode(', ');
             // var_dump($noHbl);
@@ -310,8 +313,8 @@ class CfsDefaultController extends Controller
                 ]);                                                   
         });
         foreach ($manifestes as $manifest) {
-            $tglMasuk = $manifest->tglmasuk ? Carbon::parse($manifest->tglmasuk ?? $manifest->cont->tglmasuk)->format('Ymd') : null;
-            $jamMasuk = $manifest->jammasuk ? Carbon::parse($manifest->jammasuk ?? $manifest->cont->jammasuk)->format('His') : null;
+            $tglMasuk = $manifest->cont->tglmasuk ? Carbon::parse($manifest->cont->tglmasuk)->format('Ymd') : null;
+            $jamMasuk = $manifest->cont->jammasuk ? Carbon::parse($manifest->cont->jammasuk)->format('His') : null;
             $tglTiba = Carbon::parse($manifest->job->eta)->format('Ymd');
             $dataHeader = [
                 'kd_dok' => 5,

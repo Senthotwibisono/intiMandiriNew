@@ -274,6 +274,9 @@
                     <li class="submenu-item @if(Request::is('fcl/report/daily/*')) active @endif">
                         <a href="{{ route('report.fcl.daily')}}">Daily</a>
                     </li>
+                    <li class="submenu-item @if(Request::is('fcl/report/opname*')) active @endif">
+                        <a href="{{ route('report.fcl.opname.index')}}">Opname SPPB & SPJM</a>
+                    </li>
                 </ul>
             </li>
         </ul>

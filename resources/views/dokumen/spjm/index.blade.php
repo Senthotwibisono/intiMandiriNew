@@ -19,6 +19,7 @@
                         <thead>
                             <tr>
                                 <!-- <th>Action</th> -->
+                                <th>Detil</th>
                                 <th>CAR</th>
                                 <th>Kd Kantor</th>
                                 <th>Tgl SPJM</th>
@@ -330,7 +331,9 @@
             processing: true,
             severSide: true,
             ajax: '/dokumen/spjmData',
+            scrollY: '75vh',
             columns:[
+                {data:'detil', name:'detil', className:'text-center'},
                 {data:'car', name:'car', className:'text-center'},
                 {data:'kd_kantor', name:'kd_kantor', className:'text-center'},
                 {data:'tgl_pib', name:'tgl_pib', className:'text-center'},

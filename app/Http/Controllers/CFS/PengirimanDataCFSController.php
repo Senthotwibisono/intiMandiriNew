@@ -307,8 +307,8 @@ class PengirimanDataCFSController extends Controller
                 ]);                                                   
         });
         foreach ($manifestes as $manifest) {
-            $tglMasuk = $manifest->tglmasuk ? Carbon::parse($manifest->tglmasuk ?? $manifest->cont->tglmasuk)->format('Ymd') : null;
-            $jamMasuk = $manifest->jammasuk ? Carbon::parse($manifest->jammasuk ?? $manifest->cont->jammasuk)->format('His') : null;
+            $tglMasuk = $manifest->cont->tglmasuk ? Carbon::parse($manifest->cont->tglmasuk)->format('Ymd') : null;
+            $jamMasuk = $manifest->cont->jammasuk ? Carbon::parse($manifest->cont->jammasuk)->format('His') : null;
             $tglTiba = Carbon::parse($manifest->job->eta)->format('Ymd');
             $dataHeader = [
                 'kd_dok' => 5,

@@ -58,9 +58,11 @@ class DeliveryFCLController extends Controller
 
     public function behandleData(Request $request)
     {
+        ini_set('memory_limit', '-1');
+        set_time_limit(0);
         $cont = Cont::with(['job']);
 
-        return DataTables::of($cont)
+        return DataTables::eloquent($cont)
         ->addColumn('action', function($cont){
             return '<button class="btn btn-warning editButton" data-id="'.$cont->id.'"><i class="fa fa-pencil"></i></button>';
         })
@@ -91,6 +93,75 @@ class DeliveryFCLController extends Controller
             }else {
                 // return '<span class="badge bg-light-warning">Dokumen SPJM Belum tersedia</span>';
                 return '-';
+            }
+        })
+        ->filterColumn('status', function ($query, $keyword) {
+            var_dump($keyword);
+
+            $statuses = explode('|', $keyword);
+
+            $query->where(function ($q) use ($statuses) {
+
+                if (in_array('null', $statuses)) {
+                    $q->orWhereNull('status_behandle');
+                }
+
+                $numericStatuses = array_filter($statuses, function ($status) {
+                    return $status !== 'null';
+                });
+
+                if (!empty($numericStatuses)) {
+                    $q->orWhereIn('status_behandle', $numericStatuses);
+                }
+            });
+        })
+
+        ->filterColumn('tgl_bl_awb', function ($query, $keyword) {
+
+            [$start, $end] = array_pad(explode('|', $keyword), 2, null);
+        
+            if ($start && $end) {
+                $query->whereBetween('tgl_bl_awb', [$start, $end]);
+            } elseif ($start) {
+                $query->whereDate('tgl_bl_awb', '>=', $start);
+            } elseif ($end) {
+                $query->whereDate('tgl_bl_awb', '<=', $end);
+            }
+        })
+        ->filterColumn('date_ready_behandle', function ($query, $keyword) {
+
+            [$start, $end] = array_pad(explode('|', $keyword), 2, null);
+
+            if ($start && $end) {
+                $query->whereBetween('date_ready_behandle', [$start, $end]);
+            } elseif ($start) {
+                $query->whereDate('date_ready_behandle', '>=', $start);
+            } elseif ($end) {
+                $query->whereDate('date_ready_behandle', '<=', $end);
+            }
+        })
+        ->filterColumn('date_check_behandle', function ($query, $keyword) {
+
+            [$start, $end] = array_pad(explode('|', $keyword), 2, null);
+
+            if ($start && $end) {
+                $query->whereBetween('date_check_behandle', [$start, $end]);
+            } elseif ($start) {
+                $query->whereDate('date_check_behandle', '>=', $start);
+            } elseif ($end) {
+                $query->whereDate('date_check_behandle', '<=', $end);
+            }
+        })
+        ->filterColumn('date_finish_behandle', function ($query, $keyword) {
+
+            [$start, $end] = array_pad(explode('|', $keyword), 2, null);
+
+            if ($start && $end) {
+                $query->whereBetween('date_finish_behandle', [$start, $end]);
+            } elseif ($start) {
+                $query->whereDate('date_finish_behandle', '>=', $start);
+            } elseif ($end) {
+                $query->whereDate('date_finish_behandle', '<=', $end);
             }
         })
         ->rawColumns(['action', 'photo', 'statusBehandle', 'status'])
@@ -339,53 +410,77 @@ class DeliveryFCLController extends Controller
                     ]);
                 }
             }
-            $yardDetil = RowTier::where('yard_id', $request->yard_id)->where('slot', $request->slot)->where('row', $request->row)->where('tier', $request->tier)->first();
-            if ($yardDetil) {
-                if ($yardDetil->cont_id != null && $yardDetil->cont_id != $cont->id) {
-                    return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Yard Sudah Terisi, Silahkan pilih yard lain']);
-                }
-                
-                
-                $cont->update([
-                    'yard_id'=>$request->yard_id,
-                    'yard_detil_id'=> $yardDetil->id,
-                    'desc_check_behandle' => $request->desc_check_behandle,
-                    'desc_finish_behandle' => $request->desc_finish_behandle
-                ]);
 
+            $cont->update([
+                // 'yard_id'=>$request->yard_id,
+                // 'yard_detil_id'=> $yardDetil->id,
+                'desc_check_behandle' => $request->desc_check_behandle,
+                'desc_finish_behandle' => $request->desc_finish_behandle
+            ]);
 
-                if ($cont->size == '40') {
-                    $nextSlot = $request->slot + 1;
-                    $nexyard = RowTier::where('yard_id', $request->yard_id)->where('slot', $nextSlot)->where('row', $request->row)->where('tier', $request->tier)->first();
-                    $nexyard->update([
-                        'cont_id' => $cont->id,
-                        'cont_type'=>  'fcl',
-                        'active' => 'Y',
+            if ($request->hasFile('photos')) {
+                foreach ($request->file('photos') as $photo) {
+                    $fileName = $photo->getClientOriginalName();
+                    $photo->storeAs('imagesInt', $fileName, 'public'); 
+                    $newPhoto = Photo::create([
+                        'master_id' => $cont->id,
+                        'type' => 'fcl',
+                        'action' => 'behandle',
+                        'detil' => $request->keteranganPhoto,
+                        'photo' => $fileName,
                     ]);
                 }
-                $yardDetil->update([
-                    'cont_id' => $cont->id,
-                    'cont_type'=>  'fcl',
-                    'active' => 'Y',
-                ]);
-    
-                if ($request->hasFile('photos')) {
-                    foreach ($request->file('photos') as $photo) {
-                        $fileName = $photo->getClientOriginalName();
-                        $photo->storeAs('imagesInt', $fileName, 'public'); 
-                        $newPhoto = Photo::create([
-                            'master_id' => $cont->id,
-                            'type' => 'fcl',
-                            'action' => 'behandle',
-                            'detil' => $request->keteranganPhoto,
-                            'photo' => $fileName,
-                        ]);
-                    }
-                }
-                return redirect()->back()->with('status', ['type'=>'success', 'message'=>'Data berhasil di update']);
-            }else {
-                return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Yard Tidak Ditemukan']);
             }
+
+            return redirect()->back()->with('status', ['type'=>'success', 'message'=>'Data berhasil di update']);
+
+            // $yardDetil = RowTier::where('yard_id', $request->yard_id)->where('slot', $request->slot)->where('row', $request->row)->where('tier', $request->tier)->first();
+            // if ($yardDetil) {
+            //     if ($yardDetil->cont_id != null && $yardDetil->cont_id != $cont->id) {
+            //         return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Yard Sudah Terisi, Silahkan pilih yard lain']);
+            //     }
+                
+                
+            //     $cont->update([
+            //         'yard_id'=>$request->yard_id,
+            //         'yard_detil_id'=> $yardDetil->id,
+            //         'desc_check_behandle' => $request->desc_check_behandle,
+            //         'desc_finish_behandle' => $request->desc_finish_behandle
+            //     ]);
+
+
+            //     if ($cont->size == '40') {
+            //         $nextSlot = $request->slot + 1;
+            //         $nexyard = RowTier::where('yard_id', $request->yard_id)->where('slot', $nextSlot)->where('row', $request->row)->where('tier', $request->tier)->first();
+            //         $nexyard->update([
+            //             'cont_id' => $cont->id,
+            //             'cont_type'=>  'fcl',
+            //             'active' => 'Y',
+            //         ]);
+            //     }
+            //     $yardDetil->update([
+            //         'cont_id' => $cont->id,
+            //         'cont_type'=>  'fcl',
+            //         'active' => 'Y',
+            //     ]);
+    
+            //     if ($request->hasFile('photos')) {
+            //         foreach ($request->file('photos') as $photo) {
+            //             $fileName = $photo->getClientOriginalName();
+            //             $photo->storeAs('imagesInt', $fileName, 'public'); 
+            //             $newPhoto = Photo::create([
+            //                 'master_id' => $cont->id,
+            //                 'type' => 'fcl',
+            //                 'action' => 'behandle',
+            //                 'detil' => $request->keteranganPhoto,
+            //                 'photo' => $fileName,
+            //             ]);
+            //         }
+            //     }
+            //     return redirect()->back()->with('status', ['type'=>'success', 'message'=>'Data berhasil di update']);
+            // }else {
+            //     return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Yard Tidak Ditemukan']);
+            // }
         } catch (\Throwable $th) {
             return redirect()->back()->with('status', ['type'=>'error', 'message'=>'error :' . $th->getMessage()]);
         }

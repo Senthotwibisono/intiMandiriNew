@@ -100,6 +100,9 @@
                             <th class="text-center" style="min-width: 100px;">ETA</th>
                             <th class="text-center">TPS Asal</th>
                             <th class="text-center">Consolidator</th>
+                            <th class="text-center">Consignee</th>
+                            <th class="text-center">Alamat</th>
+                            <th class="text-center">NPWP</th>
                             <th class="text-center">No PLP</th>
                             <th class="text-center">Tgl PLP</th>
                             <th class="text-center">No BC 1.1</th>
@@ -320,6 +323,7 @@
                 'copy', 'csv', excel , pdf, 'print'
             ],
             scrollX: true,
+            scrollY: '75vh',
             processing: true,
             serverSide: true,
             ajax: {
@@ -349,6 +353,9 @@
                 { data:'eta', name:'eta', className:'text-center' },
                 { data:'kd_tps_asal', name:'kd_tps_asal', className:'text-center' },
                 { data:'namaconsolidator', name:'namaconsolidator', className:'text-center' },
+                { data:'cust_name', name:'cust_name', className:'text-center' },
+                { data:'cust_alamat', name:'cust_alamat', className:'text-center' },
+                { data:'cust_npwp', name:'cust_npwp', className:'text-center' },
                 { data:'noplp', name:'noplp', className:'text-center' },
                 { data:'tglPLP', name:'tglPLP', className:'text-center' },
                 { data:'no_bc11', name:'no_bc11', className:'text-center' },

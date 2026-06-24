@@ -222,6 +222,7 @@
             precessing: true,
             serverSide: true,
             ajax: '/fcl/register/data',
+            scrollY: '75vh',
             columns: [
                 { data: 'actions', name: 'actions', orderable: false, searchable: false },
                 { data: 'nojoborder', name: 'nojoborder' },

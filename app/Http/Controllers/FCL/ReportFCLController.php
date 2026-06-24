@@ -37,12 +37,15 @@ class ReportFCLController extends Controller
             'j.ttgl_plp',
             'j.tno_bc11',
             'j.ttgl_bc11',
+            'cust.name',
+            'cust.alamat',
+            'cust.npwp',
             DB::raw('p.nm_angkut as plp_nm_angkut'),
             DB::raw('p.kd_tps_asal as plp_kd_tps_asal'),
             DB::raw('p.namaconsolidator as plp_namaconsolidator')
         )
         ->leftJoin('tjoborder_fcl as j', 'j.id', '=', 'tcontainer_fcl.joborder_id')
-         ->leftJoin('customer as cust', 'cust.id', '=', 'tcontainer_fcl.cust_id')
+        ->leftJoin('customer as cust', 'cust.id', '=', 'tcontainer_fcl.cust_id')
         ->leftJoin('tps_responplptujuanxml as p', 'p.id', '=', 'j.plp_id');
 
         // filtering by date (optional)
@@ -56,7 +59,7 @@ class ReportFCLController extends Controller
                      ->orderBy('tcontainer_fcl.tglmasuk', 'asc');
             } elseif ($request->filter == 'Tgl Gate Out') {
                 $cont->whereBetween('tcontainer_fcl.tglkeluar', [$request->start_date, $request->end_date])
-                     ->orderBy('tcontainer_fcl.tglmasuk', 'asc');
+                     ->orderBy('tcontainer_fcl.tglkeluar', 'asc');
             } elseif ($request->filter == 'Tgl BC 1.1') {
                 $cont->whereBetween('j.ttgl_bc11', [$request->start_date, $request->end_date])
                      ->orderBy('j.ttgl_bc11', 'asc');
@@ -81,6 +84,18 @@ class ReportFCLController extends Controller
             ->editColumn('jobordr', fn($cont) => $cont->nojoborder ?? '-')
             ->filterColumn('jobordr', fn($q, $k) => $q->where('j.nojoborder', 'like', "%{$k}%"))
             ->orderColumn('jobordr', 'j.nojoborder $1')
+            
+            ->editColumn('cust_name', fn($cont) => $cont->name ?? '-')
+            ->filterColumn('cust_name', fn($q, $k) => $q->where('cust.name', 'like', "%{$k}%"))
+            ->orderColumn('cust_name', 'cust.name $1')
+
+            ->editColumn('cust_alamat', fn($cont) => $cont->alamat ?? '-')
+            ->filterColumn('cust_alamat', fn($q, $k) => $q->where('cust.alamat', 'like', "%{$k}%"))
+            ->orderColumn('cust_alamat', 'cust.alamat $1')
+
+            ->editColumn('cust_npwp', fn($cont) => $cont->npwp ?? '-')
+            ->filterColumn('cust_npwp', fn($q, $k) => $q->where('cust.npwp', 'like', "%{$k}%"))
+            ->orderColumn('cust_npwp', 'cust.npwp $1')
 
             // nm_angkut (plp)
             ->editColumn('nm_angkut', fn($cont) => $cont->nm_angkut ?? '-')
@@ -205,7 +220,7 @@ class ReportFCLController extends Controller
             // lamaHari (hitung manual)
             ->addColumn('lamaHari', function($cont){
                 if (!$cont->tglmasuk) return 'Belum Masuk';
-                return Carbon::parse($cont->tglmasuk)->diffInDays($cont->tglbuangmty ?? now()) . ' hari';
+                return Carbon::parse($cont->tglmasuk)->diffInDays($cont->tglkeluar ?? now()) . ' hari';
             })
 
             // longStay
@@ -213,7 +228,7 @@ class ReportFCLController extends Controller
                 if (!$cont->tglmasuk) {
                     $longStay = 'N';
                 } else {
-                    $longStay = Carbon::parse($cont->tglmasuk)->diffInDays($cont->tglbuangmty ?? now()) >= 25 ? 'Y' : 'N';
+                    $longStay = Carbon::parse($cont->tglmasuk)->diffInDays($cont->tglkeluar ?? now()) >= 25 ? 'Y' : 'N';
                 }
                 $color = $longStay == 'Y' ? 'background-color: #28a745; color: white;' : '';
                 return '<span style="'.$color.'; padding: 5px; border-radius: 5px;">'.$longStay.'</span>';
@@ -669,6 +684,9 @@ class ReportFCLController extends Controller
         })
         ->addColumn('npwp', function($cont){
             return $cont->Customer->npwp ?? '-';
+        })
+        ->addColumn('alamat', function($cont){
+            return $cont->Customer->alamat ?? '-';
         })
         ->addColumn('email', function($cont){
             return $cont->Customer->email ?? '-';

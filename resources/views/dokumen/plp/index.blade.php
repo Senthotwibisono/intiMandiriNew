@@ -363,6 +363,7 @@
         $('#tablePLP').DataTable({
             processing: true,
             serverSide: true,
+            scrollY: '75vh',
             ajax: '/dokumen/plpData',
             columns: [
                 {data:'no_plp', name:'no_plp', className:'text-center'},

@@ -407,7 +407,7 @@ class NpctController extends Controller
     //     return;
     // }
 
-    public function movementInLCL(Request $request)
+    public function movementInLCL()
     {
         $wsdl = 'https://api.npct1.co.id/services/index.php/Line2?wsdl';    
 
@@ -485,6 +485,279 @@ class NpctController extends Controller
                     'npct_in_flag'   => $success ? 'Y' : 'N',
                     'npct_in_time'   => Carbon::now(),
                     'npct_in_status' => $xmlResponse,
+                ]); 
+
+            } catch (\SoapFault $e) {   
+
+                $cont->update([
+                    'npct_in_status' => $e->getMessage(),
+                ]);
+            }
+        }   
+
+        return response()->json(['status' => 'done']);
+    }
+
+    public function movementInFCL()
+    {
+        $wsdl = 'https://api.npct1.co.id/services/index.php/Line2?wsdl';    
+
+        // REGISTER SOAP SEKALI SAJA
+        SoapWrapper::add(function ($service) use ($wsdl) {
+            $service->name('movementInFclRequestNpct')
+                ->wsdl($wsdl)
+                ->trace(true)
+                ->cache(WSDL_CACHE_NONE)
+                ->options([
+                    'soap_version' => SOAP_1_1,
+                    'stream_context' => stream_context_create([
+                        'ssl'=>[
+                            'verify_peer'=>false,
+                            'verify_peer_name'=>false
+                        ]
+                    ])
+                ]);
+        }); 
+
+        $conts = ContF::where('lokasisandar_id', 4)->whereNotNull('tglmasuk')->where('npct_in_flag', 'N')->take(20)->get();    
+
+        foreach ($conts as $cont) { 
+
+            try {   
+
+                // ===============================
+                // CREATE XML ROOT
+                // ===============================
+                $xml = new \SimpleXMLElement('<movement/>');    
+
+                $loop = $xml->addChild('loop'); 
+
+                $loop->addChild('action', 'CREATE'); // sesuai dokumen
+                $loop->addChild('request_no', $cont->job->noplp);
+                $loop->addChild(
+                    'request_date',
+                    Carbon::parse($cont->request_date)->format('Ymd')
+                );
+                $loop->addChild('warehouse_code', 'INTI');
+                $loop->addChild('container_no', $cont->nocontainer);
+                $loop->addChild('message_type', 'IN2'); 
+
+                $loop->addChild(
+                    'action_time',
+                    Carbon::parse($cont->tglmasuk.' '.$cont->jammasuk)
+                        ->format('YmdHis')
+                );  
+
+                // ===============================
+                // REQUEST BODY
+                // ===============================
+                $reqData = [
+                    'username' => 'lini2',
+                    'password' => 'lini2@2026',
+                    'data'     => $xml->asXML(),
+                ];  
+
+                $response = null;   
+
+                SoapWrapper::service('movementInFclRequestNpct', function ($service) use ($reqData, &$response) {
+                    $response = $service->call('movement', $reqData);
+                }); 
+
+                // ===============================
+                // RESPONSE PARSE
+                // ===============================
+                $xmlResponse = is_object($response)
+                    ? ($response->return ?? '')
+                    : $response;    
+
+                $success = str_contains($xmlResponse, 'Success');   
+
+                $cont->update([
+                    'npct_in_flag'   => $success ? 'Y' : 'N',
+                    'npct_in_time'   => Carbon::now(),
+                    'npct_in_status' => $xmlResponse,
+                ]); 
+
+            } catch (\SoapFault $e) {   
+
+                $cont->update([
+                    'npct_in_status' => $e->getMessage(),
+                ]);
+            }
+        }   
+
+        return response()->json(['status' => 'done']);
+    }
+
+    public function movementOutLCL()
+    {
+        $wsdl = 'https://api.npct1.co.id/services/index.php/Line2?wsdl';    
+
+        // REGISTER SOAP SEKALI SAJA
+        SoapWrapper::add(function ($service) use ($wsdl) {
+            $service->name('movementOutLclRequestNpct')
+                ->wsdl($wsdl)
+                ->trace(true)
+                ->cache(WSDL_CACHE_NONE)
+                ->options([
+                    'soap_version' => SOAP_1_1,
+                    'stream_context' => stream_context_create([
+                        'ssl'=>[
+                            'verify_peer'=>false,
+                            'verify_peer_name'=>false
+                        ]
+                    ])
+                ]);
+        }); 
+
+        $conts = ContL::where('lokasisandar_id', 4)->whereNotNull('tglkeluar')->where('npct_out_flag', 'N')->take(20)->get();    
+
+        foreach ($conts as $cont) { 
+
+            try {   
+
+                // ===============================
+                // CREATE XML ROOT
+                // ===============================
+                $xml = new \SimpleXMLElement('<movement/>');    
+
+                $loop = $xml->addChild('loop'); 
+
+                $loop->addChild('action', 'CREATE'); // sesuai dokumen
+                $loop->addChild('request_no', $cont->job->noplp);
+                $loop->addChild(
+                    'request_date',
+                    Carbon::parse($cont->request_date)->format('Ymd')
+                );
+                $loop->addChild('warehouse_code', 'INTI');
+                $loop->addChild('container_no', $cont->nocontainer);
+                $loop->addChild('message_type', 'OUT2'); 
+
+                $loop->addChild(
+                    'action_time',
+                    Carbon::parse($cont->tglkeluar.' '.$cont->jamkeluar)
+                        ->format('YmdHis')
+                );  
+
+                // ===============================
+                // REQUEST BODY
+                // ===============================
+                $reqData = [
+                    'username' => 'lini2',
+                    'password' => 'lini2@2026',
+                    'data'     => $xml->asXML(),
+                ];  
+
+                $response = null;   
+
+                SoapWrapper::service('movementOutLclRequestNpct', function ($service) use ($reqData, &$response) {
+                    $response = $service->call('movement', $reqData);
+                }); 
+
+                // ===============================
+                // RESPONSE PARSE
+                // ===============================
+                $xmlResponse = is_object($response)
+                    ? ($response->return ?? '')
+                    : $response;    
+
+                $success = str_contains($xmlResponse, 'Success');   
+
+                $cont->update([
+                    'npct_out_flag'   => $success ? 'Y' : 'N',
+                    'npct_out_time'   => Carbon::now(),
+                    'npct_out_status' => $xmlResponse,
+                ]); 
+
+            } catch (\SoapFault $e) {   
+
+                $cont->update([
+                    'npct_in_status' => $e->getMessage(),
+                ]);
+            }
+        }   
+
+        return response()->json(['status' => 'done']);
+    }
+    
+    public function movementOutFCL()
+    {
+        $wsdl = 'https://api.npct1.co.id/services/index.php/Line2?wsdl';    
+
+        // REGISTER SOAP SEKALI SAJA
+        SoapWrapper::add(function ($service) use ($wsdl) {
+            $service->name('movementOutFclRequestNpct')
+                ->wsdl($wsdl)
+                ->trace(true)
+                ->cache(WSDL_CACHE_NONE)
+                ->options([
+                    'soap_version' => SOAP_1_1,
+                    'stream_context' => stream_context_create([
+                        'ssl'=>[
+                            'verify_peer'=>false,
+                            'verify_peer_name'=>false
+                        ]
+                    ])
+                ]);
+        }); 
+
+        $conts = ContF::where('lokasisandar_id', 4)->whereNotNull('tglkeluar')->where('npct_out_flag', 'N')->take(20)->get();    
+
+        foreach ($conts as $cont) { 
+
+            try {   
+
+                // ===============================
+                // CREATE XML ROOT
+                // ===============================
+                $xml = new \SimpleXMLElement('<movement/>');    
+
+                $loop = $xml->addChild('loop'); 
+
+                $loop->addChild('action', 'CREATE'); // sesuai dokumen
+                $loop->addChild('request_no', $cont->job->noplp);
+                $loop->addChild(
+                    'request_date',
+                    Carbon::parse($cont->request_date)->format('Ymd')
+                );
+                $loop->addChild('warehouse_code', 'INTI');
+                $loop->addChild('container_no', $cont->nocontainer);
+                $loop->addChild('message_type', 'OUT2'); 
+
+                $loop->addChild(
+                    'action_time',
+                    Carbon::parse($cont->tglkeluar.' '.$cont->jamkeluar)
+                        ->format('YmdHis')
+                );  
+
+                // ===============================
+                // REQUEST BODY
+                // ===============================
+                $reqData = [
+                    'username' => 'lini2',
+                    'password' => 'lini2@2026',
+                    'data'     => $xml->asXML(),
+                ];  
+
+                $response = null;   
+
+                SoapWrapper::service('movementOutFclRequestNpct', function ($service) use ($reqData, &$response) {
+                    $response = $service->call('movement', $reqData);
+                }); 
+
+                // ===============================
+                // RESPONSE PARSE
+                // ===============================
+                $xmlResponse = is_object($response)
+                    ? ($response->return ?? '')
+                    : $response;    
+
+                $success = str_contains($xmlResponse, 'Success');   
+
+                $cont->update([
+                    'npct_out_flag'   => $success ? 'Y' : 'N',
+                    'npct_out_time'   => Carbon::now(),
+                    'npct_out_status' => $xmlResponse,
                 ]); 
 
             } catch (\SoapFault $e) {   

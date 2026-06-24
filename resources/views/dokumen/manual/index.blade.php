@@ -254,6 +254,7 @@
         $('#tableManual').DataTable({
             processing: true,
             serverSide: true,
+            scrollY: '75vh',
             ajax: '/dokumen/manualData',
             columns:[
                 {data:'idm', name:'id', className:'text-center',

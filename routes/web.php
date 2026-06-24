@@ -53,6 +53,7 @@ use App\Http\Controllers\pengiriman\CoariCodecoController;
  use App\Http\Controllers\FCL\Delivery\DeliveryFCLController;
  use App\Http\Controllers\FCL\ContainerDokController;
  use App\Http\Controllers\FCL\ReportFCLController;
+ use App\Http\Controllers\FCL\ReportOpnameController;
  
  //  Invoice Fcl
  use App\Http\Controllers\invoiceFCL\InvoiceFCLMainController;
@@ -76,6 +77,7 @@ use App\Http\Controllers\Auth\ProfileController;
 // NPCT
 use App\Http\Controllers\NpctController;
 
+use App\Http\Controllers\LayananBehandleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -139,6 +141,7 @@ Route::controller(SystemController::class)->group(function () {
 Route::middleware('permission:dataMaster')->controller(MasterController::class)->group(function (){
     // customer
     Route::get('/master/customer', 'CustomerIndex')->name('master.customer.index');
+    Route::get('/master/customer-data', 'customerData')->name('master.customer.data');
     Route::post('/master/customer-excel', 'CustomerExcel')->name('master.customer.excel');
     Route::post('/master/customer-post', 'CustomerPost')->name('master.customer.post');
     Route::get('/master/customer-edit{id?}', 'CustomerEdit')->name('master.customer.edit');
@@ -286,7 +289,7 @@ Route::middleware('permission:tpsOnline')->controller(DokumenController::class)-
     // SPJM
     Route::get('/dokumen/spjm', 'spjmIndex')->name('dokumen.spjm.index');
     Route::get('/dokumen/spjmData', 'spjmData')->name('dokumen.spjm.data');
-    Route::get('/dokumen/spjm/detail{id?}', 'spjmDetail')->name('dokumen.spjm.detail');
+    Route::get('/dokumen/spjm/detail/{id?}', 'spjmDetail')->name('dokumen.spjm.detail');
     Route::get('/dokumen/spjm/cont{id?}', 'spjmCont')->name('dokumen.spjm.detailCont');
     Route::post('/dokumen/spjm/updateDetail', 'spjmUpdateDetail')->name('dokumen.spjm.update.detail');
     Route::post('/dokumen/spjm/updateCont', 'spjmUpdateCont')->name('dokumen.spjm.update.cont');
@@ -824,7 +827,7 @@ Route::controller(AndroidGateController::class)->group(function(){
                 Route::post('/gatePassBonMuat', 'gatePassBonMuat')->name('fcl.delivery.gatePassBonMuat');
                 Route::post('/gateOutFCL', 'gateOutFCL')->name('fcl.delivery.gateOutFCL');
     
-                Route::get('/behandleDetil{id}', 'detailBehandle');
+                Route::get('/behandleDetil/{id}', 'detailBehandle');
                 Route::get('/gateOutDetil/{id}', 'detailGateOut');
     
                 Route::get('/gateOut', 'indexGateOut');
@@ -857,6 +860,11 @@ Route::controller(AndroidGateController::class)->group(function(){
             
             Route::get('/indexDaily', 'indexDaily')->name('report.fcl.daily');
             Route::get('/dataContDaily', 'dataContDaily');
+        });
+        Route::prefix('/report/opname')->name('report.fcl.opname')->controller(ReportOpnameController::class)->group(function(){
+            Route::get('/index', 'index')->name('.index');
+            Route::post('/sppb', 'sppb')->name('.sppb');
+            Route::post('/spjm', 'spjm')->name('.spjm');
         });
     });
 
@@ -1071,4 +1079,9 @@ Route::prefix('/npct')->controller(NpctController::class)->group(function() {
     Route::get('/index', 'index')->name('npct.index');
     Route::get('/data', 'data')->name('npct.data');
     Route::post('/post', 'post')->name('npct.post');
+});
+
+Route::prefix('/layanan/behandle')->name('layanan.behandle')->controller(LayananBehandleController::class)->group(function() {
+    Route::get('/index', 'index')->name('.index');
+    Route::get('/dataFCL', 'dataFCL')->name('.dataFCL');
 });

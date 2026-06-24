@@ -640,7 +640,7 @@ class BeaCukaiController extends Controller
         $cont = ContF::where('status_bc', 'release')->get();
 
         return DataTables::of($cont)
-        ->setRowClass('highlight-blue') // Menjadikan seluruh row berwarna kuning
+        // ->setRowClass('highlight-blue') // Menjadikan seluruh row berwarna kuning
         ->addColumn('hold', function($cont){
             return '<button type="button" class="btn btn-danger holdButton" id="holdButton" data-id="'.$cont->id.'">Hold</button>';
         })

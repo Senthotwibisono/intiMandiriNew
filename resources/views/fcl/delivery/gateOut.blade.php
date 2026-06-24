@@ -273,6 +273,7 @@
             processing: true,
             serverSide: true,
             scrollX: true,
+            scrollY: '75vh',
             ajax: '{{route('fcl.delivery.dataGateOutFCL')}}',
             columns: [
                 {className:'text-center', name:'edit', data:'edit', searchable:false, orderable:false},

@@ -388,6 +388,7 @@
             processing: true,
             serverSide: true,
             scrollX: true,
+            scrollY: '75vh',
             ajax: '/dokumen/sppbData',
             columns:[
                 {data:'id', name:'id', className:'text-center',

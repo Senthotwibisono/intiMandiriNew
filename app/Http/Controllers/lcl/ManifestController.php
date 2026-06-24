@@ -254,6 +254,9 @@ class ManifestController extends Controller
                 'success' => true,
                 'message' => 'updated successfully!',
                 'data'    => $manifest,
+                'shipper_name' => $manifest->shipperM->name ?? '',
+                'customer_name' => $manifest->customer->name ?? '',
+                'notifyparty_name' => $manifest->notify->name ?? '',
             ]);
         }
     }

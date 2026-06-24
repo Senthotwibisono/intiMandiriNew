@@ -15,6 +15,14 @@
         background-color: lightgreen !important;
         color: white;
     }
+
+    .select2-container {
+        min-width: 150px !important;
+    }
+
+    .select2-selection--multiple {
+        min-height: 31px !important;
+    }
 </style>
 @endsection
 @section('content')
@@ -39,6 +47,8 @@
                             <th style="min-width: 150px;" class="text-center">Photo</th>
                             <th style="min-width: 150px;" class="text-center">Action Behandle</th>
                             <th style="min-width: 150px;" class="text-center">Status Behandle</th>
+                            <th style="min-width: 150px;" class="text-center">No SPJM</th>
+                            <th style="min-width: 250px;" class="text-center">Tgl SPJM</th>
                             <th style="min-width: 150px;" class="text-center">No Job Order</th>
                             <th style="min-width: 150px;" class="text-center">No MBL</th>
                             <th style="min-width: 150px;" class="text-center">Tgl MBL</th>
@@ -326,11 +336,14 @@
             serverSide: true,
             ajax: "{{ route('fcl.behandle.dataTable') }}",
             scrollX: true,
+            scrollY: '50vh',
             columns: [
                 {className:'text-center', data:'action', name:'action', searchable:false, orderable:false},
                 {className:'text-center', data:'photo', name:'photo', searchable:false, orderable:false},
-                {className:'text-center', data:'statusBehandle', name:'statusBehandle', searchable:false, orderable:false},
+                {className:'text-center', data:'statusBehandle', name:'statusBehandle'},
                 {className:'text-center', data:'status', name:'status'},
+                {className:'text-center', data:'no_spjm', name:'no_spjm',  defaultContent: '-'},
+                {className:'text-center', data:'tgl_spjm', name:'tgl_spjm',  defaultContent: '-'},
                 {className:'text-center', data:'job.nojoborder', name:'job.nojoborder'},
                 {className:'text-center', data:'nobl', name:'nobl'},
                 {className:'text-center', data:'tgl_bl_awb', name:'tgl_bl_awb'},
@@ -350,10 +363,59 @@
                 
                 api.columns().every(function (index) {
                     var column = this;
-                    var excludedColumns = [0, 1,2,3]; // Kolom yang tidak ingin difilter (detil, flag_segel_merah, lamaHari)
+                    var excludedColumns = [0, 1,2]; // Kolom yang tidak ingin difilter (detil, flag_segel_merah, lamaHari)
 
                     if (excludedColumns.includes(index)) {
                         $('<th></th>').appendTo(column.header()); // Kosongkan header pencarian untuk kolom yang dikecualikan
+                        return;
+                    }
+                    if (index == 3) {
+                        var select = $(`
+                            <select class="form-control form-control-sm status-filter" multiple>
+                                <option value="null">Null</option>
+                                <option value="1">Ready</option>
+                                <option value="2">On Progress</option>
+                                <option value="3">Finish</option>
+                            </select>
+                        `)
+                        .appendTo($('<th></th>').appendTo($(column.header())));                 
+
+                        select.select2({
+                            placeholder: 'Pilih Status',
+                            width: '100%',
+                            closeOnSelect: false
+                        });                 
+
+                        select.on('change', function () {
+                            var values = $(this).val();                 
+
+                            if (values && values.length > 0) {
+                                column.search(values.join('|')).draw();
+                            } else {
+                                column.search('').draw();
+                            }
+                        });                 
+
+                        return;
+                    }
+                    var dateColumns = [8,13,14,15,17];
+                    if (dateColumns.includes(index)) {
+                        var wrapper = $('<div></div>')
+                            .appendTo($('<th></th>').appendTo($(column.header())));
+
+                        $('<input type="date" class="form-control form-control-sm start-date mb-1">')
+                            .appendTo(wrapper);
+
+                        $('<input type="date" class="form-control form-control-sm end-date">')
+                            .appendTo(wrapper);
+
+                        wrapper.find('input').on('change', function () {
+                            var start = wrapper.find('.start-date').val();
+                            var end = wrapper.find('.end-date').val();
+
+                            column.search(start + '|' + end).draw();
+                        });
+
                         return;
                     }
                     var $th = $(column.header());
