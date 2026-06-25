@@ -96,7 +96,7 @@ class DeliveryFCLController extends Controller
             }
         })
         ->filterColumn('status', function ($query, $keyword) {
-            var_dump($keyword);
+            // var_dump($keyword);
 
             $statuses = explode('|', $keyword);
 
