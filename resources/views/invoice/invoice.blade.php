@@ -234,7 +234,8 @@
                                     <br>
                                     <br>
                                     <br>
-                                    <span style="text-decoration: underline;">{{ $header->kasirL->name }}</span>
+                                    <!-- <span style="text-decoration: underline;">{{ $header->kasirL->name }}</span> -->
+                                    <span style="text-decoration: underline;">Rika</span>
                                     <br>
                                     Kasir
                                 </div>
