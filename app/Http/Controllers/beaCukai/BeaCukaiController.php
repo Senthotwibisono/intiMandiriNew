@@ -637,7 +637,7 @@ class BeaCukaiController extends Controller
 
     public function releaseContainerDataTable(Request $request)
     {
-        $cont = ContF::where('status_bc', 'release')->get();
+        $cont = ContF::with(['job', 'dokumen'])->where('status_bc', 'release');
 
         return DataTables::of($cont)
         // ->setRowClass('highlight-blue') // Menjadikan seluruh row berwarna kuning
@@ -647,42 +647,42 @@ class BeaCukaiController extends Controller
         ->addColumn('photo', function($cont){
             return '<button class="btn btn-outline-info photoButton" data-id="'.$cont->id.'"><i class="fa fa-camera"></i></button>';
         })
-        ->addColumn('nojob', function($cont){
-            return $cont->job->nojoborder ?? '-';
-        })
-        ->addColumn('nombl', function($cont){
-            return $cont->job->nombl ?? '-';
-        })
-        ->addColumn('nocontainer', function($cont){
-            return $cont->nocontainer ?? '-';
-        })
-        ->addColumn('nobl', function($cont){
-            return $cont->nobl ?? '-';
-        })
-        ->addColumn('tglBL', function($cont){
-            return $cont->tgl_bl_awb ?? '-';
-        })
-        ->addColumn('tglmasuk', function($cont){
-            return $cont->tglmasuk ?? 'Belum Masuk';
-        })
-        ->addColumn('jammasuk', function($cont){
-            return $cont->jammasuk ?? 'Belum Masuk';
-        })
-        ->addColumn('tglkeluar', function($cont){
-            return $cont->tglkeluar ?? 'Belum keluar';
-        })
-        ->addColumn('jamkeluar', function($cont){
-            return $cont->jamkeluar ?? 'Belum keluar';
-        })
-        ->addColumn('kodeDok', function($cont){
-            return $cont->dokumen->name ?? '-';
-        })
-        ->addColumn('noDok', function($cont){
-            return $cont->no_dok ?? '-';
-        })
-        ->addColumn('tglDok', function($cont){
-            return $cont->tgl_dok ?? '-';
-        })
+        // ->addColumn('nojob', function($cont){
+        //     return $cont->job->nojoborder ?? '-';
+        // })
+        // ->addColumn('nombl', function($cont){
+        //     return $cont->job->nombl ?? '-';
+        // })
+        // ->addColumn('nocontainer', function($cont){
+        //     return $cont->nocontainer ?? '-';
+        // })
+        // ->addColumn('nobl', function($cont){
+        //     return $cont->nobl ?? '-';
+        // })
+        // ->addColumn('tglBL', function($cont){
+        //     return $cont->tgl_bl_awb ?? '-';
+        // })
+        // ->addColumn('tglmasuk', function($cont){
+        //     return $cont->tglmasuk ?? 'Belum Masuk';
+        // })
+        // ->addColumn('jammasuk', function($cont){
+        //     return $cont->jammasuk ?? 'Belum Masuk';
+        // })
+        // ->addColumn('tglkeluar', function($cont){
+        //     return $cont->tglkeluar ?? 'Belum keluar';
+        // })
+        // ->addColumn('jamkeluar', function($cont){
+        //     return $cont->jamkeluar ?? 'Belum keluar';
+        // })
+        // ->addColumn('kodeDok', function($cont){
+        //     return $cont->dokumen->name ?? '-';
+        // })
+        // ->addColumn('noDok', function($cont){
+        //     return $cont->no_dok ?? '-';
+        // })
+        // ->addColumn('tglDok', function($cont){
+        //     return $cont->tgl_dok ?? '-';
+        // })
         ->rawColumns(['hold', 'photo'])
         ->make(true);
     }
