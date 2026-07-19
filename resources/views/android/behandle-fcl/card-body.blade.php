@@ -13,7 +13,7 @@
                     <select name="" id="container_id" class="js-example-basic-single" style="width: 100%; height:100%">
                         <option disabled selected value>Pilih Satu</option>
                         @foreach($containers as $cont)
-                            <option value="{{$cont->id === $behandle->id}}"  {{ $cont->id == $behandle->id ? 'selected' : '' }}>{{$cont->nocontainer}}</option>
+                            <option value="{{$cont->id}}"  {{ $cont->id == $behandle->id ? 'selected' : '' }}>{{$cont->nocontainer}}</option>
                         @endforeach
                     </select>
                 </div>

@@ -432,11 +432,11 @@ Route::middleware('permission:tpsOnline')->controller(DokumenController::class)-
     // Gate In
     Route::controller(GateInController::class)->group(function(){
         Route::middleware('permission:gateInLCL')->group(function(){
+            Route::post('/lcl/realisasi/gateIn-detailDelete', 'detailDelete')->name('lcl.gateIn.delete.detail');
             Route::get('/lcl/realisasi/gateIn', 'index')->name('lcl.gateIn.index');
             Route::get('/lcl/realisasi/gateIn-edt{id?}', 'edit')->name('lcl.gateIn.edit');
             Route::post('/lcl/realisasi/gateIn-update', 'update')->name('lcl.gateIn.update');
             Route::get('/lcl/realisasi/gateIn-detail/{id?}', 'detail')->name('lcl.gateIn.detail');
-            Route::post('/lcl/realisasi/gateIn-detailDelete', 'detailDelete')->name('lcl.gateIn.delete.detail');
         });
         Route::middleware('permission:sealLCL')->group(function(){
             Route::get('/lcl/realisasi/seal', 'indexSeal')->name('lcl.seal.index');
