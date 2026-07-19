@@ -621,6 +621,13 @@ Route::controller(LclController::class)->group(function(){
     Route::controller(FCLAndroidController::class)->group(function(){
         Route::get('/android/photo/photoContFCL', 'photoCont');
         Route::get('/android/fcl/searchCont{id?}', 'searchCont');
+
+        // behandle
+        route::get('/android/fcl/behandle/index', 'indexBehandle');
+        route::post('/android/fcl/behandle/searchContainer', 'searchContainer')->name('android.behandle.searchContainer');
+        route::get('/android/fcl/behandle/detil/{id?}', 'detilBehandle');
+        route::post('/android/fcl/behandle/post', 'post')->name('android.behandle.post');
+        Route::get('/fcl/behandle-detail/{id?}', 'detailBehandle')->name('fcl.photo.detailBehandle');
     });
 // Android Gate
 

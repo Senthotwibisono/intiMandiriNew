@@ -50,6 +50,14 @@
         </ul>
     </li>
 
+    <!-- behandle FCL -->
+     <li class="sidebar-item @if(Request::is('android/fcl/behandle/*') || Request::is('/android/fcl/behandle')) active @endif">
+        <a href="/android/fcl/behandle/index" class='sidebar-link'>
+            <i class="fa-solid fa-box-open"></i>
+            <span>Behandle FCL</span>
+        </a>
+    </li>
+
     <!-- Gate -->
     <li class="sidebar-item @if(Request::is('android/gate/*') || Request::is('/android/gate/*')) active @endif">
         <a href="/android/gate/index" class='sidebar-link'>

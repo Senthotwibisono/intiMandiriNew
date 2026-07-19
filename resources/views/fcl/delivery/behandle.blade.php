@@ -356,7 +356,7 @@
                 {className:'text-center', data:'date_check_behandle', name:'date_check_behandle'},
                 {className:'text-center', data:'desc_check_behandle', name:'desc_check_behandle'},
                 {className:'text-center', data:'date_finish_behandle', name:'date_finish_behandle'},
-                {className:'text-center', data:'desc_finish_behandle', name:'desce_finish_behandle'},
+                {className:'text-center', data:'desc_finish_behandle', name:'desc_finish_behandle'},
             ],
             initComplete: function () {
                 var api = this.api();
