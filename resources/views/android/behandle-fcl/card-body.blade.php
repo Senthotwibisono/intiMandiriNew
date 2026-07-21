@@ -81,8 +81,8 @@
                         </div>
                         <div class="form-group">
                             <label for="">Keterangan</label>
-                            <select name="detil" id="detilPhoto" style="width:100%;" class="js-example-basic-single select2 form-select">
-                                <option disabled selected value>Pilih Satu</option>
+                            <select name="detil" id="detilPhoto" style="width:100%;" class="js-example-basic-single select2 form-select" data-placeholder="Plih Satu">
+                                <!-- <option disabled selected value>Pilih Satu</option> -->
                             </select>
                         </div>
                         <div class="form-group">

@@ -155,7 +155,7 @@ class FCLAndroidController extends Controller
     public function detailBehandle($id)
     {
         $manifest = Cont::where('id', $id)->first();
-        $data['title'] = "Photo Behandle Container - " . $manifest->notally;
+        $data['title'] = "Photo Behandle Container - ";
         $data['item'] = $manifest;
         $data['photos'] = Photo::where('master_id', $id)->where('type', '=', 'FCL')->where('action', '=', 'behandle')->get();
         // dd($data['photos']);

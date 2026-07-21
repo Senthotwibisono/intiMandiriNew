@@ -12,7 +12,11 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bulma/1.0.1/css/bulma.min.css" rel="stylesheet" integrity="sha384-u1DpPo/VC1cCewPdLA1ujElPdm1c/ZVa5MNAV6930PlrYYXhoKH/+hui6tE7szxu" crossorigin="anonymous">
-    <link href="https://cdn.datatables.net/v/bm/jq-3.7.0/moment-2.29.4/jszip-3.10.1/dt-2.3.8/af-2.7.1/b-3.2.6/b-colvis-3.2.6/b-html5-3.2.6/b-print-3.2.6/cr-2.1.2/cc-1.2.1/date-1.6.3/fc-5.0.5/fh-4.0.6/kt-2.12.2/r-3.0.8/rg-1.6.0/rr-1.5.1/sc-2.4.3/sb-1.8.4/sp-2.3.5/sl-3.1.3/sr-1.4.3/datatables.min.css" rel="stylesheet" integrity="sha384-B/uIdJ4/emCTtuwFl+81s/FoV9QcrhvLpFiVnZlI3UJLLBCAXflc9Gqg8NOwYMc+" crossorigin="anonymous">
+    <!-- <link href="https://cdn.datatables.net/v/bm/jq-3.7.0/moment-2.29.4/jszip-3.10.1/dt-2.3.8/af-2.7.1/b-3.2.6/b-colvis-3.2.6/b-html5-3.2.6/b-print-3.2.6/cr-2.1.2/cc-1.2.1/date-1.6.3/fc-5.0.5/fh-4.0.6/kt-2.12.2/r-3.0.8/rg-1.6.0/rr-1.5.1/sc-2.4.3/sb-1.8.4/sp-2.3.5/sl-3.1.3/sr-1.4.3/datatables.min.css" rel="stylesheet" integrity="sha384-B/uIdJ4/emCTtuwFl+81s/FoV9QcrhvLpFiVnZlI3UJLLBCAXflc9Gqg8NOwYMc+" crossorigin="anonymous"> -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bulma/1.0.1/css/bulma.min.css" rel="stylesheet" integrity="sha384-u1DpPo/VC1cCewPdLA1ujElPdm1c/ZVa5MNAV6930PlrYYXhoKH/+hui6tE7szxu" crossorigin="anonymous">
+    <link href="https://cdn.datatables.net/v/bm/dt-2.3.8/af-2.7.1/b-3.2.6/cr-2.1.2/cc-1.2.1/date-1.6.3/fc-5.0.5/fh-4.0.6/kt-2.12.2/r-3.0.8/rg-1.6.0/rr-1.5.1/sc-2.4.3/sb-1.8.4/sp-2.3.5/sl-3.1.3/sr-1.4.3/datatables.min.css" rel="stylesheet" integrity="sha384-AgZYjc71/QLXTHeBj+TLiN0B30R4H1uBxToLERps8kSBnRPrT1a/+RNDv2qQOTa0" crossorigin="anonymous">
+ 
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -77,22 +81,33 @@
             border-radius:8px;
             margin-top:10px;
         }
-
+/* 
         #tableBehandle_wrapper .dt-scroll {
             border-radius: 16px;
             overflow: hidden;
             box-shadow: 0 8px 24px rgba(0,0,0,.08);
             border: 1px solid #e5e7eb;
+        } */
+
+        .table thead tr:first-child th:first-child {
+            border-top-left-radius: 16px;
         }
 
-        #tableBehandle_wrapper .dt-scroll-head {
-            border-radius: 16px 16px 0 0;
-            overflow: hidden;
+        .table thead tr:first-child th:last-child {
+            border-top-right-radius: 16px;
+        
+        }
+
+        .table tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 16px;
+        }
+        .table tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 16px;
         }
         
-        #tableBehandle_wrapper .dt-scroll-body {
+        /* #tableBehandle_wrapper .dt-scroll-body {
             border-radius: 0 0 16px 16px;
-        }
+        } */
 
         .table tbody td {
             font-family: "Plus Jakarta Sans", sans-serif !important;
@@ -302,9 +317,13 @@
     <script src="{{asset('fontawesome/js/all.js')}}"></script>
     <script src="{{asset('fontawesome/js/all.min.js')}}"></script>
 
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js" integrity="sha384-VFQrHzqBh5qiJIU0uGU5CIW3+OWpdGGJM9LBnGbuIH2mkICcFZ7lPd/AAtI7SNf7" crossorigin="anonymous"></script> -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js" integrity="sha384-/RlQG9uf0M2vcTw3CX7fbqgbj/h8wKxw7C3zu9/GxcBPRKOEcESxaxufwRXqzq6n" crossorigin="anonymous"></script> -->
+    <!-- <script src="https://cdn.datatables.net/v/bm/jq-3.7.0/moment-2.29.4/jszip-3.10.1/dt-2.3.8/af-2.7.1/b-3.2.6/b-colvis-3.2.6/b-html5-3.2.6/b-print-3.2.6/cr-2.1.2/cc-1.2.1/date-1.6.3/fc-5.0.5/fh-4.0.6/kt-2.12.2/r-3.0.8/rg-1.6.0/rr-1.5.1/sc-2.4.3/sb-1.8.4/sp-2.3.5/sl-3.1.3/sr-1.4.3/datatables.min.js" integrity="sha384-3JvK1IEpe2+JBJuiXODRigrsZ0jM3IxX8VaTb23Q8hLb4Jti85kzDpxkwao/fQjY" crossorigin="anonymous"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js" integrity="sha384-VFQrHzqBh5qiJIU0uGU5CIW3+OWpdGGJM9LBnGbuIH2mkICcFZ7lPd/AAtI7SNf7" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js" integrity="sha384-/RlQG9uf0M2vcTw3CX7fbqgbj/h8wKxw7C3zu9/GxcBPRKOEcESxaxufwRXqzq6n" crossorigin="anonymous"></script>
-    <script src="https://cdn.datatables.net/v/bm/jq-3.7.0/moment-2.29.4/jszip-3.10.1/dt-2.3.8/af-2.7.1/b-3.2.6/b-colvis-3.2.6/b-html5-3.2.6/b-print-3.2.6/cr-2.1.2/cc-1.2.1/date-1.6.3/fc-5.0.5/fh-4.0.6/kt-2.12.2/r-3.0.8/rg-1.6.0/rr-1.5.1/sc-2.4.3/sb-1.8.4/sp-2.3.5/sl-3.1.3/sr-1.4.3/datatables.min.js" integrity="sha384-3JvK1IEpe2+JBJuiXODRigrsZ0jM3IxX8VaTb23Q8hLb4Jti85kzDpxkwao/fQjY" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/v/bm/jszip-3.10.1/dt-2.3.8/af-2.7.1/b-3.2.6/b-colvis-3.2.6/b-html5-3.2.6/b-print-3.2.6/cr-2.1.2/cc-1.2.1/date-1.6.3/fc-5.0.5/fh-4.0.6/kt-2.12.2/r-3.0.8/rg-1.6.0/rr-1.5.1/sc-2.4.3/sb-1.8.4/sp-2.3.5/sl-3.1.3/sr-1.4.3/datatables.min.js" integrity="sha384-Wg8mIRRkQRSWPky/YkHODkSArbmkuUicyI04zA5aeHsdlmC6L+M6XIqoao0OwvHP" crossorigin="anonymous"></script>
+
     <script>
     console.log('jQuery =', $.fn.jquery);
     console.log('Select2 =', $.fn.select2);
@@ -340,7 +359,15 @@
             $('#tableBehandle').dataTable({
                 lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]], // Pilihan jumlah data
                 pageLength: 25, // Default jumlah data per halaman
-                dom: 'lBfrtip', // Pastikan ada 'B' untuk menampilkan tombol
+                layout: {
+                    topStart: [
+                        'pageLength',
+                        'buttons'
+                    ],
+                    topEnd: 'search',
+                    bottomStart: 'info',
+                    bottomEnd: 'paging'
+                },
                 buttons: [
                     'copy', 'csv', excel , pdf, 'print'
                 ],
@@ -494,6 +521,49 @@
                 'width=900,height=700,left=200,top=100,resizable=yes,scrollbars=yes'
             );
         }
+    </script>
+
+    <script>
+        const scrollBody = document.querySelector('.dt-scroll-body');
+        const headers = document.querySelectorAll('.dt-scroll-head th');
+
+        function updateRadius() {
+
+            headers.forEach(th => {
+                th.classList.remove('radius-left', 'radius-right');
+            });
+
+            const scrollLeft = scrollBody.scrollLeft;
+            const width = scrollBody.clientWidth;
+
+            headers.forEach((th, i) => {
+
+                const left = th.offsetLeft;
+                const right = left + th.offsetWidth;
+
+                if (left >= scrollLeft) {
+                    th.classList.add('radius-left');
+                    return false;
+                }
+
+            });
+
+            for (let i = headers.length - 1; i >= 0; i--) {
+
+                const th = headers[i];
+
+                const left = th.offsetLeft;
+
+                if (left < scrollLeft + width) {
+                    th.classList.add('radius-right');
+                    break;
+                }
+            }
+        }
+
+        scrollBody.addEventListener('scroll', updateRadius);
+
+        updateRadius();
     </script>
 
    

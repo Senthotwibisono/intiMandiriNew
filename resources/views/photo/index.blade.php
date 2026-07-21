@@ -195,13 +195,19 @@
                                         <img src="{{ asset('storage/imagesInt/' . $photo->photo) }}" alt="Photo" class="img-fluid" style="width: 400px; height: 400px; object-fit: cover;">
                                         <p>{{$photo->detil ?? '-'}}</p>
                                     </td>
-                                    <td>
-                                        <form action="{{ route('lcl.gateIn.delete.detail')}}" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="id" value="{{$photo->id}}">
-                                            <button class="btn btn-outline-danger" type="submit">Hapus</button>
-                                        </form>
-                                    </td>
+                                    @auth
+                                        @unlessrole('bc|bcP2|tpsFCL|user|invoiceFCL|invoiceLCL')
+                                            <td>
+                                                <form action="{{ route('lcl.gateIn.delete.detail') }}" method="POST">
+                                                    @csrf
+                                                    <input type="hidden" name="id" value="{{ $photo->id }}">
+                                                    <button class="btn btn-outline-danger" type="submit">
+                                                        Hapus
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        @endunlessrole
+                                    @endauth
                                 </tr>
                             @endforeach
                         </tbody>
