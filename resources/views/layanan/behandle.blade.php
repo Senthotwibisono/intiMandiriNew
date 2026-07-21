@@ -13,7 +13,9 @@
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bulma/1.0.1/css/bulma.min.css" rel="stylesheet" integrity="sha384-u1DpPo/VC1cCewPdLA1ujElPdm1c/ZVa5MNAV6930PlrYYXhoKH/+hui6tE7szxu" crossorigin="anonymous">
     <link href="https://cdn.datatables.net/v/bm/jq-3.7.0/moment-2.29.4/jszip-3.10.1/dt-2.3.8/af-2.7.1/b-3.2.6/b-colvis-3.2.6/b-html5-3.2.6/b-print-3.2.6/cr-2.1.2/cc-1.2.1/date-1.6.3/fc-5.0.5/fh-4.0.6/kt-2.12.2/r-3.0.8/rg-1.6.0/rr-1.5.1/sc-2.4.3/sb-1.8.4/sp-2.3.5/sl-3.1.3/sr-1.4.3/datatables.min.css" rel="stylesheet" integrity="sha384-B/uIdJ4/emCTtuwFl+81s/FoV9QcrhvLpFiVnZlI3UJLLBCAXflc9Gqg8NOwYMc+" crossorigin="anonymous">
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
         .switch {
@@ -56,9 +58,17 @@
             transform: translateX(24px);
         }
 
-        .dashboard-card{
-            border-radius:12px;
-            box-shadow:0 2px 8px rgba(0,0,0,.08);
+        .dashboard-card 
+        {
+            border-radius:12px !important;
+            box-shadow:5px 2px 8px 5px rgba(0,0,0,.08) !important;
+        }
+        
+        .card 
+        .card-header 
+        .card-content{
+            border-radius:12px !important;
+            box-shadow:5px 2px 8px 5px rgba(0,0,0,.08) !important;
         }
 
         .card-line{
@@ -66,6 +76,34 @@
             width:100%;
             border-radius:8px;
             margin-top:10px;
+        }
+
+        #tableBehandle_wrapper .dt-scroll {
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0,0,0,.08);
+            border: 1px solid #e5e7eb;
+        }
+
+        #tableBehandle_wrapper .dt-scroll-head {
+            border-radius: 16px 16px 0 0;
+            overflow: hidden;
+        }
+        
+        #tableBehandle_wrapper .dt-scroll-body {
+            border-radius: 0 0 16px 16px;
+        }
+
+        .table tbody td {
+            font-family: "Plus Jakarta Sans", sans-serif !important;
+            /* font-size: 13px;
+            font-weight: 500; */
+        }
+
+        .table thead th {
+            font-family: "Plus Jakarta Sans", sans-serif !important;
+            /* font-size: 13px;
+            font-weight: 700; */
         }
     </style>
 
@@ -199,56 +237,59 @@
             </div>
 
         </div>
-        <div class="container">
-            <h1 class="title">
-                {{$title}}
-            </h1>
-
-            <div class="table">
-              <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth is-primary" id="tableBehandle">
-                <thead>
-                  <tr class="is-primary">
-                      <th style="white-space: nowrap;" class="has-text-centered">Photo</th>
-                      <th style="white-space: nowrap;" class="has-text-centered">No Container</th>
-                      <th style="white-space: nowrap;" class="has-text-centered">Size</th>
-                      <th style="white-space: nowrap;" class="has-text-centered">Type</th>
-                      <th style="white-space: nowrap;" class="has-text-centered">Type Class</th>
-                      <th style="white-space: nowrap;" class="has-text-centered">Vessel</th>
-                      <th style="white-space: nowrap;" class="has-text-centered">Voy</th>
-                      <th style="white-space: nowrap;" class="has-text-centered">Consignee</th>
-                      <th style="white-space: nowrap;" class="has-text-centered">Consignee Address</th>
-                      <th style="white-space: nowrap;" class="has-text-centered">Consignee NPWP</th>
-                      <th style="white-space: nowrap;" class="has-text-centered">Status Behandle</th>
-                      <th style="white-space: nowrap;" class="has-text-centered">No SPJM</th>
-                      <th style="white-space: nowrap;" class="has-text-centered">Tgl SPJM</th>
-                      <th style="white-space: nowrap;" class="has-text-centered">Tgl Ready Behandle</th>
-                      <th style="white-space: nowrap;" class="has-text-centered">Tgl Mulai Behandle </th>
-                      <th style="white-space: nowrap;" class="has-text-centered">Deskripsi Behandle</th>
-                      <th style="white-space: nowrap;" class="has-text-centered">Tanggal Selesai Behandle</th>
-                      <th style="white-space: nowrap;" class="has-text-centered">Deskripsi Selesai Behandle</th>
-                  </tr>
-                    <tr id="filter-row">
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                </thead>
-              </table>
+        <div class="card">
+            <div class="card-header">
+                <h1 class="title">
+                    {{$title}}
+                </h1>
+            </div>
+            <div class="card-content">
+                <div class="table-wrapper">
+                  <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth is-primary" id="tableBehandle">
+                    <thead>
+                      <tr class="is-primary">
+                          <th style="white-space: nowrap;" class="has-text-centered">Photo</th>
+                          <th style="white-space: nowrap;" class="has-text-centered">No Container</th>
+                          <th style="white-space: nowrap;" class="has-text-centered">Size</th>
+                          <th style="white-space: nowrap;" class="has-text-centered">Type</th>
+                          <th style="white-space: nowrap;" class="has-text-centered">Type Class</th>
+                          <th style="white-space: nowrap;" class="has-text-centered">Vessel</th>
+                          <th style="white-space: nowrap;" class="has-text-centered">Voy</th>
+                          <th style="white-space: nowrap;" class="has-text-centered">Consignee</th>
+                          <th style="white-space: nowrap;" class="has-text-centered">Consignee Address</th>
+                          <th style="white-space: nowrap;" class="has-text-centered">Consignee NPWP</th>
+                          <th style="white-space: nowrap;" class="has-text-centered">Status Behandle</th>
+                          <th style="white-space: nowrap;" class="has-text-centered">No SPJM</th>
+                          <th style="white-space: nowrap;" class="has-text-centered">Tgl SPJM</th>
+                          <th style="white-space: nowrap;" class="has-text-centered">Tgl Ready Behandle</th>
+                          <th style="white-space: nowrap;" class="has-text-centered">Tgl Mulai Behandle </th>
+                          <th style="white-space: nowrap;" class="has-text-centered">Deskripsi Behandle</th>
+                          <th style="white-space: nowrap;" class="has-text-centered">Tanggal Selesai Behandle</th>
+                          <th style="white-space: nowrap;" class="has-text-centered">Deskripsi Selesai Behandle</th>
+                      </tr>
+                        <tr id="filter-row">
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                  </table>
+                </div>
             </div>
         </div>
     </section>
@@ -331,7 +372,19 @@
                     {className:'has-text-centered', data:'job.ves.name', name:'job.ves.name'},
                     {className:'has-text-centered', data:'job.voy', name:'job.voy'},
                     {className:'has-text-centered', data:'cust.name', name:'cust.name'},
-                    {className:'has-text-centered', data:'cust.alamat', name:'cust.alamat'},
+                    {
+                        className: 'has-text-left',
+                        data: 'cust.alamat',
+                        name: 'cust.alamat',
+                        render: function(data) {
+                            return `<textarea
+                                        class="textarea is-small"
+                                        rows="3"
+                                        readonly
+                                        style=""
+                                    >${data ?? ''}</textarea>`;
+                        }
+                    },
                     {className:'has-text-centered', data:'cust.npwp', name:'cust.npwp'},
                     {className:'has-text-centered', data:'status', name:'status'},
                     {className:'has-text-centered', data:'no_spjm', name:'no_spjm',  defaultContent: '-'},
