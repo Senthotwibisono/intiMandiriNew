@@ -55,6 +55,18 @@
         input:checked + .slider:before {
             transform: translateX(24px);
         }
+
+        .dashboard-card{
+            border-radius:12px;
+            box-shadow:0 2px 8px rgba(0,0,0,.08);
+        }
+
+        .card-line{
+            height:5px;
+            width:100%;
+            border-radius:8px;
+            margin-top:10px;
+        }
     </style>
 
     <title>{{$title}}</title>
@@ -137,6 +149,56 @@
       </div>
     </nav>
     <section class="section">
+        <div class="columns is-multiline mb-4">
+
+            <div class="column">
+                <div class="box dashboard-card">
+                    <p class="has-text-grey">Semua Data</p>
+                    <h2 class="title mb-3" id="totalData">0</h2>
+                </div>
+            </div>
+
+            <div class="column">
+                <div class="box dashboard-card">
+                    <p class="has-text-grey">PPK Belum Siap</p>
+                    <h2 class="title mb-3" id="statusNull">0</h2>
+                    <div class="card-line" style="background:#cc0a0a"></div>
+                </div>
+            </div>
+
+            <div class="column">
+                <div class="box dashboard-card">
+                    <p class="has-text-grey">PKB</p>
+                    <h2 class="title mb-3" id="statusPKB">0</h2>
+                    <div class="card-line has-background-link"></div>
+                </div>
+            </div>
+
+            <div class="column">
+                <div class="box dashboard-card">
+                    <p class="has-text-grey">Siap Periksa</p>
+                    <h2 class="title mb-3" id="status1">0</h2>
+                    <div class="card-line" style="background:#9df5b1"></div>
+                </div>
+            </div>
+
+            <div class="column">
+                <div class="box dashboard-card">
+                    <p class="has-text-grey">Sedang Periksa</p>
+                    <h2 class="title mb-3" id="status2">0</h2>
+                    <div class="card-line" style="background:#7a7f86"></div>
+                </div>
+            </div>
+
+            <div class="column">
+                <div class="box dashboard-card">
+                    <p class="has-text-grey">Selesai Periksa</p>
+                    <h2 class="title mb-3" id="status3">0</h2>
+                    <div class="card-line" style="background:#f5c6cb"></div>
+                </div>
+            </div>
+
+        </div>
         <div class="container">
             <h1 class="title">
                 {{$title}}
@@ -146,6 +208,7 @@
               <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth is-primary" id="tableBehandle">
                 <thead>
                   <tr class="is-primary">
+                      <th style="white-space: nowrap;" class="has-text-centered">Photo</th>
                       <th style="white-space: nowrap;" class="has-text-centered">No Container</th>
                       <th style="white-space: nowrap;" class="has-text-centered">Size</th>
                       <th style="white-space: nowrap;" class="has-text-centered">Type</th>
@@ -165,6 +228,7 @@
                       <th style="white-space: nowrap;" class="has-text-centered">Deskripsi Selesai Behandle</th>
                   </tr>
                     <tr id="filter-row">
+                        <th></th>
                         <th></th>
                         <th></th>
                         <th></th>
@@ -242,10 +306,24 @@
                 orderCellsTop: true,
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('layanan.behandle.dataFCL') }}",
+                ajax: {
+                    url: "{{ route('layanan.behandle.dataFCL') }}",
+                    dataSrc: function (json) {
+                
+                        $('#totalData').text(json.summary.total);
+                        $('#statusNull').text(json.summary.ppk);
+                        $('#statusPKB').text(json.summary.pkb);
+                        $('#status1').text(json.summary.siap);
+                        $('#status2').text(json.summary.proses);
+                        $('#status3').text(json.summary.selesai);
+                
+                        return json.data;
+                    }
+                },
                 scrollX: true,
                 scrollY: '50vh',
                 columns: [
+                    {className:'has-text-centered', data:'photo', name:'photo', orderable:false, sortable: false},
                     {className:'has-text-centered', data:'nocontainer', name:'nocontainer'},
                     {className:'has-text-centered', data:'size', name:'size'},
                     {className:'has-text-centered', data:'ctr_type', name:'ctr_type'},
@@ -264,19 +342,54 @@
                     {className:'has-text-centered', data:'date_finish_behandle', name:'date_finish_behandle'},
                     {className:'has-text-centered', data:'desc_finish_behandle', name:'desc_finish_behandle'},
                 ],
+                createdRow: function(row, data) {
+                    if (data.status_behandle === null) {
+                        $(row).find('td').attr(
+                            'style',
+                            'background-color:#cc0a0a !important; color:#ffffff !important;'
+                        );
+                        return;
+                    }               
+                    switch (Number(data.status_behandle)) {
+                        case 1:
+                            $(row).css({
+                                'background-color': '#9df5b1',
+                                'color': '#155724'
+                            });
+                            break;              
+
+                        case 2:
+                            $(row).css({
+                                'background-color': '#7a7f86',
+                                'color': '#242525'
+                            });
+                            break;              
+
+                        case 3:
+                            $(row).css({
+                                'background-color': '#f5c6cb',
+                                'color': '#721c24'
+                            });
+                            break;
+                    }
+                },
                 initComplete: function () {             
 
                     var api = this.api();               
-
+                        
                     api.columns().every(function(index) {               
-
+                        if (index === 0) {
+                            return;
+                        }
                         var column = this;
                         var cell = $('#filter-row th').eq(index);               
 
-                        if (index == 9) {               
+                        if (index == 10) {               
 
                             $('<select class="input is-small">' +
                                 '<option value="">All</option>' +
+                                '<option value="PKK">PKK</option>' +
+                                '<option value="PKB">PKB</option>' +
                                 '<option value="1">Ready</option>' +
                                 '<option value="2">On Progress</option>' +
                                 '<option value="3">Finish</option>' +
@@ -287,9 +400,7 @@
                             });             
 
                             return;
-                        }      
-                        
-                        
+                        }       
 
                         $('<input type="text" class="input is-small">')
                             .appendTo(cell.empty())
@@ -322,6 +433,14 @@
 
         html.setAttribute('data-theme', savedTheme);
         toggle.checked = savedTheme === 'dark';
+
+        function openPhoto(id) {
+            window.open(
+                '/fcl/behandle-detail/' + id,
+                'behandlePhoto',
+                'width=900,height=700,left=200,top=100,resizable=yes,scrollbars=yes'
+            );
+        }
     </script>
 
    

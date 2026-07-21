@@ -26,7 +26,7 @@ use App\Models\Photo;
 class FCLAndroidController extends Controller
 {
     public function __construct() {
-        $this->middleware('auth');
+        $this->middleware('auth')->except(['detailBehandle']);
     }
     public function photoCont()
     {

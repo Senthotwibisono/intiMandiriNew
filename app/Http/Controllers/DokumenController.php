@@ -586,6 +586,14 @@ class DokumenController extends Controller
                         'no_cont'=>$detail->NO_CONT,
                         'size'=>$detail->SIZE,
                     ]);
+
+                    $containerTPS = ContF::whereNotNull('tglmasuk')->whereNull('tglkeluar')->where('nocontianer', $newCont->no_cont)->first();
+                    if ($containerTPS) {
+                        $containerTPS->update([
+                            'no_spjm' => $spjm->no_spjm,
+                            'tgl_spjm'=>Carbon::parse($spjm->tgl_spjm)->format('Y-m-d')
+                        ]);
+                    }
                }
             }
             if ($dok) {
@@ -715,6 +723,13 @@ class DokumenController extends Controller
                         'no_cont'=>$detailCont->NO_CONT,
                         'size'=>$detailCont->SIZE,
                     ]);
+                    $containerTPS = ContF::whereNotNull('tglmasuk')->whereNull('tglkeluar')->where('nocontianer', $newCont->no_cont)->first();
+                    if ($containerTPS) {
+                        $containerTPS->update([
+                            'no_spjm' => $spjm->no_spjm,
+                            'tgl_spjm'=>Carbon::parse($spjm->tgl_spjm)->format('Y-m-d')
+                        ]);
+                    }
                 }    
                 foreach ($group->DETIL->KMS as $detailKMS) {
                     $newKms = SPJMkms::create([

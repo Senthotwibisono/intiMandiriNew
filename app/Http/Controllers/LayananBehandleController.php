@@ -20,9 +20,12 @@ class LayananBehandleController extends Controller
 
     public function dataFCL(Request $request)
     {
-        $data = ContF::with(['job', 'cust', 'job.dokplp', 'job.ves'])->whereNotNull('no_spjm');
+        $data = ContF::with(['job', 'cust', 'job.dokplp', 'job.ves'])->whereNotNull('no_spjm')->whereNotNull('tglmasuk')->whereNull('tglkeluar');
 
         return DataTables::of($data)
+        ->addColumn('photo', function($cont){
+            return '<a href="javascript:void(0)"class="button is-primary"onclick="openPhoto('.$cont->id.')"><i class="fas fa-camera"></i></a>';
+        })
         ->addColumn('status', function($cont){
             if ($cont->status_behandle == 1) {
                 return '<span class="badge bg-primary">Ready</span>';
@@ -36,25 +39,34 @@ class LayananBehandleController extends Controller
             }
         })
         ->filterColumn('status', function ($query, $keyword) {
-
-            $statuses = explode('|', $keyword);
-
-            $query->where(function ($q) use ($statuses) {
-
-                if (in_array('null', $statuses)) {
-                    $q->orWhereNull('status_behandle');
-                }
-
-                $numericStatuses = array_filter($statuses, function ($status) {
-                    return $status !== 'null';
-                });
-
-                if (!empty($numericStatuses)) {
-                    $q->orWhereIn('status_behandle', $numericStatuses);
-                }
-            });
+            // var_dump($keyword);
+            // die;
+            switch ($keyword) {
+                case 'PKK':
+                    $query->whereNull('status_behandle');
+                    break;
+                case 'PKB':
+                    // Belum ada logic
+                    // nanti isi di sini
+                    break;
+                case 1:
+                case 2:
+                case 3:
+                    $query->where('status_behandle', $keyword);
+                    break;
+            }
         })
-        ->rawColumns(['status'])
+        ->with([
+            'summary' => [
+                'total' => ContF::whereNotNull('no_spjm')->whereNotNull('tglmasuk')->whereNull('tglkeluar')->count(),
+                'ppk'   => ContF::whereNotNull('no_spjm')->whereNotNull('tglmasuk')->whereNull('tglkeluar')->whereNull('status_behandle')->count(),
+                'pkb'   => 0, // nanti isi sesuai kondisinya
+                'siap'  => ContF::whereNotNull('no_spjm')->whereNotNull('tglmasuk')->whereNull('tglkeluar')->where('status_behandle', 1)->count(),
+                'proses'=> ContF::whereNotNull('no_spjm')->whereNotNull('tglmasuk')->whereNull('tglkeluar')->where('status_behandle', 2)->count(),
+                'selesai'=> ContF::whereNotNull('no_spjm')->whereNotNull('tglmasuk')->whereNull('tglkeluar')->where('status_behandle', 3)->count(),
+            ]
+        ])
+        ->rawColumns(['status', 'photo'])
         ->make(true);
     }
 }
