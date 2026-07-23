@@ -120,7 +120,7 @@ class BeaCukaiController extends Controller
             "kodeGudang"=> "LCL",
             "namaFasilitas"=> "Lapangan LCL",
             "kategoriFasilitas"=> "UMUM",
-            "kapasitasTotal"=> 500,
+            "kapasitasTotal"=> 20,
             "kapasitasTerisi"=> $terisi,
             "kapasitasTersedia"=> $tersedia,
             "okupansiPersen"=> $persentase,
