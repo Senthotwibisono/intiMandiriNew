@@ -87,12 +87,12 @@ class BeaCukaiController extends Controller
 
     private function fasilitasLCL()
     {
-        $totalTeus = 500;
+        $totalTeus = 20;
         $container = ContL::whereNotNull('tglmasuk')->whereNull('tglkeluar')->get();
         $terisi = $container->sum('teus');
-        $tersedia = 500 - $terisi;
+        $tersedia = 20 - $terisi;
         $stok = $container->count();
-        $persentase = round(($terisi / 500) * 100, 2);
+        $persentase = round(($terisi / 20) * 100, 2);
 
         $rincian = [
             [
