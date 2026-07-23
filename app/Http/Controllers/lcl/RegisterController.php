@@ -223,7 +223,7 @@ class RegisterController extends Controller
             }elseif ($request->size == '40') {
                 $teus = 2;
             }else {
-                $teus = 0;
+                $teus = 2.25;
             }
             $cont = Cont::create([
                 'nocontainer'=>$request->nocontainer,
@@ -272,7 +272,7 @@ class RegisterController extends Controller
             }elseif ($request->size == '40') {
                 $teus = 2;
             }else {
-                $teus = 0;
+                $teus = 2.25;
             }
             $cont = Cont::where('id', $request->id)->first();
             $oldWeight = $job->grossweight - $cont->weight;
@@ -335,7 +335,7 @@ class RegisterController extends Controller
                         }elseif ($cont->uk_cont == '40') {
                             $teus = 2;
                         }else {
-                            $teus = 0;
+                            $teus = 2.25;
                         }
                         $newCont = Cont::create([
                             'nocontainer'=>$cont->no_cont,

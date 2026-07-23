@@ -70,5 +70,6 @@ class Kernel extends HttpKernel
         'role' => \App\Http\Middleware\CheckRole::class, // Add this line
         'permission' => \App\Http\Middleware\checkPermission::class,
         'RedirectIfAuthenticated' => \App\Http\Middleware\RedirectIfAuthenticated::class, // Add this line
+        'beacukai.auth' => \App\Http\Middleware\BeaCukaiAuth::class,
     ];
 }

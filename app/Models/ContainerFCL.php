@@ -215,6 +215,7 @@ class ContainerFCL extends Model
 
         // SPJM
         'jenis_spjm',
+        'flag_pkb',
         'no_spjm',
         'tgl_spjm',
         'driver_id',

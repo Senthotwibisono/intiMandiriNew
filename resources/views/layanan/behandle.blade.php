@@ -424,11 +424,20 @@
                 ],
                 createdRow: function(row, data) {
                     if (data.status_behandle === null) {
-                        $(row).find('td').attr(
-                            'style',
-                            'background-color:#cc0a0a !important; color:#ffffff !important;'
-                        );
-                        return;
+                        if (data.flag_pkb === 'N') {
+                            $(row).find('td').attr(
+                                'style',
+                                'background-color:#cc0a0a !important; color:#ffffff !important;'
+                            );
+                            return;
+                        } else {
+                            $(row).find('td').attr(
+                                'style',
+                                'background-color: #3273dc !important; color:#ffffff !important;'
+                            );
+                            return;
+
+                        }
                     }               
                     switch (Number(data.status_behandle)) {
                         case 1:

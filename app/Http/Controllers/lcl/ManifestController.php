@@ -455,7 +455,7 @@ class ManifestController extends Controller
                 }elseif ($tempContRecord->size == '40') {
                     $teus = 2;
                 }else {
-                    $teus = 0;
+                    $teus = 2.25;
                 }
                 $newCont = Cont::create([
                     'nocontainer'=>$tempContRecord->nocontainer,
@@ -584,7 +584,7 @@ class ManifestController extends Controller
                 }elseif ($tempContRecord->size == '40') {
                     $teus = 2;
                 }else {
-                    $teus = 0;
+                    $teus = 2.25;
                 }
                 $newCont = Cont::create([
                     'nocontainer'=>$tempContRecord->nocontainer,

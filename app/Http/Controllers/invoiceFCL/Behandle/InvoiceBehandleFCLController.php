@@ -474,6 +474,14 @@ class InvoiceBehandleFCLController extends Controller
                 'status' => 'Y',
             ]);
 
+            $formContainer = FormC::where('form_id', $header->form_id)->get();
+            foreach ($formContainer as $formCont) {
+                $container = Cont::find($formCont->container_id);
+                $container->update([
+                    'flag_pkb' => 'Y'
+                ]);
+            }
+
             if ($cancel) {
                 $cancel->delete();
             }

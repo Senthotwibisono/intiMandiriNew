@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
  use App\Http\Controllers\ApiController;
  use App\Http\Controllers\Api\CFSController;
  use App\Http\Controllers\Api\TrackingController;
+ use App\Http\Controllers\Api\BeaCukaiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,4 +41,9 @@ Route::controller(CFSController::class)->group(function(){
 Route::controller(TrackingController::class)->prefix('/tracking')->group(function() {
     Route::post('/searchCargo', 'searchCargo');
     Route::post('/searchContainer', 'searchContainer');
+});
+
+Route::controller(BeaCukaiController::class)->middleware('beacukai.auth')->group(function() {
+    Route::get('/yor/kapasitas', 'YorKapasitas');
+    Route::get('/gate/aktivitas', 'GateAktifitas');
 });

@@ -2222,7 +2222,7 @@ class DokumenController extends Controller
 
     private function calculateTeus($size)
     {
-        return $size === '20' ? 1 : ($size === '40' ? 2 : 0);
+        return $size === '20' ? 1 : ($size === '40' ? 2 : 2.25);
     }
 
     // private function createManifests($plpDetails, $job)

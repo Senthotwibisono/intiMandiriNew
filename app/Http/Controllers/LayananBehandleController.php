@@ -43,11 +43,10 @@ class LayananBehandleController extends Controller
             // die;
             switch ($keyword) {
                 case 'PKK':
-                    $query->whereNull('status_behandle');
+                    $query->whereNull('status_behandle')->where('flag_pkb', 'N');
                     break;
                 case 'PKB':
-                    // Belum ada logic
-                    // nanti isi di sini
+                     $query->whereNull('status_behandle')->where('flag_pkb', 'Y');
                     break;
                 case 1:
                 case 2:
@@ -59,8 +58,8 @@ class LayananBehandleController extends Controller
         ->with([
             'summary' => [
                 'total' => ContF::whereNotNull('no_spjm')->whereNotNull('tglmasuk')->whereNull('tglkeluar')->count(),
-                'ppk'   => ContF::whereNotNull('no_spjm')->whereNotNull('tglmasuk')->whereNull('tglkeluar')->whereNull('status_behandle')->count(),
-                'pkb'   => 0, // nanti isi sesuai kondisinya
+                'ppk'   => ContF::whereNotNull('no_spjm')->whereNotNull('tglmasuk')->whereNull('tglkeluar')->whereNull('status_behandle')->where('flag_pkb', 'N')->count(),
+                'pkb'   => ContF::whereNotNull('no_spjm')->whereNotNull('tglmasuk')->whereNull('tglkeluar')->whereNull('status_behandle')->where('flag_pkb', 'Y')->count(),// nanti isi sesuai kondisinya
                 'siap'  => ContF::whereNotNull('no_spjm')->whereNotNull('tglmasuk')->whereNull('tglkeluar')->where('status_behandle', 1)->count(),
                 'proses'=> ContF::whereNotNull('no_spjm')->whereNotNull('tglmasuk')->whereNull('tglkeluar')->where('status_behandle', 2)->count(),
                 'selesai'=> ContF::whereNotNull('no_spjm')->whereNotNull('tglmasuk')->whereNull('tglkeluar')->where('status_behandle', 3)->count(),
