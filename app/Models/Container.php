@@ -146,6 +146,13 @@ class Container extends Model
         'npct_out_flag',
         'npct_out_time',
         'npct_out_status',
+
+        'tracking_in_flag',
+        'tracking_in_time',
+        'tracking_in_status',
+        'tracking_out_flag',
+        'tracking_out_time',
+        'tracking_out_status',
     ];
 
     public function DepoMty()

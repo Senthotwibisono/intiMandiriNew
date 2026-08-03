@@ -20,8 +20,9 @@ class Kernel extends ConsoleKernel
         $schedule->command('functions:gateInJict')->everyMinute();
         $schedule->command('functions:movementNPCT')->everyMinute();
         $schedule->command('sppb:otomatis')
-             ->timezone('Asia/Jakarta')
-             ->dailyAt('07:59');
+        ->timezone('Asia/Jakarta')
+        ->dailyAt('07:59');
+        $schedule->command('functions:trackingBc')->everyThreeMinutes();
     }
 
     /**
