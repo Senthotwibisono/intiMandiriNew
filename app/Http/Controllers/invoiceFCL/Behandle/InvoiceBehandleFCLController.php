@@ -478,7 +478,8 @@ class InvoiceBehandleFCLController extends Controller
             foreach ($formContainer as $formCont) {
                 $container = Cont::find($formCont->container_id);
                 $container->update([
-                    'flag_pkb' => 'Y'
+                    'flag_pkb' => 'Y',
+                    'tgl_pkb' => Carbon::now(),
                 ]);
             }
 
