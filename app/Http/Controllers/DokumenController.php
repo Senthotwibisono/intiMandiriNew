@@ -723,7 +723,7 @@ class DokumenController extends Controller
                         'no_cont'=>$detailCont->NO_CONT,
                         'size'=>$detailCont->SIZE,
                     ]);
-                    $containerTPS = ContF::whereNotNull('tglmasuk')->whereNull('tglkeluar')->where('nocontianer', $newCont->no_cont)->first();
+                    $containerTPS = ContF::whereNotNull('tglmasuk')->whereNull('tglkeluar')->where('nocontainer', $newCont->no_cont)->first();
                     if ($containerTPS) {
                         $containerTPS->update([
                             'no_spjm' => $spjm->no_spjm,
