@@ -1032,11 +1032,40 @@ class BackController extends Controller
             } else {
                 $status = 'C';
             }
-
+            if (isset($response['code']) && in_array($response['code'], [200, 201])) {          
+                $status = 'Y';          
+                $message = $response['detail'] ?? 'SUCCESS';            
+            } else {            
+                $status = 'C';          
+                $errors = [];           
+                if (!empty($response['data']['header']['errors'])) {            
+                    foreach ($response['data']['header']['errors'] as $error) {         
+                        $field = $error['field'] ?? '-';
+                        $errorMessage = $error['message'] ?? '-';           
+                        $errors[] = "HEADER: {$field} = {$errorMessage}";
+                    }
+                }           
+                if (!empty($response['data']['kontainer'])) {           
+                    foreach ($response['data']['kontainer'] as $containerError) {           
+                        if (!empty($containerError['errors'])) {            
+                            foreach ($containerError['errors'] as $error) {         
+                                $field = $error['field'] ?? '-';
+                                $errorMessage = $error['message'] ?? '-';           
+                                $errors[] = "CONTAINER: {$field} = {$errorMessage}";
+                            }
+                        }
+                    }
+                }           
+                $message = !empty($errors)
+                    ? implode("\n", $errors)
+                    : ($response['detail']
+                        ?? $response['result']
+                        ?? 'API ERROR');
+            }
             $container->update([
                 'coarri_cesa_flag' => $status,
                 'coarri_cesa_time' => Carbon::now(),
-                'coarri_cesa_status' => $response['detail'],
+                'coarri_cesa_status' => $message,
             ]);
         }
 
@@ -1154,10 +1183,46 @@ class BackController extends Controller
                 $status = 'C';
             }
 
+            if (isset($response['code']) && in_array($response['code'], [200, 201])) {
+                $status = 'Y';
+            } else {
+                $status = 'C';
+            }
+            if (isset($response['code']) && in_array($response['code'], [200, 201])) {          
+                $status = 'Y';          
+                $message = $response['detail'] ?? 'SUCCESS';            
+            } else {            
+                $status = 'C';          
+                $errors = [];           
+                if (!empty($response['data']['header']['errors'])) {            
+                    foreach ($response['data']['header']['errors'] as $error) {         
+                        $field = $error['field'] ?? '-';
+                        $errorMessage = $error['message'] ?? '-';           
+                        $errors[] = "HEADER: {$field} = {$errorMessage}";
+                    }
+                }           
+                if (!empty($response['data']['kontainer'])) {           
+                    foreach ($response['data']['kontainer'] as $containerError) {           
+                        if (!empty($containerError['errors'])) {            
+                            foreach ($containerError['errors'] as $error) {         
+                                $field = $error['field'] ?? '-';
+                                $errorMessage = $error['message'] ?? '-';           
+                                $errors[] = "CONTAINER: {$field} = {$errorMessage}";
+                            }
+                        }
+                    }
+                }           
+                $message = !empty($errors)
+                    ? implode("\n", $errors)
+                    : ($response['detail']
+                        ?? $response['result']
+                        ?? 'API ERROR');
+            }
+
             $container->update([
                 'coarri_cesa_flag' => $status,
                 'coarri_cesa_time' => Carbon::now(),
-                'coarri_cesa_status' => $response['detail'],
+                'coarri_cesa_status' => $message,
             ]);
         }
         return;
@@ -1279,10 +1344,46 @@ class BackController extends Controller
                 $status = 'C';
             }
 
+            if (isset($response['code']) && in_array($response['code'], [200, 201])) {
+                $status = 'Y';
+            } else {
+                $status = 'C';
+            }
+            if (isset($response['code']) && in_array($response['code'], [200, 201])) {          
+                $status = 'Y';          
+                $message = $response['detail'] ?? 'SUCCESS';            
+            } else {            
+                $status = 'C';          
+                $errors = [];           
+                if (!empty($response['data']['header']['errors'])) {            
+                    foreach ($response['data']['header']['errors'] as $error) {         
+                        $field = $error['field'] ?? '-';
+                        $errorMessage = $error['message'] ?? '-';           
+                        $errors[] = "HEADER: {$field} = {$errorMessage}";
+                    }
+                }           
+                if (!empty($response['data']['kontainer'])) {           
+                    foreach ($response['data']['kontainer'] as $containerError) {           
+                        if (!empty($containerError['errors'])) {            
+                            foreach ($containerError['errors'] as $error) {         
+                                $field = $error['field'] ?? '-';
+                                $errorMessage = $error['message'] ?? '-';           
+                                $errors[] = "CONTAINER: {$field} = {$errorMessage}";
+                            }
+                        }
+                    }
+                }           
+                $message = !empty($errors)
+                    ? implode("\n", $errors)
+                    : ($response['detail']
+                        ?? $response['result']
+                        ?? 'API ERROR');
+            }
+
             $container->update([
                 'coarri_cesa_flag' => $status,
                 'coarri_cesa_time' => Carbon::now(),
-                'coarri_cesa_status' => $response['detail'],
+                'coarri_cesa_status' => $message,
             ]);
         }
 
@@ -1400,10 +1501,46 @@ class BackController extends Controller
                 $status = 'C';
             }
 
+            if (isset($response['code']) && in_array($response['code'], [200, 201])) {
+                $status = 'Y';
+            } else {
+                $status = 'C';
+            }
+            if (isset($response['code']) && in_array($response['code'], [200, 201])) {          
+                $status = 'Y';          
+                $message = $response['detail'] ?? 'SUCCESS';            
+            } else {            
+                $status = 'C';          
+                $errors = [];           
+                if (!empty($response['data']['header']['errors'])) {            
+                    foreach ($response['data']['header']['errors'] as $error) {         
+                        $field = $error['field'] ?? '-';
+                        $errorMessage = $error['message'] ?? '-';           
+                        $errors[] = "HEADER: {$field} = {$errorMessage}";
+                    }
+                }           
+                if (!empty($response['data']['kontainer'])) {           
+                    foreach ($response['data']['kontainer'] as $containerError) {           
+                        if (!empty($containerError['errors'])) {            
+                            foreach ($containerError['errors'] as $error) {         
+                                $field = $error['field'] ?? '-';
+                                $errorMessage = $error['message'] ?? '-';           
+                                $errors[] = "CONTAINER: {$field} = {$errorMessage}";
+                            }
+                        }
+                    }
+                }           
+                $message = !empty($errors)
+                    ? implode("\n", $errors)
+                    : ($response['detail']
+                        ?? $response['result']
+                        ?? 'API ERROR');
+            }
+
             $container->update([
                 'coarri_cesa_flag' => $status,
                 'coarri_cesa_time' => Carbon::now(),
-                'coarri_cesa_status' => $response['detail'],
+                'coarri_cesa_status' => $message,
             ]);
         }
         return;
