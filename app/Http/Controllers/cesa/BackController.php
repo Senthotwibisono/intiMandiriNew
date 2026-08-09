@@ -1238,9 +1238,9 @@ class BackController extends Controller
         $containersFCL = ContF::with(['job'])->whereNotNull('tglkeluar')->whereDate('tglmasuk', '>=', $startDate)->where('coarri_cesa_flag', 'Y')->where('codeco_cesa_flag', 'N')->take(20)->get();
         foreach ($containersFCL as $container) {
             $container->update([
-                'coarri_cesa_flag' => 'P',
-                'coarri_cesa_time' => Carbon::now(),
-                'coarri_cesa_status' => 'PROCESSING',
+                'codeco_cesa_flag' => 'P',
+                'codeco_cesa_time' => Carbon::now(),
+                'codeco_cesa_status' => 'PROCESSING',
             ]);
             $header = [
                 "kodeDokumen"         => "6",
@@ -1385,9 +1385,9 @@ class BackController extends Controller
             }
 
             $container->update([
-                'coarri_cesa_flag' => $status,
-                'coarri_cesa_time' => Carbon::now(),
-                'coarri_cesa_status' => $message,
+                'codeco_cesa_flag' => $status,
+                'codeco_cesa_time' => Carbon::now(),
+                'codeco_cesa_status' => $message,
             ]);
         }
 
@@ -1395,9 +1395,9 @@ class BackController extends Controller
         $containersLCL = Cont::with(['job'])->whereNotNull('tglkeluar')->whereDate('tglmasuk', '>=', $startDate)->where('coarri_cesa_flag', 'Y')->where('codeco_cesa_flag', 'N')->take(20)->get();
         foreach ($containersLCL as $container) {
             $container->update([
-                'coarri_cesa_flag' => 'P',
-                'coarri_cesa_time' => Carbon::now(),
-                'coarri_cesa_status' => 'PROCESSING',
+                'codeco_cesa_flag' => 'P',
+                'codeco_cesa_time' => Carbon::now(),
+                'codeco_cesa_status' => 'PROCESSING',
             ]);
             $header = [
                 "kodeDokumen"         => "6",
@@ -1544,9 +1544,9 @@ class BackController extends Controller
             }
 
             $container->update([
-                'coarri_cesa_flag' => $status,
-                'coarri_cesa_time' => Carbon::now(),
-                'coarri_cesa_status' => $message,
+                'codeco_cesa_flag' => $status,
+                'codeco_cesa_time' => Carbon::now(),
+                'codeco_cesa_status' => $message,
             ]);
         }
         return;
