@@ -718,6 +718,11 @@ class BackController extends Controller
     {
         $containersFCL = ContF::with(['job'])->whereNotNull('tglmasuk')->where('tracking_in_flag', 'N')->take(50)->get();
         foreach ($containersFCL as $container) {
+            $container->update([
+                'tracking_in_flag' => 'P',
+                'tracking_in_time' => Carbon::now(),
+                'tracking_in_status' => 'PROCESSING',
+            ]);
             $data = [
                 "kodeTps"=> "1MUT",
                 "nomorKontainer"=> $container->nocontainer,
@@ -749,7 +754,7 @@ class BackController extends Controller
             if (isset($response['code']) && in_array($response['code'], [200, 201])) {
                 $status = 'Y';
             } else {
-                $status = 'N';
+                $status = 'C';
             }
 
             $container->update([
@@ -761,6 +766,11 @@ class BackController extends Controller
 
         $containersLCL = Cont::with(['job'])->whereNotNull('tglmasuk')->where('tracking_in_flag', 'N')->take(50)->get();
         foreach ($containersLCL as $container) {
+            $container->update([
+                'tracking_in_flag' => 'P',
+                'tracking_in_time' => Carbon::now(),
+                'tracking_in_status' => 'PROCESSING',
+            ]);
             $data = [
                 "kodeTps"=> "1MUT",
                 "nomorKontainer"=> $container->nocontainer,
@@ -792,7 +802,7 @@ class BackController extends Controller
             if (isset($response['code']) && in_array($response['code'], [200, 201])) {
                 $status = 'Y';
             } else {
-                $status = 'N';
+                $status = 'C';
             }
 
             $container->update([
@@ -809,6 +819,11 @@ class BackController extends Controller
     {
         $containersFCL = ContF::with(['job'])->whereNotNull('tglkeluar')->where('tracking_out_flag', 'N')->take(50)->get();
         foreach ($containersFCL as $container) {
+            $container->update([
+                'tracking_out_flag' => 'P',
+                'tracking_out_time' => Carbon::now(),
+                'tracking_out_status' => 'PROCESSING',
+            ]);
             $data = [
                 "kodeTps"=> "1MUT",
                 "nomorKontainer"=> $container->nocontainer,
@@ -840,7 +855,7 @@ class BackController extends Controller
             if (isset($response['code']) && in_array($response['code'], [200, 201])) {
                 $status = 'Y';
             } else {
-                $status = 'N';
+                $status = 'C';
             }
 
             $container->update([
@@ -852,6 +867,11 @@ class BackController extends Controller
 
         $containersLCL = Cont::with(['job'])->whereNotNull('tglkeluar')->where('tracking_out_flag', 'N')->take(50)->get();
         foreach ($containersLCL as $container) {
+            $container->update([
+                'tracking_out_flag' => 'P',
+                'tracking_out_time' => Carbon::now(),
+                'tracking_out_status' => 'PROCESSING',
+            ]);
             $data = [
                 "kodeTps"=> "1MUT",
                 "nomorKontainer"=> $container->nocontainer,
@@ -883,7 +903,7 @@ class BackController extends Controller
             if (isset($response['code']) && in_array($response['code'], [200, 201])) {
                 $status = 'Y';
             } else {
-                $status = 'N';
+                $status = 'C';
             }
 
             $container->update([
