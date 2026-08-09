@@ -1313,7 +1313,7 @@ class BackController extends Controller
                 "nomorSegelBc" => $container->nomor_segel_bc ?? '-',
                 "consignee" => $container->cust->name ?? '-',
                 "pelabuhanMuat" => $container->job->muat->kode ?? null,
-                "nomorDaftarPabean" => $container->no_dok ?? null,
+                "nomorDaftarPabean" => $container->job->noplp ?? null,
                 "noBlAwb" => $container->nobl ?? null,
                 "kodeKantor" => $container->job->dokplp->kd_kantor ?? null,
                 "nomorKontainer" => $container->nocontainer,
