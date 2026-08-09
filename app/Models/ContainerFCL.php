@@ -234,6 +234,13 @@ class ContainerFCL extends Model
         'tracking_out_flag',
         'tracking_out_time',
         'tracking_out_status',
+
+        'coarri_cesa_flag',
+        'coarri_cesa_time',
+        'coarri_cesa_status',
+        'codeco_cesa_flag',
+        'codeco_cesa_time',
+        'codeco_cesa_status',
     ];
 
     public function user()

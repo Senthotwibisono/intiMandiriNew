@@ -916,6 +916,498 @@ class BackController extends Controller
         return;
     }
 
+    public function coariCont()
+    {
+        $startDate = '2026-07-01';
+        $containersFCL = ContF::with(['job'])->whereNotNull('tglmasuk')->whereDate('tglmasuk', '>=', $startDate)->where('coarri_cesa_flag', 'N')->take(20)->get();
+        foreach ($containersFCL as $container) {
+            $container->update([
+                'coarri_cesa_flag' => 'P',
+                'coarri_cesa_time' => Carbon::now(),
+                'coarri_cesa_status' => 'PROCESSING',
+            ]);
+            $header = [
+                "kodeDokumen"         => "5",
+                "noBc11"              => $container->job->tno_bc11 ?? null,
+                "tanggalBc11"        => !empty($container->job->ttgl_bc11)
+                    ? Carbon::parse($container->job->ttgl_bc11)->format('d-m-Y')
+                    : null,
+                "nomorVoyFlight"      => $container->job->dokplp->no_voy_flight ?? null,
+                "tanggalBerangkat"    => !empty($container->job->tgl_berangkat)
+                    ? Carbon::parse($container->job->tgl_berangkat)->format('d-m-Y')
+                    : null,
+                "namaAngkut"          => $container->job->dokplp->nm_angkut ?? null,
+                "refNumber"           => $container->job->dokplp->ref_number ?? null,
+                "kodeSaranaPengangkut"=> $container->job->kode_sarana_pengangkut ?? null,
+                "kodeTps"             => "1MUT",
+                "tanggalTiba"         => !empty($container->job->dokplp->tgl_tiba)
+                    ? Carbon::parse($container->job->dokplp->tgl_tiba)->format('d-m-Y')
+                    : null,
+                "kodeGudang"          => "INTI",
+                "callSign"            => $container->job->dokplp->call_sign ?? null,
+            ];
+
+             $waktuInOut = null;
+
+            if (!empty($container->tglmasuk)) {
+                $tanggalMasuk = $container->tglmasuk;
+
+                $jamMasuk = !empty($container->jammasuk)
+                    ? $container->jammasuk
+                    : '00:00:00';
+
+                $waktuInOut = Carbon::parse(
+                    $tanggalMasuk . ' ' . $jamMasuk
+                )->format('d-m-Y H:i:s');
+            }
+
+            $kontainer = [];
+            $plpDetail = PLPdetail::where('plp_id', $container->job->plp_id)
+                ->where('no_cont', $container->nocontainer)
+                ->first();
+
+            $nomorPosBc11 = $plpDetail?->no_pos_bc11;
+
+            $kontainer[] = [
+                "tanggalSegelBc" => !empty($container->tgl_segel_bc)
+                    ? Carbon::parse($container->tgl_segel_bc)->format('d-m-Y')
+                    : Carbon::parse($container->tglmasuk)->format('d-m-Y'),
+                "tanggalDokumenInOut" => !empty($container->job->ttgl_plp)
+                    ? Carbon::parse($container->job->ttgl_plp)->format('d-m-Y')
+                    : null,
+                "tanggalBlAwb" => !empty($container->tgl_bl_awb)
+                    ? Carbon::parse($container->tgl_bl_awb)->format('d-m-Y')
+                    : null,
+                "flagKontainerKosong" => false,
+                "waktuInOut" => $waktuInOut,
+                "gudangTujuan" => "INTI",
+                "kodeDokumenInOut" => "3",
+                "ukuranKontainer" => $container->size,
+                "flagKontainer" => true,
+                "kodeTimbun" => null,
+                "noMasterBlAwb" => $container->job->nombl ?? null,
+                "pelabuhanBongkar" => $container->job->bongkar->kode ?? null,
+                "nomorDokumenInOut" => $container->job->noplp ?? null,
+                "nomorPolisi" => $container->nopol ?? '-',
+                "nomorIjinTps" => $container->nomor_ijin_tps ?? null,
+                "nomorPosBc11" => $nomorPosBc11 ?? null,
+                "tanggalMasterBlAwb" => !empty($container->job->tgl_master_bl)
+                    ? Carbon::parse($container->job->tgl_master_bl)->format('d-m-Y')
+                    : null,
+                "nomorSegelBc" => $container->nomor_segel_bc ?? '-',
+                "consignee" => $container->cust->name ?? null,
+                "pelabuhanMuat" => $container->job->muat->kode ?? null,
+                "nomorDaftarPabean" => $container->job->noplp ?? null,
+                "noBlAwb" => $container->nobl ?? null,
+                "kodeKantor" => $container->job->dokplp->kd_kantor ?? null,
+                "nomorKontainer" => $container->nocontainer,
+                "idConsignee" => $container->cust_id ?? null,
+                "jenisKontainer" => 'FCL',
+                "nomorSegel" => $container->seal->code ?? '-',
+                "isoCode" => $container->iso_code ?? null,
+                "tanggalDaftarPabean" => !empty($container->job->ttgl_plp)
+                    ? Carbon::parse($container->job->ttgl_plp)->format('d-m-Y')
+                    : null,
+                "pelabuhanTransit" => $container->job->transit->kode ?? null,
+                "bruto" => $container->weight ?? 0,
+                "tanggalIjinTps" => !empty($container->tanggal_ijin_tps)
+                    ? Carbon::parse($container->tanggal_ijin_tps)->format('d-m-Y')
+                    : null,
+            ];
+    
+            // dd($data);
+             $data = [
+                "header"     => $header,
+                "kontainer"  => $kontainer,
+            ];
+            $response = $this->request(
+                'post',
+                $this->baseUrl . '/coarri-codeco-container',
+                $data
+            )->json();
+
+            if (isset($response['code']) && in_array($response['code'], [200, 201])) {
+                $status = 'Y';
+            } else {
+                $status = 'C';
+            }
+
+            $container->update([
+                'coarri_cesa_flag' => $status,
+                'coarri_cesa_time' => Carbon::now(),
+                'coarri_cesa_status' => $response['detail'],
+            ]);
+        }
+
+
+        $containersLCL = Cont::with(['job'])->whereNotNull('tglmasuk')->whereDate('tglmasuk', '>=', $startDate)->where('coarri_cesa_flag', 'N')->take(20)->get();
+        foreach ($containersLCL as $container) {
+            $container->update([
+                'coarri_cesa_flag' => 'P',
+                'coarri_cesa_time' => Carbon::now(),
+                'coarri_cesa_status' => 'PROCESSING',
+            ]);
+            $header = [
+                "kodeDokumen"         => "5",
+                "noBc11"              => $container->job->tno_bc11 ?? null,
+                "tanggalBc11"        => !empty($container->job->ttgl_bc11)
+                    ? Carbon::parse($container->job->ttgl_bc11)->format('d-m-Y')
+                    : null,
+                "nomorVoyFlight"      => $container->job->dokplp->no_voy_flight ?? null,
+                "tanggalBerangkat"    => !empty($container->job->tgl_berangkat)
+                    ? Carbon::parse($container->job->tgl_berangkat)->format('d-m-Y')
+                    : null,
+                "namaAngkut"          => $container->job->dokplp->nm_angkut ?? null,
+                "refNumber"           => $container->job->dokplp->ref_number ?? null,
+                "kodeSaranaPengangkut"=> $container->job->kode_sarana_pengangkut ?? null,
+                "kodeTps"             => "1MUT",
+                "tanggalTiba"         => !empty($container->job->dokplp->tgl_tiba)
+                    ? Carbon::parse($container->job->dokplp->tgl_tiba)->format('d-m-Y')
+                    : null,
+                "kodeGudang"          => "INTI",
+                "callSign"            => $container->job->dokplp->call_sign ?? null,
+            ];
+
+             $waktuInOut = null;
+
+            if (!empty($container->tglmasuk)) {
+                $tanggalMasuk = $container->tglmasuk;
+
+                $jamMasuk = !empty($container->jammasuk)
+                    ? $container->jammasuk
+                    : '00:00:00';
+
+                $waktuInOut = Carbon::parse(
+                    $tanggalMasuk . ' ' . $jamMasuk
+                )->format('d-m-Y H:i:s');
+            }
+
+            $kontainer = [];
+            $plpDetail = PLPdetail::where('plp_id', $container->job->plp_id)
+                ->where('no_cont', $container->nocontainer)
+                ->first();
+
+            $nomorPosBc11 = $plpDetail?->no_pos_bc11;
+
+            $kontainer[] = [
+                "tanggalSegelBc" => !empty($container->tgl_segel_bc)
+                    ? Carbon::parse($container->tgl_segel_bc)->format('d-m-Y')
+                    : Carbon::parse($container->tglmasuk)->format('d-m-Y'),
+                "tanggalDokumenInOut" => !empty($container->job->ttgl_plp)
+                    ? Carbon::parse($container->job->ttgl_plp)->format('d-m-Y')
+                    : null,
+                "tanggalBlAwb" => !empty($container->tgl_bl_awb)
+                    ? Carbon::parse($container->tgl_bl_awb)->format('d-m-Y')
+                    : null,
+                "flagKontainerKosong" => false,
+                "waktuInOut" => $waktuInOut,
+                "gudangTujuan" => "INTI",
+                "kodeDokumenInOut" => "3",
+                "ukuranKontainer" => $container->size,
+                "flagKontainer" => true,
+                "kodeTimbun" => null,
+                "noMasterBlAwb" => $container->job->nombl ?? null,
+                "pelabuhanBongkar" => $container->job->bongkar->kode ?? null,
+                "nomorDokumenInOut" => $container->job->noplp ?? null,
+                "nomorPolisi" => $container->nopol ?? '-',
+                "nomorIjinTps" => $container->nomor_ijin_tps ?? null,
+                "nomorPosBc11" => $nomorPosBc11 ?? null,
+                "tanggalMasterBlAwb" => !empty($container->job->tgl_master_bl)
+                    ? Carbon::parse($container->job->tgl_master_bl)->format('d-m-Y')
+                    : null,
+                "nomorSegelBc" => $container->nomor_segel_bc ?? '-',
+                "consignee" => $container->cust->name ?? null,
+                "pelabuhanMuat" => $container->job->muat->kode ?? null,
+                "nomorDaftarPabean" => $container->job->noplp ?? null,
+                "noBlAwb" => $container->nobl ?? null,
+                "kodeKantor" => $container->job->dokplp->kd_kantor ?? null,
+                "nomorKontainer" => $container->nocontainer,
+                "idConsignee" => $container->cust_id ?? null,
+                "jenisKontainer" => 'LCL',
+                "nomorSegel" => $container->seal->code ?? '-',
+                "isoCode" => $container->iso_code ?? null,
+                "tanggalDaftarPabean" => !empty($container->job->ttgl_plp)
+                    ? Carbon::parse($container->job->ttgl_plp)->format('d-m-Y')
+                    : null,
+                "pelabuhanTransit" => $container->job->transit->kode ?? null,
+                "bruto" => $container->weight ?? 0,
+                "tanggalIjinTps" => !empty($container->tanggal_ijin_tps)
+                    ? Carbon::parse($container->tanggal_ijin_tps)->format('d-m-Y')
+                    : null,
+            ];
+    
+            // dd($data);
+             $data = [
+                "header"     => $header,
+                "kontainer"  => $kontainer,
+            ];
+            $response = $this->request(
+                'post',
+                $this->baseUrl . '/coarri-codeco-container',
+                $data
+            )->json();
+
+            if (isset($response['code']) && in_array($response['code'], [200, 201])) {
+                $status = 'Y';
+            } else {
+                $status = 'C';
+            }
+
+            $container->update([
+                'coarri_cesa_flag' => $status,
+                'coarri_cesa_time' => Carbon::now(),
+                'coarri_cesa_status' => $response['detail'],
+            ]);
+        }
+        return;
+    }
+
+    public function codecoCont()
+    {
+        $startDate = '2026-07-01';
+        $containersFCL = ContF::with(['job'])->whereNotNull('tglkeluar')->whereDate('tglmasuk', '>=', $startDate)->where('coarri_cesa_flag', 'Y')->where('codeco_cesa_flag', 'N')->take(20)->get();
+        foreach ($containersFCL as $container) {
+            $container->update([
+                'coarri_cesa_flag' => 'P',
+                'coarri_cesa_time' => Carbon::now(),
+                'coarri_cesa_status' => 'PROCESSING',
+            ]);
+            $header = [
+                "kodeDokumen"         => "6",
+                "noBc11"              => $container->job->tno_bc11 ?? null,
+                "tanggalBc11"        => !empty($container->job->ttgl_bc11)
+                    ? Carbon::parse($container->job->ttgl_bc11)->format('d-m-Y')
+                    : null,
+                "nomorVoyFlight"      => $container->job->dokplp->no_voy_flight ?? null,
+                "tanggalBerangkat"    => !empty($container->job->tgl_berangkat)
+                    ? Carbon::parse($container->job->tgl_berangkat)->format('d-m-Y')
+                    : null,
+                "namaAngkut"          => $container->job->dokplp->nm_angkut ?? null,
+                "refNumber"           => $container->job->dokplp->ref_number ?? null,
+                "kodeSaranaPengangkut"=> $container->job->kode_sarana_pengangkut ?? null,
+                "kodeTps"             => "1MUT",
+                "tanggalTiba"         => !empty($container->job->dokplp->tgl_tiba)
+                    ? Carbon::parse($container->job->dokplp->tgl_tiba)->format('d-m-Y')
+                    : null,
+                "kodeGudang"          => "INTI",
+                "callSign"            => $container->job->dokplp->call_sign ?? null,
+            ];
+
+             $waktuInOut = null;
+
+            if (!empty($container->tglkeluar)) {
+                $tanggalMasuk = $container->tglkeluar;
+
+                $jamMasuk = !empty($container->jamkeluar)
+                    ? $container->jamkeluar
+                    : '00:00:00';
+
+                $waktuInOut = Carbon::parse(
+                    $tanggalMasuk . ' ' . $jamMasuk
+                )->format('d-m-Y H:i:s');
+            }
+
+            $kontainer = [];
+            $plpDetail = PLPdetail::where('plp_id', $container->job->plp_id)
+                ->where('no_cont', $container->nocontainer)
+                ->first();
+
+            $nomorPosBc11 = $plpDetail?->no_pos_bc11;
+
+            $kontainer[] = [
+                "tanggalSegelBc" => !empty($container->tgl_segel_bc)
+                    ? Carbon::parse($container->tgl_segel_bc)->format('d-m-Y')
+                    : Carbon::parse($container->tglmasuk)->format('d-m-Y'),
+                "tanggalDokumenInOut" => !empty($container->job->ttgl_plp)
+                    ? Carbon::parse($container->job->ttgl_plp)->format('d-m-Y')
+                    : null,
+                "tanggalBlAwb" => !empty($container->tgl_bl_awb)
+                    ? Carbon::parse($container->tgl_bl_awb)->format('d-m-Y')
+                    : null,
+                "flagKontainerKosong" => false,
+                "waktuInOut" => $waktuInOut,
+                "gudangTujuan" => "INTI",
+                "kodeDokumenInOut" => $container->kd_dok_inout  ?? null,
+                "ukuranKontainer" => $container->size,
+                "flagKontainer" => true,
+                "kodeTimbun" => null,
+                "noMasterBlAwb" => $container->job->nombl ?? null,
+                "pelabuhanBongkar" => $container->job->bongkar->kode ?? null,
+                "nomorDokumenInOut" => $container->no_dok ?? null,
+                "nomorPolisi" => $container->nopol_mty ?? '-',
+                "nomorIjinTps" => $container->nomor_ijin_tps ?? null,
+                "nomorPosBc11" => $nomorPosBc11 ?? null,
+                "tanggalMasterBlAwb" => !empty($container->job->tgl_master_bl)
+                    ? Carbon::parse($container->job->tgl_master_bl)->format('d-m-Y')
+                    : null,
+                "nomorSegelBc" => $container->nomor_segel_bc ?? '-',
+                "consignee" => $container->cust->name ?? null,
+                "pelabuhanMuat" => $container->job->muat->kode ?? null,
+                "nomorDaftarPabean" => $container->no_dok ?? null,
+                "noBlAwb" => $container->nobl ?? null,
+                "kodeKantor" => $container->job->dokplp->kd_kantor ?? null,
+                "nomorKontainer" => $container->nocontainer,
+                "idConsignee" => $container->cust_id ?? null,
+                "jenisKontainer" => 'FCL',
+                "nomorSegel" => $container->seal->code ?? '-',
+                "isoCode" => $container->iso_code ?? null,
+                "tanggalDaftarPabean" => !empty($container->tgl_dok)
+                    ? Carbon::parse($container->tgl_dok)->format('d-m-Y')
+                    : null,
+                "pelabuhanTransit" => $container->job->transit->kode ?? null,
+                "bruto" => $container->weight ?? 0,
+                "tanggalIjinTps" => !empty($container->tanggal_ijin_tps)
+                    ? Carbon::parse($container->tanggal_ijin_tps)->format('d-m-Y')
+                    : null,
+            ];
+    
+            // dd($data);
+             $data = [
+                "header"     => $header,
+                "kontainer"  => $kontainer,
+            ];
+            $response = $this->request(
+                'post',
+                $this->baseUrl . '/coarri-codeco-container',
+                $data
+            )->json();
+
+            if (isset($response['code']) && in_array($response['code'], [200, 201])) {
+                $status = 'Y';
+            } else {
+                $status = 'C';
+            }
+
+            $container->update([
+                'coarri_cesa_flag' => $status,
+                'coarri_cesa_time' => Carbon::now(),
+                'coarri_cesa_status' => $response['detail'],
+            ]);
+        }
+
+
+        $containersLCL = Cont::with(['job'])->whereNotNull('tglkeluar')->whereDate('tglmasuk', '>=', $startDate)->where('coarri_cesa_flag', 'Y')->where('codeco_cesa_flag', 'N')->take(20)->get();
+        foreach ($containersLCL as $container) {
+            $container->update([
+                'coarri_cesa_flag' => 'P',
+                'coarri_cesa_time' => Carbon::now(),
+                'coarri_cesa_status' => 'PROCESSING',
+            ]);
+            $header = [
+                "kodeDokumen"         => "6",
+                "noBc11"              => $container->job->tno_bc11 ?? null,
+                "tanggalBc11"        => !empty($container->job->ttgl_bc11)
+                    ? Carbon::parse($container->job->ttgl_bc11)->format('d-m-Y')
+                    : null,
+                "nomorVoyFlight"      => $container->job->dokplp->no_voy_flight ?? null,
+                "tanggalBerangkat"    => !empty($container->job->tgl_berangkat)
+                    ? Carbon::parse($container->job->tgl_berangkat)->format('d-m-Y')
+                    : null,
+                "namaAngkut"          => $container->job->dokplp->nm_angkut ?? null,
+                "refNumber"           => $container->job->dokplp->ref_number ?? null,
+                "kodeSaranaPengangkut"=> $container->job->kode_sarana_pengangkut ?? null,
+                "kodeTps"             => "1MUT",
+                "tanggalTiba"         => !empty($container->job->dokplp->tgl_tiba)
+                    ? Carbon::parse($container->job->dokplp->tgl_tiba)->format('d-m-Y')
+                    : null,
+                "kodeGudang"          => "INTI",
+                "callSign"            => $container->job->dokplp->call_sign ?? null,
+            ];
+
+             $waktuInOut = null;
+
+            if (!empty($container->tglmasuk)) {
+                $tanggalMasuk = $container->tglkeluar;
+
+                $jamMasuk = !empty($container->jamkeluar)
+                    ? $container->jamkeluar
+                    : '00:00:00';
+
+                $waktuInOut = Carbon::parse(
+                    $tanggalMasuk . ' ' . $jamMasuk
+                )->format('d-m-Y H:i:s');
+            }
+
+            $kontainer = [];
+            $plpDetail = PLPdetail::where('plp_id', $container->job->plp_id)
+                ->where('no_cont', $container->nocontainer)
+                ->first();
+
+            $nomorPosBc11 = $plpDetail?->no_pos_bc11;
+
+            $kontainer[] = [
+                "tanggalSegelBc" => !empty($container->tgl_segel_bc)
+                    ? Carbon::parse($container->tgl_segel_bc)->format('d-m-Y')
+                    : Carbon::parse($container->tglmasuk)->format('d-m-Y'),
+                "tanggalDokumenInOut" => !empty($container->job->ttgl_plp)
+                    ? Carbon::parse($container->job->ttgl_plp)->format('d-m-Y')
+                    : null,
+                "tanggalBlAwb" => !empty($container->tgl_bl_awb)
+                    ? Carbon::parse($container->tgl_bl_awb)->format('d-m-Y')
+                    : null,
+                "flagKontainerKosong" => false,
+                "waktuInOut" => $waktuInOut,
+                "gudangTujuan" => "INTI",
+                "kodeDokumenInOut" => "3",
+                "ukuranKontainer" => $container->size,
+                "flagKontainer" => true,
+                "kodeTimbun" => null,
+                "noMasterBlAwb" => $container->job->nombl ?? null,
+                "pelabuhanBongkar" => $container->job->bongkar->kode ?? null,
+                "nomorDokumenInOut" => $container->job->noplp ?? null,
+                "nomorPolisi" => $container->nopol ?? '-',
+                "nomorIjinTps" => $container->nomor_ijin_tps ?? null,
+                "nomorPosBc11" => $nomorPosBc11 ?? null,
+                "tanggalMasterBlAwb" => !empty($container->job->tgl_master_bl)
+                    ? Carbon::parse($container->job->tgl_master_bl)->format('d-m-Y')
+                    : null,
+                "nomorSegelBc" => $container->nomor_segel_bc ?? '-',
+                "consignee" => $container->cust->name ?? null,
+                "pelabuhanMuat" => $container->job->muat->kode ?? null,
+                "nomorDaftarPabean" => $container->job->noplp ?? null,
+                "noBlAwb" => $container->nobl ?? null,
+                "kodeKantor" => $container->job->dokplp->kd_kantor ?? null,
+                "nomorKontainer" => $container->nocontainer,
+                "idConsignee" => $container->cust_id ?? null,
+                "jenisKontainer" => 'LCL',
+                "nomorSegel" => $container->seal->code ?? '-',
+                "isoCode" => $container->iso_code ?? null,
+                "tanggalDaftarPabean" => !empty($container->job->ttgl_plp)
+                    ? Carbon::parse($container->job->ttgl_plp)->format('d-m-Y')
+                    : null,
+                "pelabuhanTransit" => $container->job->transit->kode ?? null,
+                "bruto" => $container->weight ?? 0,
+                "tanggalIjinTps" => !empty($container->tanggal_ijin_tps)
+                    ? Carbon::parse($container->tanggal_ijin_tps)->format('d-m-Y')
+                    : null,
+            ];
+    
+            // dd($data);
+             $data = [
+                "header"     => $header,
+                "kontainer"  => $kontainer,
+            ];
+            $response = $this->request(
+                'post',
+                $this->baseUrl . '/coarri-codeco-container',
+                $data
+            )->json();
+
+            if (isset($response['code']) && in_array($response['code'], [200, 201])) {
+                $status = 'Y';
+            } else {
+                $status = 'C';
+            }
+
+            $container->update([
+                'coarri_cesa_flag' => $status,
+                'coarri_cesa_time' => Carbon::now(),
+                'coarri_cesa_status' => $response['detail'],
+            ]);
+        }
+        return;
+    }
+
     private function request($method, $url, $query = [])
     {
         $token = $this->getToken();

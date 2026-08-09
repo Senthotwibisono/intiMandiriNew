@@ -98,6 +98,11 @@ class JobOrder extends Model
         return $this->belongsTo(TpsPLP::class, 'plp_id', 'id')->where('type', 'lcl');
     }
 
+    public function dokplp()
+    {
+        return $this->belongsTo(TpsPLP::class, 'plp_id', 'id')->where('type', 'lcl');
+    }
+
     public function Kapal()
     {
         return $this->belongsTo(Vessel::class, 'vessel', 'id');

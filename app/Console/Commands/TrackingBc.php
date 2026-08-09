@@ -42,6 +42,20 @@ class TrackingBc extends Command
         }
 
         try {
+            $controller->coariCont();
+            $this->info('sendContainer executed successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Error in sendContainer: ' . $e->getMessage());
+        }
+
+        try {
+            $controller->codecoCont();
+            $this->info('sendContainer executed successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Error in sendContainer: ' . $e->getMessage());
+        }
+
+        try {
             $controller->sppbOnDemand();
             $this->info('sendContainer executed successfully.');
         } catch (\Exception $e) {
