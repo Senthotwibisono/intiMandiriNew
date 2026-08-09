@@ -998,7 +998,9 @@ class BackController extends Controller
                 "nomorSegelBc" => $container->nomor_segel_bc ?? '-',
                 "consignee" => $container->cust->name ?? '-',
                 "pelabuhanMuat" => $container->job->muat->kode ?? null,
-                "nomorDaftarPabean" => $container->job->noplp ?? null,
+                "nomorDaftarPabean" => isset($container->job->noplp)
+                    ? substr($container->job->noplp, 0, 10)
+                    : null,
                 "noBlAwb" => $container->nobl ?? null,
                 "kodeKantor" => $container->job->dokplp->kd_kantor ?? null,
                 "nomorKontainer" => $container->nocontainer,
@@ -1148,7 +1150,9 @@ class BackController extends Controller
                 "nomorSegelBc" => $container->nomor_segel_bc ?? '-',
                 "consignee" => $container->cust->name ?? '-',
                 "pelabuhanMuat" => $container->job->muat->kode ?? null,
-                "nomorDaftarPabean" => $container->job->noplp ?? null,
+                "nomorDaftarPabean" => isset($container->job->noplp)
+                    ? substr($container->job->noplp, 0, 10)
+                    : null,
                 "noBlAwb" => $container->nobl ?? null,
                 "kodeKantor" => $container->job->dokplp->kd_kantor ?? null,
                 "nomorKontainer" => $container->nocontainer,
@@ -1466,7 +1470,9 @@ class BackController extends Controller
                 "nomorSegelBc" => $container->nomor_segel_bc ?? '-',
                 "consignee" => $container->cust->name ?? '-',
                 "pelabuhanMuat" => $container->job->muat->kode ?? null,
-                "nomorDaftarPabean" => $container->job->noplp ?? null,
+                "nomorDaftarPabean" => isset($container->job->noplp)
+                    ? substr($container->job->noplp, 0, 10)
+                    : null,
                 "noBlAwb" => $container->nobl ?? null,
                 "kodeKantor" => $container->job->dokplp->kd_kantor ?? null,
                 "nomorKontainer" => $container->nocontainer,
