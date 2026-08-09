@@ -325,4 +325,90 @@ class BeaCukaiController extends Controller
             ]
         ];
     }
+
+    public function kontainer($nomorKontainer)
+    {
+        $container = ContF::where('nocontainer', $nomorKontainer)->first();
+        if ($container) {
+            $type = "7";
+        }
+        if (!$container) {
+            $container = ContL::where('nocontainer', $nomorKontainer)->first();
+            $type = "8";
+        }
+
+        if ($container) {
+            $history = [];
+            if ($container->tglmasuk !== null) {
+                $in = [
+                    "kodeKegiatan"=> 5,
+                    "waktuKegiatan"=> Carbon::parse($container->tglmasuk . ' ' . $container->jammasuk)->format('d-m-Y H:i:s'),
+                    "block"=> null,
+                    "row"=> null,
+                    "slot"=> null,
+                    "tier"=> null,
+                    "nomorPolisi"=> $container->nopol,
+                    "gate"=> 'IN',
+                    "stid"=> null,
+                    "dokumen"=> [
+                      "kodeDokumen"=> "3",
+                      "nomorDokumen"=> $container->job->noplp,
+                      "tanggalDokumen"=> $container->job->ttgl_plp
+                    ]
+                ];
+                $history[] = $in;
+            }
+
+            if ($container->tglkeluar !== null) {
+                $out = [
+                    "kodeKegiatan"=> 6,
+                    "waktuKegiatan"=> Carbon::parse($container->tglkeluar . ' ' . $container->jamkeluar)->format('d-m-Y H:i:s'),
+                    "block"=> null,
+                    "row"=> null,
+                    "slot"=> null,
+                    "tier"=> null,
+                    "nomorPolisi"=> $container->nopol_mty,
+                    "gate"=> 'OUT',
+                    "stid"=> null,
+                    "dokumen"=> [
+                      "kodeDokumen"=> $container->kd_dok_inout ?? '3',
+                      "nomorDokumen"=> $container->no_dok ?? $container->job->noplp,
+                      "tanggalDokumen"=> $container->tgl_dok ?? $container->job->ttgl_plp
+                    ]
+                ];
+                $history[] = $out;
+            }
+            $data = [
+                "kodeTps"=> "1MUT",
+                "kodeGudang"=> "INTI",
+                "nomorKontainer"=> $nomorKontainer,
+                "ukuranKontainer"=> $container->size,
+                "jenisKontainer"=> $type,
+                "nomorBlAwb"=> $container->nobl ?? '',
+                "tanggalBlAwb"=> $container->tgl_bl_awb ?? '',
+                "history" => [
+                    $history
+                ]
+            ];
+
+            // $data = [
+            //     $header,
+            //     'history'
+            // ];
+            return response()->json([
+                "status"=> 200,
+                "message"=> "Data Ditemukan",
+                "nomorKontainer"=> $nomorKontainer,
+                "data" => $data
+            ]);
+        }else {
+            return response()->json([
+                "status"=> 404,
+                "message"=> "Nomor kontainer tidak ditemukan",
+                "nomorKontainer"=> $nomorKontainer
+            ]);
+        }
+
+
+    }
 }

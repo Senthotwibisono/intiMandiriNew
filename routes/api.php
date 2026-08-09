@@ -46,4 +46,8 @@ Route::controller(TrackingController::class)->prefix('/tracking')->group(functio
 Route::controller(BeaCukaiController::class)->middleware('beacukai.auth')->group(function() {
     Route::get('/yor/kapasitas', 'YorKapasitas');
     Route::get('/gate/aktivitas', 'GateAktifitas');
+
+    Route::get('/kontainer/{nomorKontainer}', 'kontainer');
+    Route::get('/kontainer', 'kontainerTanggal');
+    Route::get('/kontainer/{nomorKontainer}/history', 'kontainerHistor');
 });
