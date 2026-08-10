@@ -237,7 +237,7 @@ class BeaCukaiController extends Controller
     {
         $gates = Gate::where(function ($query) use ($start, $end) {
             $query->whereBetween('time_in', [$start, $end])->orWhereBetween('time_out', [$start, $end]);
-            })->paginate($pageSize, ['*'], 'page', $page);;
+            })->paginate($pageSize, ['*'], 'page', $page);
 
         $data = [];
         foreach ($gates as $gate) {
@@ -494,9 +494,11 @@ class BeaCukaiController extends Controller
         $validator = Validator::make($request->all(), [
             'tanggalMulai' => 'required|date_format:d-m-Y',
             'tanggalAkhir' => 'required|date_format:d-m-Y',
-        ]);
+            'page' => 'nullable|integer|min:1',
+            'pageSize' => 'nullable|integer|min:1|max:500',
+        ]); 
 
-        if ($validator->fails()) {
+        if ($validator->fails()) {  
 
             if (
                 $validator->errors()->has('tanggalMulai') ||
@@ -507,206 +509,249 @@ class BeaCukaiController extends Controller
                     'message' => 'Parameter tanggalMulai dan tanggalAkhir wajib diisi',
                     'timestamp' => now()->format('d-m-Y H:i:s')
                 ], 400);
-            }
+            }   
 
             return response()->json([
                 'error' => 'INVALID_PARAMETER',
                 'message' => $validator->errors()->first(),
                 'timestamp' => now()->format('d-m-Y H:i:s')
             ], 400);
-        }
+        }   
 
-        $start = Carbon::createFromFormat('d-m-Y', $request->tanggalMulai)->startOfDay();
-        $end = Carbon::createFromFormat('d-m-Y', $request->tanggalAkhir)->endOfDay();
-        
-        $containersF = ContF::with('job')
-            ->where(function ($query) use ($start, $end) {
+        $start = Carbon::createFromFormat(
+            'd-m-Y',
+            $request->tanggalMulai
+        )->startOfDay();    
 
-                // tglmasuk berada di range
-                $query->whereBetween('tglmasuk', [
-                    $start->toDateString(),
-                    $end->toDateString()
-                ])
+        $end = Carbon::createFromFormat(
+            'd-m-Y',
+            $request->tanggalAkhir
+        )->endOfDay();  
 
-                // ATAU tglkeluar berada di range
-                ->orWhereBetween('tglkeluar', [
-                    $start->toDateString(),
-                    $end->toDateString()
-                ]);
-            })
-            ->get();
+        $page = $request->page ?? 1;
+        $pageSize = $request->pageSize ?? 100;  
 
-        $containersL = ContL::with('job')
-            ->where(function ($query) use ($start, $end) {
+        $result = $this->getKontainerTanggalData(
+            $start,
+            $end,
+            $pageSize,
+            $page
+        );  
 
-                // tglmasuk berada di range
-                $query->whereBetween('tglmasuk', [
-                    $start->toDateString(),
-                    $end->toDateString()
-                ])
-
-                // ATAU tglkeluar berada di range
-                ->orWhereBetween('tglkeluar', [
-                    $start->toDateString(),
-                    $end->toDateString()
-                ]);
-            })
-            ->get();
-
-
-        $data = [];
-
-        foreach ($containersF as $container) {
-
-            $history = [];
-            if ($container->tglmasuk !== null) {
-
-                $in = [
-                    "kodeKegiatan" => 5,
-                    "waktuKegiatan" => Carbon::parse(
-                        $container->tglmasuk . ' ' . $container->jammasuk
-                    )->format('d-m-Y H:i:s'),
-
-                    "block" => null,
-                    "row" => null,
-                    "slot" => null,
-                    "tier" => null,
-
-                    "nomorPolisi" => $container->nopol,
-
-                    "gate" => "IN",
-                    "stid" => null,
-
-                    "dokumen" => [
-                        "kodeDokumen" => "3",
-                        "nomorDokumen" => $container->job->noplp ?? null,
-                        "tanggalDokumen" => $container->job->ttgl_plp ?? null
-                    ]
-                ];
-
-                $history[] = $in;
-            }
-            if ($container->tglkeluar !== null) {
-                $out = [
-                    "kodeKegiatan" => 6,
-                    "waktuKegiatan" => Carbon::parse(
-                        $container->tglkeluar . ' ' . $container->jamkeluar
-                    )->format('d-m-Y H:i:s'),
-
-                    "block" => null,
-                    "row" => null,
-                    "slot" => null,
-                    "tier" => null,
-
-                    "nomorPolisi" => $container->nopol_mty,
-
-                    "gate" => "OUT",
-                    "stid" => null,
-
-                    "dokumen" => [
-                        "kodeDokumen" => $container->kd_dok_inout ?? "3",
-                        "nomorDokumen" => $container->no_dok
-                            ?? $container->job->noplp
-                            ?? null,
-                        "tanggalDokumen" => $container->tgl_dok
-                            ?? $container->job->ttgl_plp
-                            ?? null
-                    ]
-                ];
-
-                $history[] = $out;
-            }
-
-
-            $data[] = [
-                "kodeTps" => "1MUT",
-                "kodeGudang" => "INTI",
-                "nomorKontainer" => $container->nocontainer,
-                "ukuranKontainer" => $container->size,
-                "jenisKontainer" => "7",
-
-                "nomorBlAwb" => $container->nobl ?? '',
-                "tanggalBlAwb" => $container->tgl_bl_awb ?? '',
-
-                "history" => [
-                    $history
-                ]
-            ];
-        }
-        foreach ($containersL as $container) {
-
-            $history = [];
-            if ($container->tglmasuk !== null) {
-
-                $in = [
-                    "kodeKegiatan" => 5,
-                    "waktuKegiatan" => Carbon::parse(
-                        $container->tglmasuk . ' ' . $container->jammasuk
-                    )->format('d-m-Y H:i:s'),
-                    "block" => null,
-                    "row" => null,
-                    "slot" => null,
-                    "tier" => null,
-                    "nomorPolisi" => $container->nopol,
-                    "gate" => "IN",
-                    "stid" => null,
-                    "dokumen" => [
-                        "kodeDokumen" => "3",
-                        "nomorDokumen" => $container->job->noplp ?? null,
-                        "tanggalDokumen" => $container->job->ttgl_plp ?? null
-                    ]
-                ];
-
-                $history[] = $in;
-            }
-            if ($container->tglkeluar !== null) {
-                $out = [
-                    "kodeKegiatan" => 6,
-                    "waktuKegiatan" => Carbon::parse(
-                        $container->tglkeluar . ' ' . $container->jamkeluar
-                    )->format('d-m-Y H:i:s'),
-                    "block" => null,
-                    "row" => null,
-                    "slot" => null,
-                    "tier" => null,
-                    "nomorPolisi" => $container->nopol_mty,
-                    "gate" => "OUT",
-                    "stid" => null,
-                    "dokumen" => [
-                        "kodeDokumen" => $container->kd_dok_inout ?? "3",
-                        "nomorDokumen" => $container->no_dok
-                            ?? $container->job->noplp
-                            ?? null,
-                        "tanggalDokumen" => $container->tgl_dok
-                            ?? $container->job->ttgl_plp
-                            ?? null
-                    ]
-                ];
-                $history[] = $out;
-            }
-
-            $data[] = [
-                "kodeTps" => "1MUT",
-                "kodeGudang" => "INTI",
-                "nomorKontainer" => $container->nocontainer,
-                "ukuranKontainer" => $container->size,
-                "jenisKontainer" => "8",
-                "nomorBlAwb" => $container->nobl ?? '',
-                "tanggalBlAwb" => $container->tgl_bl_awb ?? '',
-                "history" => [
-                    $history
-                ]
-            ];
-        }
         return response()->json([
-            "status" => 200,
-            "message" => count($data) > 0
-                ? "Data Ditemukan"
-                : "Data Tidak Ditemukan",
-            "tanggalMulai" => $request->tanggalMulai,
-            "tanggalAkhir" => $request->tanggalAkhir,
-            "jumlah" => count($data),
-            "data" => $data
+            'header' => [
+                'kodeTps' => '1MUT',
+                'kodeGudang' => 'INTI',
+                'refNumber' => Str::uuid(),
+                'waktuPencatatan' => now()->format('d-m-Y H:i:s'),  
+
+                'totalData' => $result['pagination']['totalData'],
+                'page' => $result['pagination']['page'],
+                'pageSize' => $result['pagination']['pageSize'],
+                'totalPage' => $result['pagination']['totalPage'],
+            ],  
+
+            'data' => $result['data']
         ]);
+    }
+
+    private function getKontainerTanggalData($start, $end, $pageSize, $page)
+    {
+        /*
+        |--------------------------------------------------------------------------
+        | ContF
+        |--------------------------------------------------------------------------
+        */
+        $contF = ContF::with('job')
+            ->where(function ($query) use ($start, $end) {
+                $query->whereBetween('tglmasuk', [
+                    $start->toDateString(),
+                    $end->toDateString()
+                ])
+                ->orWhereBetween('tglkeluar', [
+                    $start->toDateString(),
+                    $end->toDateString()
+                ]);
+            })
+            ->get();    
+    
+
+        /*
+        |--------------------------------------------------------------------------
+        | ContL
+        |--------------------------------------------------------------------------
+        */
+        $contL = ContL::with('job')
+            ->where(function ($query) use ($start, $end) {
+                $query->whereBetween('tglmasuk', [
+                    $start->toDateString(),
+                    $end->toDateString()
+                ])
+                ->orWhereBetween('tglkeluar', [
+                    $start->toDateString(),
+                    $end->toDateString()
+                ]);
+            })
+            ->get();    
+    
+
+        /*
+        |--------------------------------------------------------------------------
+        | Gabungkan ContF + ContL
+        |--------------------------------------------------------------------------
+        */
+        $containers = $contF->map(function ($container) {
+            $container->container_type = 'FCL';
+            return $container;
+        })
+        ->concat(
+            $contL->map(function ($container) {
+                $container->container_type = 'LCL';
+                return $container;
+            })
+        );  
+    
+
+        /*
+        |--------------------------------------------------------------------------
+        | Pagination
+        |--------------------------------------------------------------------------
+        */
+        $totalData = $containers->count();  
+
+        $totalPage = $totalData > 0
+            ? (int) ceil($totalData / $pageSize)
+            : 0;    
+
+        $containers = $containers
+            ->forPage($page, $pageSize)
+            ->values(); 
+    
+
+        /*
+        |--------------------------------------------------------------------------
+        | Format Response
+        |--------------------------------------------------------------------------
+        */
+        $data = []; 
+
+        foreach ($containers as $container) {   
+
+            $history = [];  
+    
+
+            /*
+            |--------------------------------------------------------------------------
+            | IN
+            |--------------------------------------------------------------------------
+            */
+            if ($container->tglmasuk !== null) {    
+
+                $in = [
+                    "kodeKegiatan" => 5,    
+
+                    "waktuKegiatan" => Carbon::parse(
+                        $container->tglmasuk . ' ' . $container->jammasuk
+                    )->format('d-m-Y H:i:s'),   
+
+                    "block" => null,
+                    "row" => null,
+                    "slot" => null,
+                    "tier" => null, 
+
+                    "nomorPolisi" => $container->nopol, 
+
+                    "gate" => "IN",
+                    "stid" => null, 
+
+                    "dokumen" => [
+                        "kodeDokumen" => "3",
+                        "nomorDokumen" => $container->job->noplp ?? null,
+                        "tanggalDokumen" => $container->job->ttgl_plp ?? null
+                    ]
+                ];  
+
+                $history[] = $in;
+            }   
+    
+
+            /*
+            |--------------------------------------------------------------------------
+            | OUT
+            |--------------------------------------------------------------------------
+            */
+            if ($container->tglkeluar !== null) {   
+
+                $out = [
+                    "kodeKegiatan" => 6,    
+
+                    "waktuKegiatan" => Carbon::parse(
+                        $container->tglkeluar . ' ' . $container->jamkeluar
+                    )->format('d-m-Y H:i:s'),   
+
+                    "block" => null,
+                    "row" => null,
+                    "slot" => null,
+                    "tier" => null, 
+
+                    "nomorPolisi" => $container->nopol_mty, 
+
+                    "gate" => "OUT",
+                    "stid" => null, 
+
+                    "dokumen" => [
+                        "kodeDokumen" => $container->kd_dok_inout ?? "3",   
+
+                        "nomorDokumen" => $container->no_dok
+                            ?? $container->job->noplp
+                            ?? null,    
+
+                        "tanggalDokumen" => $container->tgl_dok
+                            ?? $container->job->ttgl_plp
+                            ?? null
+                    ]
+                ];  
+
+                $history[] = $out;
+            }   
+    
+
+            /*
+            |--------------------------------------------------------------------------
+            | Container
+            |--------------------------------------------------------------------------
+            */
+            $data[] = [
+                "kodeTps" => "1MUT",
+                "kodeGudang" => "INTI", 
+
+                "nomorKontainer" => $container->nocontainer,    
+
+                "ukuranKontainer" => $container->size,  
+
+                "jenisKontainer" => $container->container_type === 'FCL'
+                    ? "7"
+                    : "8",  
+
+                "nomorBlAwb" => $container->nobl ?? '',
+                "tanggalBlAwb" => $container->tgl_bl_awb ?? '', 
+
+                "history" => [
+                    $history
+                ]
+            ];
+        }   
+    
+
+        return [
+            'data' => $data,    
+
+            'pagination' => [
+                'totalData' => $totalData,
+                'page' => $page,
+                'pageSize' => $pageSize,
+                'totalPage' => $totalPage,
+            ]
+        ];
     }
 }
