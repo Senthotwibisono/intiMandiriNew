@@ -49,5 +49,5 @@ Route::controller(BeaCukaiController::class)->middleware('beacukai.auth')->group
 
     Route::get('/kontainer/{nomorKontainer}', 'kontainer');
     Route::get('/kontainer', 'kontainerTanggal');
-    Route::get('/kontainer/{nomorKontainer}/history', 'kontainerHistor');
+    Route::get('/kontainer/{nomorKontainer}/history', 'kontainerHistory');
 });
