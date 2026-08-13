@@ -919,7 +919,7 @@ class BackController extends Controller
 
     public function coariCont()
     {
-        $startDate = '2026-07-01';
+        $startDate = '2026-04-01';
         $containersFCL = ContF::with(['job'])->whereNotNull('tglmasuk')->whereDate('tglmasuk', '>=', $startDate)->where('coarri_cesa_flag', 'N')->take(20)->get();
         foreach ($containersFCL as $container) {
             $container->update([
@@ -1234,7 +1234,7 @@ class BackController extends Controller
 
     public function codecoCont()
     {
-        $startDate = '2026-07-01';
+        $startDate = '2026-04-01';
         $containersFCL = ContF::with(['job'])->whereNotNull('tglkeluar')->whereDate('tglmasuk', '>=', $startDate)->where('coarri_cesa_flag', 'Y')->where('codeco_cesa_flag', 'N')->take(20)->get();
         foreach ($containersFCL as $container) {
             $container->update([
