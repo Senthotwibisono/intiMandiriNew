@@ -808,7 +808,7 @@ class BeaCukaiController extends Controller
                       "kodeDokumen"=> $container->kd_dok_inout ?? '3',
                       "nomorDokumen"=> $container->no_dok ?? $container->job->noplp,
                       "tanggalDokumen"=> $container->tgl_dok ?? $container->job->ttgl_plp,
-                      "kodeKegiatan"=> 17,
+                      "kodeKegiatan"=> 5,
                       "waktuKegiatan"=> $waktuInOut,
                       "block"=> null,
                       "row"=> null,
