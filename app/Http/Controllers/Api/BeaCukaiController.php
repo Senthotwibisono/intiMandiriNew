@@ -754,4 +754,86 @@ class BeaCukaiController extends Controller
             ]
         ];
     }
+
+    public function outstandingContainer(Request $request)
+    {
+        $contF = ContF::with('job')->whereNotNull('tglmasuk')->whereNull('tglkeluar')->get(); 
+
+        $contL = ContL::with('job')->whereNotNull('tglmasuk')->whereNull('tglkeluar')->get();    
+    
+        $containers = $contF->map(function ($container) {
+            $container->container_type = 'FCL';
+            $container->jenis_kontainer = 8;
+            return $container;
+        })
+        ->concat(
+            $contL->map(function ($container) {
+                $container->container_type = 'LCL';
+                $container->jenis_kontainer = 7;
+                return $container;
+            })
+        );
+
+        $page = $request->page ?? 1;
+        $pageSize = $request->pageSize ?? 100;
+
+        $totalData = $containers->count();  
+        $totalPage = $totalData > 0
+            ? (int) ceil($totalData / $pageSize)
+            : 0;    
+        $containers = $containers->forPage($page, $pageSize)->values(); 
+
+        try {
+
+            $data = [];
+            foreach ($containers as $container) {
+                $tanggalMasuk = $container->tglmasuk;
+                $jamMasuk = !empty($container->jammasuk)
+                    ? $container->jammasuk
+                    : '00:00:00';
+                $waktuInOut = Carbon::parse(
+                    $tanggalMasuk . ' ' . $jamMasuk
+                )->format('d-m-Y H:i:s');
+                $data[] = [
+                    [
+                      "kodeTps"=> "1MUT",
+                      "kodeGudang"=> "INTI",
+                      "nomorKontainer"=> $container->nocontainer,
+                      "ukuranKontainer"=> $container->size,
+                      "jenisKontainer"=> $container->jenis_kontainer,
+                      "nomorBlAwb"=> $container->nobl,
+                      "tanggalBlAwb"=> Carbon::parse($container->tgl_bl_awb)->format('d-m-Y'),
+                      "nomorBc11"=> $container->job->tno_bc11 ?? '',
+                      "tanggalBc11"=> $container->job->ttgl_bc11,
+                      "kodeDokumen"=> $container->kd_dok_inout ?? '3',
+                      "nomorDokumen"=> $container->no_dok ?? $container->job->noplp,
+                      "tanggalDokumen"=> $container->tgl_dok ?? $container->job->ttgl_plp,
+                      "kodeKegiatan"=> 17,
+                      "waktuKegiatan"=> $waktuInOut,
+                      "block"=> null,
+                      "row"=> null,
+                      "slot"=> null,
+                      "tier"=> null
+                    ],
+                ];
+            }
+
+             return response()->json([
+                'header' => [
+                    'totalData' => $totalData,
+                    'page' => $page,
+                    'pageSize' => $pageSize,
+                    'totalPage' => $totalPage,
+                ],  
+
+                'data' => $data
+            ]);
+            
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => $th->getMessage()
+            ]);
+        }
+    }
 }
