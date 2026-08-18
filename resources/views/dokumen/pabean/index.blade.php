@@ -92,7 +92,7 @@
     <div class="modal-dialog modal-dialog-centered modal-dialog-centered modal-dialog-scrollable"role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalCenterTitle">SPPB BC23 On Demand CESA 4.0</h5>
+                <h5 class="modal-title" id="exampleModalCenterTitle">Pabean On Demand CESA 4.0</h5>
                 <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"> <i data-feather="x"></i></button>
             </div>
             <div class="modal-body">

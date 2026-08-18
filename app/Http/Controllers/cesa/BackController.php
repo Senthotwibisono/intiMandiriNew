@@ -1584,6 +1584,353 @@ class BackController extends Controller
         }
     }
 
+
+    // manual
+
+    public function manualGet()
+    {
+        $response = $this->request(
+            'get',
+            $this->baseUrl . '/get-dokumen-pabean-permit',
+            [
+                'kodeGudang' => 'INTI',
+            ]
+        )->json();
+
+        // dd($response);
+        if ($response['code'] === 200) {
+            if (empty($response['data'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $response['detail'],
+                    'data' => [],
+                ]);
+            }
+            try {
+                DB::transaction(function() use($response){
+
+                });
+                return response()->json([
+                    'success' => true,
+                    'message'=> 'Data berhasil disimpan'
+                ]);
+
+            } catch (\Throwable $th) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $th->getMessage()
+                ]);
+            }
+
+        }else {
+            return response()->json([
+                'success' => false,
+                'message' => $response['detail'] ?? 'Terjadi kesalahan'
+            ]);
+        }
+    }
+    
+    public function manualOnDemand()
+    {
+        $response = $this->request(
+            'get',
+            $this->baseUrl . '/get-dokumen-manual-ondemand',
+            [
+                'kodeDokumen' => $request->kd_dok,
+                'nomorDokumen' => $request->no_dok,
+                'tanggalDokumen' => carbon::parse($request->tgl_dok)->format('d-m-Y'),
+            ]
+        )->json();
+
+        // dd($response);
+        if ($response['code'] === 200) {
+            if (empty($response['data'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $response['detail'],
+                    'data' => [],
+                ]);
+            }
+            try {
+                DB::transaction(function() use($response){
+
+                });
+                return response()->json([
+                    'success' => true,
+                    'message'=> 'Data berhasil disimpan'
+                ]);
+
+            } catch (\Throwable $th) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $th->getMessage()
+                ]);
+            }
+
+        }else {
+            return response()->json([
+                'success' => false,
+                'message' => $response['detail'] ?? 'Terjadi kesalahan'
+            ]);
+        }
+    }
+
+
+    // spjm
+    public function spjmGet()
+    {
+        $response = $this->request(
+            'get',
+            $this->baseUrl . '/get-spjm',
+            [
+                'kodeTps' => '1MUT',
+            ]
+        )->json();
+
+        // dd($response);
+        if ($response['code'] === 200) {
+            if (empty($response['data'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $response['detail'],
+                    'data' => [],
+                ]);
+            }
+            try {
+                DB::transaction(function() use($response){
+                    foreach ($response['data']['spjm'] as $item) {
+                        $header = $item['header'] ?? [];
+                        $kontainer = $item['kontainer'] ?? [];
+                        $kemasan = $item['kemasan'] ?? [];
+
+                        if (empty($header['nomorPib']) || empty($header['tanggalPib'])) {
+                            continue;
+                        }
+
+                        $tglPib = Carbon::createFromFormat(
+                            'd-m-Y',
+                            $header['tanggalPib']
+                        )->format('Y-m-d');
+
+                        $oldSPJM = SPJM::where('no_pib', $header['nomorPib'])
+                            ->where('tgl_pib', $tglPib)
+                            ->first();
+
+                        if ($oldSPJM) {
+                            continue;
+                        }
+
+                        $tglSpjm = !empty($header['tanggalSpjm'])
+                            ? Carbon::parse($header['tanggalSpjm'])->format('Y-m-d H:i:s')
+                            : null;
+
+                        $tglBc11 = !empty($header['tanggalBc11'])
+                            ? Carbon::createFromFormat('d-m-Y', $header['tanggalBc11'])->format('Y-m-d')
+                            : null;
+
+                        $spjm = SPJM::create([
+                            'car' => $header['car'] ?? null,
+                            'kd_kantor' => $header['kodeKantor'] ?? null,
+                            'tgl_pib' => $tglPib,
+                            'no_pib' => $header['nomorPib'] ?? null,
+                            'no_spjm' => $header['nomorPib'] ?? null,
+                            'tgl_spjm' => $tglSpjm,
+                            'npwp_imp' => $header['npwpImp'] ?? null,
+                            'nama_imp' => $header['namaImp'] ?? null,
+                            'npwp_ppjk' => $header['npwpPpjk'] ?? null,
+                            'nama_ppjk' => $header['namaPpjk'] ?? null,
+                            'gudang' => $header['gudang'] ?? null,
+                            'jml_cont' => $header['jumlahKontainer'] ?? 0,
+                            'no_bc11' => $header['nomorBc11'] ?? null,
+                            'tgl_bc11' => $tglBc11,
+                            'no_pos_bc11' => $header['nomorPosBc11'] ?? null,
+                            'fl_karantina' => $header['flagKarantina'] ?? null,
+                            'nm_angkut' => $header['namaAngkut'] ?? null,
+                            'no_voy_flight' => $header['nomorVoyFlight'] ?? null,
+                            'tgl_upload' => Carbon::today()->format('Y-m-d'),
+                            'jam_upload' => Carbon::now()->format('H:i:s'),
+                        ]);
+
+                        foreach ($kontainer as $detailCont) {
+                            $newCont = SPJMcont::create([
+                                'spjm_id' => $spjm->id,
+                                'car' => $detailCont['car'] ?? $header['car'],
+                                'no_cont' => $detailCont['nomorKontainer'] ?? null,
+                                'size' => $detailCont['kodeUkuranKontainer'] ?? null,
+                            ]);
+
+                            if ($newCont->no_cont) {
+                                $containerTPS = ContF::whereNotNull('tglmasuk')
+                                    ->whereNull('tglkeluar')
+                                    ->where('nocontainer', $newCont->no_cont)
+                                    ->first();
+
+                                if ($containerTPS) {
+                                    $containerTPS->update([
+                                        'no_spjm' => $spjm->no_spjm,
+                                        'tgl_spjm' => $tglSpjm
+                                            ? Carbon::parse($tglSpjm)->format('Y-m-d')
+                                            : null,
+                                    ]);
+                                }
+                            }
+                        }
+
+                        foreach ($kemasan as $detailKms) {
+                            SPJMkms::create([
+                                'spjm_id' => $spjm->id,
+                                'car' => $detailKms['car'] ?? $header['car'],
+                                'jns_kms' => $detailKms['kodeJenisKemasan'] ?? null,
+                                'merk_kms' => null,
+                                'jml_kms' => $detailKms['jumlahKemasan'] ?? 0,
+                            ]);
+                        }
+                    }
+                });
+                return response()->json([
+                    'success' => true,
+                    'message'=> 'Data berhasil disimpan'
+                ]);
+
+            } catch (\Throwable $th) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $th->getMessage()
+                ]);
+            }
+
+        }else {
+            return response()->json([
+                'success' => false,
+                'message' => $response['detail'] ?? 'Terjadi kesalahan'
+            ]);
+        }
+    }
+
+    public function spjmOnDemand(Request $request)
+    {
+        $response = $this->request(
+            'get',
+            $this->baseUrl . '/get-spjm-ondemand',
+            [
+                'nomorDaftar' => $request->no_dok,
+                'tanggalDaftar' => carbon::parse($request->tgl_dok)->format('d-m-Y'),
+            ]
+        )->json();
+
+        // dd($response);
+        if ($response['code'] === 200) {
+            if (empty($response['data'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $response['detail'],
+                    'data' => [],
+                ]);
+            }
+            try {
+                DB::transaction(function() use($response){
+                    foreach ($response['data'] as $item) {
+                    //    if (empty($item['nomorPib']) || empty($item['tanggalPib'])) {
+                    //        continue;
+                    //    }
+
+                       $tglPib = Carbon::createFromFormat('d-m-Y', $item['tanggalPib'])->format('Y-m-d');
+
+                       $oldSPJM = SPJM::where('no_pib', $item['nomorPib'])
+                           ->where('tgl_pib', $tglPib)
+                           ->first();
+
+                    //    if ($oldSPJM) {
+                    //        continue;
+                    //    }
+
+                       $tglSpjm = !empty($item['tanggalSpjm'])
+                           ? Carbon::parse($item['tanggalSpjm'])->format('Y-m-d H:i:s')
+                           : null;
+
+                       $tglBc11 = !empty($item['tanggalBc11'])
+                           ? Carbon::createFromFormat('d-m-Y', $item['tanggalBc11'])->format('Y-m-d')
+                           : null;
+
+                       $spjm = SPJM::create([
+                           'car' => $item['car'] ?? null,
+                           'kd_kantor' => $item['kodeKantor'] ?? null,
+                           'tgl_pib' => $tglPib,
+                           'no_pib' => $item['nomorPib'] ?? null,
+                           'no_spjm' => $item['nomorPib'] ?? null,
+                           'tgl_spjm' => $tglSpjm,
+                           'npwp_imp' => $item['npwpImp'] ?? null,
+                           'nama_imp' => $item['namaImp'] ?? null,
+                           'npwp_ppjk' => $item['npwpPpjk'] ?? null,
+                           'nama_ppjk' => $item['namaPpjk'] ?? null,
+                           'gudang' => $item['kodeGudang'] ?? null,
+                           'jml_cont' => $item['jumlahKontainer'] ?? 0,
+                           'no_bc11' => $item['nomorBc11'] ?? null,
+                           'tgl_bc11' => $tglBc11,
+                           'no_pos_bc11' => $item['nomorPosBc11'] ?? null,
+                           'fl_karantina' => $item['flagKarantina'] ? 'Y' : 'T',
+                           'nm_angkut' => $item['namaAngkut'] ?? null,
+                           'no_voy_flight' => $item['nomorVoyFlight'] ?? null,
+                           'tgl_upload' => Carbon::today()->format('Y-m-d'),
+                           'jam_upload' => Carbon::now()->format('H:i:s'),
+                       ]);
+
+                       foreach (($item['kontainer'] ?? []) as $detailCont) {
+                           $newCont = SPJMcont::create([
+                               'spjm_id' => $spjm->id,
+                               'car' => $detailCont['car'] ?? $item['car'],
+                               'no_cont' => $detailCont['nomorKontainer'] ?? null,
+                               'size' => $detailCont['kodeUkuranKontainer'] ?? null,
+                           ]);
+
+                           if ($newCont->no_cont) {
+                               $containerTPS = ContF::whereNotNull('tglmasuk')
+                                   ->whereNull('tglkeluar')
+                                   ->where('nocontainer', $newCont->no_cont)
+                                   ->first();
+
+                               if ($containerTPS) {
+                                   $containerTPS->update([
+                                       'no_spjm' => $spjm->no_spjm,
+                                       'tgl_spjm' => $tglSpjm
+                                           ? Carbon::parse($tglSpjm)->format('Y-m-d')
+                                           : null,
+                                   ]);
+                               }
+                           }
+                       }
+
+                       foreach (($item['kemasan'] ?? []) as $detailKms) {
+                           SPJMkms::create([
+                               'spjm_id' => $spjm->id,
+                               'car' => $detailKms['car'] ?? $item['car'],
+                               'jns_kms' => $detailKms['kodeJenisKemasan'] ?? null,
+                               'merk_kms' => null,
+                               'jml_kms' => $detailKms['jumlahKemasan'] ?? 0,
+                           ]);
+                       }
+                    }
+                });
+                return response()->json([
+                    'success' => true,
+                    'message'=> 'Data berhasil disimpan'
+                ]);
+
+            } catch (\Throwable $th) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $th->getMessage()
+                ]);
+            }
+
+        }else {
+            return response()->json([
+                'success' => false,
+                'message' => $response['detail'] ?? 'Terjadi kesalahan'
+            ]);
+        }
+    }
+
     // Tracking
     public function apiTrackingIn()
     {
