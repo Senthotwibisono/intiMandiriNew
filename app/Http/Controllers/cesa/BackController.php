@@ -941,7 +941,7 @@ class BackController extends Controller
         }
     }
 
-    public function bc23OnDemand(Reqeust $request)
+    public function bc23OnDemand(Request $request)
     {
         $response = $this->request(
             'get',
@@ -983,7 +983,7 @@ class BackController extends Controller
                         $detil = $sppb['detil'] ?? [];    
 
                         $oldBC23 = BC23::where('car', $header['car'] ?? null)->first();
-                        if ($oldBC23) continue;   
+                        // if ($oldBC23) continue;   
 
                         $bc23 = BC23::create([
                             'car' => $header['car'] ?? null,

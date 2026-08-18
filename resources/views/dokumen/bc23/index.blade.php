@@ -12,7 +12,9 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-auto">
-                    <button type="button" id="otomaticButton" class="btn btn-success">get Data</button>
+                    <span data-bs-toggle="tooltip" title="Sudah dilakukan otomatis">
+                        <button type="button" class="btn btn-success" id="otomaticButton" disabled>get Data</button>
+                    </span>
                 </div>
                 <div class="col-auto ms-2">
                     <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addManual">SPPB BC23 On Demand</button>
@@ -63,7 +65,7 @@
     </div>
 </section>
 
-<div class="modal fade" id="addManual" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+<!-- <div class="modal fade" id="addManual" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-centered modal-dialog-scrollable"role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -99,6 +101,43 @@
                     <button type="button" id="submitButton" class="btn btn-primary ml-1" data-bs-dismiss="modal"> <i class="bx bx-check d-block d-sm-none"></i> <span class="d-none d-sm-block">Submit</span> </button>
                 </div>
             </form>
+        </div>
+    </div>
+</div> -->
+
+<div class="modal fade" id="addManual" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-centered modal-dialog-scrollable"role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">SPPB BC23 On Demand CESA 4.0</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"> <i data-feather="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-5">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <label for="">No Dok</label>
+                            <input type="text" class="form-control" id="no_dok" required>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <label for="">Tanggal Dok</label>
+                            <input type="date" class="form-control" id="tgl_dok" required>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <label for="">NPWP Importir</label>
+                            <input type="text" class="form-control" id="npwp" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal"> <i class="bx bx-x d-block d-sm-none"></i> <span class="d-none d-sm-block">Close</span> </button>
+                <button type="button" id="searchDok" class="btn btn-primary ml-1"  onClick="submitModal(this)"> <i class="bx bx-check d-block d-sm-none"></i> <span class="d-none d-sm-block">Submit</span> </button>
+            </div>
         </div>
     </div>
 </div>
@@ -266,7 +305,7 @@
         });
     });
 </script>
-<script>
+<!-- <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Attach event listener to the update button
         document.getElementById('submitButton').addEventListener('click', function (e) {
@@ -299,7 +338,7 @@
             });
         });
     });
-</script>
+</script> -->
 <script>
     document.querySelectorAll('[id^="deleteUser-"]').forEach(button => {
     button.addEventListener('click', function() {
@@ -468,5 +507,35 @@
             pageLength: 25,
         })
     })
+</script>
+
+<script>
+    async function submitModal(button) {
+        const result = await confirmation();
+        if (result.isConfirmed) {
+            showLoading();
+            const data = {
+                no_dok: document.getElementById('no_dok').value,
+                tgl_dok: document.getElementById('tgl_dok').value,
+                npwp: document.getElementById('npwp').value,
+            }
+
+            const url = '{{route('cesa.dokumen.bc23')}}';
+            const response = await globalResponse(data, url);
+            hideLoading();
+             if (response.ok) {
+                const hasil = await response.json();
+                if (hasil.success) {
+                    successHasil(hasil);
+                    $('#tableBC23').DataTable().ajax.reload();
+                }else{
+                    errorHasil(hasil);
+                }
+            }else{
+                errorResponse(response);
+                return;
+            }
+        }
+    }
 </script>
 @endsection
