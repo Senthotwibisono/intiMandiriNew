@@ -63,6 +63,13 @@ class TrackingBc extends Command
         }
 
         try {
+            $controller->bc23Get();
+            $this->info('SPPBBC23 executed successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Error in sendContainer: ' . $e->getMessage());
+        }
+
+        try {
             $controller->plpGet();
             $this->info('PLP executed successfully.');
         } catch (\Exception $e) {

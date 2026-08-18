@@ -941,7 +941,7 @@ class BackController extends Controller
         }
     }
 
-    public function bc23OnDemand()
+    public function bc23OnDemand(Reqeust $request)
     {
         $response = $this->request(
             'get',
