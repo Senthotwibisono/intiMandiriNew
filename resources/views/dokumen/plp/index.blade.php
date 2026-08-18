@@ -390,13 +390,11 @@
             ],
             createdRow: function(row, data, dataIndex) {
                 if (data.joborder_id === null || data.joborder_id === '') {
-                    $(row).css({
-                        'background-color': '#800000',
-                        'color': '#ffffff'
+                    $(row).find('td').each(function() {
+                        this.style.setProperty('background-color', '#800000', 'important');
+                        this.style.setProperty('color', '#ffffff', 'important');
                     });
-
-                    // Supaya text di dalam td juga putih
-                    $(row).find('td').css('color', '#ffffff');
+                    $(row).find('td, td a, td span, td i').css('color', '#ffffff');
                 }
             },
             pageLength: 25,

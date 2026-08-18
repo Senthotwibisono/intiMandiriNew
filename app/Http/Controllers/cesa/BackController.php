@@ -534,16 +534,16 @@ class BackController extends Controller
         }
     }
 
-    public function sppbOnDemand()
+    public function sppbOnDemand(Request $request)
     {
         $response = $this->request(
             'get',
             $this->baseUrl . '/get-impor-sppb',
             [
                 'kodeGudang' => 'INTI',
-                'nomorDokumen' => '150404/KPU.1/2026',
-                'tanggalDokumen' => "05-03-2026",
-                'npwpImp' => '0013859574091000000000'
+                'nomorDokumen' => $request->no_dok,
+                'tanggalDokumen' => Carbon::parse($request->tgl_dok)->format('d-m-Y'),
+                'npwpImp' => $request->npwp
             ]
         )->json();
 
@@ -690,6 +690,458 @@ class BackController extends Controller
                                     'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
                                     'alasan_hold' => $alasanFinal,
                                 ]);
+                            }
+                        }
+                    }
+                });
+                return response()->json([
+                    'success' => true,
+                    'message'=> 'Data berhasil disimpan'
+                ]);
+
+            } catch (\Throwable $th) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $th->getMessage()
+                ]);
+            }
+
+        }else {
+            return response()->json([
+                'success' => false,
+                'message' => $response['detail'] ?? 'Terjadi kesalahan'
+            ]);
+        }
+    }
+
+    // bc23
+    public function bc23Get()
+    {
+        $response = $this->request(
+            'get',
+            $this->baseUrl . '/get-bc23-permit',
+            [
+                'kodeGudang' => 'INTI',
+            ]
+        )->json();
+
+        // dd($response);
+        if ($response['code'] === 200) {
+            if (empty($response['data'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $response['detail'],
+                    'data' => [],
+                ]);
+            }
+            try {
+                DB::transaction(function () use ($response) {
+
+                    foreach ($response['data']['sppb'] as $sppb) {
+                        $header = $sppb['header'] ?? [];
+                        $detil  = $sppb['detil'] ?? [];
+
+                        $oldBC23 = BC23::where('car', $header['car'] ?? null)->first();
+                        if ($oldBC23) {
+                            continue;
+                        }
+
+                            $bc23 = BC23::create([
+                            'car'               => $header['car'] ?? null,
+                            'no_sppb'           => $header['nomorSppb'] ?? null,
+                            'tgl_sppb'          => $header['tanggalSppb'] ?? null,
+                            'nojoborder'        => null,
+                            'kd_kantor_pengawas'=> $header['kodeKantorPengawas'] ?? null,
+                            'kd_kantor_bongkar' => $header['kodeKantorBongkar'] ?? null,
+                            'no_pib'            => $header['nomorPib'] ?? null,
+                            'tgl_pib'           => $header['tanggalPib'] ?? null,
+                            'nama_imp'          => $header['namaImp'] ?? null,
+                            'npwp_imp'          => $header['npwpImp'] ?? null,
+                            'alamat_imp'        => $header['alamatImp'] ?? null,
+                            'npwp_ppjk'         => $header['npwpPpjk'] ?? null,
+                            'nama_ppjk'         => $header['namaPpjk'] ?? null,
+                            'alamat_ppjk'       => $header['alamatPpjk'] ?? null,
+                            'nm_angkut'         => $header['namaAngkut'] ?? null,
+                            'no_voy_flight'     => $header['nomorVoyFlight'] ?? null,
+                            'bruto'             => $header['bruto'] ?? null,
+                            'netto'             => $header['netto'] ?? null,
+                            'gudang'            => $header['gudang'] ?? null,
+                            'status_jalur'      => $header['statusJalur'] ?? null,
+                            'jml_cont'          => $header['jumlahKontainer'] ?? 0,
+                            'no_bc11'           => $header['nomorBc11'] ?? null,
+                            'tgl_bc11'          => $header['tanggalBc11'] ?? null,
+                            'no_pos_bc11'       => $header['nomorPosBc11'] ?? null,
+                            'no_bl_awb'         => $header['nomorBlAwb'] ?? null,
+                            'tgl_bl_awb'        => $header['tanggalBlAwb'] ?? null,
+                            'no_master_bl_awb'  => $header['nomorMasterBlAwb'] ?? null,
+                            'tgl_master_bl_awb' => $header['tanggalMasterBlAwb'] ?? null,
+                            'tgl_upload'        => Carbon::today()->format('Y-m-d'),
+                            'jam_upload'        => Carbon::now()->format('H:i:s'),
+                        ]);
+
+                        $tglSppb = null;
+                        if (!empty($header['tanggalSppb'])) {
+                            $tglSppb = Carbon::createFromFormat('d-m-Y', $header['tanggalSppb'])->format('Y-m-d');
+                        }
+
+                                foreach (($detil['kontainer'] ?? []) as $detailCont) {
+                                    $bcCont = BC23Cont::create([
+                                        'sppb23_id' => $bc23->id,
+                                        'car'       => $detailCont['car'] ?? null,
+                                        'no_cont'   => $detailCont['nomorKontainer']?? $detailCont['noCont']?? $detailCont['no_cont']?? null,
+                                        'size'      => $detailCont['size'] ?? null,
+                                        'jns_muat'  => $detailCont['jenisMuat']?? $detailCont['jnsMuat']?? null,
+                                    ]);
+
+                                    if (($bc23->jml_cont ?? 0) > 0) {
+                                        $nomorContainer = $detailCont['nomorKontainer']?? $detailCont['noCont']?? $detailCont['no_cont']?? null;
+                                        $size = $detailCont['size'] ?? null;
+                                        $contF = ContF::whereNull('tglkeluar')->where('nocontainer', $nomorContainer)->where('size', $size)->first();
+                                        if ($contF) {
+                                            $alasanSize = null;
+                                            if ($contF->size != $size) {
+                                                $alasanSize = '& Ukuran Fisik Size Berbeda';
+                                            }
+                                            $alasanFinal = 'Bukan Dokumen SPPB. ' . $alasanSize;
+                                            $cust = Customer::where('name', $bc23->nama_imp)->first();
+                                            
+                                            if ($cust) {
+                                                $cust->update([
+                                                    'name'   => $bc23->nama_imp,
+                                                    'npwp'   => $bc23->npwp_imp,
+                                                    'alamat' => $bc23->alamat_imp,
+                                                ]);
+
+                                            } else {
+                                                $cust = null;
+                                                if (!empty($bc23->nama_imp)) {
+                                                    $cust = Customer::create([
+                                                        'name'   => $bc23->nama_imp,
+                                                        'npwp'   => $bc23->npwp_imp,
+                                                        'alamat' => $bc23->alamat_imp,
+                                                    ]);
+                                                    }
+                                            }
+
+                                            $flagTglBl = !empty(trim($bc23->tgl_bl_awb ?? '')) ? $bc23->tgl_bl_awb : (!empty(trim($bc23->tgl_master_bl_awb ?? ''))
+                                                        ? $bc23->tgl_master_bl_awb
+                                                        : null
+                                                );
+
+                                            $flagNoBl = !empty(trim($bc23->no_bl_awb ?? '')) ? $bc23->no_bl_awb : (!empty(trim($bc23->no_master_bl_awb ?? ''))
+                                                        ? $bc23->no_master_bl_awb
+                                                        : null
+                                                );
+
+                                            $contF->update([
+                                                'kd_dok_inout' => 2,
+                                                'no_dok'      => $bc23->no_sppb,
+                                                'tgl_dok'     => $tglSppb,
+                                                'status_bc'   => 'HOLD',
+                                                'alasan_hold' => $alasanFinal,
+                                                'cust_id'     => $cust?->id,
+                                                'nobl'        => $flagNoBl,
+                                            ]);
+                                        }
+                                    }
+                                }
+
+
+                                foreach (($detil['kemasan'] ?? []) as $detailKMS) {
+                                    $bcKMS = BC23Kms::create([
+                                        'sppb23_id' => $bc23->id,
+                                        'car'       => $detailKMS['car'] ?? null,
+                                        'jns_kms'   => $detailKMS['jenisKemasan'] ?? null,
+                                        'merk_kms'  => $detailKMS['merkKemasan'] ?? $detailKMS['merkKms'] ?? null,
+                                        'jml_kms'   => $detailKMS['jumlahKemasan'] ?? null,
+                                    ]);
+
+                                    if (($bc23->jml_cont ?? 0) == 0) {
+                                        $manifest = Manifest::where('nohbl', $bc23->no_bl_awb)->whereNull('tglbuangmty')->first();
+
+                                        if ($manifest) {
+
+                                            $cust = Customer::where('name', $bc23->nama_imp)->first();
+
+                                            if ($cust) {
+                                                $cust->update([
+                                                    'name'   => $bc23->nama_imp,
+                                                    'npwp'   => $bc23->npwp_imp,
+                                                    'alamat' => $bc23->alamat_imp,
+                                                ]);
+                                            } else {
+                                                $cust = null;
+                                                if (!empty($bc23->nama_imp)) {
+                                                    $cust = Customer::create([
+                                                        'name'   => $bc23->nama_imp,
+                                                        'npwp'   => $bc23->npwp_imp,
+                                                        'alamat' => $bc23->alamat_imp,
+                                                    ]);
+                                                }
+                                            }
+
+                                            $alasanKemas = null;
+
+                                            if ($manifest->packing && $manifest->packing->code != $bcKMS->jns_kms) {
+                                                $alasanKemas = 'Jenis Kemas Berbeda';
+                                            }
+
+
+                                            $alasanJml = null;
+
+                                            if ($manifest->quantity != $bcKMS->jml_kms) {
+                                                $alasanJml = 'Quantity Berbeda';
+                                            }
+
+                                            $alasanQty = null;
+
+                                            if ($manifest->final_qty != $manifest->quantity) {
+                                                $alasanQty = 'Jumlah QTY Fisik Berbeda';
+                                            }
+
+
+                                            $alasanFinal = implode(', ', array_filter([
+                                                'Bukan Dokumen SPPB',
+                                                $alasanKemas,
+                                                $alasanJml,
+                                                $alasanQty,
+                                            ]));
+
+
+                                            $manifest->update([
+                                                'kd_dok_inout' => 2,
+                                                'no_dok'      => $bc23->no_sppb,
+                                                'tgl_dok'     => $tglSppb,
+                                                'status_bc'   => 'HOLD',
+                                                'cust_id'     => $cust?->id,
+                                                'alasan_hold' => $alasanFinal,
+                                            ]);
+                                        }
+                                    }
+                                }
+                    }
+                });
+                return response()->json([
+                    'success' => true,
+                    'message'=> 'Data berhasil disimpan'
+                ]);
+
+            } catch (\Throwable $th) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $th->getMessage()
+                ]);
+            }
+
+        }else {
+            return response()->json([
+                'success' => false,
+                'message' => $response['detail'] ?? 'Terjadi kesalahan'
+            ]);
+        }
+    }
+
+    public function bc23OnDemand()
+    {
+        $response = $this->request(
+            'get',
+            $this->baseUrl . '/get-sppb-bc23',
+            [
+                'kodeGudang' => 'INTI',
+                'noSppb' => $request->no_dok,
+                'tglSppb' => Carbon::parse($request->tgl_dok)->format('d-m-Y'),
+                'npwpImp' => $request->npwp
+                // 'noSppb' => '028260/KBC.1006/2026',
+                // 'tglSppb' => '12-08-2026',
+                // 'npwpImp' => '0029884624501000000000'
+            ]
+        )->json();
+
+        // dd($response);
+        if ($response['code'] === 200) {
+            if (empty($response['data'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $response['detail'],
+                    'data' => [],
+                ]);
+            }
+
+             $sppbList = $response['data']['sppb'] ?? [];
+
+            if (empty($sppbList)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $response['detail'] ?? 'Data SPPB tidak ditemukan',
+                    'data' => [],
+                ]);
+            }
+            try {
+                DB::transaction(function () use ($sppbList) {
+                    foreach ($sppbList as $sppb) {
+                        $header = $sppb['header'] ?? [];
+                        $detil = $sppb['detil'] ?? [];    
+
+                        $oldBC23 = BC23::where('car', $header['car'] ?? null)->first();
+                        if ($oldBC23) continue;   
+
+                        $bc23 = BC23::create([
+                            'car' => $header['car'] ?? null,
+                            'no_sppb' => $header['nomorSppb'] ?? null,
+                            'tgl_sppb' => $header['tanggalSppb'] ?? null,
+                            'nojoborder' => null,
+                            'kd_kantor_pengawas' => $header['kodeKantorPengawas'] ?? null,
+                            'kd_kantor_bongkar' => $header['kodeKantorBongkar'] ?? null,
+                            'no_pib' => $header['nomorPib'] ?? null,
+                            'tgl_pib' => $header['tanggalPib'] ?? null,
+                            'nama_imp' => $header['namaImp'] ?? null,
+                            'npwp_imp' => $header['npwpImp'] ?? null,
+                            'alamat_imp' => $header['alamatImp'] ?? null,
+                            'npwp_ppjk' => $header['npwpPpjk'] ?? null,
+                            'nama_ppjk' => $header['namaPpjk'] ?? null,
+                            'alamat_ppjk' => $header['alamatPpjk'] ?? null,
+                            'nm_angkut' => $header['namaAngkut'] ?? null,
+                            'no_voy_flight' => $header['nomorVoyFlight'] ?? null,
+                            'bruto' => $header['bruto'] ?? null,
+                            'netto' => $header['netto'] ?? null,
+                            'gudang' => $header['gudang'] ?? null,
+                            'status_jalur' => $header['statusJalur'] ?? null,
+                            'jml_cont' => $header['jumlahKontainer'] ?? 0,
+                            'no_bc11' => $header['nomorBc11'] ?? null,
+                            'tgl_bc11' => $header['tanggalBc11'] ?? null,
+                            'no_pos_bc11' => $header['nomorPosBc11'] ?? null,
+                            'no_bl_awb' => $header['nomorBlAwb'] ?? null,
+                            'tgl_bl_awb' => $header['tanggalBlAwb'] ?? null,
+                            'no_master_bl_awb' => $header['nomorMasterBlAwb'] ?? null,
+                            'tgl_master_bl_awb' => $header['tanggalMasterBlAwb'] ?? null,
+                            'tgl_upload' => Carbon::today()->format('Y-m-d'),
+                            'jam_upload' => Carbon::now()->format('H:i:s'),
+                        ]);   
+
+                        $tglSppb = !empty($header['tanggalSppb'])
+                            ? Carbon::createFromFormat('d-m-Y', $header['tanggalSppb'])->format('Y-m-d')
+                            : null;   
+
+                        foreach (($detil['kontainer'] ?? []) as $detailCont) {
+                            $nomorContainer = $detailCont['nomorKontainer']
+                                ?? $detailCont['noCont']
+                                ?? $detailCont['no_cont']
+                                ?? null;
+                            $size = $detailCont['size'] ?? null;
+                            $jnsMuat = $detailCont['jenisMuat']
+                                ?? $detailCont['jnsMuat']
+                                ?? null;      
+
+                            BC23Cont::create([
+                                'sppb23_id' => $bc23->id,
+                                'car' => $detailCont['car'] ?? null,
+                                'no_cont' => $nomorContainer,
+                                'size' => $size,
+                                'jns_muat' => $jnsMuat,
+                            ]);   
+
+                            if (($bc23->jml_cont ?? 0) > 0) {
+                                $contF = ContF::whereNull('tglkeluar')
+                                    ->where('nocontainer', $nomorContainer)
+                                    ->where('size', $size)
+                                    ->first();    
+
+                                if ($contF) {
+                                    $alasanSize = $contF->size != $size ? 'Ukuran Fisik Size Berbeda' : null;
+                                    $alasanFinal = implode(', ', array_filter(['Bukan Dokumen SPPB', $alasanSize]));      
+
+                                    $cust = Customer::where('name', $bc23->nama_imp)->first();    
+
+                                    if ($cust) {
+                                        $cust->update([
+                                            'name' => $bc23->nama_imp,
+                                            'npwp' => $bc23->npwp_imp,
+                                            'alamat' => $bc23->alamat_imp,
+                                        ]);
+                                    } elseif (!empty($bc23->nama_imp)) {
+                                        $cust = Customer::create([
+                                            'name' => $bc23->nama_imp,
+                                            'npwp' => $bc23->npwp_imp,
+                                            'alamat' => $bc23->alamat_imp,
+                                        ]);
+                                    }     
+
+                                    $flagNoBl = !empty(trim($bc23->no_bl_awb ?? ''))
+                                        ? $bc23->no_bl_awb
+                                        : (!empty(trim($bc23->no_master_bl_awb ?? '')) ? $bc23->no_master_bl_awb : null);     
+
+                                    $contF->update([
+                                        'kd_dok_inout' => 2,
+                                        'no_dok' => $bc23->no_sppb,
+                                        'tgl_dok' => $tglSppb,
+                                        'status_bc' => 'HOLD',
+                                        'alasan_hold' => $alasanFinal,
+                                        'cust_id' => $cust?->id,
+                                        'nobl' => $flagNoBl,
+                                    ]);
+                                }
+                            }
+                        }     
+
+                        foreach (($detil['kemasan'] ?? []) as $detailKMS) {
+                            $bcKMS = BC23Kms::create([
+                                'sppb23_id' => $bc23->id,
+                                'car' => $detailKMS['car'] ?? null,
+                                'jns_kms' => $detailKMS['jenisKemasan'] ?? null,
+                                'merk_kms' => $detailKMS['merkKemasan'] ?? $detailKMS['merkKms'] ?? null,
+                                'jml_kms' => $detailKMS['jumlahKemasan'] ?? null,
+                            ]);   
+
+                            if (($bc23->jml_cont ?? 0) == 0) {
+                                $manifest = Manifest::where('nohbl', $bc23->no_bl_awb)
+                                    ->whereNull('tglbuangmty')
+                                    ->first();    
+
+                                if ($manifest) {
+                                    $cust = Customer::where('name', $bc23->nama_imp)->first();    
+
+                                    if ($cust) {
+                                        $cust->update([
+                                            'name' => $bc23->nama_imp,
+                                            'npwp' => $bc23->npwp_imp,
+                                            'alamat' => $bc23->alamat_imp,
+                                        ]);
+                                    } elseif (!empty($bc23->nama_imp)) {
+                                        $cust = Customer::create([
+                                            'name' => $bc23->nama_imp,
+                                            'npwp' => $bc23->npwp_imp,
+                                            'alamat' => $bc23->alamat_imp,
+                                        ]);
+                                    }     
+
+                                    $alasanKemas = ($manifest->packing && $manifest->packing->code != $bcKMS->jns_kms)
+                                        ? 'Jenis Kemas Berbeda'
+                                        : null;   
+
+                                    $alasanJml = $manifest->quantity != $bcKMS->jml_kms
+                                        ? 'Quantity Berbeda'
+                                        : null;   
+
+                                    $alasanQty = $manifest->final_qty != $manifest->quantity
+                                        ? 'Jumlah QTY Fisik Berbeda'
+                                        : null;   
+
+                                    $alasanFinal = implode(', ', array_filter([
+                                        'Bukan Dokumen SPPB',
+                                        $alasanKemas,
+                                        $alasanJml,
+                                        $alasanQty,
+                                    ]));      
+
+                                    $manifest->update([
+                                        'kd_dok_inout' => 2,
+                                        'no_dok' => $bc23->no_sppb,
+                                        'tgl_dok' => $tglSppb,
+                                        'status_bc' => 'HOLD',
+                                        'cust_id' => $cust?->id,
+                                        'alasan_hold' => $alasanFinal,
+                                    ]);
+                                }
                             }
                         }
                     }
