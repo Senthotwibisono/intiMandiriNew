@@ -1166,6 +1166,424 @@ class BackController extends Controller
         }
     }
 
+    // Pabean
+    public function pabeanGet()
+    {
+        $response = $this->request(
+            'get',
+            $this->baseUrl . '/get-dokumen-pabean-permit',
+            [
+                'kodeGudang' => 'INTI',
+            ]
+        )->json();
+
+        // dd($response);
+        if ($response['code'] === 200) {
+            if (empty($response['data'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $response['detail'],
+                    'data' => [],
+                ]);
+            }
+            try {
+                DB::transaction(function() use($response){
+                    foreach ($response['data'] as $item) {
+                        $dokumen = $item['dokumenPabean'] ?? [];
+                        $header = $dokumen['header'] ?? [];
+                        $detil = $dokumen['detil'] ?? [];                  
+                        if (empty($header['car'])) {
+                            continue;
+                        }                  
+                        $oldPabean = Pabean::where('car', $header['car'])->first();                
+                        if ($oldPabean) {
+                            continue;
+                        }                  
+                        $tglDok = !empty($header['tanggalDokumenInOut'])
+                            ? Carbon::createFromFormat('d-m-Y', $header['tanggalDokumenInOut'])->format('Y-m-d')
+                            : null;                
+                        $tglDaftar = !empty($header['tanggalDaftar'])
+                            ? Carbon::createFromFormat('d-m-Y', $header['tanggalDaftar'])->format('Y-m-d')
+                            : null;                
+                        $tglBc11 = !empty($header['tanggalBc11'])
+                            ? Carbon::createFromFormat('d-m-Y', $header['tanggalBc11'])->format('Y-m-d')
+                            : null;                
+                        $tglBlAwb = !empty($header['tanggalBlAWb'])
+                            ? Carbon::createFromFormat('d-m-Y', $header['tanggalBlAWb'])->format('Y-m-d')
+                            : null;                
+                        $tglMasterBlAwb = !empty($header['tanggalMasterBlAwb'])
+                            ? Carbon::createFromFormat('d-m-Y', $header['tanggalMasterBlAwb'])->format('Y-m-d')
+                            : null;                
+                        $pabean = Pabean::create([
+                            'kd_dok_inout' => $header['kodeDokumenInOut'] ?? null,
+                            'car' => $header['car'],
+                            'no_dok_inout' => $header['nomorDokumenInOut'] ?? null,
+                            'tgl_dok_inout' => $tglDok,
+                            'no_daftar' => $header['nomorDaftar'] ?? null,
+                            'tgl_daftar' => $tglDaftar,
+                            'kd_kantor' => $header['kodeKantor'] ?? null,
+                            'kd_kantor_pengawas' => $header['kodeKantorPengawas'] ?? null,
+                            'kd_kantor_bongkar' => $header['kodeKantorBongkar'] ?? null,
+                            'npwp_imp' => $header['npwpImp'] ?? null,
+                            'nm_imp' => $header['namaImp'] ?? null,
+                            'al_imp' => $header['alamatImp'] ?? null,
+                            'npwp_ppjk' => $header['npwpPpjk'] ?? null,
+                            'nm_ppjk' => $header['namaPpjk'] ?? null,
+                            'al_ppjk' => $header['alamatPpjk'] ?? null,
+                            'nm_angkut' => $header['namaAngkut'] ?? null,
+                            'no_voy_flight' => $header['nomorVoyFlight'] ?? null,
+                            'brutto' => $header['bruto'] ?? null,
+                            'netto' => $header['netto'] ?? null,
+                            'gudang' => $header['gudang'] ?? null,
+                            'status_jalur' => $header['statusJalur'] ?? null,
+                            'jml_cont' => $header['jumlahKontainer'] ?? 0,
+                            'no_bc11' => $header['nomorBc11'] ?? null,
+                            'tgl_bc11' => $tglBc11,
+                            'no_pos_bc11' => $header['nomorPosBc11'] ?? null,
+                            'no_bl_awb' => $header['nomorBlAwb'] ?? null,
+                            'tgl_bl_awb' => $tglBlAwb,
+                            'no_master_bl_awb' => $header['nomorMasterBlAwb'] ?? null,
+                            'tgl_master_bl_awb' => $tglMasterBlAwb,
+                            'fl_segel' => $header['flagSegel'] ?? null,
+                            'tgl_upload' => Carbon::today()->format('Y-m-d'),
+                            'jam_upload' => Carbon::now()->format('H:i:s'),
+                        ]);                
+                        foreach (($detil['kontainer'] ?? []) as $detailCont) {
+                            $pabeanCont = PabeanCont::create([
+                                'pabean_id' => $pabean->id,
+                                'car' => $detailCont['car'] ?? $header['car'],
+                                'no_cont' => $detailCont['nomorKontainer'] ?? null,
+                                'ukr_cont' => $detailCont['ukuranKontainer'] ?? null,
+                                'size' => $detailCont['ukuranKontainer'] ?? null,
+                                'jns_muat' => $detailCont['jenisMuat'] ?? null,
+                            ]);                
+                            if ($pabean->jml_cont > 0) {
+                                $contF = ContF::whereNull('tglkeluar')
+                                    ->where('nocontainer', $detailCont['nomorKontainer'] ?? null)
+                                    ->first();                 
+                                if ($contF) {
+                                    $alasanSize = $contF->size != ($detailCont['ukuranKontainer'] ?? null)
+                                        ? '& Ukuran Fisik Size Berbeda'
+                                        : null;                
+                                    $alasanFinal = 'Bukan Dokumen SPPB. ' . $alasanSize;                   
+                                    $cust = Customer::where('name', $pabean->nm_imp)->first();                 
+                                    if ($cust) {
+                                        $cust->update([
+                                            'name' => $pabean->nm_imp,
+                                            'npwp' => $pabean->npwp_imp,
+                                            'alamat' => $pabean->al_imp,
+                                        ]);
+                                    }                  
+                                    $newCust = null;                   
+                                    if (!$cust && $pabean->nm_imp != null) {
+                                        $newCust = Customer::create([
+                                            'name' => $pabean->nm_imp,
+                                            'npwp' => $pabean->npwp_imp,
+                                            'alamat' => $pabean->al_imp,
+                                        ]);
+                                    }                  
+                                    $flagTglBl = !empty(trim($pabean->tgl_bl_awb ?? ''))
+                                        ? $pabean->tgl_bl_awb
+                                        : (!empty(trim($pabean->tgl_master_bl_awb ?? ''))
+                                            ? $pabean->tgl_master_bl_awb
+                                            : null);                   
+                                    $flagNoBl = !empty(trim($pabean->no_bl_awb ?? ''))
+                                        ? $pabean->no_bl_awb
+                                        : (!empty(trim($pabean->no_master_bl_awb ?? ''))
+                                            ? $pabean->no_master_bl_awb
+                                            : null);                   
+                                    $contF->update([
+                                        'kd_dok_inout' => $pabean->kd_dok_inout,
+                                        'no_dok' => $pabean->no_dok_inout,
+                                        'tgl_dok' => $tglDok,
+                                        'status_bc' => 'HOLD',
+                                        'alasan_hold' => $alasanFinal,
+                                        'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
+                                        'nobl' => $flagNoBl,
+                                    ]);
+                                }
+                            }
+                        }                  
+                        foreach (($detil['kemasan'] ?? []) as $detailKms) {
+                            PabeanKms::create([
+                                'pabean_id' => $pabean->id,
+                                'car' => $detailKms['car'] ?? $header['car'],
+                                'jns_kms' => $detailKms['jenisKemasan'] ?? null,
+                                'jml_kms' => $detailKms['jumlahKemasan'] ?? 0,
+                            ]);                
+                            if ($pabean->jml_cont == 0) {
+                                $manifest = Manifest::where('nohbl', $pabean->no_bl_awb)
+                                    ->whereNull('tglbuangmty')
+                                    ->first();                 
+                                if ($manifest) {
+                                    $alasanCust = null;
+                                    $statusBC = 'release';                 
+                                    $cust = Customer::where('name', $pabean->nm_imp)->first();                 
+                                    if ($cust) {
+                                        $cust->update([
+                                            'name' => $pabean->nm_imp,
+                                            'npwp' => $pabean->npwp_imp,
+                                            'alamat' => $pabean->al_imp,
+                                        ]);
+                                    }                  
+                                    $newCust = null;                   
+                                    if (!$cust && $pabean->nm_imp != null) {
+                                        $newCust = Customer::create([
+                                            'name' => $pabean->nm_imp,
+                                            'npwp' => $pabean->npwp_imp,
+                                            'alamat' => $pabean->al_imp,
+                                        ]);
+                                    }                  
+                                    $alasanFinal = 'Bukan Dokume SPPB, ' . $alasanCust . ', ';                 
+                                    $manifest->update([
+                                        'kd_dok_inout' => $pabean->kd_dok_inout,
+                                        'no_dok' => $pabean->no_dok_inout,
+                                        'tgl_dok' => $tglDok,
+                                        'status_bc' => $statusBC,
+                                        'alasan_hold' => $alasanFinal,
+                                        'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
+                                    ]);
+                                }
+                            }
+                        }
+                    }
+                });
+                return response()->json([
+                    'success' => true,
+                    'message'=> 'Data berhasil disimpan'
+                ]);
+
+            } catch (\Throwable $th) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $th->getMessage()
+                ]);
+            }
+
+        }else {
+            return response()->json([
+                'success' => false,
+                'message' => $response['detail'] ?? 'Terjadi kesalahan'
+            ]);
+        }
+    }
+
+    public function pabeanOnDemand(Request $request)
+    {
+        $response = $this->request(
+            'get',
+            $this->baseUrl . '/get-dokumen-pabean-ondemand',
+            [
+                'kodeDokumen' => $request->kd_dok,
+                'nomorDokumen' => $request->no_dok,
+                'tanggalDokumen' => carbon::parse($request->tgl_dok)->format('d-m-Y'),
+            ]
+        )->json();
+
+        // dd($response);
+        if ($response['code'] === 200) {
+            if (empty($response['data'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $response['detail'],
+                    'data' => [],
+                ]);
+            }
+            try {
+                DB::transaction(function() use($response){
+                    foreach ($response['data'] as $item) {
+                       $header = $item['header'] ?? [];
+                       $containers = $item['containers'] ?? [];
+                       $kemasan = $item['kemasan'] ?? [];
+
+                    //    if (empty($header['car'])) {
+                    //        continue;
+                    //    }
+
+                       $oldPabean = Pabean::where('car', $header['car'])->first();
+
+                    //    if ($oldPabean) {
+                    //        continue;
+                    //    }
+
+                       $tglDok = !empty($header['tanggalDokumenInOut'])
+                           ? Carbon::createFromFormat('d-m-Y', $header['tanggalDokumenInOut'])->format('Y-m-d')
+                           : null;
+
+                       $tglDaftar = !empty($header['tanggalDaftar'])
+                           ? Carbon::createFromFormat('d-m-Y', $header['tanggalDaftar'])->format('Y-m-d')
+                           : null;
+
+                       $tglBc11 = !empty($header['tanggalBc11'])
+                           ? Carbon::createFromFormat('d-m-Y', $header['tanggalBc11'])->format('Y-m-d')
+                           : null;
+
+                       $tglBlAwb = !empty($header['tanggalBlAwb'])
+                           ? Carbon::createFromFormat('d-m-Y', $header['tanggalBlAwb'])->format('Y-m-d')
+                           : null;
+
+                       $tglMasterBlAwb = !empty($header['tanggalMasterBlAwb'])
+                           ? Carbon::createFromFormat('d-m-Y', $header['tanggalMasterBlAwb'])->format('Y-m-d')
+                           : null;
+
+                       $pabean = Pabean::create([
+                           'kd_dok_inout' => $header['kodeDokumenInOut'] ?? null,
+                           'car' => $header['car'],
+                           'no_dok_inout' => $header['nomorDokumenInOut'] ?? null,
+                           'tgl_dok_inout' => $tglDok,
+                           'no_daftar' => $header['nomorDaftar'] ?? null,
+                           'tgl_daftar' => $tglDaftar,
+                           'kd_kantor' => $header['kodeKantor'] ?? null,
+                           'kd_kantor_pengawas' => $header['kodeKantorPengawas'] ?? null,
+                           'kd_kantor_bongkar' => $header['kodeKantorBongkar'] ?? null,
+                           'npwp_imp' => $header['npwpImp'] ?? null,
+                           'nm_imp' => $header['namaImp'] ?? null,
+                           'al_imp' => $header['alamatImp'] ?? null,
+                           'npwp_ppjk' => $header['npwpPpjk'] ?? null,
+                           'nm_ppjk' => $header['namaPpjk'] ?? null,
+                           'al_ppjk' => $header['alamatPpjk'] ?? null,
+                           'nm_angkut' => $header['namaAngkut'] ?? null,
+                           'no_voy_flight' => $header['nomorVoyFlight'] ?? null,
+                           'brutto' => $header['bruto'] ?? null,
+                           'netto' => $header['netto'] ?? null,
+                           'gudang' => $header['gudang'] ?? null,
+                           'status_jalur' => $header['statusJalur'] ?? null,
+                           'jml_cont' => $header['jumlahKontainer'] ?? 0,
+                           'no_bc11' => $header['nomorBc11'] ?? null,
+                           'tgl_bc11' => $tglBc11,
+                           'no_pos_bc11' => $header['nomorPosBc11'] ?? null,
+                           'no_bl_awb' => $header['nomorBlAwb'] ?? null,
+                           'tgl_bl_awb' => $tglBlAwb,
+                           'no_master_bl_awb' => $header['nomorMasterBlAwb'] ?? null,
+                           'tgl_master_bl_awb' => $tglMasterBlAwb,
+                           'fl_segel' => $header['flagSegel'] ?? null,
+                           'tgl_upload' => Carbon::today()->format('Y-m-d'),
+                           'jam_upload' => Carbon::now()->format('H:i:s'),
+                       ]);
+
+                       foreach ($containers as $detailCont) {
+                           $nomorContainer = $detailCont['nomorContainer'] ?? null;
+                           $ukuranContainer = $detailCont['ukuranContainer'] ?? null;
+
+                           PabeanCont::create([
+                               'pabean_id' => $pabean->id,
+                               'car' => $detailCont['car'] ?? $header['car'],
+                               'no_cont' => $nomorContainer,
+                               'ukr_cont' => $ukuranContainer,
+                               'size' => $ukuranContainer,
+                               'jns_muat' => $detailCont['jenisMuat'] ?? null,
+                           ]);
+
+                           if ($pabean->jml_cont > 0 && $nomorContainer) {
+                               $contF = ContF::whereNull('tglkeluar')
+                                   ->where('nocontainer', $nomorContainer)
+                                   ->first();
+
+                               if ($contF) {
+                                   $alasanSize = $contF->size != $ukuranContainer
+                                       ? '& Ukuran Fisik Size Berbeda'
+                                       : null;
+
+                                   $alasanFinal = 'Bukan Dokumen SPPB. ' . $alasanSize;
+
+                                   $cust = Customer::where('name', $pabean->nm_imp)->first();
+
+                                   if ($cust) {
+                                       $cust->update([
+                                           'name' => $pabean->nm_imp,
+                                           'npwp' => $pabean->npwp_imp,
+                                           'alamat' => $pabean->al_imp,
+                                       ]);
+                                   } else {
+                                       $cust = Customer::create([
+                                           'name' => $pabean->nm_imp,
+                                           'npwp' => $pabean->npwp_imp,
+                                           'alamat' => $pabean->al_imp,
+                                       ]);
+                                   }
+
+                                   $flagNoBl = !empty(trim($pabean->no_bl_awb ?? ''))
+                                       ? $pabean->no_bl_awb
+                                       : (!empty(trim($pabean->no_master_bl_awb ?? ''))
+                                           ? $pabean->no_master_bl_awb
+                                           : null);
+
+                                   $contF->update([
+                                       'kd_dok_inout' => $pabean->kd_dok_inout,
+                                       'no_dok' => $pabean->no_dok_inout,
+                                       'tgl_dok' => $tglDok,
+                                       'status_bc' => 'HOLD',
+                                       'alasan_hold' => $alasanFinal,
+                                       'cust_id' => $cust->id,
+                                       'nobl' => $flagNoBl,
+                                   ]);
+                               }
+                           }
+                       }
+
+                       foreach ($kemasan as $detailKms) {
+                           PabeanKms::create([
+                               'pabean_id' => $pabean->id,
+                               'car' => $detailKms['car'] ?? $header['car'],
+                               'jns_kms' => $detailKms['jenisKemasan'] ?? null,
+                               'jml_kms' => $detailKms['jumlahKemasan'] ?? 0,
+                           ]);
+
+                           if ($pabean->jml_cont == 0) {
+                               $manifest = Manifest::where('nohbl', $pabean->no_bl_awb)
+                                   ->whereNull('tglbuangmty')
+                                   ->first();
+
+                               if ($manifest) {
+                                   $cust = Customer::where('name', $pabean->nm_imp)->first();
+
+                                   if ($cust) {
+                                       $cust->update([
+                                           'name' => $pabean->nm_imp,
+                                           'npwp' => $pabean->npwp_imp,
+                                           'alamat' => $pabean->al_imp,
+                                       ]);
+                                   } else {
+                                       $cust = Customer::create([
+                                           'name' => $pabean->nm_imp,
+                                           'npwp' => $pabean->npwp_imp,
+                                           'alamat' => $pabean->al_imp,
+                                       ]);
+                                   }
+
+                                   $manifest->update([
+                                       'kd_dok_inout' => $pabean->kd_dok_inout,
+                                       'no_dok' => $pabean->no_dok_inout,
+                                       'tgl_dok' => $tglDok,
+                                       'status_bc' => 'release',
+                                       'alasan_hold' => 'Bukan Dokume SPPB, , ',
+                                       'cust_id' => $cust->id,
+                                   ]);
+                               }
+                           }
+                       }
+                    }
+                });
+                return response()->json([
+                    'success' => true,
+                    'message'=> 'Data berhasil disimpan'
+                ]);
+
+            } catch (\Throwable $th) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $th->getMessage()
+                ]);
+            }
+
+        }else {
+            return response()->json([
+                'success' => false,
+                'message' => $response['detail'] ?? 'Terjadi kesalahan'
+            ]);
+        }
+    }
+
     // Tracking
     public function apiTrackingIn()
     {
