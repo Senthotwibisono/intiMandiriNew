@@ -388,6 +388,17 @@
                     }
                 }
             ],
+            createdRow: function(row, data, dataIndex) {
+                if (data.joborder_id === null || data.joborder_id === '') {
+                    $(row).css({
+                        'background-color': '#800000',
+                        'color': '#ffffff'
+                    });
+
+                    // Supaya text di dalam td juga putih
+                    $(row).find('td').css('color', '#ffffff');
+                }
+            },
             pageLength: 25,
         })
     })

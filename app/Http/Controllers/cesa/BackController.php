@@ -282,7 +282,7 @@ class BackController extends Controller
                             'no_bc11' => $header['nomorBc11'],
                             'tgl_bc11' => $header['tanggalBc11'],
                             'ref_number' => $header['refNumber'],
-                            'uid' => Auth::id(),
+                            'uid' => 1,
                             'consolidator_id' => $consolidator->id,
                             'namaconsolidator' => $consolidator->namaconsolidator,
                         ]);

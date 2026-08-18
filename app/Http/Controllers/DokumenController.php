@@ -70,7 +70,7 @@ class DokumenController extends Controller
 
     public function plpData(Request $request)
     {
-        $dokumen = PLP::with('user')->orderBy('tgl_upload', 'desc');
+        $dokumen = PLP::with('user')->orderByRaw('joborder_id IS NOT NULL')->orderBy('tgl_upload', 'desc');
         return DataTables::of($dokumen)->make(true);
     }
 
