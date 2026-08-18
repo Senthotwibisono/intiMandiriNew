@@ -2155,7 +2155,7 @@ class BackController extends Controller
                     ? Carbon::parse($container->job->tgl_berangkat)->format('d-m-Y')
                     : null,
                 "namaAngkut"          => $container->job->dokplp->nm_angkut ?? null,
-                "refNumber"           => Str::random(20),
+                "refNumber"           => Str::random(18),
                 "kodeSaranaPengangkut"=> $container->job->kode_sarana_pengangkut ?? null,
                 "kodeTps"             => "1MUT",
                 "tanggalTiba"         => !empty($container->job->dokplp->tgl_tiba)
@@ -2307,7 +2307,7 @@ class BackController extends Controller
                     ? Carbon::parse($container->job->tgl_berangkat)->format('d-m-Y')
                     : null,
                 "namaAngkut"          => $container->job->dokplp->nm_angkut ?? null,
-                "refNumber"           => Str::random(20),
+                "refNumber"           => Str::random(18),
                 "kodeSaranaPengangkut"=> $container->job->kode_sarana_pengangkut ?? null,
                 "kodeTps"             => "1MUT",
                 "tanggalTiba"         => !empty($container->job->dokplp->tgl_tiba)
@@ -2470,7 +2470,7 @@ class BackController extends Controller
                     ? Carbon::parse($container->job->tgl_berangkat)->format('d-m-Y')
                     : null,
                 "namaAngkut"          => $container->job->dokplp->nm_angkut ?? null,
-                "refNumber"           => Str::random(20),
+                "refNumber"           => Str::random(18),
                 "kodeSaranaPengangkut"=> $container->job->kode_sarana_pengangkut ?? null,
                 "kodeTps"             => "1MUT",
                 "tanggalTiba"         => !empty($container->job->dokplp->tgl_tiba)
@@ -2627,7 +2627,7 @@ class BackController extends Controller
                     ? Carbon::parse($container->job->tgl_berangkat)->format('d-m-Y')
                     : null,
                 "namaAngkut"          => $container->job->dokplp->nm_angkut ?? null,
-                "refNumber"           => Str::random(20),
+                "refNumber"           => Str::random(18),
                 "kodeSaranaPengangkut"=> $container->job->kode_sarana_pengangkut ?? null,
                 "kodeTps"             => "1MUT",
                 "tanggalTiba"         => !empty($container->job->dokplp->tgl_tiba)
