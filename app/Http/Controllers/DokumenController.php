@@ -2096,7 +2096,7 @@ class DokumenController extends Controller
             'call_sign' => $plp->call_sign,
             'nospk' => $request->nospk,
             'forwarding_id' => $request->forwarding_id,
-            'eta' => $plp->tgl_tiba,
+            'eta' => Carbon::parse($plp->tgl_tiba)->format('Y-m-d'),
             'lokasisandar_id' => $lokId,
         ]);
     }
@@ -2138,7 +2138,7 @@ class DokumenController extends Controller
             'call_sign' => $plp->call_sign,
             'nospk' => $request->nospk,
             'forwarding_id' => $request->forwarding_id,
-            'eta' => $plp->tgl_tiba,
+            'eta' => Carbon::parse($plp->tgl_tiba)->format('Y-m-d'),
             'lokasisandar_id' => $lokId,
         ]);
     }
