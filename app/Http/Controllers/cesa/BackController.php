@@ -1029,7 +1029,7 @@ class BackController extends Controller
                                 ?? $detailCont['noCont']
                                 ?? $detailCont['no_cont']
                                 ?? null;
-                            $size = $detailCont['size'] ?? null;
+                            $size = $detailCont['size'] ?? $detailCont['ukuranKontainer'] ?? null;
                             $jnsMuat = $detailCont['jenisMuat']
                                 ?? $detailCont['jnsMuat']
                                 ?? null;      
