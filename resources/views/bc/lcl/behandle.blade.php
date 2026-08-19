@@ -9,6 +9,7 @@
 <style>
     .highlight-blue {
         background-color: blue !important;
+        color: white !important;
     }
     .highlight-green {
         background-color: green !important;
