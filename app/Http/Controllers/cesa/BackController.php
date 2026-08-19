@@ -605,14 +605,14 @@ class BackController extends Controller
                     'kemasan' => $kemasan,
                 ];
 
-                $payloadCFS = [
-                    'Username' => '1MUT',
-                    'Password' => '1MUT',
-                    'Kode_TPS' => '1MUT',
-                    'fStream' => [
-                        $dataCfs
-                    ],
-                ];
+                // $payloadCFS = [
+                //     'Username' => '1MUT',
+                //     'Password' => '1MUT',
+                //     'Kode_TPS' => '1MUT',
+                //     'fStream' => [
+                //         $dataCfs
+                //     ],
+                // ];
 
                 $responseCFS = Http::timeout(60)
                     ->withHeaders([
@@ -624,7 +624,7 @@ class BackController extends Controller
                     ])
                     ->post(
                         'https://pelindo-cfscenter.com/index.php/apijson/receivepermit',
-                        $payloadCFS
+                        $dataCfs
                     );
 
                 if (!$responseCFS->successful()) {
