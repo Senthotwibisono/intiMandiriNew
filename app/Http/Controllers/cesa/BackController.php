@@ -604,38 +604,31 @@ class BackController extends Controller
                     'kontainer' => $kontainer,
                     'kemasan' => $kemasan,
                 ];
+                $cfsSuccess = false;
+                $cfsResponse = null;
+                $cfsStatus = null;
 
-                // $payloadCFS = [
-                //     'Username' => '1MUT',
-                //     'Password' => '1MUT',
-                //     'Kode_TPS' => '1MUT',
-                //     'fStream' => [
-                //         $dataCfs
-                //     ],
-                // ];
+                try {
+                    $responseCFS = Http::timeout(60)
+                        ->withBasicAuth('1MUT', '1MUT')
+                        ->withoutVerifying()
+                        ->withHeaders([
+                            'Accept' => 'application/json',
+                            'Content-Type' => 'application/json',
+                        ])
+                        ->post(
+                            'https://pelindo-cfscenter.com/index.php/apijson/receivepermit',
+                            $dataCfs
+                        );
 
-                $responseCFS = Http::timeout(60)
-                    ->withBasicAuth('1MUT', '1MUT')
-                    ->withoutVerifying()
-                    ->withHeaders([
-                        'Accept' => 'application/json',
-                        'Content-Type' => 'application/json',
-                        'Username' => '1MUT',
-                        'Password' => 'INTIMANDIRI1',
-                        'Kode_TPS' => '1MUT',
-                    ])
-                    ->post(
-                        'https://pelindo-cfscenter.com/index.php/apijson/receivepermit',
-                        $dataCfs
-                    );
-
-                if (!$responseCFS->successful()) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Gagal mengirim data ke CFS Center',
-                        'status' => $responseCFS->status(),
-                        'response' => $responseCFS->json() ?? $responseCFS->body(),
-                    ]);
+                    $cfsSuccess = $responseCFS->successful();
+                    $cfsStatus = $responseCFS->status();
+                    $cfsResponse = $responseCFS->json() ?? $responseCFS->body();
+                } catch (\Throwable $e) {
+                    $cfsSuccess = false;
+                    $cfsResponse = [
+                        'message' => $e->getMessage()
+                    ];
                 }
                 $result = db::transaction(function() use($response){
     
@@ -776,7 +769,12 @@ class BackController extends Controller
                 });
                 return response()->json([
                     'success' => true,
-                    'message'=> 'Data berhasil disimpan'
+                    'message' => $cfsSuccess
+                        ? 'Data berhasil disimpan dan dikirim ke CFS Center'
+                        : 'Data berhasil disimpan, tetapi pengiriman ke CFS Center gagal',
+                    'cfs_success' => $cfsSuccess,
+                    'cfs_status' => $cfsStatus,
+                    'cfs_response' => $cfsResponse,
                 ]);
 
             } catch (\Throwable $th) {
