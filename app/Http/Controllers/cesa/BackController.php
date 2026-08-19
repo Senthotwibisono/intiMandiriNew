@@ -849,10 +849,10 @@ class BackController extends Controller
                     'success' => true,
                     'message' => $cfsSuccess
                         ? 'Data berhasil disimpan dan dikirim ke CFS Center'
-                        : 'Data berhasil disimpan, tetapi pengiriman ke CFS Center gagal :' . $cfsResponse['message'],
-                    'cfs_success' => $cfsSuccess,
-                    'cfs_status' => $cfsStatus,
-                    'cfs_response' => $cfsResponse,
+                        : 'Data berhasil disimpan, tetapi pengiriman ke CFS Center gagal :' . ($cfsResponse['message'] ?? null),
+                    'cfs_success' => $cfsSuccess ?? null,
+                    'cfs_status' => $cfsStatus ?? null,
+                    'cfs_response' => $cfsResponse ?? null,
                 ]);
 
             } catch (\Throwable $th) {
