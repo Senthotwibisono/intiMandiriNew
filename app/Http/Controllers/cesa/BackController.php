@@ -618,6 +618,9 @@ class BackController extends Controller
                     ->withHeaders([
                         'Accept' => 'application/json',
                         'Content-Type' => 'application/json',
+                        'Username' => '1MUT',
+                        'Password' => '1MUT',
+                        'Kode_TPS' => '1MUT',
                     ])
                     ->post(
                         'https://pelindo-cfscenter.com/index.php/apijson/receivepermit',
