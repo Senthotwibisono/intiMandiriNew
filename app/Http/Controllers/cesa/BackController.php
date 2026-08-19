@@ -1407,6 +1407,7 @@ class BackController extends Controller
 
                 $cfsSuccess = false;
                 $cfsResponse = null;
+                $cfsResult = null;
                 $cfsStatus = null;  
 
                 try {
@@ -1425,6 +1426,7 @@ class BackController extends Controller
                     $cfsSuccess = $responseCFS->successful();
                     $cfsStatus = $responseCFS->status();
                     $cfsResponse = $responseCFS->json() ?? $responseCFS->body();    
+                    $cfsResult = $cfsResponse['message'];    
 
                     if ($cfsSuccess) {
                         $hasil['cfs_berhasil']++;
@@ -1434,6 +1436,9 @@ class BackController extends Controller
                 } catch (\Throwable $e) {
                     $cfsSuccess = false;
                     $cfsResponse = [
+                        'message' => $e->getMessage()
+                    ];  
+                    $cfsResult = [
                         'message' => $e->getMessage()
                     ];  
 
@@ -1633,6 +1638,7 @@ class BackController extends Controller
                     'cfs_success' => $cfsSuccess,
                     'cfs_status' => $cfsStatus,
                     'cfs_response' => $cfsResponse,
+                    'cfs_result' => $cfsResult,
                 ];  
 
             } catch (\Throwable $th) {
