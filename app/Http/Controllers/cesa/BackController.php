@@ -950,8 +950,8 @@ class BackController extends Controller
                             'kontainer' => $kontainer ?? (object) [],
                         ],
                         'header' => [
-                            'tanggalBc11' => $header['tanggalBc11'] ?? null,
-                            'tanggalBlAwb' => $header['tanggalBlAwb'] ?? null,
+                            'tanggalBc11' => !empty($header['tanggalBc11']) ? Carbon::parse($header['tanggalBc11'])->format('Y-m-d') : null,
+                            'tanggalBlAwb' => !empty($header['tanggalBlAwb']) ? Carbon::parse($header['tanggalBlAwb'])->format('Y-m-d') : null,
                             'gudang' => $header['gudang'] ?? null,
                             'statusJalur' => $header['statusJalur'] ?? null,
                             'nomorBc11' => $header['nomorBc11'] ?? null,
@@ -961,16 +961,16 @@ class BackController extends Controller
                             'car' => $header['car'] ?? null,
                             'namaAngkut' => $header['namaAngkut'] ?? null,
                             'nomorBlAwb' => $header['nomorBlAwb'] ?? null,
-                            'tanggalPib' => $header['tanggalPib'] ?? null,
+                            'tanggalPib' => !empty($header['tanggalPib']) ? Carbon::parse($header['tanggalPib'])->format('Y-m-d') : null,
                             'kodeKantorBongkar' => $header['kodeKantorBongkar'] ?? null,
                             'npwpPpjk' => $header['npwpPpjk'] ?? null,
                             'nomorPosBc11' => $header['nomorPosBc11'] ?? null,
-                            'tanggalMasterBlAwb' => $header['tanggalMasterBlAwb'] ?? null,
+                            'tanggalMasterBlAwb' => !empty($header['tanggalMasterBlAwb']) ? Carbon::parse($header['tanggalMasterBlAwb'])->format('Y-m-d') : null,
                             'nomorVoyFlight' => $header['nomorVoyFlight'] ?? null,
                             'namaImp' => $header['namaImp'] ?? null,
                             'netto' => $header['netto'] ?? null,
                             'idHeader' => $header['idHeader'] ?? null,
-                            'tanggalSppb' => $header['tanggalSppb'] ?? null,
+                            'tanggalSppb' => !empty($header['tanggalSppb']) ? Carbon::parse($header['tanggalSppb'])->format('Y-m-d') : null,
                             'kodeKantorPengawas' => $header['kodeKantorPengawas'] ?? null,
                             'alamatPpjk' => $header['alamatPpjk'] ?? null,
                             'nomorSppb' => $header['nomorSppb'] ?? null,
@@ -980,7 +980,7 @@ class BackController extends Controller
                             'jumlahKontainer' => $header['jumlahKontainer'] ?? 0,
                         ],
                     ],
-                ];  
+                ];
 
                 /*
                  * ==========================================================
@@ -1363,12 +1363,18 @@ class BackController extends Controller
                 $dataCfs = [
                     'sppb' => [
                         'detil' => [
-                            'kemasan' => $kemasan ?? (object) [],
-                            'kontainer' => $kontainer ?? (object) [],
+                            'kemasan' => $kemasan,
+                            'kontainer' => $kontainer,
                         ],
                         'header' => [
-                            'tanggalBc11' => $header['tanggalBc11'] ?? null,
-                            'tanggalBlAwb' => $header['tanggalBlAwb'] ?? null,
+                            'tanggalBc11' => !empty($header['tanggalBc11'])
+                                ? Carbon::parse($header['tanggalBc11'])->format('Y-m-d')
+                                : null,             
+
+                            'tanggalBlAwb' => !empty($header['tanggalBlAwb'])
+                                ? Carbon::parse($header['tanggalBlAwb'])->format('Y-m-d')
+                                : null,             
+
                             'gudang' => $header['gudang'] ?? null,
                             'statusJalur' => $header['statusJalur'] ?? null,
                             'nomorBc11' => $header['nomorBc11'] ?? null,
@@ -1377,17 +1383,29 @@ class BackController extends Controller
                             'alamatImp' => $header['alamatImp'] ?? null,
                             'car' => $header['car'] ?? null,
                             'namaAngkut' => $header['namaAngkut'] ?? null,
-                            'nomorBlAwb' => $header['nomorBlAwb'] ?? null,
-                            'tanggalPib' => $header['tanggalPib'] ?? null,
+                            'nomorBlAwb' => $header['nomorBlAwb'] ?? null,              
+
+                            'tanggalPib' => !empty($header['tanggalPib'])
+                                ? Carbon::parse($header['tanggalPib'])->format('Y-m-d')
+                                : null,             
+
                             'kodeKantorBongkar' => $header['kodeKantorBongkar'] ?? null,
                             'npwpPpjk' => $header['npwpPpjk'] ?? null,
-                            'nomorPosBc11' => $header['nomorPosBc11'] ?? null,
-                            'tanggalMasterBlAwb' => $header['tanggalMasterBlAwb'] ?? null,
+                            'nomorPosBc11' => $header['nomorPosBc11'] ?? null,              
+
+                            'tanggalMasterBlAwb' => !empty($header['tanggalMasterBlAwb'])
+                                ? Carbon::parse($header['tanggalMasterBlAwb'])->format('Y-m-d')
+                                : null,             
+
                             'nomorVoyFlight' => $header['nomorVoyFlight'] ?? null,
                             'namaImp' => $header['namaImp'] ?? null,
                             'netto' => $header['netto'] ?? null,
-                            'idHeader' => $header['idHeader'] ?? null,
-                            'tanggalSppb' => $header['tanggalSppb'] ?? null,
+                            'idHeader' => $header['idHeader'] ?? null,              
+
+                            'tanggalSppb' => !empty($header['tanggalSppb'])
+                                ? Carbon::parse($header['tanggalSppb'])->format('Y-m-d')
+                                : null,             
+
                             'kodeKantorPengawas' => $header['kodeKantorPengawas'] ?? null,
                             'alamatPpjk' => $header['alamatPpjk'] ?? null,
                             'nomorSppb' => $header['nomorSppb'] ?? null,
@@ -1397,7 +1415,7 @@ class BackController extends Controller
                             'jumlahKontainer' => $header['jumlahKontainer'] ?? 0,
                         ],
                     ],
-                ];  
+                ];
 
                 /*
                  * ==========================================================
