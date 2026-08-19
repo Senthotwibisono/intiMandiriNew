@@ -1338,18 +1338,18 @@ class BackController extends Controller
 
                 $oldBC23 = BC23::where('car', $header['car'] ?? null)->first(); 
 
-                if ($oldBC23) {
-                    $hasil['dilewati']++;   
+                // if ($oldBC23) {
+                //     $hasil['dilewati']++;   
 
-                    $hasil['detail'][] = [
-                        'status' => 'skip',
-                        'car' => $header['car'] ?? null,
-                        'no_sppb' => $header['nomorSppb'] ?? null,
-                        'message' => 'BC23 sudah ada',
-                    ];  
+                //     $hasil['detail'][] = [
+                //         'status' => 'skip',
+                //         'car' => $header['car'] ?? null,
+                //         'no_sppb' => $header['nomorSppb'] ?? null,
+                //         'message' => 'BC23 sudah ada',
+                //     ];  
 
-                    continue;
-                }   
+                //     continue;
+                // }   
 
                 /*
                  * ==========================================================
