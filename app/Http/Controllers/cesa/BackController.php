@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 use Carbon\Carbon;
+use Auth;
 
 use App\Models\cesa\Token;
 
