@@ -615,6 +615,7 @@ class BackController extends Controller
                 // ];
 
                 $responseCFS = Http::timeout(60)
+                    ->withBasicAuth('1MUT', '1MUT')
                     ->withHeaders([
                         'Accept' => 'application/json',
                         'Content-Type' => 'application/json',
