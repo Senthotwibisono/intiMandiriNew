@@ -131,9 +131,9 @@ class BackController extends Controller
                         ->where('tgl_plp', $header['tanggalPlp'])
                         ->first();
 
-                    if ($oldPLP) {
-                        continue;
-                    }
+                    // if ($oldPLP) {
+                    //     continue;
+                    // }
 
                     $plp = PLP::create([
                         'tgl_upload'        => now()->format('Ymd'),
