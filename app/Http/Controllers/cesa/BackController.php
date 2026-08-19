@@ -140,7 +140,7 @@ class BackController extends Controller
                         'upload_time'       => now()->format('H:i:s'),
 
                         'kd_kantor'         => $header['kodeKantor'],
-                        'kd_tps'            => $this->kode,
+                        'kd_tps'            => '1MUT',
                         'kd_tps_asal'       => $header['kodeTpsAsal'],
                         'kd_tps_tujuan'     => $header['kodeTpsTujuan'],
 
@@ -266,7 +266,7 @@ class BackController extends Controller
                             'upload_date' => today(),
                             'upload_time' => now()->format('H:i:s'),
                             'kd_kantor' => $header['kodeKantor'],
-                            'kd_tps' => $this->kode,
+                            'kd_tps' => '1MUT',
                             'kd_tps_asal' => $header['kodeTpsAsal'],
                             'kd_tps_tujuan' => $header['kodeTpsTujuan'],
                             'gudang_asal' => $header['gudangAsal'],
