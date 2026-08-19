@@ -95,7 +95,7 @@ class BackController extends Controller
             $this->baseUrl . '/get-respon-plp-on-demand',
             [
                 'nomorPlp' => $request->nomorPlp,
-                'tanggalPlp' => $request->tanggalPlp,
+                'tanggalPlp' => Carbon::parse($request->tanggalPlp)->format('d-m-Y'),
                 'nomorReference' => $request->nomorReference,
                 'kodeGudang' => $request->kodeGudang,
             ]
