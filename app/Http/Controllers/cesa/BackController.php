@@ -559,6 +559,70 @@ class BackController extends Controller
                 ]);
             }
             try {
+                $data = $response['data'][0] ?? null;
+                $header = $data['header'][0] ?? null;
+                $kontainer = $data['kontainer'][0] ?? null;
+                $kemasan = $data['kemasan'][0] ?? null;
+
+                if (!$header) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Data header SPPB tidak ditemukan'
+                    ]);
+                }
+                $payloadCFS = [
+                    'header' => [
+                        'idheader' => $header['idheader'] ?? null,
+                        'car' => $header['car'] ?? null,
+                        'nomorDokumen' => $header['nomorDokumen'] ?? null,
+                        'tanggalDokumen' => $header['tanggalDokumen'] ?? null,
+                        'kodeKantor' => $header['kodeKantor'] ?? null,
+                        'nomorPib' => $header['nomorPib'] ?? null,
+                        'tanggalPib' => $header['tanggalPib'] ?? null,
+                        'npwpImp' => $header['npwpImp'] ?? null,
+                        'namaImp' => $header['namaImp'] ?? null,
+                        'alamatImp' => $header['alamatImp'] ?? null,
+                        'npwpPpjk' => $header['npwpPpjk'] ?? null,
+                        'namaPpjk' => $header['namaPpjk'] ?? null,
+                        'alamatPpjk' => $header['alamatPpjk'] ?? null,
+                        'namaAngkut' => $header['namaAngkut'] ?? null,
+                        'nomorVoyFlight' => $header['nomorVoyFlight'] ?? null,
+                        'bruto' => $header['bruto'] ?? null,
+                        'netto' => $header['netto'] ?? null,
+                        'gudang' => $header['gudang'] ?? null,
+                        'statusJalur' => $header['statusJalur'] ?? null,
+                        'flagKarantina' => $header['flagKarantina'] ?? null,
+                        'jumlahKontainer' => $header['jumlahKontainer'] ?? null,
+                        'nomorBc11' => $header['nomorBc11'] ?? null,
+                        'tanggalBc11' => $header['tanggalBc11'] ?? null,
+                        'nomorPosBc11' => $header['nomorPosBc11'] ?? null,
+                        'nomorBlAwb' => $header['nomorBlAwb'] ?? null,
+                        'tanggalBlAwb' => $header['tanggalBlAwb'] ?? null,
+                        'nomorMasterBlAwb' => $header['nomorMasterBlAwb'] ?? null,
+                        'tanggalMasterBlAwb' => $header['tanggalMasterBlAwb'] ?? null,
+                    ],
+                    'kontainer' => $kontainer,
+                    'kemasan' => $kemasan,
+                ];
+
+                $responseCFS = Http::timeout(60)
+                    ->withHeaders([
+                        'Accept' => 'application/json',
+                        'Content-Type' => 'application/json',
+                    ])
+                    ->post(
+                        'https://pelindo-cfscenter.com/index.php/apijson/receivepermit',
+                        $payloadCFS
+                    );
+
+                if (!$responseCFS->successful()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Gagal mengirim data ke CFS Center',
+                        'status' => $responseCFS->status(),
+                        'response' => $responseCFS->json() ?? $responseCFS->body(),
+                    ]);
+                }
                 $result = db::transaction(function() use($response){
     
                     $data = $response['data'][0] ?? null;
