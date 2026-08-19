@@ -570,7 +570,7 @@ class BackController extends Controller
                         'message' => 'Data header SPPB tidak ditemukan'
                     ]);
                 }
-                $payloadCFS = [
+                $dataCfs = [
                     'header' => [
                         'idheader' => $header['idheader'] ?? null,
                         'car' => $header['car'] ?? null,
@@ -603,6 +603,15 @@ class BackController extends Controller
                     ],
                     'kontainer' => $kontainer,
                     'kemasan' => $kemasan,
+                ];
+
+                $payloadCFS = [
+                    'Username' => '1MUT',
+                    'Password' => '1MUT',
+                    'Kode_TPS' => '1MUT',
+                    'fStream' => [
+                        $dataCfs
+                    ],
                 ];
 
                 $responseCFS = Http::timeout(60)
