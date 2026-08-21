@@ -298,7 +298,9 @@ body {
                     <p class=""><strong>Admin</strong> : {{ number_format(ceil($header->admin), 0) }}</p>
                     <p class=""><strong>Total</strong> : {{ number_format(ceil($header->total), 0) }}</p>
                     <hr>
-                    <p class=""><strong>PPN (11%)</strong> : {{ number_format(ceil($header->ppn), 0) }}</p>
+                    @if (!str_contains(strtoupper($header->cust_name), 'FAJAR SURYA WISESA'))
+                        <p><strong>PPN (11%)</strong> : {{ number_format(ceil($header->ppn), 0) }}</p>
+                    @endif
                     @if(ceil($header->grand_total) >= 5000000)
                     <p class=""><strong>Materai</strong> : 10.000</p>
                     @endif
