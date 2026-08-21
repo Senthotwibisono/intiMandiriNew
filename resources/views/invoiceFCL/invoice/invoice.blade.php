@@ -300,6 +300,8 @@ body {
                     <hr>
                     @if (!str_contains(strtoupper($header->cust_name), 'FAJAR SURYA WISESA'))
                         <p><strong>PPN (11%)</strong> : {{ number_format(ceil($header->ppn), 0) }}</p>
+                    @else
+                        <p><strong>PPN</strong> : {{ number_format(ceil($header->ppn), 0) }}</p>
                     @endif
                     @if(ceil($header->grand_total) >= 5000000)
                     <p class=""><strong>Materai</strong> : 10.000</p>
