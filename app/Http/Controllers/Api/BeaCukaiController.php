@@ -795,7 +795,6 @@ class BeaCukaiController extends Controller
                     $tanggalMasuk . ' ' . $jamMasuk
                 )->format('d-m-Y H:i:s');
                 $data[] = [
-                    [
                       "kodeTps"=> "1MUT",
                       "kodeGudang"=> "INTI",
                       "nomorKontainer"=> $container->nocontainer,
@@ -804,17 +803,16 @@ class BeaCukaiController extends Controller
                       "nomorBlAwb"=> $container->nobl,
                       "tanggalBlAwb"=> Carbon::parse($container->tgl_bl_awb)->format('d-m-Y'),
                       "nomorBc11"=> $container->job->tno_bc11 ?? '',
-                      "tanggalBc11"=> $container->job->ttgl_bc11,
+                      "tanggalBc11"=> $container->job->ttgl_bc11 ? Carbon::parse($container->job->ttgl_bc11) : null,
                       "kodeDokumen"=> $container->kd_dok_inout ?? '3',
                       "nomorDokumen"=> $container->no_dok ?? $container->job->noplp,
-                      "tanggalDokumen"=> $container->tgl_dok ?? $container->job->ttgl_plp,
+                      "tanggalDokumen"=> ($container->tgl_dok ?? $container->job->ttgl_plp) ? Carbon::parse($container->tgl_dok ?? $container->job->ttgl_plp)->format('d-m-Y') : null,
                       "kodeKegiatan"=> 5,
                       "waktuKegiatan"=> $waktuInOut,
                       "block"=> null,
                       "row"=> null,
                       "slot"=> null,
                       "tier"=> null
-                    ],
                 ];
             }
 

@@ -294,6 +294,12 @@ class Manifest extends Model
         'coari_cfs_at',
         'codeco_cfs_at',
         'detil_hbl_cfs_at',
+        'coarri_cesa_flag',
+        'coarri_cesa_time',
+        'coarri_cesa_status',
+        'codeco_cesa_flag',
+        'codeco_cesa_time',
+        'codeco_cesa_status',
         
     ];
 

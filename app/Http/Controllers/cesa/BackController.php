@@ -3286,6 +3286,162 @@ class BackController extends Controller
         return;
     }
 
+    public function coariKms()
+    {
+        $startDate = '2025-07-01';
+        $manifestes = Mnifest::with(['job'])->whereNotNull('tglstripping')->whereDate('tglstripping', '>=', $startDate)->where('coarri_cesa_flag', 'N')->take(20)->get();
+        foreach ($manifestes as $manifest) {
+            $manifest->update([
+                'coarri_cesa_flag' => 'P',
+                'coarri_cesa_time' => Carbon::now(),
+                'coarri_cesa_status' => 'PROCESSING',
+            ]);
+            $header = [
+                "kodeDokumen"         => "5",
+                "noBc11"              => $manifest->job->tno_bc11 ?? null,
+                "tanggalBc11"        => !empty($manifest->job->ttgl_bc11)
+                    ? Carbon::parse($manifest->job->ttgl_bc11)->format('d-m-Y')
+                    : null,
+                "nomorVoyFlight"      => $manifest->job->dokplp->no_voy_flight ?? null,
+                "tanggalBerangkat"    => !empty($manifest->job->tgl_berangkat)
+                    ? Carbon::parse($manifest->job->tgl_berangkat)->format('d-m-Y')
+                    : null,
+                "namaAngkut"          => $manifest->job->dokplp->nm_angkut ?? null,
+                "refNumber"           => Str::random(18),
+                "kodeSaranaPengangkut"=> $manifest->job->kode_sarana_pengangkut ?? null,
+                "kodeTps"             => "1MUT",
+                "tanggalTiba"         => !empty($manifest->job->dokplp->tgl_tiba)
+                    ? Carbon::parse($manifest->job->dokplp->tgl_tiba)->format('d-m-Y')
+                    : null,
+                "kodeGudang"          => "INTI",
+                "callSign"            => $manifest->job->dokplp->call_sign ?? null,
+            ];
+
+             $waktuInOut = null;
+
+            if (!empty($manifest->tglmasuk)) {
+                $tanggalMasuk = $manifest->tglmasuk;
+
+                $jamMasuk = !empty($manifest->jammasuk)
+                    ? $manifest->jammasuk
+                    : '00:00:00';
+
+                $waktuInOut = Carbon::parse(
+                    $tanggalMasuk . ' ' . $jamMasuk
+                )->format('d-m-Y H:i:s');
+            }
+
+            $kontainer = [];
+            $plpDetail = PLPdetail::where('plp_id', $manifest->job->plp_id)
+                ->where('no_cont', $manifest->nocontainer)
+                ->first();
+
+            $nomorPosBc11 = $plpDetail?->no_pos_bc11;
+
+            $kontainer[] = [
+                "tanggalSegelBc" => !empty($manifest->tgl_segel_bc)
+                    ? Carbon::parse($manifest->tgl_segel_bc)->format('d-m-Y')
+                    : Carbon::parse($manifest->tglmasuk)->format('d-m-Y'),
+                "tanggalDokumenInOut" => !empty($manifest->job->ttgl_plp)
+                    ? Carbon::parse($manifest->job->ttgl_plp)->format('d-m-Y')
+                    : null,
+                "tanggalBlAwb" => !empty($manifest->tgl_bl_awb)
+                    ? Carbon::parse($manifest->tgl_bl_awb)->format('d-m-Y')
+                    : null,
+                "flagKontainerKosong" => false,
+                "waktuInOut" => $waktuInOut,
+                "gudangTujuan" => "INTI",
+                "kodeDokumenInOut" => "3",
+                "ukuranKontainer" => $manifest->size,
+                "flagKontainer" => true,
+                "kodeTimbun" => null,
+                "noMasterBlAwb" => $manifest->job->nombl ?? null,
+                "pelabuhanBongkar" => $manifest->job->bongkar->kode ?? null,
+                "nomorDokumenInOut" => $manifest->job->noplp ?? null,
+                "nomorPolisi" => $manifest->nopol ?? '-',
+                "nomorIjinTps" => $manifest->nomor_ijin_tps ?? null,
+                "nomorPosBc11" => $nomorPosBc11 ?? null,
+                "tanggalMasterBlAwb" => !empty($manifest->job->tgl_master_bl)
+                    ? Carbon::parse($manifest->job->tgl_master_bl)->format('d-m-Y')
+                    : null,
+                "nomorSegelBc" => $manifest->nomor_segel_bc ?? '-',
+                "consignee" => $manifest->cust->name ?? '-',
+                "pelabuhanMuat" => $manifest->job->muat->kode ?? null,
+                "nomorDaftarPabean" => isset($manifest->job->noplp)
+                    ? substr($manifest->job->noplp, 0, 10)
+                    : null,
+                "noBlAwb" => $manifest->nobl ?? null,
+                "kodeKantor" => $manifest->job->dokplp->kd_kantor ?? null,
+                "nomorKontainer" => $manifest->nocontainer,
+                "idConsignee" => $manifest->cust_id ?? '-',
+                "jenisKontainer" => 'FCL',
+                "nomorSegel" => $manifest->seal->code ?? '-',
+                "isoCode" => $manifest->iso_code ?? null,
+                "tanggalDaftarPabean" => !empty($manifest->job->ttgl_plp)
+                    ? Carbon::parse($manifest->job->ttgl_plp)->format('d-m-Y')
+                    : null,
+                "pelabuhanTransit" => $manifest->job->transit->kode ?? null,
+                "bruto" => $manifest->weight ?? 0,
+                "tanggalIjinTps" => !empty($manifest->tanggal_ijin_tps)
+                    ? Carbon::parse($manifest->tanggal_ijin_tps)->format('d-m-Y')
+                    : null,
+            ];
+    
+            // dd($data);
+             $data = [
+                "header"     => $header,
+                "kontainer"  => $kontainer,
+            ];
+            $response = $this->request(
+                'post',
+                $this->baseUrl . '/coarri-codeco-container',
+                $data
+            )->json();
+
+            if (isset($response['code']) && in_array($response['code'], [200, 201])) {
+                $status = 'Y';
+            } else {
+                $status = 'C';
+            }
+            if (isset($response['code']) && in_array($response['code'], [200, 201])) {          
+                $status = 'Y';          
+                $message = $response['detail'] ?? 'SUCCESS';            
+            } else {            
+                $status = 'C';          
+                $errors = [];           
+                if (!empty($response['data']['header']['errors'])) {            
+                    foreach ($response['data']['header']['errors'] as $error) {         
+                        $field = $error['field'] ?? '-';
+                        $errorMessage = $error['message'] ?? '-';           
+                        $errors[] = "HEADER: {$field} = {$errorMessage}";
+                    }
+                }           
+                if (!empty($response['data']['kontainer'])) {           
+                    foreach ($response['data']['kontainer'] as $manifestError) {           
+                        if (!empty($manifestError['errors'])) {            
+                            foreach ($manifestError['errors'] as $error) {         
+                                $field = $error['field'] ?? '-';
+                                $errorMessage = $error['message'] ?? '-';           
+                                $errors[] = "CONTAINER: {$field} = {$errorMessage}";
+                            }
+                        }
+                    }
+                }           
+                $message = !empty($errors)
+                    ? implode("\n", $errors)
+                    : ($response['detail']
+                        ?? $response['result']
+                        ?? 'API ERROR');
+            }
+            $manifest->update([
+                'coarri_cesa_flag' => $status,
+                'coarri_cesa_time' => Carbon::now(),
+                'coarri_cesa_status' => $message,
+            ]);
+        }
+        return;
+    }
+
     private function request($method, $url, $query = [])
     {
         $token = $this->getToken();
