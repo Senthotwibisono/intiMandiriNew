@@ -674,6 +674,9 @@
             <li class="submenu-item @if(Request::is('bc/fcl/releaseContainerIndex') || Request::is('/bc/fcl/releaseContainerIndex')) active @endif">
                 <a href="{{ url('/bc/fcl/releaseContainerIndex')}}">Release Container</a>
             </li>
+            <li class="submenu-item @if(Request::is('bc/fcl/behandleIndex') || Request::is('/bc/fcl/behandleIndex')) active @endif">
+                <a href="{{ url('/bc/fcl/behandleIndex')}}">Behandle</a>
+            </li>
 
             <!-- Delivery -->
             <!-- <li class="sidebar-item has-sub @if(Request::is('fcl/delivery/*')) active @endif">

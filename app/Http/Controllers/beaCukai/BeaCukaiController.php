@@ -706,4 +706,99 @@ class BeaCukaiController extends Controller
             ]);
         }
     }
+
+    public function behandleIndex()
+    {
+        $data['title'] = 'Behandle Index';
+
+        return view('bc.fcl.behandle', $data);
+    }
+
+    public function behandleData(Request $request)
+    {
+        $data = ContF::with(['job', 'cust', 'job.dokplp', 'job.ves'])->whereNotNull('no_spjm')->whereNotNull('tglmasuk')->whereNull('tglkeluar');
+
+        return DataTables::of($data)
+        ->addColumn('photo', function($cont){
+            return '<a href="javascript:void(0)"class="button is-primary"onclick="openPhoto('.$cont->id.')"><i class="fas fa-camera"></i></a>';
+        })
+        ->addColumn('pkb', function($cont){
+            if ($cont->status_behandle === null) {
+                if ($cont->flag_pkb === 'N') {
+                    return '<button class="btn btn-primary" data-id="'.$cont->id.'" onClick="makePKB(this)">Transfer ke PKB</button>';
+                }else {
+                    return '<button class="btn btn-danger" data-id="'.$cont->id.'" onClick="cancelPKB(this)">Batal PKB</button>';
+                }
+            }else{
+                return;
+            }
+        })
+        ->addColumn('status', function($cont){
+            if ($cont->status_behandle == 1) {
+                return '<span class="badge bg-primary">Ready</span>';
+            } elseif ($cont->status_behandle == 2) {
+                return '<span class="badge bg-warning">On Progress</span>';
+            } elseif ($cont->status_behandle == 3) {
+                return '<span class="badge bg-info">Finish</span>';
+            }else {
+                // return '<span class="badge bg-light-warning">Dokumen SPJM Belum tersedia</span>';
+                return '-';
+            }
+        })
+        ->filterColumn('status', function ($query, $keyword) {
+            // var_dump($keyword);
+            // die;
+            switch ($keyword) {
+                case 'PKK':
+                    $query->whereNull('status_behandle')->where('flag_pkb', 'N');
+                    break;
+                case 'PKB':
+                     $query->whereNull('status_behandle')->where('flag_pkb', 'Y');
+                    break;
+                case 1:
+                case 2:
+                case 3:
+                    $query->where('status_behandle', $keyword);
+                    break;
+            }
+        })
+        ->with([
+            'summary' => [
+                'total' => ContF::whereNotNull('no_spjm')->whereNotNull('tglmasuk')->whereNull('tglkeluar')->count(),
+                'ppk'   => ContF::whereNotNull('no_spjm')->whereNotNull('tglmasuk')->whereNull('tglkeluar')->whereNull('status_behandle')->where('flag_pkb', 'N')->count(),
+                'pkb'   => ContF::whereNotNull('no_spjm')->whereNotNull('tglmasuk')->whereNull('tglkeluar')->whereNull('status_behandle')->where('flag_pkb', 'Y')->count(),// nanti isi sesuai kondisinya
+                'siap'  => ContF::whereNotNull('no_spjm')->whereNotNull('tglmasuk')->whereNull('tglkeluar')->where('status_behandle', 1)->count(),
+                'proses'=> ContF::whereNotNull('no_spjm')->whereNotNull('tglmasuk')->whereNull('tglkeluar')->where('status_behandle', 2)->count(),
+                'selesai'=> ContF::whereNotNull('no_spjm')->whereNotNull('tglmasuk')->whereNull('tglkeluar')->where('status_behandle', 3)->count(),
+            ]
+        ])
+        ->rawColumns(['status', 'photo', 'pkb'])
+        ->make(true);
+    }
+
+    public function pkbFlag(Request $request)
+    {
+        $cont = ContF::find($request->id);
+        $cont->update([
+            'flag_pkb' => 'Y'
+        ]);
+
+        return response()->json([
+            'success' => true, 
+            'message' => 'Aksi berhasil', 
+        ]);
+    }
+
+    public function pkbCancel(Request $request)
+    {
+        $cont = ContF::find($request->id);
+        $cont->update([
+            'flag_pkb' => 'N'
+        ]);
+
+        return response()->json([
+            'success' => true, 
+            'message' => 'Aksi berhasil', 
+        ]);
+    }
 }

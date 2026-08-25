@@ -537,6 +537,11 @@ Route::controller(BeaCukaiController::class)->group(function(){
     Route::get('/bc/fcl/releaseContainerIndex', 'ReleaseContainerIndex');
     Route::get('/bc/fcl/releaseContainerDataTable', 'releaseContainerDataTable');
     Route::post('/bc/fcl/holdFCLCont', 'holdFCLCont');
+
+    Route::get('/bc/fcl/behandleIndex', 'behandleIndex');
+    Route::get('/bc/fcl/behandleData', 'behandleData')->name('bc.fcl.dataBehandle');
+    Route::post('/bc/fcl/pkbFlag', 'pkbFlag')->name('bc.fcl.pkbFlag');;
+    Route::post('/bc/fcl/pkbCancel', 'pkbCancel')->name('bc.fcl.pkbCancel');;
 });
 
 // Qr Reader
