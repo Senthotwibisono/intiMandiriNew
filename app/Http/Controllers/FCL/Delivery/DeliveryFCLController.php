@@ -39,6 +39,9 @@ use App\Models\InvoiceHeader as Header;
 use App\Models\KeteranganPhoto as KP;
 use DataTables;
 
+use Illuminate\Support\Facades\Mail;
+use App\Mail\fclBehandle;
+
 class DeliveryFCLController extends Controller
 {
     public function __construct()
@@ -65,6 +68,9 @@ class DeliveryFCLController extends Controller
         return DataTables::eloquent($cont)
         ->addColumn('action', function($cont){
             return '<button class="btn btn-warning editButton" data-id="'.$cont->id.'"><i class="fa fa-pencil"></i></button>';
+        })
+        ->addColumn('mail', function($cont){
+            return '<button class="btn btn-warning mail-button" data-id="'.$cont->id.'"><i class="fa fa-envelope"></i></button>';
         })
         ->addColumn('photo', function($cont){
             return '<a href="javascript:void(0)" onclick="openWindow(\'/fcl/delivery/behandleDetil/'.$cont->id.'\')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>';
@@ -164,7 +170,7 @@ class DeliveryFCLController extends Controller
                 $query->whereDate('date_finish_behandle', '<=', $end);
             }
         })
-        ->rawColumns(['action', 'photo', 'statusBehandle', 'status'])
+        ->rawColumns(['action', 'photo', 'statusBehandle', 'status', 'mail'])
         ->make(true);
     }
 
@@ -494,6 +500,37 @@ class DeliveryFCLController extends Controller
         $data['photos'] = Photo::where('master_id', $id)->where('type', '=', 'fcl')->where('action', '=', 'behandle')->get();
         // dd($data['photos']);
         return view('photo.index', $data);
+    }
+
+    public function sendEmail(Request $request)
+    {
+        try {
+            $cont = Cont::find($request->id);
+            $cotnainer = $cont->nocontainer;
+            $customer = $cont->cust->name;
+            $message = $request->message;
+
+            Mail::to([
+                $request->email
+                // 'azzambackup326@gmail.com'
+            ])->send(
+                new SppbBelumGateoutMail(
+                    $cotnainer,
+                    $customer,
+                    $message
+                )
+            );
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Aksi berhasil'
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => $th->getMessage()
+            ]);
+        }
     }
     
     public function detailGateOut($id)

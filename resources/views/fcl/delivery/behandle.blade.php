@@ -44,6 +44,7 @@
                     <thead style="white-space: nowrap;">
                         <tr>
                             <th style="min-width: 150px;" class="text-center">Action</th>
+                            <th style="min-width: 150px;" class="text-center">Email</th>
                             <th style="min-width: 150px;" class="text-center">Photo</th>
                             <th style="min-width: 150px;" class="text-center">Action Behandle</th>
                             <th style="min-width: 150px;" class="text-center">Status Behandle</th>
@@ -217,6 +218,39 @@
         </form>
     </div>
 </section>
+
+<div class="modal fade" id="addManual" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-centered modal-dialog-scrollable"role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">Add Data Driver</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"> <i data-feather="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="from-group">
+                    <div class="col-12">
+                        <label for="">E-Mail Customer</label>
+                        <input type="text" name="email" id="email" class="form-control">
+                        <input type="hidden" name="id_mail" id="id_mail" class="form-control">
+                    </div>
+                    
+                    <div class="col-12">
+                        <label for="">Message</label>
+                        <textarea class="form-control" name="" id="message_mail" cols="30" rows="10">
+
+                        </textarea>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal"> <i class="bx bx-x d-block d-sm-none"></i> <span class="d-none d-sm-block">Close</span> </button>
+                <button type="button" class="btn btn-primary ml-1" data-bs-dismiss="modal" onClick="sendEmail()"> <i class="bx bx-check d-block d-sm-none"></i> <span class="d-none d-sm-block">Submit</span> </button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('custom_js')
@@ -339,6 +373,7 @@
             scrollY: '50vh',
             columns: [
                 {className:'text-center', data:'action', name:'action', searchable:false, orderable:false},
+                {className:'text-center', data:'mail', name:'action', searchable:false, orderable:false},
                 {className:'text-center', data:'photo', name:'photo', searchable:false, orderable:false},
                 {className:'text-center', data:'statusBehandle', name:'statusBehandle'},
                 {className:'text-center', data:'status', name:'status'},
@@ -369,7 +404,7 @@
                         $('<th></th>').appendTo(column.header()); // Kosongkan header pencarian untuk kolom yang dikecualikan
                         return;
                     }
-                    if (index == 3) {
+                    if (index == 4) {
                         var select = $(`
                             <select class="form-control form-control-sm status-filter" multiple>
                                 <option value="null">Null</option>
@@ -531,60 +566,117 @@ $(document).ready(function() {
                     Swal.showLoading();
                 }
         });
-    let id = $(this).data('id');
-    console.log(id);
-    $.ajax({
-      type: 'GET',
-      url: '/fcl/delivery/dataCont/' + id,
-      cache: false,
-      data: {
-        id: id
-      },
-      dataType: 'json',
+        let id = $(this).data('id');
+        console.log(id);
+        $.ajax({
+          type: 'GET',
+          url: '/fcl/delivery/dataCont/' + id,
+          cache: false,
+          data: {
+            id: id
+          },
+          dataType: 'json',
 
-      success: function(response) {
-        swal.close();
+          success: function(response) {
+            swal.close();
 
-        console.log(response);
-        if (response.success) {
-            
-            $("#id_edit").val(response.data.id);
-            $("#nocontainer_edit").val(response.data.nocontainer);
-            $("#jenis_spjm").val(response.data.jenis_spjm).trigger('change');
-            $("#no_spjm").val(response.data.no_spjm);
-            $("#tgl_spjm").val(response.data.tgl_spjm);
-            $("#nojoborder_edit").val(response.job.nojoborder);
-            $("#size_edit").val(response.data.size);
-            $("#no_spjm_edit").val(response.data.no_spjm);
-            $("#tgl_spjm_edit").val(response.data.tgl_spjm);
-            $("#date_ready_behandle_edit").val(response.data.date_ready_behandle);
-            $("#date_check_behandle_edit").val(response.data.date_check_behandle);
-            $("#desc_check_behandle_edit").val(response.data.desc_check_behandle);
-            $("#desc_finish_behandle_edit").val(response.data.desc_finish_behandle);
-           
-                if (response.data.yard_id) {
-                    slotValue = response.slot;
-                    rowValue = response.row;
-                    tierValue = response.tier;
-                    $("#yard_id").val(response.data.yard_id).trigger('change');
-                } else {
-                    $('#yard_id').val(null).append('<option disabled selected>Pilih Satu</option>');
-                    $('#yard_slot').empty().append('<option disabled selected>Pilih Block Terlebih Dahulu!</option>');
-                    $('#yard_row').empty().append('<option disabled selected>Pilih Slot Terlebih Dahulu!</option>');
-                    $('#yard_tier').empty().append('<option disabled selected>Pilih Row Terlebih Dahulu!</option>');
-                }
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: response.message,
-            });
-        }
-      },
-      error: function(data) {
-        console.log('error:', data)
-      }
+            console.log(response);
+            if (response.success) {
+
+                $("#id_edit").val(response.data.id);
+                $("#nocontainer_edit").val(response.data.nocontainer);
+                $("#jenis_spjm").val(response.data.jenis_spjm).trigger('change');
+                $("#no_spjm").val(response.data.no_spjm);
+                $("#tgl_spjm").val(response.data.tgl_spjm);
+                $("#nojoborder_edit").val(response.job.nojoborder);
+                $("#size_edit").val(response.data.size);
+                $("#no_spjm_edit").val(response.data.no_spjm);
+                $("#tgl_spjm_edit").val(response.data.tgl_spjm);
+                $("#date_ready_behandle_edit").val(response.data.date_ready_behandle);
+                $("#date_check_behandle_edit").val(response.data.date_check_behandle);
+                $("#desc_check_behandle_edit").val(response.data.desc_check_behandle);
+                $("#desc_finish_behandle_edit").val(response.data.desc_finish_behandle);
+
+                    if (response.data.yard_id) {
+                        slotValue = response.slot;
+                        rowValue = response.row;
+                        tierValue = response.tier;
+                        $("#yard_id").val(response.data.yard_id).trigger('change');
+                    } else {
+                        $('#yard_id').val(null).append('<option disabled selected>Pilih Satu</option>');
+                        $('#yard_slot').empty().append('<option disabled selected>Pilih Block Terlebih Dahulu!</option>');
+                        $('#yard_row').empty().append('<option disabled selected>Pilih Slot Terlebih Dahulu!</option>');
+                        $('#yard_tier').empty().append('<option disabled selected>Pilih Row Terlebih Dahulu!</option>');
+                    }
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: response.message,
+                });
+            }
+          },
+          error: function(data) {
+            console.log('error:', data)
+          }
+        });
     });
-  });
+
+    $(document).on('click', '.mail-button', function() {
+        Swal.fire({
+            title: 'Processing...',
+            text: 'Please wait',
+            icon: 'info',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            willOpen: () => {
+                Swal.showLoading();
+            }
+        }); 
+
+        let id = $(this).data('id');    
+
+        console.log('ID:', id); 
+
+        $.ajax({
+            type: 'GET',
+            url: '/fcl/delivery/dataCont/' + id,
+            cache: false,
+            data: {
+                id: id
+            },
+            dataType: 'json',   
+
+            success: function(response) {   
+
+                Swal.close();   
+
+                console.log('Response:', response); 
+
+                if (response.success) { 
+
+                    const message = `Container dengan nomor container ${response.data.nocontainer} akan dilakukan pengecekan behandle!`;    
+                    $("#id_mail").val(response.data.id);    
+                    $("#message_mail").val(message);    
+                    $('#addManual').modal('show');  
+                } else {    
+                    Swal.fire({
+                        icon: 'error',
+                        title: response.message || 'Data tidak ditemukan'
+                    });
+                }
+            },  
+            error: function(xhr, status, error) {   
+                Swal.close();   
+                console.log('error:', error);
+                console.log('response:', xhr.responseText); 
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Terjadi kesalahan',
+                    text: 'Gagal mengambil data container.'
+                });
+            }
+        });
+    });
 });
 </script>
 <script>
@@ -984,6 +1076,49 @@ $(document).on('click', '.unapproveButton', function() {
 <script>
     function openWindow(url) {
         window.open(url, '_blank', 'width=600,height=800');
+    }
+</script>
+
+<script>
+    async function sendEmail(button) {
+        const result = await confirmation();
+        if (result.isConfirmed) {
+            showLoading();
+            const data = {
+                id: document.getElementById('id_mail').value,
+                message: document.getElementById('message_mail').value,
+                email: document.getElementById('email').value,
+            }
+
+            if (!data.email) {
+                hideLoading();
+                Swal.fire({
+                    title: "Gagal!",
+                    text: "Email Kosong",
+                    icon: "error",
+                    confirmButtonText: "Tutup"
+                });
+
+                return;
+            }
+
+            const url = '{{route('fcl.behandle.email')}}';
+            const response = await globalResponse(data, url);
+            hideLoading();
+             if (response.ok) {
+                const hasil = await response.json();
+                if (hasil.success) {
+                    successHasil(hasil);
+                }else{
+                    errorHasil(hasil);
+                }
+            }else{
+                errorResponse(response);
+                return;
+            }
+        }else{
+            return;
+        }
     }
 </script>
 

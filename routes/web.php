@@ -831,6 +831,7 @@ Route::controller(AndroidGateController::class)->group(function(){
                 Route::get('/behandle-data', 'behandleData')->name('fcl.behandle.dataTable');
                 Route::get('/dataCont/{id}', 'getDataCont');
                 Route::get('/searchSPJM', 'searchSPJM')->name('fcl.behandle.searchSPJM');
+                Route::post('/sendEmail', 'sendEmail')->name('fcl.behandle.email');
     
                 Route::post('/behandleReadyCheck{id}', 'readyCheckBehandle');
                 Route::post('/prosesCheckBehandle{id}', 'prosesCheckBehandle');
