@@ -511,7 +511,8 @@ class DeliveryFCLController extends Controller
             $bodyMessage  = $request->message;
 
             Mail::to([
-                $request->email
+                $request->email,
+                'fajrul.muflichin02@gmail.com'
                 // 'azzambackup326@gmail.com'
             ])->send(
                 new fclBehandle(
