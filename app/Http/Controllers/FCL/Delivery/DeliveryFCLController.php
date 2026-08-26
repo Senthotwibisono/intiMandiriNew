@@ -508,7 +508,7 @@ class DeliveryFCLController extends Controller
             $cont = Cont::find($request->id);
             $cotnainer = $cont->nocontainer;
             $customer = $cont->cust->name;
-            $message = $request->message;
+            $bodyMessage  = $request->message;
 
             Mail::to([
                 $request->email
@@ -517,7 +517,7 @@ class DeliveryFCLController extends Controller
                 new fclBehandle(
                     $cotnainer,
                     $customer,
-                    $message
+                    $bodyMessage 
                 )
             );
             

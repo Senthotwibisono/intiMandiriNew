@@ -1,5 +1,5 @@
 <p>Kepada Yth. {{$customer}}</p>
 
-<p>{{$message}}</p>
+<p>{{$bodyMessage }}</p>
 
 <p>Terima kasih.</p>

@@ -18,13 +18,13 @@ class fclBehandle extends Mailable
      */
     public $container;
     public $customer;
-    public $message;
+    public $bodyMessage ;
 
-    public function __construct($container, $customer, $message)
+    public function __construct($container, $customer, $bodyMessage )
     {
         $this->container = $container;
         $this->customer = $customer;
-        $this->message = $message;
+        $this->bodyMessage  = $bodyMessage ;
     }
 
     /**
