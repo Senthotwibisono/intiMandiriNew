@@ -514,7 +514,7 @@ class DeliveryFCLController extends Controller
                 $request->email
                 // 'azzambackup326@gmail.com'
             ])->send(
-                new SppbBelumGateoutMail(
+                new fclBehandle(
                     $cotnainer,
                     $customer,
                     $message
