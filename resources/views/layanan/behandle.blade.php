@@ -478,8 +478,8 @@
 
                             $('<select class="input is-small">' +
                                 '<option value="">All</option>' +
-                                '<option value="PKK">PKK</option>' +
-                                '<option value="PKB">PKB</option>' +
+                                '<option value="PKK">IN 1MUT</option>' +
+                                '<option value="PKB">PKK Belum Siap</option>' +
                                 '<option value="1">Ready</option>' +
                                 '<option value="2">On Progress</option>' +
                                 '<option value="3">Finish</option>' +
