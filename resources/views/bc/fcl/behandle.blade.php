@@ -508,7 +508,7 @@
                     let column = this;
                     let cell = $('#filter-row th').eq(index);
 
-                    if (index === 11) {
+                    if (index === 13) {
                         $('<select class="form-select form-select-sm">' +
                             '<option value="">All</option>' +
                             '<option value="PKK">PKK</option>' +
