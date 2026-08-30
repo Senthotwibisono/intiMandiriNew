@@ -248,8 +248,6 @@
                                 <th>Consignee Address</th>
                                 <th>Consignee NPWP</th>
                                 <th>Status Behandle</th>
-                                <th>No SPJM</th>
-                                <th>Tgl SPJM</th>
                                 <th>Tgl Ready Behandle</th>
                                 <th>Tgl Mulai Behandle</th>
                                 <th>Deskripsi Behandle</th>
