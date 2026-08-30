@@ -213,17 +213,17 @@
 
             <div class="column">
                 <div class="box dashboard-card">
-                    <p class="has-text-grey">PPK Belum Siap</p>
+                    <p class="has-text-grey">IN 1MUT</p>
                     <h2 class="title mb-3" id="statusNull">0</h2>
-                    <div class="card-line" style="background:#cc0a0a"></div>
+                    <div class="card-line" style="background:#FF8C00"></div>
                 </div>
             </div>
 
             <div class="column">
                 <div class="box dashboard-card">
-                    <p class="has-text-grey">PKB</p>
+                    <p class="has-text-grey">PPK Belum Siap</p>
                     <h2 class="title mb-3" id="statusPKB">0</h2>
-                    <div class="card-line has-background-link"></div>
+                    <div class="card-line" style="background:#cc0a0a"></div>
                 </div>
             </div>
 
@@ -239,7 +239,8 @@
                 <div class="box dashboard-card">
                     <p class="has-text-grey">Sedang Periksa</p>
                     <h2 class="title mb-3" id="status2">0</h2>
-                    <div class="card-line" style="background:#7a7f86"></div>
+                    <!-- <div class="card-line" style="background:#7a7f86"></div> -->
+                    <div class="card-line has-background-link"></div>
                 </div>
             </div>
 
@@ -427,13 +428,13 @@
                         if (data.flag_pkb === 'N') {
                             $(row).find('td').attr(
                                 'style',
-                                'background-color:#cc0a0a !important; color:#ffffff !important;'
+                                'background-color:#FF8C00 !important; color:#ffffff !important;'
                             );
                             return;
                         } else {
                             $(row).find('td').attr(
                                 'style',
-                                'background-color: #3273dc !important; color:#ffffff !important;'
+                                'background-color: #cc0a0a !important; color:#ffffff !important;'
                             );
                             return;
 
@@ -449,7 +450,7 @@
 
                         case 2:
                             $(row).css({
-                                'background-color': '#7a7f86',
+                                'background-color': '#3273dc',
                                 'color': '#242525'
                             });
                             break;              

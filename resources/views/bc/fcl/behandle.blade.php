@@ -101,6 +101,11 @@
         margin-left: 6px;
     }
 
+    .status-o td {
+        background-color: #FF8C00 !important;
+        color: #fff !important;
+    }
+
     .status-pkk td {
         background-color: #cc0a0a !important;
         color: #fff !important;
@@ -171,9 +176,9 @@
             <div class="col-12 col-sm-6 col-lg-2">
                 <div class="card dashboard-card">
                     <div class="card-body">
-                        <div class="card-label">PPK Belum Siap</div>
+                        <div class="card-label">IN 1MUT</div>
                         <div class="card-value" id="statusNull">0</div>
-                        <div class="card-line" style="background:#cc0a0a"></div>
+                        <div class="card-line" style="background:#FF8C00"></div>
                     </div>
                 </div>
             </div>
@@ -181,9 +186,9 @@
             <div class="col-12 col-sm-6 col-lg-2">
                 <div class="card dashboard-card">
                     <div class="card-body">
-                        <div class="card-label">PKB</div>
+                        <div class="card-label">PPK Belum Siap</div>
                         <div class="card-value" id="statusPKB">0</div>
-                        <div class="card-line bg-primary"></div>
+                        <div class="card-line" style="background:#cc0a0a"></div>
                     </div>
                 </div>
             </div>
@@ -203,7 +208,7 @@
                     <div class="card-body">
                         <div class="card-label">Sedang Periksa</div>
                         <div class="card-value" id="status2">0</div>
-                        <div class="card-line" style="background:#7a7f86"></div>
+                        <div class="card-line bg-primary"></div>
                     </div>
                 </div>
             </div>
@@ -457,9 +462,9 @@
 
                 if (data.status_behandle === null) {
                     if (data.flag_pkb === 'N') {
-                        $(row).addClass('status-pkk');
+                        $(row).addClass('status-o');
                     } else {
-                        $(row).addClass('status-pkb');
+                        $(row).addClass('status-pkk');
                     }
 
                     return;
@@ -471,7 +476,7 @@
                         break;
 
                     case 2:
-                        $(row).addClass('status-progress');
+                        $(row).addClass('status-pkb');
                         break;
 
                     case 3:

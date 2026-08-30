@@ -717,6 +717,16 @@ class BeaCukaiController extends Controller
     public function behandleData(Request $request)
     {
         $data = ContF::with(['job', 'cust', 'job.dokplp', 'job.ves'])->whereNotNull('no_spjm')->whereNotNull('tglmasuk')->whereNull('tglkeluar');
+        $data->orderByRaw("
+            CASE
+                WHEN status_behandle IS NULL AND flag_pkb = 'N' THEN 1
+                WHEN status_behandle IS NULL AND flag_pkb = 'Y' THEN 2
+                WHEN status_behandle = 1 THEN 3
+                WHEN status_behandle = 2 THEN 4
+                WHEN status_behandle = 3 THEN 5
+                ELSE 6
+            END ASC
+        ");
 
         return DataTables::of($data)
         ->addColumn('photo', function($cont){
