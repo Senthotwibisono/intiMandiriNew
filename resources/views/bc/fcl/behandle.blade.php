@@ -240,6 +240,8 @@
                                 <th>Size</th>
                                 <th>Type</th>
                                 <th>Type Class</th>
+                                <th>No SPJM</th>
+                                <th>Tgl SPJM</th>
                                 <th>Vessel</th>
                                 <th>Voy</th>
                                 <th>Consignee</th>
@@ -377,6 +379,18 @@
                     className: 'text-center',
                     data: 'type_class',
                     name: 'type_class'
+                },
+                {
+                    className: 'text-center',
+                    data: 'no_spjm',
+                    name: 'no_spjm',
+                    defaultContent: '-'
+                },
+                {
+                    className: 'text-center',
+                    data: 'tgl_spjm',
+                    name: 'tgl_spjm',
+                    defaultContent: '-'
                 },
                 {
                     className: 'text-center',
