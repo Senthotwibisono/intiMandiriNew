@@ -235,7 +235,7 @@
                         <thead>
                             <tr>
                                 <th>Photo</th>
-                                <th>PKB Action</th>
+                                <th>PPK Action</th>
                                 <th>No Container</th>
                                 <th>Size</th>
                                 <th>Type</th>
