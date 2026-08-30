@@ -735,9 +735,9 @@ class BeaCukaiController extends Controller
         ->addColumn('pkb', function($cont){
             if ($cont->status_behandle === null) {
                 if ($cont->flag_pkb === 'N') {
-                    return '<button class="btn btn-primary" data-id="'.$cont->id.'" onClick="makePKB(this)">Transfer ke PKB</button>';
+                    return '<button class="btn btn-primary" data-id="'.$cont->id.'" onClick="makePKB(this)">Eksekusi PPK</button>';
                 }else {
-                    return '<button class="btn btn-danger" data-id="'.$cont->id.'" onClick="cancelPKB(this)">Batal PKB</button>';
+                    return '<button class="btn btn-danger" data-id="'.$cont->id.'" onClick="cancelPKB(this)">Batal PPK</button>';
                 }
             }else{
                 return;
