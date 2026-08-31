@@ -2672,7 +2672,7 @@ class BackController extends Controller
                     ? Carbon::parse($container->job->tgl_berangkat)->format('d-m-Y')
                     : null,
                 "namaAngkut"          => $container->job->dokplp->nm_angkut ?? null,
-                "refNumber"           => Str::random(18),
+                "refNumber" => '1MUT' . date('ymdHis') . Str::upper(Str::random(2)),
                 "kodeSaranaPengangkut"=> $container->job->kode_sarana_pengangkut ?? null,
                 "kodeTps"             => "1MUT",
                 "tanggalTiba"         => !empty($container->job->dokplp->tgl_tiba)
@@ -2824,7 +2824,7 @@ class BackController extends Controller
                     ? Carbon::parse($container->job->tgl_berangkat)->format('d-m-Y')
                     : null,
                 "namaAngkut"          => $container->job->dokplp->nm_angkut ?? null,
-                "refNumber"           => Str::random(18),
+                "refNumber" => '1MUT' . date('ymdHis') . Str::upper(Str::random(2)),
                 "kodeSaranaPengangkut"=> $container->job->kode_sarana_pengangkut ?? null,
                 "kodeTps"             => "1MUT",
                 "tanggalTiba"         => !empty($container->job->dokplp->tgl_tiba)
@@ -2987,7 +2987,7 @@ class BackController extends Controller
                     ? Carbon::parse($container->job->tgl_berangkat)->format('d-m-Y')
                     : null,
                 "namaAngkut"          => $container->job->dokplp->nm_angkut ?? null,
-                "refNumber"           => Str::random(18),
+                "refNumber" => '1MUT' . date('ymdHis') . Str::upper(Str::random(2)),
                 "kodeSaranaPengangkut"=> $container->job->kode_sarana_pengangkut ?? null,
                 "kodeTps"             => "1MUT",
                 "tanggalTiba"         => !empty($container->job->dokplp->tgl_tiba)
@@ -3144,7 +3144,7 @@ class BackController extends Controller
                     ? Carbon::parse($container->job->tgl_berangkat)->format('d-m-Y')
                     : null,
                 "namaAngkut"          => $container->job->dokplp->nm_angkut ?? null,
-                "refNumber"           => Str::random(18),
+                "refNumber" => '1MUT' . date('ymdHis') . Str::upper(Str::random(2)),
                 "kodeSaranaPengangkut"=> $container->job->kode_sarana_pengangkut ?? null,
                 "kodeTps"             => "1MUT",
                 "tanggalTiba"         => !empty($container->job->dokplp->tgl_tiba)
@@ -3307,7 +3307,7 @@ class BackController extends Controller
                     ? Carbon::parse($manifest->job->tgl_berangkat)->format('d-m-Y')
                     : null,
                 "namaAngkut"          => $manifest->job->dokplp->nm_angkut ?? null,
-                "refNumber"           => Str::random(18),
+                "refNumber" => '1MUT' . date('ymdHis') . Str::upper(Str::random(2)),
                 "kodeSaranaPengangkut"=> $manifest->job->kode_sarana_pengangkut ?? null,
                 "kodeTps"             => "1MUT",
                 "tanggalTiba"         => !empty($manifest->job->dokplp->tgl_tiba)
