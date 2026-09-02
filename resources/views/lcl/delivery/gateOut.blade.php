@@ -39,6 +39,7 @@
                             <th class="text-center">Waktu Lepas Segel</th>
                             <th class="text-center">No HBL</th>
                             <th class="text-center">Tgl HBL</th>
+                            <th class="text-center">Lama Timbun</th>
                             <th class="text-center">No Tally</th>
                             <th class="text-center">Shipper</th>
                             <th class="text-center">Customer</th>
@@ -189,6 +190,7 @@
                 {className:'text-center', data:'tanggal_lepas_segel_merah', name:'tanggal_lepas_segel_merah'},
                 { data: 'nohbl', name: 'nohbl', className: 'text-center' },
                 { data: 'tgl_hbl', name: 'tgl_hbl', className: 'text-center' },
+                { data: 'lamaHari', name: 'lamaHari', className: 'text-center' },
                 { data: 'notally', name: 'notally', className: 'text-center' },
                 { data: 'shipper', name: 'shipper', className: 'text-center' },
                 { data: 'customer', name: 'customer', className: 'text-center' },

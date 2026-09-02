@@ -452,6 +452,14 @@ class DeliveryController extends Controller
         ->addColumn('tglDok', function($manifest){
             return $manifest->tgl_dok ?? '-';
         })
+        ->addColumn('lamaHari', function($manifest){
+            $start = Carbon::parse($manifest->tglstripping);
+            $end = $manifest->tglrelease
+                ? Carbon::parse($manifest->tglrelease)
+                : Carbon::today();
+                    
+            return $start->diffInDays($end);
+        })
         ->rawColumns(['edit', 'detail', 'barcode', 'desc', 'bonMuat'])
         ->make(true);
     }
