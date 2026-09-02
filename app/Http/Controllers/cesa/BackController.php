@@ -2147,7 +2147,7 @@ class BackController extends Controller
         }
     }
     
-    public function manualOnDemand()
+    public function manualOnDemand(Request $request)
     {
         $response = $this->request(
             'get',
@@ -2155,43 +2155,167 @@ class BackController extends Controller
             [
                 'kodeDokumen' => $request->kd_dok,
                 'nomorDokumen' => $request->no_dok,
-                'tanggalDokumen' => carbon::parse($request->tgl_dok)->format('d-m-Y'),
+                'tanggalDokumen' => Carbon::parse($request->tgl_dok)->format('d-m-Y'),
             ]
         )->json();
-
-        // dd($response);
-        if ($response['code'] === 200) {
-            if (empty($response['data'])) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $response['detail'],
-                    'data' => [],
-                ]);
-            }
-            try {
-                DB::transaction(function() use($response){
-
-                });
-                return response()->json([
-                    'success' => true,
-                    'message'=> 'Data berhasil disimpan'
-                ]);
-
-            } catch (\Throwable $th) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $th->getMessage()
-                ]);
-            }
-
-        }else {
+    
+        if (($response['code'] ?? null) !== 200) {
             return response()->json([
                 'success' => false,
-                'message' => $response['detail'] ?? 'Terjadi kesalahan'
+                'message' => $response['detail'] ?? 'Terjadi kesalahan',
+            ]);
+        }
+    
+        if (empty($response['data']['manual'])) {
+            return response()->json([
+                'success' => false,
+                'message' => $response['detail'] ?? 'Data tidak ditemukan',
+                'data' => [],
+            ]);
+        }
+    
+        try {
+            DB::transaction(function () use ($response) {
+                foreach ($response['data']['manual'] as $manualData) {
+                    $header = $manualData['header'];
+    
+                    $manual = Manual::create([
+                        'id' => $header['id'] ?? null,
+                        'kd_kantor' => $header['kodeKantor'] ?? null,
+                        'kd_dok_inout' => $header['kodeDokumenInout'] ?? null,
+                        'no_dok_inout' => $header['nomorDokumenInout'] ?? null,
+                        'tgl_dok_inout' => !empty($header['tanggalDokumenInout'])
+                            ? Carbon::createFromFormat('d-m-Y', $header['tanggalDokumenInout'])->format('Y-m-d')
+                            : null,
+                        'id_consignee' => $header['idConsignee'] ?? null,
+                        'consignee' => $header['consignee'] ?? null,
+                        'npwp_ppjk' => $header['npwpPpjk'] ?? null,
+                        'nama_ppjk' => $header['namaPpjk'] ?? null,
+                        'nm_angkut' => $header['nmAngkut'] ?? null,
+                        'no_voy_flight' => $header['nomorVoyFlight'] ?? null,
+                        'kd_gudang' => '1MUT',
+                        'jml_cont' => $header['jumlahKontainer'] ?? 0,
+                        'no_bc11' => $header['nomorBc11'] ?? null,
+                        'tgl_bc11' => !empty($header['tanggalBc11'])
+                            ? Carbon::createFromFormat('d-m-Y', $header['tanggalBc11'])->format('Y-m-d')
+                            : null,
+                        'no_pos_bc11' => $header['nomorPosBc11'] ?? null,
+                        'no_bl_awb' => $header['nomorBlAwb'] ?? null,
+                        'tgl_bl_awb' => !empty($header['tanggalBlAwb'])
+                            ? Carbon::createFromFormat('d-m-Y', $header['tanggalBlAwb'])->format('Y-m-d')
+                            : null,
+                        'fl_segel' => $header['flagSegel'] ?? null,
+                        'tgl_upload' => Carbon::today()->format('Y-m-d'),
+                        'jam_upload' => Carbon::now()->format('H:i:s'),
+                    ]);
+    
+                    if (!empty($manualData['kemasan'])) {
+                        foreach ($manualData['kemasan'] as $detail) {
+                            $manualKms = ManualKms::create([
+                                'manual_id' => $manual->idm,
+                                'id' => $detail['id'] ?? null,
+                                'jns_kms' => $detail['jenisKemasan'] ?? null,
+                                'merk_kms' => $detail['merkKemasan'] ?? null,
+                                'jml_kms' => $detail['jumlahKemasan'] ?? 0,
+                            ]);
+    
+                            if ((int) $manual->jml_cont === 0) {
+                                $manifest = Manifest::where('nohbl', $manual->no_bl_awb)
+                                    ->whereNull('tglbuangmty')
+                                    ->first();
+    
+                                if ($manifest) {
+                                    $statusBC = 'release';
+                                    $cust = Customer::where('name', $manual->consignee)->first();
+    
+                                    if (!$cust && $manual->consignee != null) {
+                                        $cust = Customer::create([
+                                            'name' => $manual->consignee,
+                                        ]);
+                                    }
+    
+                                    $alasanKemas = null;
+                                    $alasanJml = null;
+    
+                                    if ($manifest->packing && $manifest->packing->code != $manualKms->jns_kms) {
+                                        $alasanKemas = 'Jenis Kemas Berbeda';
+                                        $statusBC = 'HOLD';
+                                    }
+    
+                                    if ($manifest->quantity != $manualKms->jml_kms) {
+                                        $alasanJml = 'Quantity Berbeda';
+                                        $statusBC = 'HOLD';
+                                    }
+    
+                                    $alasanFinal = 'Bukan Dokume SPPB, ' . $alasanKemas . ', ' . $alasanJml;
+    
+                                    $manifest->update([
+                                        'kd_dok_inout' => $manual->kd_dok_inout,
+                                        'no_dok' => $manual->no_dok_inout,
+                                        'tgl_dok' => Carbon::parse($manual->tgl_dok_inout)->format('Y-m-d'),
+                                        'status_bc' => $statusBC,
+                                        'alasan_hold' => $alasanFinal,
+                                        'cust_id' => $cust?->id,
+                                    ]);
+                                }
+                            }
+                        }
+                    }
+    
+                    if (!empty($manualData['kontainer'])) {
+                        foreach ($manualData['kontainer'] as $detail) {
+                            ManualCont::create([
+                                'manual_id' => $manual->idm,
+                                'id' => $detail['id'] ?? null,
+                                'no_cont' => $detail['nomorKontainer'] ?? null,
+                                'size' => $detail['size'] ?? null,
+                                'jns_muat' => $detail['jenisMuat'] ?? null,
+                            ]);
+    
+                            $contF = ContF::whereNull('tglkeluar')
+                                ->where('nocontainer', $detail['nomorKontainer'])
+                                ->where('size', $detail['size'])
+                                ->first();
+    
+                            if ($contF) {
+                                $alasanSize = $contF->size != $detail['size']
+                                    ? '& Ukuran Fisik Size Berbeda'
+                                    : null;
+    
+                                $cust = Customer::where('name', $manual->consignee)->first();
+    
+                                if (!$cust && $manual->consignee != null) {
+                                    $cust = Customer::create([
+                                        'name' => $manual->consignee,
+                                    ]);
+                                }
+    
+                                $contF->update([
+                                    'kd_dok_inout' => $manual->kd_dok_inout,
+                                    'no_dok' => $manual->no_dok_inout,
+                                    'tgl_dok' => Carbon::parse($manual->tgl_dok_inout)->format('Y-m-d'),
+                                    'status_bc' => 'HOLD',
+                                    'alasan_hold' => 'Bukan Dokumen SPPB. ' . $alasanSize,
+                                    'cust_id' => $cust?->id,
+                                ]);
+                            }
+                        }
+                    }
+                }
+            });
+    
+            return response()->json([
+                'success' => true,
+                'message' => 'Data berhasil disimpan',
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => $th->getMessage(),
             ]);
         }
     }
-
+    
 
     // spjm
     public function spjmGet()

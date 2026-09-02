@@ -41,7 +41,7 @@
     </div>
 </section>
 
-<div class="modal fade" id="addManual" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+<!-- <div class="modal fade" id="addManual" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-centered modal-dialog-scrollable"role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -82,6 +82,48 @@
                     <button type="submit" class="btn btn-primary ml-1" data-bs-dismiss="modal"> <i class="bx bx-check d-block d-sm-none"></i> <span class="d-none d-sm-block">Submit</span> </button>
                 </div>
             </form>
+        </div>
+    </div>
+</div> -->
+
+<div class="modal fade" id="addManual" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-centered modal-dialog-scrollable"role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">Pabean On Demand CESA 4.0</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"> <i data-feather="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-5">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <label for="">No Dok</label>
+                            <input type="text" class="form-control" id="no_dok" required>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <label for="">Tanggal Dok</label>
+                            <input type="date" class="form-control" id="tgl_dok" required>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <label for="">Kode Dokumen Importir</label>
+                            <select name="kd_dok" id="kd_dok" style="width: 100%;" class="choices">
+                                <option value disabled selected>Pilih Satu!</option>
+                                @foreach($codes as $code)
+                                    <option value="{{$code->kode}}">{{$code->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal"> <i class="bx bx-x d-block d-sm-none"></i> <span class="d-none d-sm-block">Close</span> </button>
+                <button type="button" id="searchDok" class="btn btn-primary ml-1"  onClick="submitModal(this)"> <i class="bx bx-check d-block d-sm-none"></i> <span class="d-none d-sm-block">Submit</span> </button>
+            </div>
         </div>
     </div>
 </div>
@@ -283,7 +325,7 @@
         });
     });
 </script>
-<script>
+<!-- <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Attach event listener to the update button
         document.getElementById('submitButton').addEventListener('click', function (e) {
@@ -306,8 +348,8 @@
             });
         });
     });
-</script>
-<script>
+</script> -->
+<!-- <script>
     document.querySelectorAll('[id^="deleteUser-"]').forEach(button => {
     button.addEventListener('click', function() {
         var userId = this.getAttribute('data-id');
@@ -356,7 +398,7 @@
         });
     });
 });
-</script>
+</script> -->
 
 <script>
    $(document).on('click', '.formEdit', function() {
@@ -384,7 +426,7 @@
     });
   });
 </script>
-<script>
+<!-- <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Attach event listener to the update button
         document.getElementById('updateButton').addEventListener('click', function (e) {
@@ -407,5 +449,35 @@
             });
         });
     });
+</script> -->
+
+<script>
+    async function submitModal(button) {
+        const result = await confirmation();
+        if (result.isConfirmed) {
+            showLoading();
+            const data = {
+                no_dok: document.getElementById('no_dok').value,
+                tgl_dok: document.getElementById('tgl_dok').value,
+                kd_dok: document.getElementById('kd_dok').value,
+            }
+
+            const url = '{{route('cesa.dokumen.manual')}}';
+            const response = await globalResponse(data, url);
+            hideLoading();
+             if (response.ok) {
+                const hasil = await response.json();
+                if (hasil.success) {
+                    successHasil(hasil);
+                    $('#tablePabean').DataTable().ajax.reload();
+                }else{
+                    errorHasil(hasil);
+                }
+            }else{
+                errorResponse(response);
+                return;
+            }
+        }
+    }
 </script>
 @endsection

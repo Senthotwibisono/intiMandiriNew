@@ -9,5 +9,6 @@ Route::prefix('/cesa/dokumen')->name('cesa.dokumen.')->controller(BackController
     Route::post('/sppb', 'sppbOnDemand')->name('sppb');
     Route::post('/bc23', 'bc23OnDemand')->name('bc23');
     Route::post('/pabean', 'pabeanOnDemand')->name('pabean');
+    Route::post('/manual', 'manualOnDemand')->name('manual');
     Route::post('/spjm', 'spjmOnDemand')->name('spjm');
 });
