@@ -469,9 +469,9 @@ class DeliveryController extends Controller
         $manifest = Manifest::where('id', $request->id)->first();
 
         $kdDok = $request->kd_dok;
-        $tglDok = Carbon::parse($request->tgl_dok)->format('n/j/Y');
-        $tglDokManual = Carbon::parse($request->tgl_dok)->format('d/m/Y');
-        $tglDokPabean = Carbon::parse($request->tgl_dok)->format('Ymd');
+        $tglDok = Carbon::parse($request->tgl_dok)->format('d-m-Y');
+        $tglDokManual = Carbon::parse($request->tgl_dok)->format('Y-m-d');
+        $tglDokPabean = Carbon::parse($request->tgl_dok)->format('Y-m-d');
         // var_dump($tglDok, $request->no_dok, $request->kd_dok);
         // die();
         if ($kdDok == 1) {
