@@ -177,23 +177,15 @@ class BackController extends Controller
                             'tgl_upload'   => $plp->tgl_upload,
                             'no_plp'       => $plp->no_plp,
                             'tgl_plp'      => $plp->tgl_plp,
-
                             'no_cont'      => $container['nomorKontainer'],
                             'uk_cont'      => $container['ukuranKontainer'],
-
-                            // response tidak memiliki jenisKontainer
                             'jns_cont'     => $container['jenisMuat'] ?? null,
-
                             'no_bc11'      => $plp->no_bc11,
                             'tgl_bc11'     => $plp->tgl_bc11,
-
                             'no_pos_bc11'  => $container['nomorPosBc11'],
-
-                            // response tidak memiliki field ini
-                            'consignee'    => null,
-                            'no_bl_awb'    => null,
-                            'tgl_bl_awb'   => null,
-
+                            'consignee'    => $container['namaPemilik'],
+                            'no_bl_awb'    => $container['nomorHostBl'],
+                            'tgl_bl_awb'   => $container['tanggalHostBl'],
                             'flag_spk'     => $plp->flag_spk,
                         ]);
                     }
