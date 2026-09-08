@@ -198,6 +198,19 @@
                     </li>
                 </ul>
             </li>
+            <li class="sidebar-item has-sub @if(Request::is('lcl/behandle/*')) active @endif">
+                <a href="#" class='sidebar-link'>
+                    <span>Behandle & Segel Merah</span>
+                </a>
+                <ul class="submenu @if(Request::is('lcl/behanle/*')) active @endif">
+                    <li class="submenu-item @if(Request::is('lcl/behandle/behandle-index')) active @endif">
+                        <a href="{{ route('lcl.behandle.index-behandle')}}">Behandle</a>
+                    </li>
+                    <li class="submenu-item @if(Request::is('lcl/report/manifest')) active @endif">
+                        <a href="{{ url('/lcl/report/manifest')}}">Segel Merah</a>
+                    </li>
+                </ul>
+            </li>
             <li class="sidebar-item has-sub @if(Request::is('lcl/cfs/*')) active @endif">
                 <a href="#" class="sidebar-link">
                     <span>CFS Data Center</span>

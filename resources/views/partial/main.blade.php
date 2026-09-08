@@ -310,16 +310,37 @@
             });
         }
 
+        // async function globalResponse(data, url) {
+        //     console.log(data, url);
+        //     return response = await fetch(url, {
+        //         method: "POST",
+        //         headers: {
+        //           "X-CSRF-TOKEN": "{{ csrf_token() }}",
+        //           "Content-Type": "application/json",
+        //         },
+        //         body: JSON.stringify(data),
+        //     });
+        // }
+
         async function globalResponse(data, url) {
-            console.log(data, url);
-            return response = await fetch(url, {
+
+            const options = {
                 method: "POST",
                 headers: {
-                  "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data),
-            });
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                }
+            };
+        
+            if (data instanceof FormData) {
+                // Jangan set Content-Type
+                // Browser akan otomatis menambahkan multipart/form-data beserta boundary
+                options.body = data;
+            } else {
+                options.headers["Content-Type"] = "application/json";
+                options.body = JSON.stringify(data);
+            }
+        
+            return await fetch(url, options);
         }
 
         

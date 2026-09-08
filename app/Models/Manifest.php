@@ -22,6 +22,44 @@ use Carbon\Carbon;
 
 class Manifest extends Model
 {
+    // public static function ignoreSegelMerah(bool $ignore = true)
+    // {
+    //     static::$ignoreSegelMerah = $ignore;
+    // }
+
+    // protected static function booted()
+    // {
+    //     parent::boot();
+
+    //     static::saving(function ($model) {
+    //         if ($model->flag_segel_merah === 'Y' || !static::$ignoreSegelMerah) {
+    //             if (app()->runningInConsole()) {
+    //                 return;
+    //             }
+
+    //             if (!Auth::check() || !(Auth::user()->hasRole('bcP2') )) {
+    //                 throw ValidationException::withMessages([
+    //                     'error' => 'Tidak dapat melakukan perubahan karena sedang segel merah.'
+    //                 ]);
+    //             }
+    //         }
+    //     });
+
+    //     static::deleting(function ($model) {
+    //         if ($model->flag_segel_merah === 'Y' || !static::$ignoreSegelMerah) {
+    //             if (app()->runningInConsole()) {
+    //                 return;
+    //             }
+
+    //             if (!Auth::check() || !(Auth::user()->hasRole('bcP2') )) {
+    //                 throw ValidationException::withMessages([
+    //                     'error' => 'Tidak dapat menghapus data karena sedang segel merah.'
+    //                 ]);
+    //             }
+    //         }
+    //     });
+    // }
+
     protected static function booted()
     {
         // static::addGlobalScope(new FlagSegelMerahScope());
@@ -251,6 +289,7 @@ class Manifest extends Model
         'date_finish_behandle',
         'desc_check_behandle',
         'desc_finish_behandle',
+        'petugas_behandle',
 
         'location_id',
         'location_name',

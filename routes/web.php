@@ -11,6 +11,7 @@ use App\Http\Controllers\lcl\ManifestController;
 use App\Http\Controllers\lcl\StrippingController;
 use App\Http\Controllers\lcl\GateInController;
 use App\Http\Controllers\lcl\DeliveryController;
+use App\Http\Controllers\lcl\BehandleController;
 use App\Http\Controllers\lcl\RackingController;
 use App\Http\Controllers\BarcodeAutoGateController;
 use App\Http\Controllers\PhotoController;
@@ -414,6 +415,15 @@ Route::middleware('permission:tpsOnline')->controller(DokumenController::class)-
 
         Route::get('/barcode/autoGate-indexManifest{id?}', 'manifestBarcode');
 
+    });
+
+    Route::middleware('permission:behandleLCL')->controller(BehandleController::class)->prefix('/lcl/behandle')->name('lcl.behandle')->group(function(){
+        Route::get('/behandle-index', 'behandleIndex')->name('.index-behandle');
+        Route::get('/behandle-data', 'behandleData')->name('.data-behandle');
+        Route::post('/manifest-data', 'manifestData')->name('.data-manifest');
+        Route::post('/spjm-data', 'spjmData')->name('.data-spjm');
+        Route::post('/behandle-submit', 'behandleSubmit')->name('.submit-behandle');
+        Route::get('/behandle-report', 'behandleReport')->name('.report-behandle');
     });
 
     Route::controller(RackingController::class)->group(function(){
