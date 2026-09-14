@@ -111,7 +111,7 @@ class FormFCLController extends Controller
                 ->whereNotExists(function ($query) {
                     $query->selectRaw('1')
                         ->from('tform_container_fcl as fc')
-                        ->join('tinvoice_header_fcl as h', 'h.id', '=', 'fc.form_id')
+                        ->join('tinvoice_header_fcl as h', 'h.form_id', '=', 'fc.form_id')
                         ->whereColumn('fc.container_id', 'tcontainer_fcl.id')
                         ->where('h.type', '!=', 'EXTEND')
                         ->where('h.status', 'Y');
