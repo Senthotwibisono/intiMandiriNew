@@ -171,37 +171,40 @@ class BackController extends Controller
 
                     // simpan kontainer
                     foreach ($data['detil']['kontainer'] ?? [] as $container) {
-
-                        PLPdetail::create([
-                            'plp_id'       => $plp->id,
-                            'tgl_upload'   => $plp->tgl_upload,
-                            'no_plp'       => $plp->no_plp,
-                            'tgl_plp'      => $plp->tgl_plp,
-                            'no_cont'      => $container['nomorKontainer'],
-                            'uk_cont'      => $container['ukuranKontainer'],
-                            'jns_cont'     => $container['jenisMuat'] ?? null,
-                            'no_bc11'      => $plp->no_bc11,
-                            'tgl_bc11'     => $plp->tgl_bc11,
-                            'no_pos_bc11'  => $container['nomorPosBc11'],
-                            'consignee'    => $container['namaPemilik'],
-                            'no_bl_awb'    => $container['nomorHostBl'],
-                            'tgl_bl_awb'   => $container['tanggalHostBl'],
-                            'flag_spk'     => $plp->flag_spk,
-                        ]);
+                        if ($container['flagSetuju'] === true) {
+                            PLPdetail::create([
+                                'plp_id'       => $plp->id,
+                                'tgl_upload'   => $plp->tgl_upload,
+                                'no_plp'       => $plp->no_plp,
+                                'tgl_plp'      => $plp->tgl_plp,
+                                'no_cont'      => $container['nomorKontainer'],
+                                'uk_cont'      => $container['ukuranKontainer'],
+                                'jns_cont'     => $container['jenisMuat'] ?? null,
+                                'no_bc11'      => $plp->no_bc11,
+                                'tgl_bc11'     => $plp->tgl_bc11,
+                                'no_pos_bc11'  => $container['nomorPosBc11'],
+                                'consignee'    => $container['namaPemilik'],
+                                'no_bl_awb'    => $container['nomorHostBl'],
+                                'tgl_bl_awb'   => $container['tanggalHostBl'],
+                                'flag_spk'     => $plp->flag_spk,
+                            ]);
+                        }
                     }
 
                     // update data kemasan
                     foreach ($data['detil']['kemasan'] ?? [] as $kemasan) {
-
-                        PLPdetail::where('plp_id', $plp->id)
-                            ->where('no_pos_bc11', $kemasan['nomorPosBc11'])
-                            ->update([
-                                'consignee'  => $kemasan['consignee'],
-                                'no_bl_awb'  => $kemasan['nomorBlAwb'],
-                                'tgl_bl_awb' => $kemasan['tanggalBlAwb'],
-                                'jns_kms'    => $kemasan['jenisKemasan'],
-                                'jml_kms'    => $kemasan['jumlahKemasan'],
-                            ]);
+                        if ($kemasan['flagSetuju'] === true) {
+                            # code...
+                            PLPdetail::where('plp_id', $plp->id)
+                                ->where('no_pos_bc11', $kemasan['nomorPosBc11'])
+                                ->update([
+                                    'consignee'  => $kemasan['consignee'],
+                                    'no_bl_awb'  => $kemasan['nomorBlAwb'],
+                                    'tgl_bl_awb' => $kemasan['tanggalBlAwb'],
+                                    'jns_kms'    => $kemasan['jenisKemasan'],
+                                    'jml_kms'    => $kemasan['jumlahKemasan'],
+                                ]);
+                        }
                     }
                 }
             });
@@ -286,22 +289,24 @@ class BackController extends Controller
                         // ========================
         
                         foreach ($item['kontainer'] as $container) {
-                            PLPdetail::create([
-                                'plp_id' => $plp->id,
-                                'tgl_upload' => $plp->tgl_upload,
-                                'no_plp' => $plp->no_plp,
-                                'tgl_plp' => $plp->tgl_plp,
-                                'no_cont' => $container['nomorKontainer'],
-                                'uk_cont' => $container['ukuranKontainer'],
-                                'jns_cont' => $container['jenisKontainer'],
-                                'no_bc11' => $plp->no_bc11,
-                                'tgl_bc11' => $plp->tgl_bc11,
-                                'no_pos_bc11' => $container['nomorPosBc11'],
-                                'consignee' => $container['consignee'],
-                                'no_bl_awb' => $container['nomorBlAwb'],
-                                'tgl_bl_awb' => $container['tanggalBlAwb'],
-                                'flag_spk' => $plp->flag_spk,
-                            ]);
+                            if ($container['flagSetuju'] === true) {
+                                PLPdetail::create([
+                                    'plp_id' => $plp->id,
+                                    'tgl_upload' => $plp->tgl_upload,
+                                    'no_plp' => $plp->no_plp,
+                                    'tgl_plp' => $plp->tgl_plp,
+                                    'no_cont' => $container['nomorKontainer'],
+                                    'uk_cont' => $container['ukuranKontainer'],
+                                    'jns_cont' => $container['jenisKontainer'],
+                                    'no_bc11' => $plp->no_bc11,
+                                    'tgl_bc11' => $plp->tgl_bc11,
+                                    'no_pos_bc11' => $container['nomorPosBc11'],
+                                    'consignee' => $container['consignee'],
+                                    'no_bl_awb' => $container['nomorBlAwb'],
+                                    'tgl_bl_awb' => $container['tanggalBlAwb'],
+                                    'flag_spk' => $plp->flag_spk,
+                                ]);
+                            }
                         }
         
                         // ========================
@@ -309,14 +314,17 @@ class BackController extends Controller
                         // ========================
         
                         foreach ($item['kemasan'] as $kemasan) {
+                            if ($kemasan['flagSetuju'] === true) {
+                                # code...
+                                PLPdetail::where('plp_id', $plp->id)
+                                    ->where('no_bl_awb', $kemasan['nomorBlAwb'])
+                                    ->where('no_pos_bc11', $kemasan['nomorPosBc11'])
+                                    ->update([
+                                        'jns_kms' => $kemasan['jenisKemasan'],
+                                        'jml_kms' => $kemasan['jumlahKemasan'],
+                                    ]);
+                            }
         
-                            PLPdetail::where('plp_id', $plp->id)
-                                ->where('no_bl_awb', $kemasan['nomorBlAwb'])
-                                ->where('no_pos_bc11', $kemasan['nomorPosBc11'])
-                                ->update([
-                                    'jns_kms' => $kemasan['jenisKemasan'],
-                                    'jml_kms' => $kemasan['jumlahKemasan'],
-                                ]);
                         }
                     }
                 });
