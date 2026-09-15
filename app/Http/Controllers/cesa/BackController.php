@@ -291,7 +291,7 @@ class BackController extends Controller
                         // ========================
         
                         foreach ($item['kontainer'] as $container) {
-                            if ($container['flagSetuju'] === true) {
+                            if ($container['flagSetuju'] === true || $container['flagSetuju'] === 'Y') {
                                 PLPdetail::create([
                                     'plp_id' => $plp->id,
                                     'tgl_upload' => $plp->tgl_upload,
@@ -316,7 +316,7 @@ class BackController extends Controller
                         // ========================
         
                         foreach ($item['kemasan'] as $kemasan) {
-                            if ($kemasan['flagSetuju'] === true) {
+                            if ($container['flagSetuju'] === true || $container['flagSetuju'] === 'Y') {
                                 # code...
                                 PLPdetail::where('plp_id', $plp->id)
                                     ->where('no_bl_awb', $kemasan['nomorBlAwb'])
