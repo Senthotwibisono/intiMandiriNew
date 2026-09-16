@@ -115,7 +115,7 @@ class FormFCLController extends Controller
             }
             $cont = ContF::whereNotNull('tglmasuk')
                 ->where('nobl', $request->bl)
-                ->whereNotExists(function ($query) {
+                ->whereNotExists(function ($query) use ($tipe) {
                     $query->selectRaw('1')
                         ->from('tform_container_fcl as fc')
                         ->join('tinvoice_header_fcl as h', 'h.form_id', '=', 'fc.form_id')
