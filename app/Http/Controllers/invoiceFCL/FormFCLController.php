@@ -120,7 +120,8 @@ class FormFCLController extends Controller
                         ->from('tform_container_fcl as fc')
                         ->join('tinvoice_header_fcl as h', 'h.form_id', '=', 'fc.form_id')
                         ->whereColumn('fc.container_id', 'tcontainer_fcl.id')
-                        ->whereNotIn('h.type', ['EXTEND', $tipe])
+                        ->where('h.type', $tipe)
+                        ->where('h.type', '!=', 'EXTEND')
                         ->where('h.status', 'Y');
                 })
                 ->get();
