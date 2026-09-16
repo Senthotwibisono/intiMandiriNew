@@ -72,84 +72,84 @@ class FormFCLController extends Controller
         ]);
     }
 
-    // public function getBLData(Request $request)
-    // {
-    //     try {
-    //         $cont = ContF::whereNotNull('tglmasuk')->where('nobl', $request->bl)->get();
-    //         if ($cont->isEmpty()) {
-    //             return response()->json([
-    //                 'success'=> false,
-    //                 'message'=> 'Tidak ada container yang dapat dipilih !!',
-    //             ]);
-    //         }
-    //         $dateBL = ContF::where('nobl', $request->bl)->value('tgl_bl_awb');
-    //         $custId = ContF::where('nobl', $request->bl)->value('cust_id');
-    //         $customer = Customer::find($custId);
-
-    //         // var_dump($customer);
-    //         // die();
-            
-    //         return response()->json([
-    //             'success' => true,
-    //             'data' => $dateBL,
-    //             'containers' => $cont, // Kirim daftar container ke frontend
-    //             'customer' => $customer,
-    //         ]);
-    //     } catch (\Throwable $th) {
-    //         return response()->json([
-    //             'success'=> false,
-    //             'message'=> $th->getMessage(),
-    //         ]);
-    //     }
-    // }
-
     public function getBLData(Request $request)
     {
         try {
-            $tipe = $request->invoice_type;
-            if (empty($tipe)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'tipe invoice belum di pilih',
-                ]);
-            }
-            $cont = ContF::whereNotNull('tglmasuk')
-                ->where('nobl', $request->bl)
-                ->whereNotExists(function ($query) use ($tipe) {
-                    $query->selectRaw('1')
-                        ->from('tform_container_fcl as fc')
-                        ->join('tinvoice_header_fcl as h', 'h.form_id', '=', 'fc.form_id')
-                        ->whereColumn('fc.container_id', 'tcontainer_fcl.id')
-                        ->where('h.type', $tipe)
-                        ->where('h.type', '!=', 'EXTEND')
-                        ->where('h.status', 'Y');
-                })
-                ->get();
-    
+            $cont = ContF::whereNotNull('tglmasuk')->where('nobl', $request->bl)->get();
             if ($cont->isEmpty()) {
                 return response()->json([
-                    'success' => false,
-                    'message' => 'Tidak ada container yang dapat dipilih !!',
+                    'success'=> false,
+                    'message'=> 'Tidak ada container yang dapat dipilih !!',
                 ]);
             }
-    
             $dateBL = ContF::where('nobl', $request->bl)->value('tgl_bl_awb');
             $custId = ContF::where('nobl', $request->bl)->value('cust_id');
             $customer = Customer::find($custId);
-    
+
+            // var_dump($customer);
+            // die();
+            
             return response()->json([
                 'success' => true,
                 'data' => $dateBL,
-                'containers' => $cont,
+                'containers' => $cont, // Kirim daftar container ke frontend
                 'customer' => $customer,
             ]);
         } catch (\Throwable $th) {
             return response()->json([
-                'success' => false,
-                'message' => $th->getMessage(),
+                'success'=> false,
+                'message'=> $th->getMessage(),
             ]);
         }
     }
+
+    // public function getBLData(Request $request)
+    // {
+    //     try {
+    //         $tipe = $request->invoice_type;
+    //         if (empty($tipe)) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'tipe invoice belum di pilih',
+    //             ]);
+    //         }
+    //         $cont = ContF::whereNotNull('tglmasuk')
+    //             ->where('nobl', $request->bl)
+    //             ->whereNotExists(function ($query) use ($tipe) {
+    //                 $query->selectRaw('1')
+    //                     ->from('tform_container_fcl as fc')
+    //                     ->join('tinvoice_header_fcl as h', 'h.form_id', '=', 'fc.form_id')
+    //                     ->whereColumn('fc.container_id', 'tcontainer_fcl.id')
+    //                     ->where('h.type', $tipe)
+    //                     ->where('h.type', '!=', 'EXTEND')
+    //                     ->where('h.status', 'Y');
+    //             })
+    //             ->get();
+    
+    //         if ($cont->isEmpty()) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Tidak ada container yang dapat dipilih !!',
+    //             ]);
+    //         }
+    
+    //         $dateBL = ContF::where('nobl', $request->bl)->value('tgl_bl_awb');
+    //         $custId = ContF::where('nobl', $request->bl)->value('cust_id');
+    //         $customer = Customer::find($custId);
+    
+    //         return response()->json([
+    //             'success' => true,
+    //             'data' => $dateBL,
+    //             'containers' => $cont,
+    //             'customer' => $customer,
+    //         ]);
+    //     } catch (\Throwable $th) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => $th->getMessage(),
+    //         ]);
+    //     }
+    // }
 
     public function postStep1(Request $request)
     {
