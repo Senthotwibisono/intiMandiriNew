@@ -110,7 +110,7 @@ class FormFCLController extends Controller
             if (empty($tipe)) {
                 return response()->json([
                     'success' => false,
-                    'message' => $th->getMessage(),
+                    'message' => 'tipe invoice belum di pilih',
                 ]);
             }
             $cont = ContF::whereNotNull('tglmasuk')
