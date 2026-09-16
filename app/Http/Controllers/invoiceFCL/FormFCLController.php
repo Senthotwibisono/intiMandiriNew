@@ -106,6 +106,13 @@ class FormFCLController extends Controller
     public function getBLData(Request $request)
     {
         try {
+            $tipe = $request->invoice_type;
+            if (empty($tipe)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $th->getMessage(),
+                ]);
+            }
             $cont = ContF::whereNotNull('tglmasuk')
                 ->where('nobl', $request->bl)
                 ->whereNotExists(function ($query) {
@@ -113,7 +120,7 @@ class FormFCLController extends Controller
                         ->from('tform_container_fcl as fc')
                         ->join('tinvoice_header_fcl as h', 'h.form_id', '=', 'fc.form_id')
                         ->whereColumn('fc.container_id', 'tcontainer_fcl.id')
-                        ->where('h.type', '!=', 'EXTEND')
+                        ->whereNotIn('h.type', ['EXTEND', $tipe])
                         ->where('h.status', 'Y');
                 })
                 ->get();

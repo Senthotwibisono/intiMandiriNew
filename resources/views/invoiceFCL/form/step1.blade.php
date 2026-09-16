@@ -68,7 +68,7 @@
                     <div class="col-3">
                         <div class="form-group">
                             <label for="">Invoice Type</label>
-                            <select name="type" id="" class="js-example-basic-single select2 form-select" style="width: 100%;">
+                            <select name="type" id="invoice_type" class="js-example-basic-single select2 form-select" style="width: 100%;">
                                 <option disabled selected value>Wajib Pilih Satu</option>
                                 <option value="STANDART">STANDART</option>
                                 <option value="TPP">TPP</option>
@@ -124,18 +124,21 @@
 <script>
     $(document).on('change', '#nobl', function(){
         let bl = $(this).val();
+        const invoice_type = document.getElementById('invoice_type').value;
         Swal.showLoading();
         $.ajax({
             type: 'GET',
             data: 
             {
                 _token: '{{ csrf_token() }}',
-                bl:bl
+                bl:bl,
+                invoice_type:invoice_type
              },
             url: '/invoiceFCL/form/getBLData',
             cache: false,
             data: {
-              bl:bl
+              bl:bl,
+              invoice_type:invoice_type
             },
             dataType: 'json',
             success: function(response){
