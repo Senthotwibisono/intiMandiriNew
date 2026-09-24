@@ -568,7 +568,7 @@ class NpctController extends Controller
                 // ===============================
                 $xmlResponse = is_object($response)
                     ? ($response->return ?? '')
-                    : $response;    
+                    : $response; 
 
                 $success = str_contains($xmlResponse, 'Success');   
 
