@@ -805,7 +805,8 @@ class DeliveryController extends Controller
             }
         })
         ->addColumn('bonMuat', function($manifest){
-            return '<button class="btn btn-danger printBonmuat" data-id="'.$manifest->id.'"><i class="fa fa-print"></i></button>';
+            $herfBarcode = '/lcl/manifest/barcode-';
+            return '<a href="javascript:void(0)" onclick="openWindow(\''. $herfBarcode . $manifest->id .'\')" class="btn btn-sm btn-danger"><i class="fa fa-print"></i></a>';
         })
         // ->addColumn('status_bc', function($manifest){
         //     return $manifest->status_bc ?? '-';

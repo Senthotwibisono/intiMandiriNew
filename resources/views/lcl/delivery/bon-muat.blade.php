@@ -28,7 +28,7 @@
                         <tr>
                             <th class="text-center">Edit</th>
                             <th class="text-center">Detil</th>
-                            <th class="text-center">Barcode</th>
+                            <!-- <th class="text-center">Barcode</th> -->
                             <th class="text-center">Bon Muat</th>
                             <th class="text-center">Status BC</th>
                             <th class="text-center">Alasan Hold</th>
@@ -175,7 +175,7 @@
             columns: [
                 { data: 'edit', name: 'edit', className: 'text-center' },
                 { data: 'detail', name: 'detail', className: 'text-center' },
-                { data: 'barcode', name: 'barcode', className: 'text-center' },
+                // { data: 'barcode', name: 'barcode', className: 'text-center' },
                 { data: 'bonMuat', name: 'barcode', className: 'text-center' },
                 { data: 'status_bc', name: 'status_bc', className: 'text-center' },
                 { data: 'alasan_hold', name: 'alasan_hold', className: 'text-center' },
