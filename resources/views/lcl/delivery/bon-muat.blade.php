@@ -1,0 +1,349 @@
+@extends('partial.main')
+@section('custom_styles')
+<style>
+    .highlight-yellow {
+        background-color: yellow !important;;
+    }
+</style>
+
+<style>
+    .highlight-blue {
+        background-color: lightblue !important;;
+    }
+</style>
+
+<style>
+    .highlight-red {
+        background-color: red !important;;
+    }
+</style>
+@endsection
+@section('content')
+<section>
+    <div class="card">
+        <div class="card-body">
+            <div class="table">
+                <table class="table-hover table-stripped" id="tableGateOut" style="white-space: nowrap;">
+                    <thead>
+                        <tr>
+                            <th class="text-center">Edit</th>
+                            <th class="text-center">Detil</th>
+                            <th class="text-center">Barcode</th>
+                            <th class="text-center">Bon Muat</th>
+                            <th class="text-center">Status BC</th>
+                            <th class="text-center">Alasan Hold</th>
+                            <th class="text-center">Segel Merah</th>
+                            <th class="text-center">Alasan Segel</th>
+                            <th class="text-center">Waktu Segel</th>
+                            <th class="text-center">Alasan Lepas Segel</th>
+                            <th class="text-center">Waktu Lepas Segel</th>
+                            <th class="text-center">No HBL</th>
+                            <th class="text-center">Tgl HBL</th>
+                            <th class="text-center">Lama Timbun</th>
+                            <th class="text-center">No Tally</th>
+                            <th class="text-center">Shipper</th>
+                            <th class="text-center">Customer</th>
+                            <th class="text-center">Qty</th>
+                            <th class="text-center">Qty Real Time</th>
+                            <th class="text-center">Packing</th>
+                            <th class="text-center">Kode Kemas</th>
+                            <th class="text-center">Desc of Goods</th>
+                            <th class="text-center">Weight</th>
+                            <th class="text-center">Meas</th>
+                            <th class="text-center">Packing Tally</th>
+                            <th class="text-center">Jenis Dok</th>
+                            <th class="text-center">No Dok</th>
+                            <th class="text-center">Tgl Dok</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- <section>
+    <div class="card">
+        <div class="card-header">
+            <h4 class="text-center">Gate Out From</h4>
+        </div>
+        <form action="{{route('lcl.delivery.updateGateOut')}}" id="updateForm" method="post" enctype="multipart/form-data">
+            @csrf
+            <div class="card-body">
+                <div class="row mt-1">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="">No Tally</label>
+                            <input type="text" name="notally" id="notally_edit" class="form-control" readonly>
+                            <input type="hidden" name="id" id="id_edit" class="form-control" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="">No HBL</label>
+                            <input type="text" name="nohbl" id="nohbl_edit" class="form-control" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="">Quantity</label>
+                            <input type="text" name="quantity" id="quantity_edit" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="row">
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <label for="">Kode Dokumen</label>
+                                    <select name="kd_dok" id="kd_dok_edit" style="width: 100%; " class="js-example-basic-single form-select select2">
+                                        <option value disabled selected>Pilih Satu</option>
+                                        
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <label for="">No Dok</label>
+                                    <input type="text" name="no_dok" id="no_dok_edit" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <label for="">Tgl Dok </label>
+                                    <input type="date" name="tgl_dok" id="tgl_dok_edit" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <br>
+                                <button class="btn btn-outline-info CheckSPJMDok" type="button">Check</button>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="">No Polisi Release</label>
+                                <input type="text" class="form-control" name="nopol_release" id="nopol_release_edit">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="">Tgl Keluar</label>
+                                    <input type="date" name="tglbuangmty" id="tglbuangmty_edit" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="">Jam Keluar </label>
+                                    <input type="time" name="jambuangmty" id="jambuangmty_edit" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="photos">Pilih Foto-foto</label>
+                                    <input type="file" class="form-control" id="photos" name="photos[]" multiple accept="image/*">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="">Keterangan Photo</label>
+                                    <select name="keteranganPhoto" class="js-example-basic-single form-select select2" style="width: 100%;">
+                                        <option disabled selected value>Pilih Satu!</option>
+                                        
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <button type="button" class="btn btn-outline-danger" id="cancelButton">Cancel</button>
+                <button type="button" class="btn btn-outline-success updateButton" id="updateButton">Submit</button>
+                <button type="button" class="btn btn-outline-warning cetakSuratJalan" id="cetakSuratJalan">Cetak Surat Jalan</button>      
+            </div>
+        </form>
+    </div>
+</section> -->
+@endsection
+
+@section('custom_js')
+<script>
+    $(document).ready(function(){
+        $('#tableGateOut').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '/lcl/delivery/dataBonMuat',
+            scrollX: true,
+            columns: [
+                { data: 'edit', name: 'edit', className: 'text-center' },
+                { data: 'detail', name: 'detail', className: 'text-center' },
+                { data: 'barcode', name: 'barcode', className: 'text-center' },
+                { data: 'bonMuat', name: 'barcode', className: 'text-center' },
+                { data: 'status_bc', name: 'status_bc', className: 'text-center' },
+                { data: 'alasan_hold', name: 'alasan_hold', className: 'text-center' },
+                {className:'text-center', data:'flag_segel_merah', name:'flag_segel_merah'},
+                {className:'text-center', data:'alasan_segel', name:'alasan_segel'},
+                {className:'text-center', data:'tanggal_segel_merah', name:'tanggal_segel_merah'},
+                {className:'text-center', data:'alasan_lepas_segel', name:'alasan_lepas_segel'},
+                {className:'text-center', data:'tanggal_lepas_segel_merah', name:'tanggal_lepas_segel_merah'},
+                { data: 'nohbl', name: 'nohbl', className: 'text-center' },
+                { data: 'tgl_hbl', name: 'tgl_hbl', className: 'text-center' },
+                { data: 'lamaHari', name: 'lamaHari', className: 'text-center' },
+                { data: 'notally', name: 'notally', className: 'text-center' },
+                { data: 'shipper', name: 'shipper', className: 'text-center' },
+                { data: 'customer', name: 'customer', className: 'text-center' },
+                { data: 'quantity', name: 'quantity', className: 'text-center' },
+                { data: 'final_qty', name: 'final_qty', className: 'text-center' },
+                { data: 'packingName', name: 'packingName', className: 'text-center' },
+                { data: 'packingCode', name: 'packingCode', className: 'text-center' },
+                { data: 'desc', name: 'desc', className: 'text-center' },
+                { data: 'weight', name: 'weight', className: 'text-center' },
+                { data: 'meas', name: 'meas', className: 'text-center' },
+                { data: 'packingTally', name: 'packingTally', className: 'text-center' },
+                { data: 'dokumen', name: 'dokumen', className: 'text-center' },
+                { data: 'no_dok', name: 'no_dok', className: 'text-center' },
+                { data: 'tglDok', name: 'tglDok', className: 'text-center' },
+            ],
+            createdRow: function (row, data, dataIndex) {
+                if (data.flag_segel_merah === 'Y') {
+                    $(row).addClass('highlight-red text-white');
+                } else if (data.status_bc === 'HOLD') {
+                    $(row).addClass('highlight-yellow');
+                } else if (data.status_bc === 'release'){
+                    $(row).addClass('highlight-blue');
+                }
+            },
+            initComplete: function () {
+                var api = this.api();
+                
+                api.columns().every(function (index) {
+                    var column = this;
+                    var excludedColumns = [0, 1, 2, 3]; // Kolom yang tidak ingin difilter (detil, flag_segel_merah, lamaHari)
+                    
+                    if (excludedColumns.includes(index)) {
+                        $('<th></th>').appendTo(column.header()); // Kosongkan header pencarian untuk kolom yang dikecualikan
+                        return;
+                    }
+
+                    var $th = $(column.header());
+                    var $input = $('<input type="text" class="form-control form-control-sm" placeholder="Search ' + $th.text() + '">')
+                        .appendTo($('<th class="text-center"></th>').appendTo($th))
+                        .on('keyup change', function () {
+                            column.search($(this).val()).draw();
+                        });
+                });
+            }
+        })
+    })
+</script>
+<script>
+$(document).ready(function() {
+    // When Cancel button is clicked
+    $('#cancelButton').click(function() {
+        // Reload the current page
+        location.reload();
+    });
+});
+</script>
+
+<script>
+    $(document).ready(function(){
+        $('#cetakSuratJalan').click(function(){
+            var manifestId = $("#id_edit").val();
+
+            if (manifestId == null || manifestId == '') {
+                Swal.fire('Error', 'Anda belum memilih manifest, harap pilih manifest terlebih dahulu', 'error');
+            } else {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Apakah anda yakin menerbitakn surat jalan untuk manifest ini?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        swal.fire({
+                            title: 'Processing...',
+                            text: 'Please wait',
+                            icon: 'info',
+                            allowOutsideClick: false,
+                            showConfirmButton: false,
+                                willOpen: () => {
+                                    Swal.showLoading();
+                                }
+                        });
+    
+                        window.open('/lcl/delivery/cetakSuratJalan-' + manifestId, "preview bon muat","width=600,height=600,menubar=no,status=no,scrollbars=yes");
+                        swal.close();
+                    }
+                });
+            }
+        })
+    })
+</script>
+
+<script>
+    $(document).on('click', '.printBarcode', function(e) {
+        e.preventDefault();
+        var containerId = $(this).data('id');
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        Swal.fire({
+            icon: 'question',
+            title: 'Do you want to generate the barcode?',
+            showCancelButton: true,
+            confirmButtonText: 'Generate',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/lcl/delivery/gateOut-barcodeGate',
+                    data: { id: containerId },
+                    cache: false,
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire('Generated!', '', 'success')
+                                .then(() => {
+                                    var barcodeId = response.data.id;
+                                    window.open('/barcode/autoGate-indexManifest' + barcodeId, '_blank', 'width=600,height=800');
+                                });
+                        } else {
+                            Swal.fire('Error', response.message, 'error');
+                        }
+                    },
+                    error: function(response) {
+                        var errors = response.responseJSON.errors;
+                        if (errors) {
+                            var errorMessage = '';
+                            $.each(errors, function(key, value) {
+                                errorMessage += value[0] + '<br>';
+                            });
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Validation Error',
+                                html: errorMessage,
+                            });
+                        } else {
+                            Swal.fire('Error', 'An error occurred while processing your request', 'error');
+                        }
+                    },
+                });
+            }
+        });
+    });
+</script>
+
+
+<script>
+    function openWindow(url) {
+        window.open(url, '_blank', 'width=600,height=800');
+    }
+</script>
+
+@endsection

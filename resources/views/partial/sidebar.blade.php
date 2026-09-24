@@ -175,6 +175,9 @@
                     <li class="submenu-item @if(Request::is('lcl/delivery/gateOut') || Request::is('lcl/delivery/gateOut/*')) active @endif">
                         <a href="{{ url('/lcl/delivery/gateOut')}}">Gate Out</a>
                     </li>
+                    <li class="submenu-item @if(Request::is('lcl/delivery/BonMuat') || Request::is('lcl/delivery/BonMuat/*')) active @endif">
+                        <a href="{{ url('/lcl/delivery/BonMuat')}}">Bon Muat</a>
+                    </li>
                 </ul>
             </li>
 

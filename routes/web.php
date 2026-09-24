@@ -410,6 +410,9 @@ Route::middleware('permission:tpsOnline')->controller(DokumenController::class)-
             Route::get('/lcl/realisasi/GateOut-detail{id?}', 'detailGateOut')->name('lcl.delivery.detailGateOut');
             Route::post('/lcl/delivery/gateOut-barcodeGate', 'createBarcode')->name('lcl.delivery.barcodeGate');
         });
+        
+        Route::get('/lcl/delivery/BonMuat', 'indexBonMuat')->name('lcl.delivery.BonMuat');
+        Route::get('/lcl/delivery/dataBonMuat', 'dataBonMuat');
 
         Route::get('/lcl/delivery/cetakSuratJalan-{id?}', 'cetakSuratJalan');
 
