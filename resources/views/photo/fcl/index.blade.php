@@ -9,7 +9,7 @@
 @section('content')
 <section>
     <div class="card">
-        <div class="card-body fixed-height-cardBody">
+        <div class="card-body">
             <br>
             <!-- <table class="tabelCustom" style="overflow-x:auto;">
                 <thead>
@@ -125,6 +125,8 @@
         $('#tableContainer').DataTable({
             processing: true,
             serverSide: true,
+            scrollX: true,
+            scrollY: '50hv',
 
                 ajax: {
                 url: "{{ url('/photo/fcl/container') }}",
