@@ -30,7 +30,7 @@
                     </tbody>
                 </thead>
             </table> -->
-            <table id="tableContainer" class="tabelCustom" style="width:100%;">
+            <table id="tableContainer" class="" style="width:100%;">
                 <thead>
                     <tr>
                         <th>Action</th>
