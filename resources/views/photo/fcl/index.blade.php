@@ -24,7 +24,7 @@
                         <th>Buang Empty</th>
                     </tr>
                     <tbody>
-                        @foreach($conts as $cont)
+                        
                             <tr>
                                 <td>
                                     <div class="button-container">
@@ -46,7 +46,7 @@
                                     <a href="javascript:void(0)" onclick="openWindow('/fcl/realisasi/mty-detail{{$cont->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
                                 </td>
                             </tr>
-                        @endforeach
+              
                     </tbody>
                 </thead>
             </table> -->
