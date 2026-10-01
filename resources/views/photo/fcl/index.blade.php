@@ -151,11 +151,11 @@
                 },
                 {
                     data: 'nojoborder',
-                    name: 'job.nojoborder'
+                    name: 'nojoborder'
                 },
                 {
                     data: 'nospk',
-                    name: 'job.nospk'
+                    name: 'nospk'
                 },
                 {
                     data: 'nocontainer',
@@ -163,7 +163,7 @@
                 },
                 {
                     data: 'nombl',
-                    name: 'job.nombl'
+                    name: 'nombl'
                 },
                 {
                     data: 'gate_in',
