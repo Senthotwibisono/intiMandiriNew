@@ -62,7 +62,7 @@
                                 <td>
                                     <div class="button-container">
                                         <button class="btn btn-outline-info approveButton" data-id="{{$mans->id}}">Approve</button>
-                                        <a href="javascript:void(0)" onclick="openWindow('/lcl/realisasi/GateOut-detail{{$mans->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
+                                        <a href="javascript:void(0)" onclick="openWindow('/lcl/report/manifestPhoto{{$mans->id}}')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
                                     </div>
                                 </td>
                                 <td>
