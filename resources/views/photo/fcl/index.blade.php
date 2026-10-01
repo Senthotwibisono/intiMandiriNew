@@ -126,7 +126,7 @@
             processing: true,
             serverSide: true,
             scrollX: true,
-            scrollY: '50hv',
+            scrollY: '50vh',
 
                 ajax: {
                 url: "{{ url('/photo/fcl/container') }}",
