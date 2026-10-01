@@ -550,7 +550,8 @@ class BeaCukaiController extends Controller
             return '<button type="button" class="btn btn-info releaseButton" id="releaseButton" data-id="'.$cont->id.'">Release</button>';
         })
         ->addColumn('photo', function($cont){
-            return '<button class="btn btn-outline-info photoButton" data-id="'.$cont->id.'"><i class="fa fa-camera"></i></button>';
+            $herf = '/fcl/report/photoCont';
+            return '<a href="javascript:void(0)" onclick="openWindow(\''.$herf.$cont->id.'\')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>';
         })
         ->addColumn('nojob', function($cont){
             return $cont->job->nojoborder ?? '-';
@@ -645,7 +646,8 @@ class BeaCukaiController extends Controller
             return '<button type="button" class="btn btn-danger holdButton" id="holdButton" data-id="'.$cont->id.'">Hold</button>';
         })
         ->addColumn('photo', function($cont){
-            return '<button class="btn btn-outline-info photoButton" data-id="'.$cont->id.'"><i class="fa fa-camera"></i></button>';
+            $herf = '/fcl/report/photoCont';
+            return '<a href="javascript:void(0)" onclick="openWindow(\''.$herf.$cont->id.'\')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>';
         })
         // ->addColumn('nojob', function($cont){
         //     return $cont->job->nojoborder ?? '-';

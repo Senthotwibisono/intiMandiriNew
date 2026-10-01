@@ -76,7 +76,7 @@ class ReportFCLController extends Controller
 
         return DataTables::of($cont)
             ->addColumn('detil', function($cont){
-                $herf = '/lcl/report/contPhoto';
+                $herf = '/fcl/report/photoCont';
                 return '<a href="javascript:void(0)" onclick="openWindow(\''.$herf.$cont->id.'\')" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>';
             })
 
