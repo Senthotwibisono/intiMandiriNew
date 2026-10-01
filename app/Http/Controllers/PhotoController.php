@@ -50,16 +50,8 @@ class PhotoController extends Controller
     public function indexFclContainer(Request $request)
     {
         if ($request->ajax()) {
-            $query = ContF::with([
-                'job:id,nojoborder,nospk,nombl'
-            ])
-            ->select([
-                'id',
-                'joborder_id',
-                'nocontainer',
-            ])
-            ->orderBy('joborder_id', 'asc');
-    
+            $query = ContF::query();
+
             return DataTables::of($query)
                 ->addColumn('action', function ($cont) {
                     return '
@@ -70,7 +62,7 @@ class PhotoController extends Controller
                                 data-id="' . $cont->id . '">
                                 <i class="fa fa-pen"></i>
                             </button>
-    
+
                             <a href="javascript:void(0)"
                                onclick="openWindow(\'/fcl/report/contPhoto' . $cont->id . '\')"
                                class="btn btn-sm btn-info">
@@ -123,9 +115,9 @@ class PhotoController extends Controller
                 ])
                 ->make(true);
         }
-    
+
         $data['title'] = 'Photo Container';
-    
+
         return view('photo.fcl.index', $data);
     }
 
