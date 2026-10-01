@@ -14,6 +14,7 @@ use App\Models\JobOrder as Job;
 use App\Models\Manifest;
 use App\Models\Photo;
 use App\Models\KeteranganPhoto as Ket;
+use DataTables;
 
 class PhotoController extends Controller
 {
@@ -38,11 +39,93 @@ class PhotoController extends Controller
         return view('photo.lcl.cont.index', $data);
     }
 
-    public function indexFclContainer()
-    {
-        $data['title'] = "Photo Container";
-        $data['conts'] = ContF::orderBy('joborder_id', 'asc')->get();
+    // public function indexFclContainer()
+    // {
+    //     $data['title'] = "Photo Container";
+    //     $data['conts'] = ContF::orderBy('joborder_id', 'asc')->get();
 
+    //     return view('photo.fcl.index', $data);
+    // }
+
+    public function indexFclContainer(Request $request)
+    {
+        if ($request->ajax()) {
+            $query = ContF::with([
+                'job:id,nojoborder,nospk,nombl'
+            ])
+            ->select([
+                'id',
+                'joborder_id',
+                'nocontainer',
+            ])
+            ->orderBy('joborder_id', 'asc');
+    
+            return DataTables::of($query)
+                ->addColumn('action', function ($cont) {
+                    return '
+                        <div class="button-container">
+                            <button
+                                type="button"
+                                class="btn btn-outline-warning editButton"
+                                data-id="' . $cont->id . '">
+                                <i class="fa fa-pen"></i>
+                            </button>
+    
+                            <a href="javascript:void(0)"
+                               onclick="openWindow(\'/fcl/report/contPhoto' . $cont->id . '\')"
+                               class="btn btn-sm btn-info">
+                                <i class="fa fa-eye"></i>
+                            </a>
+                        </div>
+                    ';
+                })
+                ->addColumn('nojoborder', function ($cont) {
+                    return $cont->job->nojoborder ?? '-';
+                })
+                ->addColumn('nospk', function ($cont) {
+                    return $cont->job->nospk ?? '-';
+                })
+                ->addColumn('nombl', function ($cont) {
+                    return $cont->job->nombl ?? '-';
+                })
+                ->addColumn('gate_in', function ($cont) {
+                    return '
+                        <a href="javascript:void(0)"
+                           onclick="openWindow(\'/fcl/realisasi/gateIn-detail' . $cont->id . '\')"
+                           class="btn btn-sm btn-info">
+                            <i class="fa fa-eye"></i>
+                        </a>
+                    ';
+                })
+                ->addColumn('stripping', function ($cont) {
+                    return '
+                        <a href="javascript:void(0)"
+                           onclick="openWindow(\'/fcl/realisasi/stripping-photoCont' . $cont->id . '\')"
+                           class="btn btn-sm btn-info">
+                            <i class="fa fa-eye"></i>
+                        </a>
+                    ';
+                })
+                ->addColumn('buang_empty', function ($cont) {
+                    return '
+                        <a href="javascript:void(0)"
+                           onclick="openWindow(\'/fcl/realisasi/mty-detail' . $cont->id . '\')"
+                           class="btn btn-sm btn-info">
+                            <i class="fa fa-eye"></i>
+                        </a>
+                    ';
+                })
+                ->rawColumns([
+                    'action',
+                    'gate_in',
+                    'stripping',
+                    'buang_empty'
+                ])
+                ->make(true);
+        }
+    
+        $data['title'] = 'Photo Container';
+    
         return view('photo.fcl.index', $data);
     }
 

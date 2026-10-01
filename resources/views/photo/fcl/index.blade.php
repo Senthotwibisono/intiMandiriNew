@@ -11,7 +11,7 @@
     <div class="card">
         <div class="card-body fixed-height-cardBody">
             <br>
-            <table class="tabelCustom" style="overflow-x:auto;">
+            <!-- <table class="tabelCustom" style="overflow-x:auto;">
                 <thead>
                     <tr>
                         <th>Action</th>
@@ -49,6 +49,22 @@
                         @endforeach
                     </tbody>
                 </thead>
+            </table> -->
+            <table id="tableContainer" class="tabelCustom" style="width:100%;">
+                <thead>
+                    <tr>
+                        <th>Action</th>
+                        <th>No Job Order</th>
+                        <th>No SPK</th>
+                        <th>No Container</th>
+                        <th>No MBL</th>
+                        <th>Gate In</th>
+                        <th>Stripping</th>
+                        <th>Buang Empty</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
             </table>
         </div>
     </div>
@@ -123,6 +139,75 @@
 @section('custom_js')
 
 <script>
+
+    $(document).ready(function () {
+
+        $('#tableContainer').DataTable({
+            processing: true,
+            serverSide: true,
+
+                ajax: {
+                url: "{{ url('/photo/fcl/container') }}",
+                type: "GET"
+            },
+
+                pageLength: 25,
+
+                lengthMenu: [
+                [10, 25, 50, 100],
+                [10, 25, 50, 100]
+            ],
+
+                order: [
+                [1, 'asc']
+            ],
+
+                columns: [
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'nojoborder',
+                    name: 'job.nojoborder'
+                },
+                {
+                    data: 'nospk',
+                    name: 'job.nospk'
+                },
+                {
+                    data: 'nocontainer',
+                    name: 'nocontainer'
+                },
+                {
+                    data: 'nombl',
+                    name: 'job.nombl'
+                },
+                {
+                    data: 'gate_in',
+                    name: 'gate_in',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'stripping',
+                    name: 'stripping',
+                    orderable: false,
+                    searchable: false
+                },
+                {
+                    data: 'buang_empty',
+                    name: 'buang_empty',
+                    orderable: false,
+                    searchable: false
+                }
+            ]
+        });
+
+    });
+
 $(document).ready(function(){
     $('#kegiatan').on('change', function(){
         let kegiatan = $(this).val();
