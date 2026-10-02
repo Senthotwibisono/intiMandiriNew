@@ -235,44 +235,79 @@ class PhotoController extends Controller
         }
     
     }
+    
     public function storeContainerFcl(Request $request)
     {
-        $cont = ContF::where('id', $request->id)->first();
+        $cont = ContF::where('id', $request->id)->first();  
+
         try {
-            if ($cont) {
+            if (!$cont) {
+                return redirect()->back()->with('status', [
+                    'type' => 'error',
+                    'message' => 'Container tidak ditemukan'
+                ]);
+            }   
+
+            /*
+            |--------------------------------------------------------------------------
+            | Update data container
+            |--------------------------------------------------------------------------
+            | Tetap mengikuti aturan segel merah.
+            */
+            if ($cont->flag_segel_merah !== 'Y') {
                 $cont->update([
                     'nopol' => $request->nopol ?? $cont->nopol,
                     'nopol_mty' => $request->nopol_mty,
                     'tglkeluar' => $request->tglkeluar,
                     'jamkeluar' => $request->jamkeluar,
-                ]);
-            }
-            if ($request->hasFile('photos')) {
-                foreach ($request->file('photos') as $photo) {
-                    $fileName = $photo->getClientOriginalName();
-                    $photo->storeAs('imagesInt', $fileName, 'public'); 
-                    $newPhoto = Photo::create([
-                        'master_id' => $cont->id,
-                        'type' => 'fcl',
-                        'action' => $request->action,
-                        'photo' => $fileName,
-                        'detil'=> $request->detil,
-                    ]);
-                }
-            }
+                ]); 
 
-            if ($request->has('tglmasuk')) {
-                if ($request->tglmasuk != null) {
+                if ($request->has('tglmasuk') && $request->tglmasuk != null) {
                     $cont->update([
                         'tglmasuk' => $request->tglmasuk,
                         'jammasuk' => $request->jammasuk,
                     ]);
                 }
-            }
-            return redirect()->back()->with('status', ['type'=>'success', 'message'=>'Data Berhasil di Update']);
-            
-        } catch (\Throwable $e) {
-            return redirect()->back()->with('status', ['type'=>'error', 'message'=>'Oopss, Something Wrong'. $e->getMessage()]);
+            }   
+
+            /*
+            |--------------------------------------------------------------------------
+            | Upload foto
+            |--------------------------------------------------------------------------
+            | Foto TETAP boleh di-upload walaupun flag_segel_merah = Y.
+            */
+            if ($request->hasFile('photos')) {
+                foreach ($request->file('photos') as $photo) {  
+
+                    $fileName = $photo->getClientOriginalName();    
+
+                    $photo->storeAs(
+                        'imagesInt',
+                        $fileName,
+                        'public'
+                    );  
+
+                    Photo::create([
+                        'master_id' => $cont->id,
+                        'type'      => 'fcl',
+                        'action'    => $request->action,
+                        'photo'     => $fileName,
+                        'detil'     => $request->detil,
+                    ]);
+                }
+            }   
+
+            return redirect()->back()->with('status', [
+                'type' => 'success',
+                'message' => 'Data Berhasil di Update'
+            ]); 
+
+        } catch (\Throwable $e) {   
+
+            return redirect()->back()->with('status', [
+                'type' => 'error',
+                'message' => 'Oopss, Something Wrong ' . $e->getMessage()
+            ]);
         }
     }
 
