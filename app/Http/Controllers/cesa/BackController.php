@@ -1858,7 +1858,7 @@ class BackController extends Controller
                                         'kd_dok_inout' => $pabean->kd_dok_inout,
                                         'no_dok' => $pabean->no_dok_inout,
                                         'tgl_dok' => $tglDok,
-                                        'status_bc' => $statusBC,
+                                        'status_bc' => 'HOLD',
                                         'alasan_hold' => $alasanFinal,
                                         'cust_id' => $cust ? $cust->id : ($newCust ? $newCust->id : null),
                                     ]);
@@ -2074,7 +2074,7 @@ class BackController extends Controller
                                        'kd_dok_inout' => $pabean->kd_dok_inout,
                                        'no_dok' => $pabean->no_dok_inout,
                                        'tgl_dok' => $tglDok,
-                                       'status_bc' => 'release',
+                                       'status_bc' => 'HOLD',
                                        'alasan_hold' => 'Bukan Dokume SPPB, , ',
                                        'cust_id' => $cust->id,
                                    ]);
@@ -2255,7 +2255,7 @@ class BackController extends Controller
                                         'kd_dok_inout' => $manual->kd_dok_inout,
                                         'no_dok' => $manual->no_dok_inout,
                                         'tgl_dok' => Carbon::parse($manual->tgl_dok_inout)->format('Y-m-d'),
-                                        'status_bc' => $statusBC,
+                                        'status_bc' => 'HOLD',
                                         'alasan_hold' => $alasanFinal,
                                         'cust_id' => $cust?->id,
                                     ]);
