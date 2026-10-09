@@ -45,7 +45,7 @@ use App\Models\Customer;
 class BackController extends Controller
 {
     private $username = 'tpsimut';
-    private $password = 'Jakarta#20211';
+    private $password = 'Jakarta#2026';
     private $apiKey   = '2d404382-449c-46bc-9084-d256a8cb3ab1'; // jika diperlukan
     private $baseUrl   = 'https://apis-gw.beacukai.go.id/v1/openapi-tpsonline'; // jika diperlukan
 
