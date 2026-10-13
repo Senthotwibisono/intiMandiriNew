@@ -8,7 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Str;
 
 use App\Models\ContainerFCL as ContF;
-use App\Models\Container as Cont;
+use App\Models\Container as ContL;
 
 use GuzzleHttp\Client;
 
@@ -51,10 +51,24 @@ class ApiController extends Controller
         
         $plp = $request->plpNumber;
         $contNumber = $request->containerNumber;
+        // $cont = ContF::where('nocontainer', $contNumber)
+        //     ->whereHas('job', function ($query) use ($plp) {
+        //         $query->where('noplp', $plp);
+        //     })->first();
+
         $cont = ContF::where('nocontainer', $contNumber)
             ->whereHas('job', function ($query) use ($plp) {
                 $query->where('noplp', $plp);
-            })->first();
+            })
+            ->first();      
+
+        if (!$cont) {
+            $cont = ContL::where('nocontainer', $contNumber)
+                ->whereHas('job', function ($query) use ($plp) {
+                    $query->where('noplp', $plp);
+                })
+                ->first();
+        }
 
         if ($cont) {
 
